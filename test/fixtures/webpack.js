@@ -58,7 +58,7 @@
   },
   function (e, t, i) {
     const a = i(1);
-    e.exports.colors = '#FBC02D';
+    e.exports.color = '#FBC02D';
     t.a = 3;
   },
   function (e, t, i) {

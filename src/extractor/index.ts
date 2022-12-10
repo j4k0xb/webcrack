@@ -7,7 +7,7 @@ export type BundleType = 'webpack';
 export interface BundleInfo {
   type: BundleType;
   entryId: number;
-  modules: Module[];
+  modules: Map<number, Module>;
 }
 
 export function getBundleInfo(ast: t.File): BundleInfo | undefined {

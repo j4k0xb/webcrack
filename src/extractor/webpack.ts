@@ -4,7 +4,10 @@ import * as m from '@codemod/matchers';
 import assert from 'assert';
 import { Module } from './module';
 
-export function getModules(ast: t.File): { entryId: number, modules: Module[] } {
+export function getModules(ast: t.File): {
+  entryId: number;
+  modules: Map<number, Module>;
+} {
   const entryId = findEntryId(ast);
   const modules = extractModules(ast, entryId);
 
@@ -36,8 +39,8 @@ function findEntryId(ast: t.File) {
   return entryId;
 }
 
-function extractModules(ast: t.File, entryId: number): Module[] {
-  const modules: Module[] = [];
+function extractModules(ast: t.File, entryId: number): Map<number, Module> {
+  const modules = new Map<number, Module>();
 
   traverse(ast, {
     CallExpression(path) {
@@ -59,11 +62,7 @@ function extractModules(ast: t.File, entryId: number): Module[] {
 
       factoriesPath.get('elements').forEach((factoryPath, index) => {
         if (factoryPath.isFunctionExpression()) {
-          modules.push({
-            id: index,
-            ast: t.file(t.program(factoryPath.node.body.body)),
-            isEntry: index === entryId,
-          });
+          modules.set(index, new Module(index, factoryPath, index === entryId));
         }
       });
 
