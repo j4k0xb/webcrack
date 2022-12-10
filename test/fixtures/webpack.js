@@ -50,10 +50,18 @@
       return Object.prototype.hasOwnProperty.call(e, t);
     }),
     (n.p = ''),
-    n((n.s = 1));
+    n((n.s = 2));
 })([
   ,
   function (e, t, i) {
-    const a = i(4);
+    const a = i(3);
+  },
+  function (e, t, i) {
+    const a = i(1);
+    e.exports.colors = '#FBC02D';
+    t.a = 3;
+  },
+  function (e, t, i) {
+    e.exports = 4;
   },
 ]);
