@@ -25,8 +25,8 @@
     "@types/babel__generator": "^7.6.4",
     "@types/babel__template": "^7.4.1",
     "@types/babel__traverse": "^7.18.3",
-    "@types/node": "^18.11.12",
+    "@types/node": "^18.11.13",
     "typescript": "^4.9.4",
-    "vitest": "^0.25.6"
+    "vitest": "^0.25.7"
   }
 }
