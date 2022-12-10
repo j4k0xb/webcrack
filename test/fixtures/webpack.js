@@ -58,6 +58,7 @@
   },
   function (e, t, i) {
     const a = i(1);
+    const module = 1;
     e.exports.color = '#FBC02D';
     t.a = 3;
   },
