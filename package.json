@@ -1,0 +1,32 @@
+{
+  "name": "webcrack",
+  "version": "1.0.0",
+  "description": "",
+  "author": "j4k0xb",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node .",
+    "test": "vitest"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@babel/generator": "^7.20.5",
+    "@babel/parser": "^7.20.5",
+    "@babel/template": "^7.18.10",
+    "@babel/traverse": "^7.20.5",
+    "@babel/types": "^7.20.5",
+    "@codemod/matchers": "^1.2.1"
+  },
+  "devDependencies": {
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__template": "^7.4.1",
+    "@types/babel__traverse": "^7.18.3",
+    "@types/node": "^18.11.12",
+    "typescript": "^4.9.4",
+    "vitest": "^0.25.6"
+  }
+}
