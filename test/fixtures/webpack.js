@@ -60,6 +60,11 @@
     const a = i(1);
     const module = 1;
     e.exports.color = '#FBC02D';
+    {
+      const module = 2;
+      console.log(module);
+      console.log(e);
+    }
     t.a = 3;
   },
   function (e, t, i) {

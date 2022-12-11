@@ -19,9 +19,16 @@ export class Module {
   renameParams() {
     const FACTORY_PARAM_NAMES = ['module', 'exports', 'require'];
 
+    // Rename existing bindings with this name so there's no risk of conflicts
+    this.ast.traverse({
+      Identifier(path) {
+        if (FACTORY_PARAM_NAMES.includes(path.node.name)) {
+          path.scope.rename(path.node.name);
+        }
+      },
+    });
+
     this.ast.node.params.forEach((param, index) => {
-      // Rename existing bindings with this name so there's no risk of conflicts
-      this.ast.scope.rename(FACTORY_PARAM_NAMES[index]);
       this.ast.scope.rename(
         (param as t.Identifier).name,
         FACTORY_PARAM_NAMES[index]

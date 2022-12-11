@@ -2,10 +2,8 @@ import * as t from '@babel/types';
 import { Module } from './module';
 import * as webpack from './webpack';
 
-export type BundleType = 'webpack';
-
 export interface BundleInfo {
-  type: BundleType;
+  type: 'webpack' | 'webpack-jsonp' | 'parcel';
   entryId: number;
   modules: Map<number, Module>;
 }

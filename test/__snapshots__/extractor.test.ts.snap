@@ -4,6 +4,11 @@ exports[`extractor > extracts module information 1`] = `
 "const a = i(1);
 const module = 1;
 e.exports.color = '#FBC02D';
+{
+  const module = 2;
+  console.log(module);
+  console.log(e);
+}
 t.a = 3;"
 `;
 
@@ -11,5 +16,10 @@ exports[`extractor > renames factory params 1`] = `
 "const a = require(1);
 const _module = 1;
 module.exports.color = '#FBC02D';
+{
+  const _module2 = 2;
+  console.log(_module2);
+  console.log(module);
+}
 exports.a = 3;"
 `;
