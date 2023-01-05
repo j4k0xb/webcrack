@@ -14,7 +14,7 @@ declare module 'vitest' {
 
 beforeEach(async context => {
   context.ast = parse(
-    await readFile(join(__dirname, 'fixtures', 'webpack.js'), 'utf8')
+    await readFile(join(__dirname, 'samples', 'webpack.js'), 'utf8')
   );
   context.info = getBundleInfo(context.ast)!;
 });
