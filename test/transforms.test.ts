@@ -1,6 +1,6 @@
 import generate from '@babel/generator';
 import * as t from '@babel/types';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import computedProperties from '../src/transforms/computedProperties';
 import sequence from '../src/transforms/sequence';
 import splitVariableDeclarations from '../src/transforms/splitVariableDeclarations';
@@ -13,7 +13,7 @@ expect.addSnapshotSerializer({
 
 describe('sequence', () => {
   const expect = transformer(sequence);
-  it('to statements', () =>
+  test('to statements', () =>
     expect(`
       if (a) b(), c();
     `).toMatchInlineSnapshot(`
@@ -23,7 +23,7 @@ describe('sequence', () => {
       }
     `));
 
-  it('rearrange from return', () =>
+  test('rearrange from return', () =>
     expect(`
       function f() {
         return a(), b(), c();
@@ -36,7 +36,7 @@ describe('sequence', () => {
       }
     `));
 
-  it('rearrange from if', () =>
+  test('rearrange from if', () =>
     expect(`
       function f() {
         if (a(), b()) c();
@@ -48,7 +48,7 @@ describe('sequence', () => {
       }
     `));
 
-  it('rearrange from for-in', () =>
+  test('rearrange from for-in', () =>
     expect(`
       for (let key in a = 1, object) {}
     `).toMatchInlineSnapshot(`
@@ -59,7 +59,7 @@ describe('sequence', () => {
 
 describe('splitVariableDeclarations', () => {
   const expect = transformer(splitVariableDeclarations);
-  it('split variable declaration', () =>
+  test('split variable declaration', () =>
     expect(`
       const a = 1, b = 2, c = 3;
     `).toMatchInlineSnapshot(`
@@ -71,12 +71,12 @@ describe('splitVariableDeclarations', () => {
 
 describe('computedProperties', () => {
   const expect = transformer(computedProperties);
-  it('convert to identifier', () =>
+  test('convert to identifier', () =>
     expect(`
       console["log"]("hello");
     `).toMatchInlineSnapshot('console.log("hello");'));
 
-  it('ignore invalid identifier', () =>
+  test('ignore invalid identifier', () =>
     expect(`
       console["1"]("hello");
     `).toMatchInlineSnapshot('console["1"]("hello");'));
