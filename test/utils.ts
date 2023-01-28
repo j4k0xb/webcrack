@@ -1,4 +1,3 @@
-import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import { expect } from 'vitest';
@@ -8,6 +7,6 @@ export function transformer(transform: Transform) {
   return (actualCode: string) => {
     const ast = parse(actualCode);
     traverse(ast, transform.visitor, undefined, { changes: 0 });
-    return expect(generate(ast).code);
+    return expect(ast);
   };
 }
