@@ -2,7 +2,7 @@ import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
-export default function (ast: t.Node) {
+export default (ast: t.Node) => {
   traverse(ast, {
     ExpressionStatement(path) {
       if (t.isSequenceExpression(path.node.expression)) {
@@ -43,4 +43,4 @@ export default function (ast: t.Node) {
       }
     },
   });
-}
+};

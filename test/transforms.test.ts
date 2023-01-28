@@ -1,7 +1,8 @@
 import * as t from '@babel/types';
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'vitest';
 import sequence from '../src/transforms/sequence';
-import { expectTransform } from './utils';
+import splitVariableDeclarations from '../src/transforms/splitVariableDeclarations';
+import { transformer } from './utils';
 
 declare global {
   namespace Vi {
@@ -12,9 +13,9 @@ declare global {
 }
 
 describe('sequence', () => {
-  expect.setState({ transform: sequence });
+  const expect = transformer(sequence);
   it('to statements', () =>
-    expectTransform(`
+    expect(`
       if (a) b(), c();
     `).toMatchInlineSnapshot(`
       "if (a) {
@@ -24,7 +25,7 @@ describe('sequence', () => {
     `));
 
   it('rearrange from return', () =>
-    expectTransform(`
+    expect(`
       function f() {
         return a(), b(), c();
       }
@@ -37,7 +38,7 @@ describe('sequence', () => {
     `));
 
   it('rearrange from if', () =>
-    expectTransform(`
+    expect(`
       function f() {
         if (a(), b()) c();
       }
@@ -49,10 +50,22 @@ describe('sequence', () => {
     `));
 
   it('rearrange from for-in', () =>
-    expectTransform(`
+    expect(`
       for (let key in a = 1, object) {}
     `).toMatchInlineSnapshot(`
       "a = 1;
       for (let key in object) {}"
+    `));
+});
+
+describe('split variable declaration', () => {
+  const expect = transformer(splitVariableDeclarations);
+  it('split variable declaration', () =>
+    expect(`
+      const a = 1, b = 2, c = 3;
+    `).toMatchInlineSnapshot(`
+      "const a = 1;
+      const b = 2;
+      const c = 3;"
     `));
 });
