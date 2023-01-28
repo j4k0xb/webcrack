@@ -1,8 +1,10 @@
-import traverse from '@babel/traverse';
 import * as t from '@babel/types';
+import { Tag, Transform } from '.';
 
-export default (ast: t.Node) => {
-  traverse(ast, {
+export default {
+  name: 'computedProperties',
+  tags: [Tag.SAFE, Tag.PREPROCESS],
+  visitor: {
     MemberExpression(path) {
       const { node } = path;
 
@@ -13,8 +15,9 @@ export default (ast: t.Node) => {
       ) {
         node.computed = false;
         node.property = t.identifier(node.property.value);
+        this.changes++;
       }
     },
     noScope: true,
-  });
-};
+  },
+} satisfies Transform;

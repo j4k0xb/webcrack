@@ -1,8 +1,10 @@
-import traverse from '@babel/traverse';
 import * as t from '@babel/types';
+import { Tag, Transform } from '.';
 
-export default (ast: t.Node) => {
-  traverse(ast, {
+export default {
+  name: 'splitVariableDeclarations',
+  tags: [Tag.SAFE, Tag.PREPROCESS],
+  visitor: {
     VariableDeclaration(path) {
       if (path.node.declarations.length > 1) {
         path.replaceWithMultiple(
@@ -10,7 +12,8 @@ export default (ast: t.Node) => {
             t.variableDeclaration(path.node.kind, [declaration])
           )
         );
+        this.changes++;
       }
     },
-  });
-};
+  },
+} satisfies Transform;
