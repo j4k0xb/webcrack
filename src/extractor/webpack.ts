@@ -33,6 +33,7 @@ function findEntryId(ast: t.File) {
         path.stop();
       }
     },
+    noScope: true,
   });
 
   assert(entryId !== undefined, 'No entry id found');

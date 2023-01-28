@@ -42,5 +42,6 @@ export default (ast: t.Node) => {
         path.insertBefore(statements);
       }
     },
+    noScope: true,
   });
 };

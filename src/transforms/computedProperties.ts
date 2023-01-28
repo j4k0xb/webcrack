@@ -15,5 +15,6 @@ export default (ast: t.Node) => {
         node.property = t.identifier(node.property.value);
       }
     },
+    noScope: true,
   });
 };
