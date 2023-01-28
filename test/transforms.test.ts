@@ -1,5 +1,6 @@
 import * as t from '@babel/types';
 import { describe, it } from 'vitest';
+import computedProperties from '../src/transforms/computedProperties';
 import sequence from '../src/transforms/sequence';
 import splitVariableDeclarations from '../src/transforms/splitVariableDeclarations';
 import { transformer } from './utils';
@@ -58,7 +59,7 @@ describe('sequence', () => {
     `));
 });
 
-describe('split variable declaration', () => {
+describe('splitVariableDeclarations', () => {
   const expect = transformer(splitVariableDeclarations);
   it('split variable declaration', () =>
     expect(`
@@ -68,4 +69,17 @@ describe('split variable declaration', () => {
       const b = 2;
       const c = 3;"
     `));
+});
+
+describe('computedProperties', () => {
+  const expect = transformer(computedProperties);
+  it('convert to identifier', () =>
+    expect(`
+      console['log']('hello');
+    `).toMatchInlineSnapshot('"console.log(\'hello\');"'));
+
+  it('ignore invalid identifier', () =>
+    expect(`
+      console["1"]('hello');
+    `).toMatchInlineSnapshot('"console[\\"1\\"](\'hello\');"'));
 });
