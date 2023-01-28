@@ -5,7 +5,6 @@
   "author": "j4k0xb",
   "license": "MIT",
   "main": "dist/index.js",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
