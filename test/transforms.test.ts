@@ -1,15 +1,8 @@
-import generate from '@babel/generator';
-import * as t from '@babel/types';
-import { describe, expect, test } from 'vitest';
+import { describe, test } from 'vitest';
 import computedProperties from '../src/transforms/computedProperties';
 import sequence from '../src/transforms/sequence';
 import splitVariableDeclarations from '../src/transforms/splitVariableDeclarations';
 import { transformer } from './utils';
-
-expect.addSnapshotSerializer({
-  serialize: val => generate(val).code,
-  test: val => t.isNode(val),
-});
 
 describe('sequence', () => {
   const expect = transformer(sequence);

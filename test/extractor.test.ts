@@ -27,12 +27,12 @@ describe('extractor', async () => {
   test('extract module information', ({ info }) => {
     const entryModule = info.modules.get(info.entryId)!;
     expect(info.modules).toHaveLength(3);
-    expect(entryModule.getCode()).toMatchSnapshot();
+    expect(entryModule.getAST()).toMatchSnapshot();
   });
 
   test('rename factory params', ({ info }) => {
     const entryModule = info.modules.get(info.entryId)!;
     entryModule.renameParams();
-    expect(entryModule.getCode()).toMatchSnapshot();
+    expect(entryModule.getAST()).toMatchSnapshot();
   });
 });

@@ -1,7 +1,7 @@
 // Vitest Snapshot v1
 
-exports[`extractor > extracts module information 1`] = `
-"const a = i(1);
+exports[`extractor > extract module information 1`] = `
+const a = i(1);
 const module = 1;
 e.exports.color = '#FBC02D';
 {
@@ -9,11 +9,11 @@ e.exports.color = '#FBC02D';
   console.log(module);
   console.log(e);
 }
-t.a = 3;"
+t.a = 3;
 `;
 
-exports[`extractor > renames factory params 1`] = `
-"const a = require(1);
+exports[`extractor > rename factory params 1`] = `
+const a = require(1);
 const _module = 1;
 module.exports.color = '#FBC02D';
 {
@@ -21,5 +21,5 @@ module.exports.color = '#FBC02D';
   console.log(_module2);
   console.log(module);
 }
-exports.a = 3;"
+exports.a = 3;
 `;
