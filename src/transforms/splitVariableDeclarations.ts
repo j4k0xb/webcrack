@@ -1,9 +1,9 @@
 import * as t from '@babel/types';
-import { Tag, Transform } from '.';
+import { Transform } from '.';
 
 export default {
   name: 'splitVariableDeclarations',
-  tags: [Tag.SAFE, Tag.PREPROCESS],
+  tags: ['safe', 'preprocess'],
   visitor: {
     VariableDeclaration(path) {
       if (path.node.declarations.length > 1) {

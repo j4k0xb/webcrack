@@ -1,10 +1,10 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Tag, Transform } from '.';
+import { Transform } from '.';
 
 export default {
   name: 'sequence',
-  tags: [Tag.SAFE, Tag.PREPROCESS],
+  tags: ['safe', 'preprocess'],
   visitor: {
     ExpressionStatement(path) {
       if (t.isSequenceExpression(path.node.expression)) {
@@ -16,10 +16,8 @@ export default {
       }
     },
     ReturnStatement(path) {
-      const sequence = m.capture(m.sequenceExpression());
-      const matcher = m.returnStatement(sequence);
-      if (matcher.match(path.node)) {
-        const expressions = sequence.current!.expressions;
+      if (t.isSequenceExpression(path.node.argument)) {
+        const expressions = path.node.argument.expressions;
         path.node.argument = expressions.pop();
         const statements = expressions.map(expr => t.expressionStatement(expr));
         path.insertBefore(statements);
@@ -27,10 +25,8 @@ export default {
       }
     },
     IfStatement(path) {
-      const sequence = m.capture(m.sequenceExpression());
-      const matcher = m.ifStatement(sequence);
-      if (matcher.match(path.node)) {
-        const expressions = sequence.current!.expressions;
+      if (t.isSequenceExpression(path.node.test)) {
+        const expressions = path.node.test.expressions;
         path.node.test = expressions.pop()!;
         const statements = expressions.map(expr => t.expressionStatement(expr));
         path.insertBefore(statements);

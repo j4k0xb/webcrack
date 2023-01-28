@@ -11,12 +11,8 @@ export const transforms: Transform[] = [
 
 export interface Transform {
   name: string;
+  tags: Tag[];
   visitor: TraverseOptions<{ changes: number }>;
-  tags?: Tag[];
 }
 
-export enum Tag {
-  SAFE,
-  UNSAFE,
-  PREPROCESS,
-}
+export type Tag = 'safe' | 'unsafe' | 'preprocess';

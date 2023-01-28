@@ -1,12 +1,13 @@
 import generate from '@babel/generator';
 import { parse } from '@babel/parser';
-import * as t from '@babel/types';
+import traverse from '@babel/traverse';
 import { expect } from 'vitest';
+import { Transform } from '../src/transforms';
 
-export function transformer(transform: (ast: t.Node) => void) {
+export function transformer(transform: Transform) {
   return (actualCode: string) => {
     const ast = parse(actualCode);
-    transform(ast);
+    traverse(ast, transform.visitor, undefined, { changes: 0 });
     return expect(generate(ast).code);
   };
 }
