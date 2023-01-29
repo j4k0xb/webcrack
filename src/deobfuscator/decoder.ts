@@ -3,10 +3,39 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { StringArray } from './stringArray';
 
-interface Decoder {
-  path: NodePath<t.FunctionDeclaration>;
-  references: NodePath[];
+class Decoder {
   name: string;
+
+  constructor(public path: NodePath<t.FunctionDeclaration>) {
+    this.name = path.node.id!.name;
+  }
+
+  /**
+   * replaces all references to `var e = decode;` with `decode`
+   */
+  inlineAliasVars() {
+    while (true) {
+      this.path.parentPath.scope.crawl();
+      const references =
+        this.path.parentPath.scope.bindings[this.name].referencePaths;
+
+      let changes = 0;
+      for (const path of references) {
+        const varName = m.capture(m.anyString());
+        const matcher = m.variableDeclarator(
+          m.identifier(varName),
+          m.identifier(this.name)
+        );
+        if (matcher.match(path.parent)) {
+          path.parentPath!.scope.rename(varName.current!, this.name);
+          // remove the var declaration
+          path.parentPath!.parentPath!.remove();
+          changes++;
+        }
+      }
+      if (changes === 0) return;
+    }
+  }
 }
 
 export function findDecoder(stringArray: StringArray): Decoder | undefined {
@@ -41,15 +70,6 @@ export function findDecoder(stringArray: StringArray): Decoder | undefined {
         )
       )
     );
-    if (matcher.match(decoderFn.node)) {
-      const references =
-        decoderFn.parentPath.scope.bindings[functionName.current!]
-          .referencePaths;
-      return {
-        path: decoderFn,
-        references,
-        name: functionName.current!,
-      };
-    }
+    if (matcher.match(decoderFn.node)) return new Decoder(decoderFn);
   }
 }
