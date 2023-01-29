@@ -19,7 +19,6 @@ export default (ast: t.Node) => {
           e => (e as t.StringLiteral).value
         );
         const name = functionName.current!;
-        path.parentPath.scope.crawl();
         let references = path.parentPath.scope.bindings[name].referencePaths;
         // Skip references in the same function
         references = references.filter(ref => !ref.findParent(p => p === path));
@@ -27,7 +26,6 @@ export default (ast: t.Node) => {
         path.stop();
       }
     },
-    noScope: true,
   });
 
   return result;
@@ -36,6 +34,7 @@ export default (ast: t.Node) => {
 const functionName = m.capture(m.anyString());
 const arrayName = m.capture(m.anyString());
 const array = m.capture(m.arrayExpression(m.arrayOf(m.stringLiteral())));
+// getStringArray = function () { return n; };
 const functionAssignment = m.assignmentExpression(
   '=',
   m.identifier(m.fromCapture(functionName)),
@@ -50,14 +49,20 @@ const functionAssignment = m.assignmentExpression(
 const variableDeclaration = m.variableDeclaration(undefined, [
   m.variableDeclarator(m.identifier(arrayName), array),
 ]);
+// function getStringArray() { ... }
 const matcher = m.functionDeclaration(
   m.identifier(functionName),
   [],
   m.or(
+    // var array = ["hello", "world"];
+    // return (getStringArray = function () { return array; })();
     m.blockStatement([
       variableDeclaration,
       m.returnStatement(m.callExpression(functionAssignment)),
     ]),
+    // var array = ["hello", "world"];
+    // getStringArray = function () { return n; });
+    // return getStringArray();
     m.blockStatement([
       variableDeclaration,
       m.expressionStatement(functionAssignment),
