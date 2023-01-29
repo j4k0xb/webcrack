@@ -2,7 +2,7 @@ import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
-interface StringArray {
+export interface StringArray {
   path: NodePath<t.FunctionDeclaration>;
   references: NodePath[];
   name: string;
