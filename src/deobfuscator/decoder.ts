@@ -38,6 +38,7 @@ class Decoder {
   }
 }
 
+// TODO: support base64/rc4 by only searching for var array = getStringArray(); and array member access
 export function findDecoder(stringArray: StringArray): Decoder | undefined {
   for (const path of stringArray.references) {
     const decoderFn = path.findParent(p =>
@@ -70,6 +71,9 @@ export function findDecoder(stringArray: StringArray): Decoder | undefined {
         )
       )
     );
-    if (matcher.match(decoderFn.node)) return new Decoder(decoderFn);
+    if (matcher.match(decoderFn.node)) {
+      decoderFn.parentPath.scope.rename(decoderFn.node.id!.name, '__DECODE__');
+      return new Decoder(decoderFn);
+    }
   }
 }

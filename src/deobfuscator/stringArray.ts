@@ -9,7 +9,7 @@ export interface StringArray {
   strings: string[];
 }
 
-export default (ast: t.Node) => {
+export function findStringArray(ast: t.Node) {
   let result: StringArray | undefined;
 
   traverse(ast, {
@@ -20,16 +20,17 @@ export default (ast: t.Node) => {
         );
         const name = functionName.current!;
         let references = path.parentPath.scope.bindings[name].referencePaths;
-        // Skip references in the same function
+        // Skip references in the getStringArray function itself
         references = references.filter(ref => !ref.findParent(p => p === path));
-        result = { path, references, name, strings };
+        path.parentPath.scope.rename(name, '__STRING_ARRAY__');
+        result = { path, references, name: '__STRING_ARRAY__', strings };
         path.stop();
       }
     },
   });
 
   return result;
-};
+}
 
 const functionName = m.capture(m.anyString());
 const arrayName = m.capture(m.anyString());

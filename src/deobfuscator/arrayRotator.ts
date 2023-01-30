@@ -27,6 +27,7 @@ export function findArrayRotator(ast: t.Node) {
         path.stop();
       }
     },
+    noScope: true,
   });
 
   return result;
