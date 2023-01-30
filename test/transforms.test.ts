@@ -123,3 +123,13 @@ describe('extractTernaryCalls', () => {
       log(p ? 8590 : 5814);
     `));
 });
+
+describe('literals', () => {
+  test('string', ({ expectTransform }) =>
+    expectTransform(`const a = "\\x61"`).toMatchInlineSnapshot(
+      'const a = "a";'
+    ));
+
+  test('number', ({ expectTransform }) =>
+    expectTransform(`const a = 0x1;`).toMatchInlineSnapshot('const a = 1;'));
+});
