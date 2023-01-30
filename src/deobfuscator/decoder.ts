@@ -14,6 +14,7 @@ export class Decoder {
    * replaces all references to `var e = decode;` with `decode`
    */
   inlineAliasVars() {
+    // TODO: improve performance
     while (true) {
       this.path.parentPath.scope.crawl();
       const references =

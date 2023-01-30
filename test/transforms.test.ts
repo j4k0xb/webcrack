@@ -1,13 +1,28 @@
-import { describe, test } from 'vitest';
-import computedProperties from '../src/transforms/computedProperties';
-import sequence from '../src/transforms/sequence';
-import splitVariableDeclarations from '../src/transforms/splitVariableDeclarations';
-import { transformer } from './utils';
+import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
+import { assert, beforeEach, describe, expect, test } from 'vitest';
+import { transforms } from '../src/transforms';
+
+declare module 'vitest' {
+  export interface TestContext {
+    expectTransform: (actualCode: string) => Vi.Assertion<Node>;
+    state: { changes: number };
+  }
+}
+
+beforeEach((context, suite) => {
+  const transform = transforms.find(t => t.name === suite.name);
+  assert(transform, `Transform ${suite.name} not found`);
+  context.expectTransform = (actualCode: string) => {
+    const ast = parse(actualCode);
+    traverse(ast, transform.visitor, undefined, { changes: 0 });
+    return expect(ast);
+  };
+});
 
 describe('sequence', () => {
-  const expect = transformer(sequence);
-  test('to statements', () =>
-    expect(`
+  test('to statements', ({ expectTransform }) =>
+    expectTransform(`
       if (a) b(), c();
     `).toMatchInlineSnapshot(`
       if (a) {
@@ -16,8 +31,8 @@ describe('sequence', () => {
       }
     `));
 
-  test('rearrange from return', () =>
-    expect(`
+  test('rearrange from return', ({ expectTransform }) =>
+    expectTransform(`
       function f() {
         return a(), b(), c();
       }
@@ -29,8 +44,8 @@ describe('sequence', () => {
       }
     `));
 
-  test('rearrange from if', () =>
-    expect(`
+  test('rearrange from if', ({ expectTransform }) =>
+    expectTransform(`
       function f() {
         if (a(), b()) c();
       }
@@ -41,8 +56,8 @@ describe('sequence', () => {
       }
     `));
 
-  test('rearrange from for-in', () =>
-    expect(`
+  test('rearrange from for-in', ({ expectTransform }) =>
+    expectTransform(`
       for (let key in a = 1, object) {}
     `).toMatchInlineSnapshot(`
       a = 1;
@@ -51,9 +66,8 @@ describe('sequence', () => {
 });
 
 describe('splitVariableDeclarations', () => {
-  const expect = transformer(splitVariableDeclarations);
-  test('split variable declaration', () =>
-    expect(`
+  test('split variable declaration', ({ expectTransform }) =>
+    expectTransform(`
       const a = 1, b = 2, c = 3;
     `).toMatchInlineSnapshot(`
       const a = 1;
@@ -63,14 +77,13 @@ describe('splitVariableDeclarations', () => {
 });
 
 describe('computedProperties', () => {
-  const expect = transformer(computedProperties);
-  test('convert to identifier', () =>
-    expect(`
+  test('convert to identifier', ({ expectTransform }) =>
+    expectTransform(`
       console["log"]("hello");
     `).toMatchInlineSnapshot('console.log("hello");'));
 
-  test('ignore invalid identifier', () =>
-    expect(`
+  test('ignore invalid identifier', ({ expectTransform }) =>
+    expectTransform(`
       console["1"]("hello");
     `).toMatchInlineSnapshot('console["1"]("hello");'));
 });

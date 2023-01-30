@@ -1,10 +1,11 @@
 {
   "name": "webcrack",
   "version": "1.0.0",
-  "description": "",
+  "description": "Deobfuscate, unminify and unpack bundled code",
   "author": "j4k0xb",
   "license": "MIT",
   "main": "dist/index.js",
+  "bin": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
