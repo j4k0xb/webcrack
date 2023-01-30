@@ -74,6 +74,16 @@ describe('splitVariableDeclarations', () => {
       const b = 2;
       const c = 3;
     `));
+
+  test('ddont split in for loop', ({ expectTransform }) =>
+    expectTransform(`
+      for (let i = 0, j = 1; i < 10; i++, j++) var a, b;
+    `).toMatchInlineSnapshot(`
+      for (let i = 0, j = 1; i < 10; i++, j++) {
+        var a;
+        var b;
+      }
+    `));
 });
 
 describe('computedProperties', () => {
