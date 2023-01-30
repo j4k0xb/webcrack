@@ -1,8 +1,9 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { infiniteLoop } from '../utils/matcher';
 
-interface ArrayRotator {
+export interface ArrayRotator {
   path: NodePath<t.ExpressionStatement>;
 }
 /**
@@ -50,7 +51,6 @@ const pushShift = m.callExpression(
     ),
   ]
 );
-
 const matcher = m.expressionStatement(
   m.callExpression(
     m.functionExpression(
@@ -58,19 +58,20 @@ const matcher = m.expressionStatement(
       m.anything(),
       m.blockStatement(
         m.anyList<t.Statement>(
-          // = decodeFn
+          // var decodeAlias = decodeFn;
           m.variableDeclaration(),
-          // = array
+          // var array = getStringArray();
           m.variableDeclaration(undefined, [
             m.variableDeclarator(m.identifier(arrayName)),
           ]),
           m.zeroOrMore(),
-          // TODO: preprocess and check the more general while(true) case
-          m.forStatement(
-            null,
-            null,
-            null,
-            m.tryStatement(m.containerOf(pushShift), m.containerOf(pushShift))
+          infiniteLoop(
+            m.blockStatement([
+              m.tryStatement(
+                m.containerOf(pushShift),
+                m.containerOf(pushShift)
+              ),
+            ])
           )
         )
       )

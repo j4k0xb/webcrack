@@ -3,7 +3,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { StringArray } from './stringArray';
 
-class Decoder {
+export class Decoder {
   name: string;
 
   constructor(public path: NodePath<t.FunctionDeclaration>) {
@@ -38,7 +38,6 @@ class Decoder {
   }
 }
 
-// TODO: support base64/rc4 by only searching for var array = getStringArray(); and array member access
 export function findDecoder(stringArray: StringArray): Decoder | undefined {
   for (const path of stringArray.references) {
     const decoderFn = path.findParent(p =>
@@ -60,6 +59,7 @@ export function findDecoder(stringArray: StringArray): Decoder | undefined {
               m.callExpression(m.identifier(stringArray.name))
             ),
           ]),
+          m.zeroOrMore(),
           // var h = array[e]; return h;
           // or return array[e -= 254];
           m.containerOf(
@@ -67,7 +67,8 @@ export function findDecoder(stringArray: StringArray): Decoder | undefined {
               m.identifier(m.fromCapture(arrayName)),
               m.anything()
             )
-          )
+          ),
+          m.zeroOrMore()
         )
       )
     );
