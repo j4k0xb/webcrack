@@ -18,7 +18,8 @@
     "@babel/template": "^7.18.10",
     "@babel/traverse": "^7.20.5",
     "@babel/types": "^7.20.5",
-    "@codemod/matchers": "^1.2.1"
+    "@codemod/matchers": "^1.2.1",
+    "vm2": "^3.9.13"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
