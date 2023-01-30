@@ -3,7 +3,7 @@ import { Transform } from '.';
 export default {
   name: 'literals',
   tags: ['safe'],
-  visitor: {
+  visitor: () => ({
     StringLiteral(path) {
       delete path.node.extra;
       this.changes++;
@@ -13,5 +13,5 @@ export default {
       this.changes++;
     },
     noScope: true,
-  },
+  }),
 } satisfies Transform;

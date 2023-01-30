@@ -10,18 +10,21 @@ export class Decoder {
     this.name = path.node.id!.name;
   }
 
+  get references() {
+    return this.path.parentPath.scope.bindings[this.name].referencePaths;
+  }
+
   /**
    * replaces all references to `var e = decode;` with `decode`
    */
   inlineAliasVars() {
     // TODO: improve performance
+    // search recursively and delete only at the end
     while (true) {
       this.path.parentPath.scope.crawl();
-      const references =
-        this.path.parentPath.scope.bindings[this.name].referencePaths;
 
       let changes = 0;
-      for (const path of references) {
+      for (const path of this.references) {
         const varName = m.capture(m.anyString());
         const matcher = m.variableDeclarator(
           m.identifier(varName),

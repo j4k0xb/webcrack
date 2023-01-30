@@ -4,7 +4,7 @@ import { Transform } from '.';
 export default {
   name: 'computedProperties',
   tags: ['safe', 'preprocess'],
-  visitor: {
+  visitor: () => ({
     MemberExpression(path) {
       const { node } = path;
 
@@ -19,5 +19,5 @@ export default {
       }
     },
     noScope: true,
-  },
+  }),
 } satisfies Transform;

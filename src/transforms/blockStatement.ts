@@ -4,7 +4,7 @@ import { Transform } from '.';
 export default {
   name: 'blockStatement',
   tags: ['safe', 'preprocess'],
-  visitor: {
+  visitor: () => ({
     WhileStatement(path) {
       if (!t.isBlockStatement(path.node.body)) {
         path.node.body = t.blockStatement([path.node.body]);
@@ -40,5 +40,5 @@ export default {
       }
     },
     noScope: true,
-  },
+  }),
 } satisfies Transform;

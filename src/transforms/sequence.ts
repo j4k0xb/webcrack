@@ -5,7 +5,7 @@ import { Transform } from '.';
 export default {
   name: 'sequence',
   tags: ['safe', 'preprocess'],
-  visitor: {
+  visitor: () => ({
     ExpressionStatement(path) {
       if (t.isSequenceExpression(path.node.expression)) {
         const statements = path.node.expression.expressions.map(expr =>
@@ -45,5 +45,5 @@ export default {
       }
     },
     noScope: true,
-  },
+  }),
 } satisfies Transform;

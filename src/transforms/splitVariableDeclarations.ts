@@ -4,8 +4,7 @@ import { Transform } from '.';
 export default {
   name: 'splitVariableDeclarations',
   tags: ['safe', 'preprocess'],
-  visitor: {
-    // FIXME: dont in for loops
+  visitor: () => ({
     VariableDeclaration(path) {
       if (
         path.node.declarations.length > 1 &&
@@ -19,5 +18,5 @@ export default {
         this.changes++;
       }
     },
-  },
+  }),
 } satisfies Transform;

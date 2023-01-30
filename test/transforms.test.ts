@@ -5,7 +5,7 @@ import { transforms } from '../src/transforms';
 
 declare module 'vitest' {
   export interface TestContext {
-    expectTransform: (actualCode: string) => Vi.Assertion<Node>;
+    expectTransform: (actualCode: string, filter?: any) => Vi.Assertion<Node>;
     state: { changes: number };
   }
 }
@@ -13,9 +13,10 @@ declare module 'vitest' {
 beforeEach((context, suite) => {
   const transform = transforms.find(t => t.name === suite.name);
   assert(transform, `Transform ${suite.name} not found`);
-  context.expectTransform = (actualCode: string) => {
+  // TODO: type options
+  context.expectTransform = (actualCode: string, filter?: any) => {
     const ast = parse(actualCode);
-    traverse(ast, transform.visitor, undefined, { changes: 0 });
+    traverse(ast, transform.visitor(filter), undefined, { changes: 0 });
     return expect(ast);
   };
 });
@@ -96,4 +97,29 @@ describe('computedProperties', () => {
     expectTransform(`
       console["1"]("hello");
     `).toMatchInlineSnapshot('console["1"]("hello");'));
+});
+
+describe('extractTernaryCalls', () => {
+  test('extract all', ({ expectTransform }) =>
+    expectTransform(`
+      __DECODE__(100 < o ? 10753 : 5 < o ? 2382 : 2820);
+      log(p ? 8590 : 5814);
+    `).toMatchInlineSnapshot(
+      `
+      100 < o ? __DECODE__(10753) : 5 < o ? __DECODE__(2382) : __DECODE__(2820);
+      p ? log(8590) : log(5814);
+    `
+    ));
+
+  test('extract with filter', ({ expectTransform }) =>
+    expectTransform(
+      `
+    __DECODE__(100 < o ? 10753 : 5 < o ? 2382 : 2820);
+    log(p ? 8590 : 5814);
+    `,
+      options => options.callee === '__DECODE__'
+    ).toMatchInlineSnapshot(`
+      100 < o ? __DECODE__(10753) : 5 < o ? __DECODE__(2382) : __DECODE__(2820);
+      log(p ? 8590 : 5814);
+    `));
 });

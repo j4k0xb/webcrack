@@ -1,6 +1,7 @@
 import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import extractTernaryCalls from '../transforms/extractTernaryCalls';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import { findDecoder } from './decoder';
@@ -30,6 +31,13 @@ export default (ast: t.Node) => {
   console.log('Inlined decoder alias vars');
 
   const vm = createVM({ stringArray, rotator, decoder });
+
+  traverse(
+    ast,
+    extractTernaryCalls.visitor(options => options.callee === decoder.name),
+    undefined,
+    { changes: 0 }
+  );
 
   traverse(ast, {
     CallExpression(path) {
