@@ -76,7 +76,7 @@ describe('splitVariableDeclarations', () => {
       const c = 3;
     `));
 
-  test('ddont split in for loop', ({ expectTransform }) =>
+  test('dont split in for loop', ({ expectTransform }) =>
     expectTransform(`
       for (let i = 0, j = 1; i < 10; i++, j++) var a, b;
     `).toMatchInlineSnapshot(`
@@ -132,4 +132,31 @@ describe('literals', () => {
 
   test('number', ({ expectTransform }) =>
     expectTransform(`const a = 0x1;`).toMatchInlineSnapshot('const a = 1;'));
+});
+
+describe('blockStatement', () => {
+  test('convert to block statement', ({ expectTransform }) =>
+    expectTransform(`
+      if (a) b();
+      while (a) b();
+      for (;;) b();
+      for (const key in object) b();
+      for (const item of array) b();
+    `).toMatchInlineSnapshot(`
+      if (a) {
+        b();
+      }
+      while (a) {
+        b();
+      }
+      for (;;) {
+        b();
+      }
+      for (const key in object) {
+        b();
+      }
+      for (const item of array) {
+        b();
+      }
+    `));
 });
