@@ -5,7 +5,7 @@
   "author": "j4k0xb",
   "license": "MIT",
   "main": "dist/index.js",
-  "bin": "dist/index.js",
+  "bin": "dist/cli.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
@@ -20,6 +20,7 @@
     "@babel/traverse": "^7.20.5",
     "@babel/types": "^7.20.5",
     "@codemod/matchers": "^1.2.1",
+    "commander": "^10.0.0",
     "vm2": "^3.9.13"
   },
   "devDependencies": {
