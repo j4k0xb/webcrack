@@ -16,7 +16,7 @@ export function webcrack(code: string): WebcrackResult {
   const ast = parse(code);
 
   applyTransform(ast, deobfuscator);
-  applyTransforms(ast, ['formatting']);
+  applyTransforms(ast, ['readability']);
 
   const bundle = getBundleInfo(ast);
   console.log('Bundle:', bundle);

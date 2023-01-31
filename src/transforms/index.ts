@@ -26,4 +26,4 @@ export interface Transform<TOptions = any> {
   visitor?: (options?: TOptions) => TraverseOptions<{ changes: number }>;
 }
 
-export type Tag = 'safe' | 'unsafe' | 'formatting';
+export type Tag = 'safe' | 'unsafe' | 'readability';

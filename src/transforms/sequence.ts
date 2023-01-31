@@ -4,7 +4,7 @@ import { Transform } from '.';
 
 export default {
   name: 'sequence',
-  tags: ['safe', 'formatting'],
+  tags: ['safe', 'readability'],
   visitor: () => ({
     ExpressionStatement(path) {
       if (t.isSequenceExpression(path.node.expression)) {
