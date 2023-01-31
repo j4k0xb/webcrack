@@ -6,6 +6,7 @@ import numberExpressions from './numberExpressions';
 import rawLiterals from './rawLiterals';
 import sequence from './sequence';
 import splitVariableDeclarations from './splitVariableDeclarations';
+import unminifyBooleans from './unminifyBooleans';
 
 export const transforms: Transform<any>[] = [
   rawLiterals,
@@ -15,6 +16,7 @@ export const transforms: Transform<any>[] = [
   splitVariableDeclarations,
   extractTernaryCalls,
   numberExpressions,
+  unminifyBooleans,
 ];
 
 export interface Transform<TOptions = any> {

@@ -172,3 +172,16 @@ describe('numberExpressions', () => {
       console.log(0x1021e + "test");
     `).toMatchInlineSnapshot('console.log(0x1021e + "test");'));
 });
+
+describe('unminifyBooleans', () => {
+  test('true', ({ expectTransform }) => {
+    expectTransform('!0').toMatchInlineSnapshot('true;');
+    expectTransform('!!1').toMatchInlineSnapshot('true;');
+    expectTransform('!![]').toMatchInlineSnapshot('true;');
+  });
+
+  test('false', ({ expectTransform }) => {
+    expectTransform('!1').toMatchInlineSnapshot('false;');
+    expectTransform('![]').toMatchInlineSnapshot('false;');
+  });
+});

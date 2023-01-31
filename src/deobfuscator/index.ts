@@ -9,6 +9,7 @@ import extractTernaryCalls from '../transforms/extractTernaryCalls';
 import numberExpressions from '../transforms/numberExpressions';
 import sequence from '../transforms/sequence';
 import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
+import unminifyBooleans from '../transforms/unminifyBooleans';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import { findDecoders } from './decoder';
@@ -26,6 +27,7 @@ export default {
     sequence,
     splitVariableDeclarations,
     numberExpressions,
+    unminifyBooleans,
   ],
   run(ast, state) {
     const stringArray = findStringArray(ast);
