@@ -1,7 +1,7 @@
 import { parse } from '@babel/parser';
 import { assert, beforeEach, describe, expect, test } from 'vitest';
-import { applyTransform } from '../src/index';
 import { transforms } from '../src/transforms';
+import { applyTransform } from '../src/transforms/index';
 
 declare module 'vitest' {
   export interface TestContext {

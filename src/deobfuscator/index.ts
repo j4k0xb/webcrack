@@ -1,8 +1,7 @@
 import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { applyTransform } from '..';
-import { Transform } from '../transforms';
+import { applyTransform, Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
 import computedProperties from '../transforms/computedProperties';
 import extractTernaryCalls from '../transforms/extractTernaryCalls';

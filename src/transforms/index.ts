@@ -1,4 +1,4 @@
-import { Node, TraverseOptions } from '@babel/traverse';
+import traverse, { Node, TraverseOptions } from '@babel/traverse';
 import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
@@ -20,6 +20,42 @@ export const transforms: Transform<any>[] = [
   unminifyBooleans,
   booleanIf,
 ];
+
+export function applyTransforms(ast: Node, tags: Tag[]) {
+  transforms
+    .filter(t => tags.some(x => t.tags.includes(x)))
+    .forEach(transform => {
+      applyTransform(ast, transform);
+    });
+}
+
+export function applyTransform<TOptions>(
+  ast: Node,
+  transform: Transform<TOptions>,
+  options?: TOptions
+) {
+  const start = performance.now();
+  console.log(`${transform.name}: started`);
+
+  transform.preTransforms?.forEach(preTransform => {
+    applyTransform(ast, preTransform);
+  });
+
+  const state = { changes: 0 };
+  transform.run?.(ast, state);
+  if (transform.visitor)
+    traverse(ast, transform.visitor(options), undefined, state);
+
+  transform.postTransforms?.forEach(postTransform => {
+    applyTransform(ast, postTransform);
+  });
+
+  console.log(
+    `${transform.name}: finished in ${Math.floor(
+      performance.now() - start
+    )} ms with ${state.changes} changes`
+  );
+}
 
 export interface Transform<TOptions = any> {
   name: string;
