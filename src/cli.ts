@@ -25,7 +25,7 @@ program
     const { output = 'webcrack-out', force } = program.opts();
 
     if (force || !existsSync(output)) {
-      rmSync(output, { recursive: true });
+      rmSync(output, { recursive: true, force: true });
       mkdirSync(output, { recursive: true });
     } else {
       program.error('output directory already exists');
