@@ -15,29 +15,27 @@ export class Decoder {
   }
 
   /**
-   * replaces all references to `var e = decode;` with `decode`
+   * Replaces all references to `var alias = decode;` with `decode`
    */
   inlineAliasVars() {
-    // TODO: improve performance
-    // search recursively and delete only at the end
-    while (true) {
-      this.path.parentPath.scope.crawl();
+    const references = [...this.references];
 
-      let changes = 0;
-      for (const path of this.references) {
-        const varName = m.capture(m.anyString());
-        const matcher = m.variableDeclarator(
-          m.identifier(varName),
-          m.identifier(this.name)
+    for (const ref of references) {
+      const varName = m.capture(m.anyString());
+      const matcher = m.variableDeclarator(
+        m.identifier(varName),
+        m.identifier(this.name)
+      );
+
+      if (matcher.match(ref.parent)) {
+        // Check all further assignments to that variable (`var anotherAlias = alias;`)
+        references.push(
+          ...ref.parentPath!.scope.bindings[varName.current!].referencePaths
         );
-        if (matcher.match(path.parent)) {
-          path.parentPath!.scope.rename(varName.current!, this.name);
-          // remove the var declaration
-          path.parentPath!.parentPath!.remove();
-          changes++;
-        }
+        ref.parentPath!.scope.rename(varName.current!, this.name);
+        // remove the var declaration
+        ref.parentPath!.parentPath!.remove();
       }
-      if (changes === 0) return;
     }
   }
 }

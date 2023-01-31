@@ -49,10 +49,8 @@ export default {
     for (const decoder of decoders) {
       console.log(` - ${codePreview(decoder.path.node)}`);
 
-      const start = performance.now();
       decoder.inlineAliasVars();
       console.log('Inlined decoder alias vars');
-      console.log(performance.now() - start, 'ms');
 
       // Needed so the decoder calls only contain literals
       applyTransform(ast, extractTernaryCalls, { callee: decoder.name });
