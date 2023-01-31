@@ -1,4 +1,4 @@
-import * as t from '@babel/types';
+import { expression } from '@babel/template';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
 
@@ -16,12 +16,6 @@ export default {
   tags: ['safe'],
   visitor: options => ({
     CallExpression(path) {
-      const conditionalMatch = m.capture(m.conditionalExpression());
-      const identifierMatch = m.capture(m.anyString());
-      const matcher = m.callExpression(m.identifier(identifierMatch), [
-        conditionalMatch,
-      ]);
-
       if (
         matcher.match(path.node) &&
         (!options || options.callee === identifierMatch.current)
@@ -29,18 +23,24 @@ export default {
         const conditional = conditionalMatch.current!;
 
         path.replaceWith(
-          t.conditionalExpression(
-            conditional.test,
-            t.callExpression(t.identifier(identifierMatch.current!), [
-              conditional.consequent,
-            ]),
-            t.callExpression(t.identifier(identifierMatch.current!), [
-              conditional.alternate,
-            ])
-          )
+          buildTernary({
+            CONDITION: conditional.test,
+            CALLEE: identifierMatch.current,
+            ARG1: conditional.consequent,
+            ARG2: conditional.alternate,
+          })
         );
+        this.changes++;
       }
     },
     noScope: true,
   }),
 } satisfies Transform<{ callee: string }>;
+
+const buildTernary = expression('CONDITION ? CALLEE(ARG1) : CALLEE(ARG2)');
+
+const conditionalMatch = m.capture(m.conditionalExpression());
+const identifierMatch = m.capture(m.anyString());
+const matcher = m.callExpression(m.identifier(identifierMatch), [
+  conditionalMatch,
+]);
