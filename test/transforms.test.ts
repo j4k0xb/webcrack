@@ -1,11 +1,11 @@
 import { parse } from '@babel/parser';
-import traverse from '@babel/traverse';
 import { assert, beforeEach, describe, expect, test } from 'vitest';
+import { applyTransform } from '../src/index';
 import { transforms } from '../src/transforms';
 
 declare module 'vitest' {
   export interface TestContext {
-    expectTransform: (actualCode: string, filter?: any) => Vi.Assertion<Node>;
+    expectTransform: (actualCode: string, options?: any) => Vi.Assertion<Node>;
     state: { changes: number };
   }
 }
@@ -14,9 +14,9 @@ beforeEach((context, suite) => {
   const transform = transforms.find(t => t.name === suite.name);
   assert(transform, `Transform ${suite.name} not found`);
   // TODO: type options
-  context.expectTransform = (actualCode: string, filter?: any) => {
+  context.expectTransform = (actualCode, options) => {
     const ast = parse(actualCode);
-    traverse(ast, transform.visitor(filter), undefined, { changes: 0 });
+    applyTransform(ast, transform, options);
     return expect(ast);
   };
 });
@@ -117,7 +117,7 @@ describe('extractTernaryCalls', () => {
     __DECODE__(100 < o ? 10753 : 5 < o ? 2382 : 2820);
     log(p ? 8590 : 5814);
     `,
-      options => options.callee === '__DECODE__'
+      { callee: '__DECODE__' }
     ).toMatchInlineSnapshot(`
       100 < o ? __DECODE__(10753) : 5 < o ? __DECODE__(2382) : __DECODE__(2820);
       log(p ? 8590 : 5814);

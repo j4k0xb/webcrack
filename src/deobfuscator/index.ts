@@ -54,9 +54,7 @@ export default {
 
         traverse(
           ast,
-          extractTernaryCalls.visitor(
-            options => options.callee === decoder.name
-          ),
+          extractTernaryCalls.visitor({ callee: decoder.name }),
           undefined,
           state
         );

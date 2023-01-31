@@ -5,7 +5,7 @@ import { Transform } from '.';
 export default {
   name: 'extractTernaryCalls',
   tags: ['safe'],
-  visitor: (filter = () => true) => ({
+  visitor: options => ({
     CallExpression(path) {
       const conditionalMatch = m.capture(m.conditionalExpression());
       const identifierMatch = m.capture(m.anyString());
@@ -15,7 +15,7 @@ export default {
 
       if (
         matcher.match(path.node) &&
-        filter({ callee: identifierMatch.current! })
+        (!options || options.callee === identifierMatch.current)
       ) {
         const conditional = conditionalMatch.current!;
 

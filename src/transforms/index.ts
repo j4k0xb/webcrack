@@ -1,4 +1,4 @@
-import { TraverseOptions } from '@babel/traverse';
+import { Node, TraverseOptions } from '@babel/traverse';
 import blockStatement from './blockStatement';
 import computedProperties from './computedProperties';
 import extractTernaryCalls from './extractTernaryCalls';
@@ -15,14 +15,13 @@ export const transforms: Transform<any>[] = [
   extractTernaryCalls,
 ];
 
-export interface Transform<TFilter extends Record<string, unknown> = {}> {
+export interface Transform<TOptions = any> {
   name: string;
   tags: Tag[];
   preTransforms?: Transform[];
   postTransforms?: Transform[];
-  visitor: (
-    filter?: (options: TFilter) => unknown
-  ) => TraverseOptions<{ changes: number }>;
+  run?: (ast: Node, options: TOptions) => void;
+  visitor?: (options?: TOptions) => TraverseOptions<{ changes: number }>;
 }
 
 export type Tag = 'safe' | 'unsafe' | 'formatting';
