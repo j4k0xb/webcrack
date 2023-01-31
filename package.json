@@ -15,7 +15,19 @@
     "start": "node dist/cli.js",
     "test": "vitest"
   },
-  "keywords": [],
+  "keywords": [
+    "webpack",
+    "bundle",
+    "extract",
+    "reverse-engineering",
+    "ast",
+    "deobfuscation",
+    "unpack",
+    "debundle",
+    "deobfuscator",
+    "unminify",
+    "unbundle"
+  ],
   "dependencies": {
     "@babel/generator": "^7.20.5",
     "@babel/parser": "^7.20.5",
