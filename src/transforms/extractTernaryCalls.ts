@@ -2,6 +2,15 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
 
+/**
+ * ```js
+ * callee(condition ? 1 : 2)
+ * ```
+ * ->
+ * ```js
+ * condition ? callee(1) : callee(2)
+ * ```
+ */
 export default {
   name: 'extractTernaryCalls',
   tags: ['safe'],

@@ -1,0 +1,8 @@
+// Vitest Snapshot v1
+
+exports[`encoders > multiple 1`] = `
+"function hi() {
+  console.log(\\"Hello World!\\");
+}
+hi();"
+`;

@@ -42,7 +42,9 @@ export class Decoder {
   }
 }
 
-export function findDecoder(stringArray: StringArray): Decoder | undefined {
+export function findDecoders(stringArray: StringArray): Decoder[] {
+  const decoders: Decoder[] = [];
+
   for (const path of stringArray.references) {
     const decoderFn = path.findParent(p =>
       p.isFunctionDeclaration()
@@ -77,8 +79,12 @@ export function findDecoder(stringArray: StringArray): Decoder | undefined {
       )
     );
     if (matcher.match(decoderFn.node)) {
-      decoderFn.parentPath.scope.rename(decoderFn.node.id!.name, '__DECODE__');
-      return new Decoder(decoderFn);
+      decoderFn.parentPath.scope.rename(
+        decoderFn.node.id!.name,
+        `__DECODE_${decoders.length}__`
+      );
+      decoders.push(new Decoder(decoderFn));
     }
   }
+  return decoders;
 }

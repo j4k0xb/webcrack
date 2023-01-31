@@ -7,9 +7,13 @@ import { StringArray } from './stringArray';
 export function createVM(options: {
   stringArray: StringArray;
   rotator?: ArrayRotator;
-  decoder: Decoder;
+  decoders: Decoder[];
 }) {
-  const util = { params: [] as unknown[], stringArray: [] as string[] };
+  const util = {
+    params: [] as unknown[],
+    decoder: '',
+    stringArray: [] as string[],
+  };
   const vm = new VM({
     timeout: 5_000,
     allowAsync: false,
@@ -23,9 +27,12 @@ export function createVM(options: {
   const rotatorCode = options.rotator
     ? generate(options.rotator.path.node).code
     : '';
-  const decoderCode = generate(options.decoder.path.node).code;
+  const decoderCode = options.decoders
+    .map(decoder => generate(decoder.path.node).code)
+    .join('\n');
 
   // Precompute the rotated string array to allow for faster decoding
+  // We need to include all decoders because the rotator might call them
   util.stringArray = vm.run(`
     ${stringArrayCode}
     ${rotatorCode}
@@ -35,9 +42,12 @@ export function createVM(options: {
   const script = new VMScript(`
     function ${options.stringArray.name}() { return util.stringArray; }
     ${decoderCode}
-    ${options.decoder.name}(...util.params);`);
+    var __DECODERS__ = { ${options.decoders.map(d => d.name).join(', ')} };
+    __DECODERS__[util.decoder](...util.params);`);
+
   return {
-    decode(params: unknown[]) {
+    decode(decoder: Decoder, params: unknown[]) {
+      util.decoder = decoder.name;
       util.params = params;
       return vm.run(script);
     },

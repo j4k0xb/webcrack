@@ -1,6 +1,7 @@
 import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { applyTransform } from '..';
 import { Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
 import computedProperties from '../transforms/computedProperties';
@@ -9,7 +10,7 @@ import sequence from '../transforms/sequence';
 import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
-import { findDecoder } from './decoder';
+import { findDecoders } from './decoder';
 import { findStringArray } from './stringArray';
 import { createVM } from './vm';
 
@@ -37,47 +38,49 @@ export default {
       console.log(` - ${codePreview(rotator.path.node)}`);
     }
 
-    const decoder = findDecoder(stringArray);
-    console.log(`String Array Decode: ${!!decoder}`);
-    if (!decoder) return;
-    console.log(` - ${codePreview(decoder.path.node)}`);
+    const decoders = findDecoders(stringArray);
+    console.log(`String Array Encodings: ${decoders.length}`);
 
-    const start = performance.now();
-    decoder.inlineAliasVars();
-    console.log('Inlined decoder alias vars');
-    console.log(performance.now() - start, 'ms');
+    // TODO: inline alias vars, wrappers
 
-    const vm = createVM({ stringArray, rotator, decoder });
+    for (const decoder of decoders) {
+      console.log(` - ${codePreview(decoder.path.node)}`);
 
-    traverse(
-      ast,
-      extractTernaryCalls.visitor({ callee: decoder.name }),
-      undefined,
-      state
-    );
+      const start = performance.now();
+      decoder.inlineAliasVars();
+      console.log('Inlined decoder alias vars');
+      console.log(performance.now() - start, 'ms');
+
+      // Needed so the decoder calls only contain literals
+      applyTransform(ast, extractTernaryCalls, { callee: decoder.name });
+    }
+
+    const vm = createVM({ stringArray, rotator, decoders });
 
     traverse(ast, {
       CallExpression(path) {
-        const matcher = m.callExpression(
-          m.identifier(decoder.name),
-          m.anything()
-        );
+        for (const decoder of decoders) {
+          const matcher = m.callExpression(
+            m.identifier(decoder.name),
+            m.anything()
+          );
 
-        if (matcher.match(path.node) && t.isLiteral(path.node.arguments[0])) {
-          const args = path.node.arguments.map(arg => {
-            if (t.isNumericLiteral(arg) || t.isStringLiteral(arg)) {
-              return arg.value;
-            }
-          });
-          path.replaceWith(t.stringLiteral(vm.decode(args)));
-          state.changes++;
+          if (matcher.match(path.node) && t.isLiteral(path.node.arguments[0])) {
+            const args = path.node.arguments.map(arg => {
+              if (t.isNumericLiteral(arg) || t.isStringLiteral(arg)) {
+                return arg.value;
+              }
+            });
+            path.replaceWith(t.stringLiteral(vm.decode(decoder, args)));
+            state.changes++;
+          }
         }
       },
       noScope: true,
     });
 
     stringArray.path.remove();
-    decoder.path.remove();
+    decoders.forEach(decoder => decoder.path.remove());
     rotator?.path.remove();
   },
 } satisfies Transform;
