@@ -1,5 +1,8 @@
 # webcrack
 
+[![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
+[![license](https://img.shields.io/github/license/j4k0xb/webcrack)](/LICENSE)
+
 Deobfuscate, unminify and unpack bundled javascript
 
 ## Usage
