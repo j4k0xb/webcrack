@@ -3,7 +3,7 @@ import { Transform } from '.';
 
 export default {
   name: 'splitVariableDeclarations',
-  tags: ['safe', 'preprocess'],
+  tags: ['safe', 'formatting'],
   visitor: () => ({
     VariableDeclaration(path) {
       if (

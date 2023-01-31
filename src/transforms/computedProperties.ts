@@ -3,7 +3,7 @@ import { Transform } from '.';
 
 export default {
   name: 'computedProperties',
-  tags: ['safe', 'preprocess'],
+  tags: ['safe', 'formatting'],
   visitor: () => ({
     MemberExpression(path) {
       const { node } = path;

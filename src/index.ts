@@ -1,35 +1,22 @@
 import generate from '@babel/generator';
 import { parse } from '@babel/parser';
-import traverse from '@babel/traverse';
+import traverse, { Node } from '@babel/traverse';
 import deobfuscator from './deobfuscator';
 import { BundleInfo, getBundleInfo } from './extractor';
-import { transforms } from './transforms';
+import { Tag, Transform, transforms } from './transforms';
 
-const preprocessors = transforms.filter(t => t.tags.includes('preprocess'));
+export interface WebcrackResult {
+  code: string;
+  bundle: BundleInfo | undefined;
+}
 
 export default webcrack;
 
-export function webcrack(code: string): {
-  code: string;
-  bundle: BundleInfo | undefined;
-} {
+export function webcrack(code: string): WebcrackResult {
   const ast = parse(code);
 
-  for (const transform of preprocessors) {
-    const state = { changes: 0 };
-    traverse(ast, transform.visitor(), undefined, state);
-    if (state.changes > 0)
-      console.log(`${transform.name}: ${state.changes} changes`);
-  }
-
-  deobfuscator(ast);
-
-  for (const transform of transforms) {
-    const state = { changes: 0 };
-    traverse(ast, transform.visitor(), undefined, state);
-    if (state.changes > 0)
-      console.log(`${transform.name}: ${state.changes} changes`);
-  }
+  applyTransform(ast, deobfuscator);
+  applyTransforms(ast, ['formatting']);
 
   const bundle = getBundleInfo(ast);
   console.log('Bundle:', bundle);
@@ -41,4 +28,34 @@ export function webcrack(code: string): {
   }
 
   return result;
+}
+
+export function applyTransforms(ast: Node, tags: Tag[]) {
+  transforms
+    .filter(t => tags.some(x => t.tags.includes(x)))
+    .forEach(transform => {
+      applyTransform(ast, transform);
+    });
+}
+
+export function applyTransform(ast: Node, transform: Transform) {
+  const start = performance.now();
+  console.log(`${transform.name}: started`);
+
+  transform.preTransforms?.forEach(preTransform => {
+    applyTransform(ast, preTransform);
+  });
+
+  const state = { changes: 0 };
+  traverse(ast, transform.visitor(), undefined, state);
+
+  transform.postTransforms?.forEach(postTransform => {
+    applyTransform(ast, postTransform);
+  });
+
+  console.log(
+    `${transform.name}: finished in ${Math.floor(
+      performance.now() - start
+    )} ms with ${state.changes} changes`
+  );
 }

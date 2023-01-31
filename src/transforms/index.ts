@@ -18,9 +18,11 @@ export const transforms: Transform<any>[] = [
 export interface Transform<TFilter extends Record<string, unknown> = {}> {
   name: string;
   tags: Tag[];
+  preTransforms?: Transform[];
+  postTransforms?: Transform[];
   visitor: (
     filter?: (options: TFilter) => unknown
   ) => TraverseOptions<{ changes: number }>;
 }
 
-export type Tag = 'safe' | 'unsafe' | 'preprocess';
+export type Tag = 'safe' | 'unsafe' | 'formatting';

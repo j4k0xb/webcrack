@@ -3,7 +3,7 @@ import { Transform } from '.';
 
 export default {
   name: 'blockStatement',
-  tags: ['safe', 'preprocess'],
+  tags: ['safe', 'formatting'],
   visitor: () => ({
     WhileStatement(path) {
       if (!t.isBlockStatement(path.node.body)) {
