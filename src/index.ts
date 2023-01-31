@@ -38,7 +38,11 @@ export function applyTransforms(ast: Node, tags: Tag[]) {
     });
 }
 
-export function applyTransform(ast: Node, transform: Transform) {
+export function applyTransform<TTransform extends Transform>(
+  ast: Node,
+  transform: TTransform,
+  options?: TTransform extends Transform<infer TOptions> ? TOptions : never
+) {
   const start = performance.now();
   console.log(`${transform.name}: started`);
 
@@ -47,7 +51,9 @@ export function applyTransform(ast: Node, transform: Transform) {
   });
 
   const state = { changes: 0 };
-  traverse(ast, transform.visitor(), undefined, state);
+  transform.run?.(ast, state);
+  if (transform.visitor)
+    traverse(ast, transform.visitor(options), undefined, state);
 
   transform.postTransforms?.forEach(postTransform => {
     applyTransform(ast, postTransform);

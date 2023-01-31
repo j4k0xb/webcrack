@@ -20,7 +20,7 @@ export interface Transform<TOptions = any> {
   tags: Tag[];
   preTransforms?: Transform[];
   postTransforms?: Transform[];
-  run?: (ast: Node, options: TOptions) => void;
+  run?: (ast: Node, state: { changes: number }, options?: TOptions) => void;
   visitor?: (options?: TOptions) => TraverseOptions<{ changes: number }>;
 }
 

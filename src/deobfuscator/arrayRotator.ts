@@ -59,7 +59,9 @@ const matcher = m.expressionStatement(
       m.blockStatement(
         m.anyList<t.Statement>(
           // var decodeAlias = decodeFn;
+          // can be up to 3 variables (encoding none, base64 and rc4)
           m.variableDeclaration(),
+          m.zeroOrMore(),
           // var array = getStringArray();
           m.variableDeclaration(undefined, [
             m.variableDeclarator(m.identifier(arrayName)),
