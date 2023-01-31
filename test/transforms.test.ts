@@ -185,3 +185,23 @@ describe('unminifyBooleans', () => {
     expectTransform('![]').toMatchInlineSnapshot('false;');
   });
 });
+
+describe('booleanIf', () => {
+  test('and', ({ expectTransform }) =>
+    expectTransform(`
+      x && y && z();
+    `).toMatchInlineSnapshot(`
+      if (x && y) {
+        z();
+      }
+    `));
+
+  test('or', ({ expectTransform }) =>
+    expectTransform(`
+      x || y || z();
+    `).toMatchInlineSnapshot(`
+      if (!(x || y)) {
+        z();
+      }
+    `));
+});

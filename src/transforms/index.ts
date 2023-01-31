@@ -1,5 +1,6 @@
 import { Node, TraverseOptions } from '@babel/traverse';
 import blockStatement from './blockStatement';
+import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
 import extractTernaryCalls from './extractTernaryCalls';
 import numberExpressions from './numberExpressions';
@@ -17,6 +18,7 @@ export const transforms: Transform<any>[] = [
   extractTernaryCalls,
   numberExpressions,
   unminifyBooleans,
+  booleanIf,
 ];
 
 export interface Transform<TOptions = any> {
