@@ -5,12 +5,16 @@ export default {
   tags: ['safe', 'readability'],
   visitor: () => ({
     StringLiteral(path) {
-      delete path.node.extra;
-      this.changes++;
+      if (path.node.extra) {
+        delete path.node.extra;
+        this.changes++;
+      }
     },
     NumericLiteral(path) {
-      delete path.node.extra;
-      this.changes++;
+      if (path.node.extra) {
+        delete path.node.extra;
+        this.changes++;
+      }
     },
     noScope: true,
   }),

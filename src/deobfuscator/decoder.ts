@@ -3,48 +3,16 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { StringArray } from './stringArray';
 
-export class Decoder {
+export interface Decoder {
   name: string;
-
-  constructor(public path: NodePath<t.FunctionDeclaration>) {
-    this.name = path.node.id!.name;
-  }
-
-  get references() {
-    return this.path.parentPath.scope.bindings[this.name].referencePaths;
-  }
-
-  /**
-   * Replaces all references to `var alias = decode;` with `decode`
-   */
-  inlineAliasVars() {
-    const references = [...this.references];
-
-    for (const ref of references) {
-      const varName = m.capture(m.anyString());
-      const matcher = m.variableDeclarator(
-        m.identifier(varName),
-        m.identifier(this.name)
-      );
-
-      if (matcher.match(ref.parent)) {
-        // Check all further assignments to that variable (`var anotherAlias = alias;`)
-        references.push(
-          ...ref.parentPath!.scope.bindings[varName.current!].referencePaths
-        );
-        ref.parentPath!.scope.rename(varName.current!, this.name);
-        // remove the var declaration
-        ref.parentPath!.parentPath!.remove();
-      }
-    }
-  }
+  path: NodePath<t.FunctionDeclaration>;
 }
 
 export function findDecoders(stringArray: StringArray): Decoder[] {
   const decoders: Decoder[] = [];
 
-  for (const path of stringArray.references) {
-    const decoderFn = path.findParent(p =>
+  for (const ref of stringArray.references) {
+    const decoderFn = ref.findParent(p =>
       p.isFunctionDeclaration()
     ) as NodePath<t.FunctionDeclaration> | null;
     if (!decoderFn) continue;
@@ -77,11 +45,10 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
       )
     );
     if (matcher.match(decoderFn.node)) {
-      decoderFn.parentPath.scope.rename(
-        decoderFn.node.id!.name,
-        `__DECODE_${decoders.length}__`
-      );
-      decoders.push(new Decoder(decoderFn));
+      const oldName = functionName.current!;
+      const newName = `__DECODE_${decoders.length}__`;
+      decoderFn.parentPath.scope.rename(oldName, newName);
+      decoders.push({ name: newName, path: decoderFn });
     }
   }
   return decoders;

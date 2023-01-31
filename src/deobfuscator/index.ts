@@ -1,6 +1,3 @@
-import traverse from '@babel/traverse';
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
 import { applyTransform, Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
 import computedProperties from '../transforms/computedProperties';
@@ -12,6 +9,8 @@ import unminifyBooleans from '../transforms/unminifyBooleans';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import { findDecoders } from './decoder';
+import inlineDecodedStrings from './inlineDecodedStrings';
+import inlineDecoderWrappers from './inlineDecoderWrappers';
 import { findStringArray } from './stringArray';
 import { createVM } from './vm';
 
@@ -44,41 +43,17 @@ export default {
     const decoders = findDecoders(stringArray);
     console.log(`String Array Encodings: ${decoders.length}`);
 
-    // TODO: inline alias vars, wrappers
-
     for (const decoder of decoders) {
       console.log(` - ${codePreview(decoder.path.node)}`);
 
-      decoder.inlineAliasVars();
-      console.log('Inlined decoder alias vars');
+      applyTransform(ast, inlineDecoderWrappers, decoder.path);
 
-      // Needed so the decoder calls only contain literals
+      // Needed so the decoder calls only contain literal arguments
       applyTransform(ast, extractTernaryCalls, { callee: decoder.name });
     }
 
     const vm = createVM({ stringArray, rotator, decoders });
-
-    traverse(ast, {
-      CallExpression(path) {
-        for (const decoder of decoders) {
-          const matcher = m.callExpression(
-            m.identifier(decoder.name),
-            m.anything()
-          );
-
-          if (matcher.match(path.node) && t.isLiteral(path.node.arguments[0])) {
-            const args = path.node.arguments.map(arg => {
-              if (t.isNumericLiteral(arg) || t.isStringLiteral(arg)) {
-                return arg.value;
-              }
-            });
-            path.replaceWith(t.stringLiteral(vm.decode(decoder, args)));
-            state.changes++;
-          }
-        }
-      },
-      noScope: true,
-    });
+    applyTransform(ast, inlineDecodedStrings, { decoders, vm });
 
     stringArray.path.remove();
     decoders.forEach(decoder => decoder.path.remove());

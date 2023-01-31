@@ -42,7 +42,7 @@ export function applyTransform<TOptions>(
   });
 
   const state = { changes: 0 };
-  transform.run?.(ast, state);
+  transform.run?.(ast, state, options);
   if (transform.visitor)
     traverse(ast, transform.visitor(options), undefined, state);
 
