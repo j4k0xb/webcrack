@@ -6,6 +6,7 @@ import { Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
 import computedProperties from '../transforms/computedProperties';
 import extractTernaryCalls from '../transforms/extractTernaryCalls';
+import numberExpressions from '../transforms/numberExpressions';
 import sequence from '../transforms/sequence';
 import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
 import { codePreview } from '../utils/ast';
@@ -24,6 +25,7 @@ export default {
     computedProperties,
     sequence,
     splitVariableDeclarations,
+    numberExpressions,
   ],
   run(ast, state) {
     const stringArray = findStringArray(ast);

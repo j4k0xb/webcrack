@@ -18,3 +18,4 @@ npx webcrack <file>
   - Index Shift
   - Variable Wrapper Type
   - None/Base64/RC4 encoding
+- Numbers To Expressions

@@ -124,7 +124,7 @@ describe('extractTernaryCalls', () => {
     `));
 });
 
-describe('literals', () => {
+describe('rawLiterals', () => {
   test('string', ({ expectTransform }) =>
     expectTransform(`const a = "\\x61"`).toMatchInlineSnapshot(
       'const a = "a";'
@@ -159,4 +159,16 @@ describe('blockStatement', () => {
         b();
       }
     `));
+});
+
+describe('numberExpressions', () => {
+  test('simplify', ({ expectTransform }) =>
+    expectTransform(`
+      console.log(-0x1021e + -0x7eac8 + 0x17 * 0xac9c);
+    `).toMatchInlineSnapshot('console.log(431390);'));
+
+  test('ignore other node types', ({ expectTransform }) =>
+    expectTransform(`
+      console.log(0x1021e + "test");
+    `).toMatchInlineSnapshot('console.log(0x1021e + "test");'));
 });

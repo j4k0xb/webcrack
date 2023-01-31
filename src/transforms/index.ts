@@ -2,17 +2,19 @@ import { Node, TraverseOptions } from '@babel/traverse';
 import blockStatement from './blockStatement';
 import computedProperties from './computedProperties';
 import extractTernaryCalls from './extractTernaryCalls';
-import literals from './literals';
+import numberExpressions from './numberExpressions';
+import rawLiterals from './rawLiterals';
 import sequence from './sequence';
 import splitVariableDeclarations from './splitVariableDeclarations';
 
 export const transforms: Transform<any>[] = [
-  literals,
+  rawLiterals,
   blockStatement,
   computedProperties,
   sequence,
   splitVariableDeclarations,
   extractTernaryCalls,
+  numberExpressions,
 ];
 
 export interface Transform<TOptions = any> {

@@ -1,7 +1,7 @@
 import { Transform } from '.';
 
 export default {
-  name: 'literals',
+  name: 'rawLiterals',
   tags: ['safe', 'formatting'],
   visitor: () => ({
     StringLiteral(path) {
