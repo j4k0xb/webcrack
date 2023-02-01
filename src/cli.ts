@@ -18,11 +18,11 @@ const { version } = JSON.parse(
 
 program
   .version(version)
-  .option('-o, --output <path>', 'output directory')
+  .option('-o, --output <path>', 'output directory', 'webcrack-out')
   .option('-f, --force', 'overwrite output directory')
   .argument('<file>', 'input file')
   .action(input => {
-    const { output = 'webcrack-out', force } = program.opts();
+    const { output, force } = program.opts();
 
     if (force || !existsSync(output)) {
       rmSync(output, { recursive: true, force: true });

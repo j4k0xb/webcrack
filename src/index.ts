@@ -12,7 +12,7 @@ export interface WebcrackResult {
 export default webcrack;
 
 export function webcrack(code: string): WebcrackResult {
-  const ast = parse(code);
+  const ast = parse(code, { sourceType: 'unambiguous' });
 
   applyTransform(ast, deobfuscator);
   applyTransforms(ast, ['readability']);
