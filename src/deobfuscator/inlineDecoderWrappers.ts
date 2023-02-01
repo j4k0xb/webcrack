@@ -13,22 +13,29 @@ export default {
     if (!decoder || !decoder.node.id) return;
 
     const decoderName = decoder.node.id.name;
-    const references = [
-      ...decoder.parentPath.scope.bindings[decoderName].referencePaths,
-    ];
+    const decoderBinding = decoder.parentPath.scope.bindings[decoderName];
 
-    for (const ref of references) {
+    for (const aliasRef of decoderBinding.referencePaths) {
       const varName = m.capture(m.anyString());
-      const matcher = m.variableDeclarator(
+      const varMatcher = m.variableDeclarator(
         m.identifier(varName),
         m.identifier(decoderName)
       );
 
-      if (matcher.match(ref.parent)) {
-        // Check all further assignments to that variable (`var anotherAlias = alias;`)
-        references.push(
-          ...ref.parentPath!.scope.bindings[varName.current!].referencePaths
-        );
+      if (varMatcher.match(aliasRef.parent)) {
+        const scope = aliasRef.parentPath!.scope;
+
+        // Update decoder references to keep it up to date because scope.rename doesn't do that
+        const aliasRefs = scope.bindings[varName.current!].referencePaths;
+        aliasRefs.forEach(ref => decoderBinding.reference(ref));
+        scope.rename(varName.current!, decoderName);
+
+        // Remove the alias var declaration
+        aliasRef.parentPath!.parentPath!.remove();
+
+        state.changes++;
+        continue;
+      }
         ref.parentPath!.scope.rename(varName.current!, decoderName);
         // remove the var declaration
         ref.parentPath!.parentPath!.remove();

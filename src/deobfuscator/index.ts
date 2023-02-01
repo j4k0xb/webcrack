@@ -2,7 +2,6 @@ import { applyTransform, Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
 import computedProperties from '../transforms/computedProperties';
 import extractTernaryCalls from '../transforms/extractTernaryCalls';
-import numberExpressions from '../transforms/numberExpressions';
 import sequence from '../transforms/sequence';
 import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
 import unminifyBooleans from '../transforms/unminifyBooleans';
@@ -24,7 +23,6 @@ export default {
     computedProperties,
     sequence,
     splitVariableDeclarations,
-    numberExpressions,
     unminifyBooleans,
   ],
   run(ast, state) {

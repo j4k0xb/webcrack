@@ -1,11 +1,13 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
+import numberExpressions from '../transforms/numberExpressions';
 import { Decoder } from './decoder';
 
 export default {
   name: 'inlineDecodedStrings',
   tags: ['unsafe'],
+  preTransforms: [numberExpressions],
   visitor: options => ({
     CallExpression(path) {
       options?.decoders.forEach(decoder => {
