@@ -1,16 +1,9 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { webcrack } from '.';
-import { BundleInfo } from './extractor';
 
 const { version } = JSON.parse(
   readFileSync(join(__dirname, '..', 'package.json'), 'utf8')
@@ -26,42 +19,10 @@ program
 
     if (force || !existsSync(output)) {
       rmSync(output, { recursive: true, force: true });
-      mkdirSync(output, { recursive: true });
     } else {
       program.error('output directory already exists');
     }
 
-    const result = webcrack(readFileSync(input, 'utf8'));
-    writeFileSync(join(output, 'deobfuscated.js'), result.code, 'utf8');
-
-    if (result.bundle) {
-      saveBundle(result.bundle, output);
-    }
+    webcrack(readFileSync(input, 'utf8')).save(output);
   })
   .parse();
-
-function saveBundle(bundle: BundleInfo, output: string) {
-  const bundleJson = {
-    type: bundle.type,
-    entryId: bundle.entryId,
-    modules: Array.from(bundle.modules.values(), module => ({
-      id: module.id,
-      path: module.path,
-    })),
-  };
-  writeFileSync(
-    join(output, 'bundle.json'),
-    JSON.stringify(bundleJson, null, 2),
-    'utf8'
-  );
-
-  mkdirSync(join(output, 'modules'), { recursive: true });
-
-  bundle.modules.forEach(module => {
-    writeFileSync(
-      join(output, 'modules', `${module.id}.js`),
-      module.code,
-      'utf8'
-    );
-  });
-}

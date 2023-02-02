@@ -1,10 +1,10 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { BundleInfo } from './index';
+import { Bundle } from './index';
 import { Module } from './module';
 
-export function extract(ast: t.Node): BundleInfo | undefined {
+export function extract(ast: t.Node): Bundle | undefined {
   const modules = new Map<number, Module>();
 
   traverse(ast, {
@@ -34,11 +34,7 @@ export function extract(ast: t.Node): BundleInfo | undefined {
   });
 
   if (modules.size > 0 && entryIdMatcher.current) {
-    return {
-      type: 'webpack',
-      modules,
-      entryId: entryIdMatcher.current.value,
-    };
+    return new Bundle('webpack', entryIdMatcher.current.value, modules);
   }
 }
 

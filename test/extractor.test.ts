@@ -2,6 +2,7 @@ import assert from 'assert';
 import { readFile } from 'fs/promises';
 import { describe, expect, test } from 'vitest';
 import webcrack from '../src/index';
+import { relativePath } from '../src/utils/path';
 
 describe('extractor', async () => {
   test('webpack', async () => {
@@ -17,4 +18,21 @@ describe('extractor', async () => {
       expect(module.ast).toMatchSnapshot();
     }
   });
+
+  test('path mapping', async () => {
+    const { bundle } = webcrack(
+      await readFile('./test/samples/webpack.js', 'utf8'),
+      { mappings: m => ({ './utils/color.js': m.stringLiteral('#FBC02D') }) }
+    );
+    expect(bundle).toBeDefined();
+    assert(bundle);
+    for (const module of bundle.modules.values()) {
+      expect(module.ast).toMatchSnapshot();
+    }
+  });
+});
+
+test('relative paths', () => {
+  expect(relativePath('./a.js', './x/y.js')).toBe('./x/y.js');
+  expect(relativePath('./x/y.js', './a.js')).toBe('../a.js');
 });

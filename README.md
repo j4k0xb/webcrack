@@ -59,6 +59,20 @@ return a(), b(), c(); // a(); b(); return c();
 if ((a(), b())) c(); // a(); if (b()) c();
 ```
 
-### Bundle Unpacking
+## Bundle Unpacking
 
-Extracts each module of a webpack bundle into a separate file.
+Extracts each module of a webpack bundle into a separate file
+and allows the paths to be remapped based on AST matching.
+
+```js
+import { webcrack } from 'webcrack';
+import { readFileSync } from 'fs';
+
+webcrack(readFileSync('webpack-bundle.js', 'utf8'), {
+  mappings: m => ({
+    './utils/color.js': m.regExpLiteral('^#([0-9a-f]{3}){1,2}$'),
+  }),
+}).save('output-dir');
+```
+
+See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers#readme) for more information about the `mappings` option.
