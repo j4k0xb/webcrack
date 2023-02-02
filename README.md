@@ -5,25 +5,40 @@
 
 Blazingly fast deobfuscator, unminifier and bundle unpacker for javascript
 
-## Usage
+## Installation
 
 ```sh
-npx webcrack <file>
+npm install -g webcrack
+```
+
+## Usage
+
+```
+Usage: webcrack [options] <file>
+
+Arguments:
+  file                 input file
+
+Options:
+  -V, --version        output the version number
+  -o, --output <path>  output directory (default: "webcrack-out")
+  -f, --force          overwrite output directory
+  -h, --help           display help for command
 ```
 
 ## Deobfuscations
 
-[obfuscator.io](https://obfuscator.io):
+### [obfuscator.io](https://obfuscator.io)
 
 - String Array
   - Rotate
   - Shuffle
   - Index Shift
-  - Variable Wrapper Type
+  - Variable/Function Wrapper Type
   - None/Base64/RC4 encoding
 - Numbers To Expressions
 
-General/unminifying:
+### General/unminifying
 
 ```js
 console['\x6c\x6f\x67']('\x61'); // console.log('a')
