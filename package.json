@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "bin": "dist/cli.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],

@@ -27,6 +27,12 @@ Options:
   -h, --help           display help for command
 ```
 
+```js
+import { webcrack } from 'webcrack';
+
+console.log(webcrack('const a = 1+1;').code);
+```
+
 ## Deobfuscations
 
 ### [obfuscator.io](https://obfuscator.io)
