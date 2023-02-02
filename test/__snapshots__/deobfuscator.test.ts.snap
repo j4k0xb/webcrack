@@ -1,5 +1,73 @@
 // Vitest Snapshot v1
 
+exports[`deobfuscate obfuscator.io.js 1`] = `
+"// v4.0.0
+
+function hi() {
+  var e = function () {
+    var f = true;
+    return function (g, h) {
+      var i = f ? function () {
+        if (h) {
+          var j = h.apply(g, arguments);
+          h = null;
+          return j;
+        }
+      } : function () {};
+      f = false;
+      return i;
+    };
+  }();
+  (function () {
+    e(this, function () {
+      var f = new RegExp(\\"function *\\\\\\\\( *\\\\\\\\)\\");
+      var g = new RegExp(\\"\\\\\\\\+\\\\\\\\+ *(?:[a-zA-Z_$][0-9a-zA-Z_$]*)\\", \\"i\\");
+      var h = a(\\"init\\");
+      !f.test(h + \\"chain\\") || !g.test(h + \\"input\\") ? h(\\"0\\") : a();
+    })();
+  })();
+  console.log(\\"Hello World!\\");
+}
+hi();
+function a(b) {
+  function e(f) {
+    if (typeof f === \\"string\\") {
+      return function (g) {}.constructor(\\"while (true) {}\\").apply(\\"counter\\");
+    } else {
+      (\\"\\" + f / f).length !== 1 || f % 20 === 0 ? function () {
+        return true;
+      }.constructor(\\"debu\\" + \\"gger\\").call(\\"action\\") : function () {
+        return false;
+      }.constructor(\\"debu\\" + \\"gger\\").apply(\\"stateObject\\");
+    }
+    e(++f);
+  }
+  try {
+    if (b) {
+      return e;
+    } else {
+      e(0);
+    }
+  } catch (f) {}
+}"
+`;
+
+exports[`deobfuscate obfuscator.io-function-wrapper.js 1`] = `
+"function hi() {
+  console.log(\\"Hello World!\\");
+  console.log(30);
+  console.log(undefined);
+}
+hi();"
+`;
+
+exports[`deobfuscate obfuscator.io-multi-encoders.js 1`] = `
+"function hi() {
+  console.log(\\"Hello World!\\");
+}
+hi();"
+`;
+
 exports[`encoders > multiple 1`] = `
 "function hi() {
   console.log(\\"Hello World!\\");

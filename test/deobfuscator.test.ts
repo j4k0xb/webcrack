@@ -2,10 +2,23 @@ import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import { readFile } from 'fs/promises';
+import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { findStringArray } from '../src/deobfuscator/stringArray';
 import { webcrack } from '../src/index';
 import { inlineFunctionAliases, inlineVariableAliases } from '../src/utils/ast';
+
+// Test samples
+test.each([
+  'obfuscator.io.js',
+  'obfuscator.io-multi-encoders.js',
+  'obfuscator.io-function-wrapper.js',
+])(`deobfuscate %s`, async filename => {
+  const result = webcrack(
+    await readFile(join('./test/samples', filename), 'utf8')
+  );
+  expect(result.code).toMatchSnapshot();
+});
 
 describe('find string array', async () => {
   const ast = parse(await readFile('./test/samples/obfuscator.io.js', 'utf8'));
@@ -16,24 +29,6 @@ describe('find string array', async () => {
     expect(stringArray!.name).toBe('__STRING_ARRAY__');
     expect(stringArray!.references).toHaveLength(2);
     expect(stringArray!.strings).toHaveLength(25);
-  });
-});
-
-describe('encoders', () => {
-  test('multiple', async () => {
-    const result = webcrack(
-      await readFile('./test/samples/obfuscator.io-multi-encoders.js', 'utf8')
-    );
-    expect(result.code).toMatchSnapshot();
-  });
-});
-
-describe('string array wrappers', () => {
-  test('function', async () => {
-    const result = webcrack(
-      await readFile('./test/samples/obfuscator.io-function-wrapper.js', 'utf8')
-    );
-    expect(result.code).toMatchSnapshot();
   });
 });
 
