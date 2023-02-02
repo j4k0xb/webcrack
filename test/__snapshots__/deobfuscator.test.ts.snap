@@ -28,3 +28,12 @@ decoder(1);
   };
 };"
 `;
+
+exports[`string array wrappers > function 1`] = `
+"function hi() {
+  console.log(\\"Hello World!\\");
+  console.log(30);
+  console.log(undefined);
+}
+hi();"
+`;

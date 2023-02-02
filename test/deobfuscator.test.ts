@@ -28,6 +28,15 @@ describe('encoders', () => {
   });
 });
 
+describe('string array wrappers', () => {
+  test('function', async () => {
+    const result = webcrack(
+      await readFile('./test/samples/obfuscator.io-function-wrapper.js', 'utf8')
+    );
+    expect(result.code).toMatchSnapshot();
+  });
+});
+
 describe('inline decoder', () => {
   test('inline variable', () => {
     const ast = parse(`
