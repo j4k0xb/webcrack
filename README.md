@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
 [![license](https://img.shields.io/github/license/j4k0xb/webcrack)](/LICENSE)
 
-Blazingly fast deobfuscator, unminifier and bundle unpacker for javascript
+Deobfuscator, unminifier and bundle unpacker for javascript
 
 ## Installation
 
@@ -45,7 +45,7 @@ console.log(webcrack('const a = 1+1;').code);
   - None/Base64/RC4 encoding
 - Numbers To Expressions
 
-### General/unminifying
+### General/Unminifying
 
 ```js
 console['\x6c\x6f\x67']('\x61'); // console.log('a')
@@ -58,3 +58,7 @@ x || y || z(); // if (!(x || y)) z();
 return a(), b(), c(); // a(); b(); return c();
 if ((a(), b())) c(); // a(); if (b()) c();
 ```
+
+### Bundle Unpacking
+
+Extracts each module of a webpack bundle into a separate file.

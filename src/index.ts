@@ -20,11 +20,5 @@ export function webcrack(code: string): WebcrackResult {
   const bundle = getBundleInfo(ast);
   console.log('Bundle:', bundle);
 
-  const result = { code: generate(ast).code, bundle };
-
-  if (bundle?.type === 'webpack') {
-    bundle.modules.forEach(module => module.renameParams());
-  }
-
-  return result;
+  return { code: generate(ast).code, bundle };
 }

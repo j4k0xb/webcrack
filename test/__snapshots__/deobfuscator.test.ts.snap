@@ -68,13 +68,6 @@ exports[`deobfuscate obfuscator.io-multi-encoders.js 1`] = `
 hi();"
 `;
 
-exports[`encoders > multiple 1`] = `
-"function hi() {
-  console.log(\\"Hello World!\\");
-}
-hi();"
-`;
-
 exports[`inline decoder > inline function 1`] = `
 "function decoder() {}
 decoder(1);
@@ -95,13 +88,4 @@ decoder(1);
     decoder(3);
   };
 };"
-`;
-
-exports[`string array wrappers > function 1`] = `
-"function hi() {
-  console.log(\\"Hello World!\\");
-  console.log(30);
-  console.log(undefined);
-}
-hi();"
 `;

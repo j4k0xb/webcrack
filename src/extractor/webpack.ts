@@ -1,75 +1,94 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import assert from 'assert';
+import { BundleInfo } from './index';
 import { Module } from './module';
 
-export function getModules(ast: t.File): {
-  entryId: number;
-  modules: Map<number, Module>;
-} {
-  const entryId = findEntryId(ast);
-  const modules = extractModules(ast, entryId);
-
-  return { entryId, modules };
-}
-
-/**
- * Finds the first assignment expression in prelude, e.g. `i((i.s = 161));`
- */
-function findEntryId(ast: t.File) {
-  let entryId: number | undefined;
-
-  traverse(ast, {
-    AssignmentExpression(path) {
-      const entryIdMatcher = m.capture(m.numericLiteral());
-      const matcher = m.assignmentExpression(
-        '=',
-        m.memberExpression(),
-        entryIdMatcher
-      );
-      if (matcher.match(path.node)) {
-        entryId = entryIdMatcher.current?.value;
-        path.stop();
-      }
-    },
-    noScope: true,
-  });
-
-  assert(entryId !== undefined, 'No entry id found');
-  return entryId;
-}
-
-function extractModules(ast: t.File, entryId: number): Map<number, Module> {
+export function extract(ast: t.Node): BundleInfo | undefined {
   const modules = new Map<number, Module>();
 
   traverse(ast, {
     CallExpression(path) {
-      // [, factory1, factory2, ...] can contain holes
-      const factoriesMatcher = m.arrayExpression(
-        m.anyList(m.zeroOrMore(), m.functionExpression())
-      );
+      if (matcher.match(path.node)) {
+        path.stop();
 
-      // (function(e) {....})([, factory1, factory2, ...])
-      const matcher = m.callExpression(m.functionExpression(), [
-        factoriesMatcher,
-      ]);
+        const argumentPath = path.get(
+          'arguments'
+        )[0] as NodePath<t.ArrayExpression>;
 
-      if (!matcher.match(path.node)) return;
+        argumentPath.get('elements').forEach((moduleWrapper, id) => {
+          if (moduleWrapper.isFunctionExpression()) {
+            renameParams(moduleWrapper);
 
-      const factoriesPath = path.get(
-        'arguments'
-      )[0] as NodePath<t.ArrayExpression>;
-
-      factoriesPath.get('elements').forEach((factoryPath, index) => {
-        if (factoryPath.isFunctionExpression()) {
-          modules.set(index, new Module(index, factoryPath, index === entryId));
-        }
-      });
-
-      path.stop();
+            const file = t.file(t.program(moduleWrapper.node.body.body));
+            const module = new Module(
+              id,
+              file,
+              id === entryIdMatcher.current?.value
+            );
+            modules.set(id, module);
+          }
+        });
+      }
     },
   });
 
-  return modules;
+  if (modules.size > 0 && entryIdMatcher.current) {
+    return {
+      type: 'webpack',
+      modules,
+      entryId: entryIdMatcher.current.value,
+    };
+  }
 }
+
+/**
+ * `function (e, t, i) {...}` -> `function (module, exports, require) {...}`
+ */
+function renameParams(moduleWrapper: NodePath<t.FunctionExpression>) {
+  const FACTORY_PARAM_NAMES = ['module', 'exports', 'require'];
+
+  // Rename existing bindings with this name so there's no risk of conflicts
+  moduleWrapper.traverse({
+    Identifier(path) {
+      if (FACTORY_PARAM_NAMES.includes(path.node.name)) {
+        path.scope.rename(path.node.name);
+      }
+    },
+  });
+
+  moduleWrapper.node.params.forEach((param, index) => {
+    moduleWrapper.scope.rename(
+      (param as t.Identifier).name,
+      FACTORY_PARAM_NAMES[index]
+    );
+  });
+}
+
+const entryIdMatcher = m.capture(m.numericLiteral());
+const moduleFunctionsMatcher = m.capture(
+  m.arrayExpression(m.anyList(m.zeroOrMore(), m.functionExpression()))
+);
+
+const matcher = m.callExpression(
+  m.functionExpression(
+    undefined,
+    undefined,
+    m.blockStatement(
+      m.anyList<t.Statement>(
+        m.zeroOrMore(),
+        m.functionDeclaration(),
+        m.zeroOrMore(),
+        m.containerOf(
+          // E.g. __webpack_require__.s = 2
+          m.assignmentExpression(
+            '=',
+            m.memberExpression(m.anything(), m.identifier('s')),
+            entryIdMatcher
+          )
+        )
+      )
+    )
+  ),
+  [moduleFunctionsMatcher]
+);

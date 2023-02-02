@@ -35,15 +35,23 @@ program
     writeFileSync(join(output, 'deobfuscated.js'), result.code, 'utf8');
 
     if (result.bundle) {
-      saveModules(output, result.bundle);
+      saveBundle(result.bundle, output);
     }
   })
   .parse();
 
-function saveModules(output: string, bundle: BundleInfo) {
+function saveBundle(bundle: BundleInfo, output: string) {
+  const bundleJson = {
+    type: bundle.type,
+    entryId: bundle.entryId,
+    modules: Array.from(bundle.modules.values(), module => ({
+      id: module.id,
+      path: module.path,
+    })),
+  };
   writeFileSync(
     join(output, 'bundle.json'),
-    JSON.stringify(bundle, null, 2),
+    JSON.stringify(bundleJson, null, 2),
     'utf8'
   );
 
@@ -52,7 +60,7 @@ function saveModules(output: string, bundle: BundleInfo) {
   bundle.modules.forEach(module => {
     writeFileSync(
       join(output, 'modules', `${module.id}.js`),
-      module.getCode(),
+      module.code,
       'utf8'
     );
   });

@@ -8,9 +8,6 @@ export interface BundleInfo {
   modules: Map<number, Module>;
 }
 
-export function getBundleInfo(ast: t.File): BundleInfo | undefined {
-  try {
-    const info = webpack.getModules(ast);
-    return { type: 'webpack', ...info };
-  } catch (error) {}
+export function getBundleInfo(ast: t.Node): BundleInfo | undefined {
+  return webpack.extract(ast);
 }
