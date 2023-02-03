@@ -242,3 +242,21 @@ describe('deterministicIf', () => {
   `).toMatchInlineSnapshot('b();');
   });
 });
+
+describe('ternaryToIf', () => {
+  test('statement', ({ expectTransform }) =>
+    expectTransform(`
+      a ? b() : c();
+    `).toMatchInlineSnapshot(`
+      if (a) {
+        b();
+      } else {
+        c();
+      }
+    `));
+
+  test('ignore expression', ({ expectTransform }) =>
+    expectTransform(`
+      const x = a ? b() : c();
+    `).toMatchInlineSnapshot('const x = a ? b() : c();'));
+});

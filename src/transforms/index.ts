@@ -8,6 +8,7 @@ import numberExpressions from './numberExpressions';
 import rawLiterals from './rawLiterals';
 import sequence from './sequence';
 import splitVariableDeclarations from './splitVariableDeclarations';
+import ternaryToIf from './ternaryToIf';
 import unminifyBooleans from './unminifyBooleans';
 
 export const transforms: Transform<any>[] = [
@@ -20,6 +21,7 @@ export const transforms: Transform<any>[] = [
   numberExpressions,
   unminifyBooleans,
   booleanIf,
+  ternaryToIf,
   deterministicIf,
 ];
 

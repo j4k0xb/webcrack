@@ -23,7 +23,11 @@ function hi() {
       var f = new RegExp(\\"function *\\\\\\\\( *\\\\\\\\)\\");
       var g = new RegExp(\\"\\\\\\\\+\\\\\\\\+ *(?:[a-zA-Z_$][0-9a-zA-Z_$]*)\\", \\"i\\");
       var h = a(\\"init\\");
-      !f.test(h + \\"chain\\") || !g.test(h + \\"input\\") ? h(\\"0\\") : a();
+      if (!f.test(h + \\"chain\\") || !g.test(h + \\"input\\")) {
+        h(\\"0\\");
+      } else {
+        a();
+      }
     })();
   })();
   console.log(\\"Hello World!\\");
@@ -34,11 +38,15 @@ function a(b) {
     if (typeof f === \\"string\\") {
       return function (g) {}.constructor(\\"while (true) {}\\").apply(\\"counter\\");
     } else {
-      (\\"\\" + f / f).length !== 1 || f % 20 === 0 ? function () {
-        return true;
-      }.constructor(\\"debu\\" + \\"gger\\").call(\\"action\\") : function () {
-        return false;
-      }.constructor(\\"debu\\" + \\"gger\\").apply(\\"stateObject\\");
+      if ((\\"\\" + f / f).length !== 1 || f % 20 === 0) {
+        (function () {
+          return true;
+        }).constructor(\\"debu\\" + \\"gger\\").call(\\"action\\");
+      } else {
+        (function () {
+          return false;
+        }).constructor(\\"debu\\" + \\"gger\\").apply(\\"stateObject\\");
+      }
     }
     e(++f);
   }
