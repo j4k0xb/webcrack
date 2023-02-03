@@ -12,11 +12,18 @@ export function extract(ast: t.Node): Bundle | undefined {
       if (matcher.match(path.node)) {
         path.stop();
 
-        const argumentPath = path.get(
-          'arguments'
-        )[0] as NodePath<t.ArrayExpression>;
+        const argumentPath = path.get('arguments')[0];
 
-        argumentPath.get('elements').forEach((moduleWrapper, id) => {
+        const moduleWrappers = argumentPath.isArrayExpression()
+          ? (argumentPath.get('elements') as NodePath<t.Node | null>[])
+          : (argumentPath.get('properties') as NodePath<t.Node>[]);
+
+        moduleWrappers.forEach((moduleWrapper, id) => {
+          if (t.isObjectProperty(moduleWrapper.node)) {
+            id = (moduleWrapper.node.key as t.NumericLiteral).value;
+            moduleWrapper = moduleWrapper.get('value') as NodePath<t.Node>;
+          }
+
           if (moduleWrapper.isFunctionExpression()) {
             renameParams(moduleWrapper);
 
@@ -63,7 +70,14 @@ function renameParams(moduleWrapper: NodePath<t.FunctionExpression>) {
 
 const entryIdMatcher = m.capture(m.numericLiteral());
 const moduleFunctionsMatcher = m.capture(
-  m.arrayExpression(m.anyList(m.zeroOrMore(), m.functionExpression()))
+  m.or(
+    // E.g. [,,function (e, t, i) {...}, ...], index is the module ID
+    m.arrayExpression(m.arrayOf(m.or(m.functionExpression(), null))),
+    // E.g. {0: function (e, t, i) {...}, ...}, key is the module ID
+    m.objectExpression(
+      m.arrayOf(m.objectProperty(m.numericLiteral(), m.functionExpression()))
+    )
+  )
 );
 
 const matcher = m.callExpression(

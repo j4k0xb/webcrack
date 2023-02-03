@@ -5,7 +5,7 @@ import webcrack from '../src/index';
 import { relativePath } from '../src/utils/path';
 
 describe('extractor', async () => {
-  test('webpack', async () => {
+  test('webpack array', async () => {
     const { bundle } = webcrack(
       await readFile('./test/samples/webpack.js', 'utf8')
     );
@@ -14,6 +14,20 @@ describe('extractor', async () => {
     expect(bundle.type).toBe('webpack');
     expect(bundle.entryId).toBe(2);
     expect(bundle.modules.size).toBe(3);
+    for (const module of bundle.modules.values()) {
+      expect(module.ast).toMatchSnapshot();
+    }
+  });
+
+  test('webpack object', async () => {
+    const { bundle } = webcrack(
+      await readFile('./test/samples/webpack_object.js', 'utf8')
+    );
+    expect(bundle).toBeDefined();
+    assert(bundle);
+    expect(bundle.type).toBe('webpack');
+    expect(bundle.entryId).toBe(386);
+    expect(bundle.modules.size).toBe(2);
     for (const module of bundle.modules.values()) {
       expect(module.ast).toMatchSnapshot();
     }
