@@ -49,16 +49,16 @@ export class Bundle {
       })),
     };
 
+    mkdirSync(path, { recursive: true });
+
     writeFileSync(
       join(path, 'bundle.json'),
       JSON.stringify(bundleJson, null, 2),
       'utf8'
     );
 
-    mkdirSync(join(path, 'modules'), { recursive: true });
-
     this.modules.forEach(module => {
-      const modulePath = join(path, 'modules', module.path);
+      const modulePath = join(path, module.path);
       mkdirSync(dirname(modulePath), { recursive: true });
       writeFileSync(modulePath, module.code, 'utf8');
     });
