@@ -38,17 +38,18 @@ describe('inline decoder', () => {
       function decoder() {}
       decoder(1);
       (() => {
-        const alias = decoder;
+        const alias = decoder, alias3 = alias;
         alias(2);
+        alias3(3);
         (() => {
-          const alias2 = alias;
-          alias2(3);
+          let alias2;
+          (alias2 = alias)(4);
         });
       });
   `);
     traverse(ast, {
       FunctionDeclaration(path) {
-        const binding = path.scope.parent.bindings.decoder;
+        const binding = path.scope.getBinding('decoder')!;
         inlineVariableAliases(binding);
         path.stop();
       },

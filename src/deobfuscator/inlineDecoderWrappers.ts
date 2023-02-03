@@ -13,8 +13,10 @@ export default {
     if (!decoder || !decoder.node.id) return;
 
     const decoderName = decoder.node.id.name;
-    const decoderBinding = decoder.parentPath.scope.bindings[decoderName];
-    inlineVariableAliases(decoderBinding);
-    inlineFunctionAliases(decoderBinding);
+    const decoderBinding = decoder.parentPath.scope.getBinding(decoderName);
+    if (decoderBinding) {
+      inlineVariableAliases(decoderBinding);
+      inlineFunctionAliases(decoderBinding);
+    }
   },
 } satisfies Transform<NodePath<t.FunctionDeclaration>>;

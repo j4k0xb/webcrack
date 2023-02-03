@@ -12,34 +12,60 @@ export function codePreview(node: t.Node) {
 }
 
 /**
- * Recursively renames all aliases variable declarations to the binding name.
- * Make sure the binding name isn't shadowed anywhere above the alias scope!
+ * Recursively renames all references to the binding.
+ * Make sure the binding name isn't shadowed anywhere!
  *
- * Example: `var alias = original; alias(1);` -> `original(1);`
+ * Example: `var alias = decoder; alias(1);` -> `decoder(1);`
  */
-export function inlineVariableAliases(binding: Binding) {
+export function inlineVariableAliases(
+  binding: Binding,
+  targetName = binding.identifier.name
+) {
   const refs = [...binding.referencePaths];
   const varName = m.capture(m.anyString());
-  const matcher = m.variableDeclarator(
-    m.identifier(varName),
-    m.identifier(binding.identifier.name)
+  const matcher = m.or(
+    m.variableDeclarator(
+      m.identifier(varName),
+      m.identifier(binding.identifier.name)
+    ),
+    m.assignmentExpression(
+      '=',
+      m.identifier(varName),
+      m.identifier(binding.identifier.name)
+    )
   );
 
   for (const ref of refs) {
     if (matcher.match(ref.parent)) {
       const varScope = ref.scope;
+      const varBinding = varScope.getBinding(varName.current!);
+      if (!varBinding) continue;
 
       // Check all further aliases (`var alias2 = alias;`)
-      const varRefs = varScope.bindings[varName.current!].referencePaths;
-      refs.push(...varRefs);
+      inlineVariableAliases(varBinding, targetName);
 
-      varScope.rename(varName.current!, binding.identifier.name);
-      ref.parentPath?.remove();
+      if (ref.parentPath?.isAssignmentExpression()) {
+        // Remove `var alias;` when the assignment happens separately
+        varBinding.path.remove();
+
+        if (t.isExpressionStatement(ref.parentPath.parentPath)) {
+          // Remove `alias = decoder;`
+          ref.parentPath.remove();
+        } else {
+          // Replace `(alias = decoder)(1);` with `decoder(1);`
+          ref.parentPath.replaceWith(ref.parentPath.node.right);
+        }
+      } else if (ref.parentPath?.isVariableDeclarator()) {
+        // Remove `alias = decoder;` of declarator
+        ref.parentPath!.remove();
+      }
+    } else {
+      // Rename the reference
+      ref.replaceWith(t.identifier(targetName));
     }
   }
 
   // Have to crawl again because renaming messed up the references
-  binding.scope.crawl();
 }
 
 /**
@@ -68,8 +94,10 @@ export function inlineFunctionAliases(binding: Binding) {
     );
 
     if (fn && matcher.match(fn.node)) {
+      const fnBinding = fn.scope.parent.getBinding(fnName.current!);
+      if (!fnBinding) continue;
       // Check all further aliases (`function alias2(a, b) { return alias(a - 1, b + 3); }`)
-      const fnRefs = fn.scope.parent.bindings[fnName.current!].referencePaths;
+      const fnRefs = fnBinding.referencePaths;
       refs.push(...fnRefs);
 
       // E.g. [alias(1071, 1077), alias(1, 2)]

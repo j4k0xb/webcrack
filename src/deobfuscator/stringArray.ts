@@ -19,7 +19,9 @@ export function findStringArray(ast: t.Node) {
           e => (e as t.StringLiteral).value
         );
         const name = functionName.current!;
-        let references = path.parentPath.scope.bindings[name].referencePaths;
+        const binding = path.parentPath.scope.getBinding(name);
+        if (!binding) return;
+        let references = binding.referencePaths;
         // Skip references in the getStringArray function itself
         references = references.filter(ref => !ref.findParent(p => p === path));
         path.parentPath.scope.rename(name, '__STRING_ARRAY__');

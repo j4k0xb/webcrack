@@ -16,22 +16,6 @@ exports.a = 3;
 
 exports[`extractor > path mapping 3`] = `module.exports = 4;`;
 
-exports[`extractor > webpack 1`] = `const a = require("./3.js");`;
-
-exports[`extractor > webpack 2`] = `
-const a = require("./1.js");
-const _module = 1;
-module.exports.color = "#FBC02D";
-{
-  const _module2 = 2;
-  console.log(_module2);
-  console.log(module);
-}
-exports.a = 3;
-`;
-
-exports[`extractor > webpack 3`] = `module.exports = 4;`;
-
 exports[`extractor > webpack array 1`] = `const a = require("./3.js");`;
 
 exports[`extractor > webpack array 2`] = `

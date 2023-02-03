@@ -92,8 +92,9 @@ exports[`inline decoder > inline variable 1`] = `
 decoder(1);
 () => {
   decoder(2);
+  decoder(3);
   () => {
-    decoder(3);
+    alias(4);
   };
 };"
 `;
