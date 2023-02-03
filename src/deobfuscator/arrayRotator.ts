@@ -1,6 +1,7 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { callExpression } from '@codemod/matchers';
 import { infiniteLoop } from '../utils/matcher';
 
 export interface ArrayRotator {
@@ -36,12 +37,10 @@ export function findArrayRotator(ast: t.Node) {
 
 // e.g. 'array'
 const arrayName = m.capture(m.anyString());
+
 // e.g. array.push(array.shift())
 const pushShift = m.callExpression(
-  m.memberExpression(
-    m.identifier(m.fromCapture(arrayName)),
-    m.identifier('push')
-  ),
+  m.memberExpression(m.identifier(arrayName), m.identifier('push')),
   [
     m.callExpression(
       m.memberExpression(
@@ -51,6 +50,7 @@ const pushShift = m.callExpression(
     ),
   ]
 );
+
 const matcher = m.expressionStatement(
   m.callExpression(
     m.functionExpression(
@@ -59,18 +59,22 @@ const matcher = m.expressionStatement(
       m.blockStatement(
         m.anyList<t.Statement>(
           m.zeroOrMore(),
-          // var array = getStringArray();
-          m.variableDeclaration(undefined, [
-            m.variableDeclarator(m.identifier(arrayName)),
-          ]),
-          m.zeroOrMore(),
           infiniteLoop(
-            m.blockStatement([
-              m.tryStatement(
-                m.containerOf(pushShift),
-                m.containerOf(pushShift)
-              ),
-            ])
+            m.matcher<t.BlockStatement>(node => {
+              return (
+                m
+                  .containerOf(callExpression(m.identifier('parseInt')))
+                  .match(node) &&
+                m
+                  .blockStatement([
+                    m.tryStatement(
+                      m.containerOf(pushShift),
+                      m.containerOf(pushShift)
+                    ),
+                  ])
+                  .match(node)
+              );
+            })
           )
         )
       )
