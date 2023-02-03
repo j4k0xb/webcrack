@@ -2,6 +2,7 @@ import traverse, { Node, TraverseOptions } from '@babel/traverse';
 import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
+import deterministicIf from './deterministicIf';
 import extractTernaryCalls from './extractTernaryCalls';
 import numberExpressions from './numberExpressions';
 import rawLiterals from './rawLiterals';
@@ -19,6 +20,7 @@ export const transforms: Transform<any>[] = [
   numberExpressions,
   unminifyBooleans,
   booleanIf,
+  deterministicIf,
 ];
 
 export function applyTransforms(ast: Node, tags: Tag[]) {

@@ -205,3 +205,40 @@ describe('booleanIf', () => {
       }
     `));
 });
+
+describe('deterministicIf', () => {
+  test('always true', ({ expectTransform }) => {
+    expectTransform(`
+      if ("xyz" === "xyz") {
+        a();
+      } else {
+        b();
+      }
+  `).toMatchInlineSnapshot('a();');
+    expectTransform(`
+      if ("xyz" !== "abc") {
+        a();
+      } else {
+        b();
+      }
+  `).toMatchInlineSnapshot('a();');
+  });
+
+  test('always false', ({ expectTransform }) => {
+    expectTransform(`
+      if ("abc" === "xyz") {
+        a();
+      } else {
+        b();
+      }
+  `).toMatchInlineSnapshot('b();');
+
+    expectTransform(`
+      if ("abc" !== "abc") {
+        a();
+      } else {
+        b();
+      }
+  `).toMatchInlineSnapshot('b();');
+  });
+});
