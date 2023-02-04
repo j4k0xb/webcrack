@@ -11,7 +11,7 @@ export default {
       if (
         node.computed &&
         t.isStringLiteral(node.property) &&
-        t.isValidIdentifier(node.property.value)
+        isValidProperty(node.property.value)
       ) {
         node.computed = false;
         node.property = t.identifier(node.property.value);
@@ -21,3 +21,7 @@ export default {
     noScope: true,
   }),
 } satisfies Transform;
+
+function isValidProperty(name: string) {
+  return /^(?!\d)[\w$]+$/.test(name);
+}

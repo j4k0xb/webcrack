@@ -88,10 +88,14 @@ describe('splitVariableDeclarations', () => {
 });
 
 describe('computedProperties', () => {
-  test('convert to identifier', ({ expectTransform }) =>
+  test('convert to identifier', ({ expectTransform }) => {
     expectTransform(`
       console["log"]("hello");
-    `).toMatchInlineSnapshot('console.log("hello");'));
+    `).toMatchInlineSnapshot('console.log("hello");');
+    expectTransform(`
+      require("foo")["default"];
+    `).toMatchInlineSnapshot('require("foo").default;');
+  });
 
   test('ignore invalid identifier', ({ expectTransform }) =>
     expectTransform(`
