@@ -20,7 +20,8 @@ export function codePreview(node: t.Node) {
 export function inlineVariableAliases(
   binding: Binding,
   targetName = binding.identifier.name
-) {
+): { changes: number } {
+  const state = { changes: 0 };
   const refs = [...binding.referencePaths];
   const varName = m.capture(m.anyString());
   const matcher = m.or(
@@ -42,7 +43,7 @@ export function inlineVariableAliases(
       if (!varBinding) continue;
 
       // Check all further aliases (`var alias2 = alias;`)
-      inlineVariableAliases(varBinding, targetName);
+      state.changes += inlineVariableAliases(varBinding, targetName).changes;
 
       if (ref.parentPath?.isAssignmentExpression()) {
         // Remove `var alias;` when the assignment happens separately
@@ -59,13 +60,15 @@ export function inlineVariableAliases(
         // Remove `alias = decoder;` of declarator
         ref.parentPath!.remove();
       }
+      state.changes++;
     } else {
       // Rename the reference
       ref.replaceWith(t.identifier(targetName));
+      state.changes++;
     }
   }
 
-  // Have to crawl again because renaming messed up the references
+  return state;
 }
 
 /**
@@ -74,7 +77,8 @@ export function inlineVariableAliases(
  * ->
  * `decode(1077 - 938, 1071)`
  */
-export function inlineFunctionAliases(binding: Binding) {
+export function inlineFunctionAliases(binding: Binding): { changes: number } {
+  const state = { changes: 0 };
   const refs = [...binding.referencePaths];
   for (const ref of refs) {
     const fn = ref.findParent(p =>
@@ -126,12 +130,15 @@ export function inlineFunctionAliases(binding: Binding) {
         callRef.replaceWith(
           (fnClone.body.body[0] as t.ReturnStatement).argument!
         );
+        state.changes++;
       }
 
       fn.remove();
+      state.changes++;
     }
   }
 
   // Have to crawl again because renaming messed up the references
   binding.scope.crawl();
+  return state;
 }

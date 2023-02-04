@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-import { program } from 'commander';
+import { InvalidArgumentError, program } from 'commander';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { webcrack } from '.';
+import { defaultOptions } from './index';
 
 const { version } = JSON.parse(
   readFileSync(join(__dirname, '..', 'package.json'), 'utf8')
@@ -12,10 +13,17 @@ const { version } = JSON.parse(
 program
   .version(version)
   .option('-o, --output <path>', 'output directory', 'webcrack-out')
+  .option(
+    '-m, --max-iterations <number>',
+    'maximum iterations for readability transforms',
+    validatePositiveNumber,
+    defaultOptions.maxIterations
+  )
   .option('-f, --force', 'overwrite output directory')
   .argument('<file>', 'input file')
+  .showHelpAfterError()
   .action(async input => {
-    const { output, force } = program.opts();
+    const { output, maxIterations, force } = program.opts();
 
     if (force || !existsSync(output)) {
       rmSync(output, { recursive: true, force: true });
@@ -23,6 +31,16 @@ program
       program.error('output directory already exists');
     }
 
-    (await webcrack(readFileSync(input, 'utf8'))).save(output);
+    (await webcrack(readFileSync(input, 'utf8'), { maxIterations })).save(
+      output
+    );
   })
   .parse();
+
+function validatePositiveNumber(value: string) {
+  const n = Number(value);
+  if (Number.isNaN(n) || n < 0) {
+    throw new InvalidArgumentError('Not a positive number');
+  }
+  return n;
+}

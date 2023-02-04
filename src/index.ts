@@ -37,18 +37,34 @@ export interface Options {
   mappings?: (
     m: typeof import('@codemod/matchers')
   ) => Record<string, m.Matcher<any>>;
+  /**
+   * Maximum number of iterations for readability transforms.
+   */
+  maxIterations?: number;
 }
+
+export const defaultOptions = {
+  maxIterations: 5,
+} satisfies Options;
 
 export default webcrack;
 
 export async function webcrack(
   code: string,
-  options: Options = {}
+  options: Options = defaultOptions
 ): Promise<WebcrackResult> {
   const ast = parse(code, { sourceType: 'unambiguous' });
 
   applyTransform(ast, deobfuscator);
-  applyTransforms(ast, ['readability']);
+
+  for (
+    let i = 1;
+    i <= (options.maxIterations ?? defaultOptions.maxIterations);
+    i++
+  ) {
+    console.log('\n== Iteration', i, '==');
+    if (applyTransforms(ast, ['readability']).changes === 0) break;
+  }
 
   const bundle = extractBundle(ast);
   if (bundle && options.mappings) bundle.applyMappings(options.mappings(m));

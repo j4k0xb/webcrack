@@ -27,12 +27,14 @@ export const transforms: Transform<any>[] = [
   deterministicIf,
 ];
 
-export function applyTransforms(ast: Node, tags: Tag[]) {
+export function applyTransforms(ast: Node, tags: Tag[]): { changes: number } {
+  const state = { changes: 0 };
   transforms
     .filter(t => tags.some(x => t.tags.includes(x)))
     .forEach(transform => {
-      applyTransform(ast, transform);
+      state.changes += applyTransform(ast, transform).changes;
     });
+  return state;
 }
 
 export function applyTransform<TOptions>(
@@ -43,23 +45,26 @@ export function applyTransform<TOptions>(
   const start = performance.now();
   console.log(`${transform.name}: started`);
 
+  const state = { changes: 0 };
+
   transform.preTransforms?.forEach(preTransform => {
-    applyTransform(ast, preTransform);
+    state.changes += applyTransform(ast, preTransform).changes;
   });
 
-  const state = { changes: 0 };
   transform.run?.(ast, state, options);
   if (transform.visitor)
     traverse(ast, transform.visitor(options), undefined, state);
 
   transform.postTransforms?.forEach(postTransform => {
-    applyTransform(ast, postTransform);
+    state.changes += applyTransform(ast, postTransform).changes;
   });
 
   console.log(
-    `${transform.name}: finished in ${Math.floor(
-      performance.now() - start
-    )} ms with ${state.changes} changes`
+    `${transform.name}: finished in`,
+    Math.floor(performance.now() - start),
+    'ms with',
+    state.changes,
+    'changes'
   );
 
   return state;

@@ -18,13 +18,14 @@ npm install -g webcrack
 Usage: webcrack [options] <file>
 
 Arguments:
-  file                 input file
+  file                           input file
 
 Options:
-  -V, --version        output the version number
-  -o, --output <path>  output directory (default: "webcrack-out")
-  -f, --force          overwrite output directory
-  -h, --help           display help for command
+  -V, --version                  output the version number
+  -o, --output <path>            output directory (default: "webcrack-out")
+  -m, --max-iterations <number>  maximum iterations for readability transforms (default: 5)
+  -f, --force                    overwrite output directory
+  -h, --help                     display help for command
 ```
 
 ```js

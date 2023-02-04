@@ -15,8 +15,8 @@ export default {
     const decoderName = decoder.node.id.name;
     const decoderBinding = decoder.parentPath.scope.getBinding(decoderName);
     if (decoderBinding) {
-      inlineVariableAliases(decoderBinding);
-      inlineFunctionAliases(decoderBinding);
+      state.changes += inlineVariableAliases(decoderBinding).changes;
+      state.changes += inlineFunctionAliases(decoderBinding).changes;
     }
   },
 } satisfies Transform<NodePath<t.FunctionDeclaration>>;
