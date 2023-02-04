@@ -1,7 +1,7 @@
 import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import * as m from '@codemod/matchers';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import { Bundle, extractBundle } from './extractor';
@@ -14,10 +14,15 @@ export interface WebcrackResult {
    * Save the deobufscated code and the extracted bundle to the given directory.
    * @param path Output directory
    */
-  save(path: string): void;
+  save(path: string): Promise<void>;
 }
 
 export interface Options {
+  /**
+   * Run for every module after generating the code and before saving it.
+   * This can be used to format the code or apply other transformations.
+   */
+  transformCode?: (code: string) => Promise<string> | string;
   /**
    * Assigns paths to modules based on the given matchers.
    * This will also rewrite `require()` calls to use the new paths.
@@ -36,7 +41,10 @@ export interface Options {
 
 export default webcrack;
 
-export function webcrack(code: string, options: Options = {}): WebcrackResult {
+export async function webcrack(
+  code: string,
+  options: Options = {}
+): Promise<WebcrackResult> {
   const ast = parse(code, { sourceType: 'unambiguous' });
 
   applyTransform(ast, deobfuscator);
@@ -47,15 +55,18 @@ export function webcrack(code: string, options: Options = {}): WebcrackResult {
   bundle?.replaceRequireCalls();
   console.log('Bundle:', bundle);
 
-  const outputCode = generate(ast).code;
+  let outputCode = generate(ast).code;
+  outputCode = options.transformCode
+    ? await options.transformCode(outputCode)
+    : outputCode;
 
   return {
     code: outputCode,
     bundle,
-    save(path) {
-      mkdirSync(path, { recursive: true });
-      writeFileSync(join(path, 'deobfuscated.js'), outputCode, 'utf8');
-      bundle?.save(path);
+    async save(path) {
+      await mkdir(path, { recursive: true });
+      await writeFile(join(path, 'deobfuscated.js'), outputCode, 'utf8');
+      bundle?.save(path, options.transformCode);
     },
   };
 }

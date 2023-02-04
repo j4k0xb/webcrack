@@ -6,7 +6,7 @@ import { relativePath } from '../src/utils/path';
 
 describe('extractor', async () => {
   test('webpack array', async () => {
-    const { bundle } = webcrack(
+    const { bundle } = await webcrack(
       await readFile('./test/samples/webpack.js', 'utf8')
     );
     expect(bundle).toBeDefined();
@@ -20,7 +20,7 @@ describe('extractor', async () => {
   });
 
   test('webpack object', async () => {
-    const { bundle } = webcrack(
+    const { bundle } = await webcrack(
       await readFile('./test/samples/webpack_object.js', 'utf8')
     );
     expect(bundle).toBeDefined();
@@ -34,7 +34,7 @@ describe('extractor', async () => {
   });
 
   test('path mapping', async () => {
-    const { bundle } = webcrack(
+    const { bundle } = await webcrack(
       await readFile('./test/samples/webpack.js', 'utf8'),
       { mappings: m => ({ './utils/color.js': m.stringLiteral('#FBC02D') }) }
     );

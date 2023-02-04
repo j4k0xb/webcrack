@@ -1,7 +1,7 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { relativePath } from '../utils/path';
 import { Module } from './module';
@@ -39,7 +39,10 @@ export class Bundle {
    * Saves each module to a file and the bundle metadata to a JSON file.
    * @param path Output directory
    */
-  save(path: string) {
+  async save(
+    path: string,
+    transformCode = (code: string): Promise<string> | string => code
+  ) {
     const bundleJson = {
       type: this.type,
       entryId: this.entryId,
@@ -49,19 +52,22 @@ export class Bundle {
       })),
     };
 
-    mkdirSync(path, { recursive: true });
+    await mkdir(path, { recursive: true });
 
-    writeFileSync(
+    await writeFile(
       join(path, 'bundle.json'),
       JSON.stringify(bundleJson, null, 2),
       'utf8'
     );
 
-    this.modules.forEach(module => {
-      const modulePath = join(path, module.path);
-      mkdirSync(dirname(modulePath), { recursive: true });
-      writeFileSync(modulePath, module.code, 'utf8');
-    });
+    await Promise.all(
+      Array.from(this.modules.values(), async module => {
+        const modulePath = join(path, module.path);
+        const code = await transformCode(module.code);
+        await mkdir(dirname(modulePath), { recursive: true });
+        await writeFile(modulePath, code, 'utf8');
+      })
+    );
   }
 
   /**

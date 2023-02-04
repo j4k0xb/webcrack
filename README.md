@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
 [![license](https://img.shields.io/github/license/j4k0xb/webcrack)](/LICENSE)
 
-Deobfuscator, unminifier and bundle unpacker for javascript
+Deobfuscate, unminify and unpack bundled javascript
 
 ## Installation
 
@@ -30,7 +30,7 @@ Options:
 ```js
 import { webcrack } from 'webcrack';
 
-console.log(webcrack('const a = 1+1;').code);
+console.log((await webcrack('const a = 1+1;')).code);
 ```
 
 ## Deobfuscations
@@ -68,11 +68,12 @@ and allows the paths to be remapped based on AST matching.
 import { webcrack } from 'webcrack';
 import { readFileSync } from 'fs';
 
-webcrack(readFileSync('webpack-bundle.js', 'utf8'), {
+const result = await webcrack(readFileSync('webpack-bundle.js', 'utf8'), {
   mappings: m => ({
     './utils/color.js': m.regExpLiteral('^#([0-9a-f]{3}){1,2}$'),
   }),
-}).save('output-dir');
+});
+result.save('output-dir');
 ```
 
 See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers#readme) for more information about the `mappings` option.

@@ -14,7 +14,7 @@ program
   .option('-o, --output <path>', 'output directory', 'webcrack-out')
   .option('-f, --force', 'overwrite output directory')
   .argument('<file>', 'input file')
-  .action(input => {
+  .action(async input => {
     const { output, force } = program.opts();
 
     if (force || !existsSync(output)) {
@@ -23,6 +23,6 @@ program
       program.error('output directory already exists');
     }
 
-    webcrack(readFileSync(input, 'utf8')).save(output);
+    (await webcrack(readFileSync(input, 'utf8'))).save(output);
   })
   .parse();

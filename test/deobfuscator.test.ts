@@ -14,7 +14,7 @@ test.each([
   'obfuscator.io-multi-encoders.js',
   'obfuscator.io-function-wrapper.js',
 ])(`deobfuscate %s`, async filename => {
-  const result = webcrack(
+  const result = await webcrack(
     await readFile(join('./test/samples', filename), 'utf8')
   );
   expect(result.code).toMatchSnapshot();
