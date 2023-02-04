@@ -18,6 +18,32 @@ export default {
         this.changes++;
       }
     },
+    ObjectProperty(path) {
+      const { node } = path;
+
+      if (
+        node.computed &&
+        t.isStringLiteral(node.key) &&
+        isValidProperty(node.key.value)
+      ) {
+        node.computed = false;
+        node.key = t.identifier(node.key.value);
+        this.changes++;
+      }
+    },
+    ObjectMethod(path) {
+      const { node } = path;
+
+      if (
+        node.computed &&
+        t.isStringLiteral(node.key) &&
+        isValidProperty(node.key.value)
+      ) {
+        node.computed = false;
+        node.key = t.identifier(node.key.value);
+        this.changes++;
+      }
+    },
     noScope: true,
   }),
 } satisfies Transform;

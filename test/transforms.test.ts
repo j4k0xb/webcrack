@@ -95,6 +95,17 @@ describe('computedProperties', () => {
     expectTransform(`
       require("foo")["default"];
     `).toMatchInlineSnapshot('require("foo").default;');
+    expectTransform(`
+      const x = { ["foo"](){} };
+      const y = { ["foo"]: 1 };
+    `).toMatchInlineSnapshot(`
+      const x = {
+        foo() {}
+      };
+      const y = {
+        foo: 1
+      };
+    `);
   });
 
   test('ignore invalid identifier', ({ expectTransform }) =>
