@@ -11,6 +11,7 @@ import { inlineFunctionAliases, inlineVariableAliases } from '../src/utils/ast';
 // Test samples
 test.each([
   'obfuscator.io.js',
+  'obfuscator.io-rotator-unary.js',
   'obfuscator.io-multi-encoders.js',
   'obfuscator.io-function-wrapper.js',
 ])(`deobfuscate %s`, async filename => {

@@ -51,33 +51,35 @@ const pushShift = m.callExpression(
   ]
 );
 
-const matcher = m.expressionStatement(
-  m.callExpression(
-    m.functionExpression(
-      null,
-      m.anything(),
-      m.blockStatement(
-        m.anyList<t.Statement>(
-          m.zeroOrMore(),
-          infiniteLoop(
-            m.matcher<t.BlockStatement>(node => {
-              return (
-                m
-                  .containerOf(callExpression(m.identifier('parseInt')))
-                  .match(node) &&
-                m
-                  .blockStatement([
-                    m.tryStatement(
-                      m.containerOf(pushShift),
-                      m.containerOf(pushShift)
-                    ),
-                  ])
-                  .match(node)
-              );
-            })
-          )
+const callMatcher = m.callExpression(
+  m.functionExpression(
+    null,
+    m.anything(),
+    m.blockStatement(
+      m.anyList<t.Statement>(
+        m.zeroOrMore(),
+        infiniteLoop(
+          m.matcher<t.BlockStatement>(node => {
+            return (
+              m
+                .containerOf(callExpression(m.identifier('parseInt')))
+                .match(node) &&
+              m
+                .blockStatement([
+                  m.tryStatement(
+                    m.containerOf(pushShift),
+                    m.containerOf(pushShift)
+                  ),
+                ])
+                .match(node)
+            );
+          })
         )
       )
     )
   )
+);
+
+const matcher = m.expressionStatement(
+  m.or(callMatcher, m.unaryExpression('!', callMatcher))
 );

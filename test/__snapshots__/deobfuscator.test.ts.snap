@@ -76,6 +76,13 @@ exports[`deobfuscate obfuscator.io-multi-encoders.js 1`] = `
 hi();"
 `;
 
+exports[`deobfuscate obfuscator.io-rotator-unary.js 1`] = `
+"function hi() {
+  console.log(\\"Hello World!\\");
+}
+hi();"
+`;
+
 exports[`inline decoder > inline function 1`] = `
 "function decoder() {}
 decoder(1);
