@@ -23,12 +23,16 @@ export function createVM(options: {
   });
   vm.freeze(util, 'util');
 
-  const stringArrayCode = generate(options.stringArray.path.node).code;
+  // Generate as compact to bypass the debug protection
+  // (which tests someFunction.toString against a regex)
+  const stringArrayCode = generate(options.stringArray.path.node, {
+    compact: true,
+  }).code;
   const rotatorCode = options.rotator
-    ? generate(options.rotator.path.node).code
+    ? generate(options.rotator.path.node, { compact: true }).code
     : '';
   const decoderCode = options.decoders
-    .map(decoder => generate(decoder.path.node).code)
+    .map(decoder => generate(decoder.path.node, { compact: true }).code)
     .join('\n');
 
   // Precompute the rotated string array to allow for faster decoding
