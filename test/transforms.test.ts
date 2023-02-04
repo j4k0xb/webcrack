@@ -47,14 +47,18 @@ describe('sequence', () => {
 
   test('rearrange from if', ({ expectTransform }) =>
     expectTransform(`
-      function f() {
-        if (a(), b()) c();
-      }
+      if (a(), b()) c();
     `).toMatchInlineSnapshot(`
-      function f() {
-        a();
-        if (b()) c();
-      }
+      a();
+      if (b()) c();
+    `));
+
+  test('rearrange from switch', ({ expectTransform }) =>
+    expectTransform(`
+      switch (a(), b()) {}
+    `).toMatchInlineSnapshot(`
+      a();
+      switch (b()) {}
     `));
 
   test('rearrange from for-in', ({ expectTransform }) =>

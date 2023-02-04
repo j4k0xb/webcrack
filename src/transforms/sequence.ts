@@ -33,6 +33,15 @@ export default {
         this.changes++;
       }
     },
+    SwitchStatement(path) {
+      if (t.isSequenceExpression(path.node.discriminant)) {
+        const expressions = path.node.discriminant.expressions;
+        path.node.discriminant = expressions.pop()!;
+        const statements = expressions.map(expr => t.expressionStatement(expr));
+        path.insertBefore(statements);
+        this.changes++;
+      }
+    },
     ForInStatement(path) {
       const sequence = m.capture(m.sequenceExpression());
       const matcher = m.forInStatement(m.anything(), sequence);
