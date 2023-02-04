@@ -44,17 +44,27 @@ export default {
     for (const decoder of decoders) {
       console.log(` - ${codePreview(decoder.path.node)}`);
 
-      applyTransform(ast, inlineDecoderWrappers, decoder.path);
+      state.changes += applyTransform(
+        ast,
+        inlineDecoderWrappers,
+        decoder.path
+      ).changes;
 
       // Needed so the decoder calls only contain literal arguments
-      applyTransform(ast, extractTernaryCalls, { callee: decoder.name });
+      state.changes += applyTransform(ast, extractTernaryCalls, {
+        callee: decoder.name,
+      }).changes;
     }
 
     const vm = createVM({ stringArray, rotator, decoders });
-    applyTransform(ast, inlineDecodedStrings, { decoders, vm });
+    state.changes += applyTransform(ast, inlineDecodedStrings, {
+      decoders,
+      vm,
+    }).changes;
 
     stringArray.path.remove();
-    decoders.forEach(decoder => decoder.path.remove());
     rotator?.path.remove();
+    decoders.forEach(decoder => decoder.path.remove());
+    state.changes += 2 + decoders.length;
   },
 } satisfies Transform;

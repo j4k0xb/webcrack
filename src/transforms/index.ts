@@ -37,7 +37,7 @@ export function applyTransform<TOptions>(
   ast: Node,
   transform: Transform<TOptions>,
   options?: TOptions
-) {
+): { changes: number } {
   const start = performance.now();
   console.log(`${transform.name}: started`);
 
@@ -59,6 +59,8 @@ export function applyTransform<TOptions>(
       performance.now() - start
     )} ms with ${state.changes} changes`
   );
+
+  return state;
 }
 
 export interface Transform<TOptions = any> {
