@@ -41,11 +41,11 @@ function a(b) {
       if ((\\"\\" + f / f).length !== 1 || f % 20 === 0) {
         (function () {
           return true;
-        }).constructor(\\"debu\\" + \\"gger\\").call(\\"action\\");
+        }).constructor(\\"debugger\\").call(\\"action\\");
       } else {
         (function () {
           return false;
-        }).constructor(\\"debu\\" + \\"gger\\").apply(\\"stateObject\\");
+        }).constructor(\\"debugger\\").apply(\\"stateObject\\");
       }
     }
     e(++f);

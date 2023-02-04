@@ -4,6 +4,7 @@ import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
 import deterministicIf from './deterministicIf';
 import extractTernaryCalls from './extractTernaryCalls';
+import mergeStrings from './mergeStrings';
 import numberExpressions from './numberExpressions';
 import rawLiterals from './rawLiterals';
 import sequence from './sequence';
@@ -14,6 +15,7 @@ import unminifyBooleans from './unminifyBooleans';
 export const transforms: Transform<any>[] = [
   rawLiterals,
   blockStatement,
+  mergeStrings,
   computedProperties,
   sequence,
   splitVariableDeclarations,

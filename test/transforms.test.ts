@@ -260,3 +260,10 @@ describe('ternaryToIf', () => {
       const x = a ? b() : c();
     `).toMatchInlineSnapshot('const x = a ? b() : c();'));
 });
+
+describe('mergeStrings', () => {
+  test('multiple', ({ expectTransform }) =>
+    expectTransform(`
+      console.log("a" + "b" + "c");
+    `).toMatchInlineSnapshot('console.log("abc");'));
+});
