@@ -1,3 +1,4 @@
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
@@ -8,62 +9,53 @@ export default {
   visitor: () => ({
     enter(path) {
       // TODO: check binding conflicts
-      if (equalsMatcher.match(path.node)) {
-        if (
-          leftLiteral.current === rightLiteral.current &&
-          t.isBlockStatement(path.node.consequent)
-        ) {
-          path.replaceWithMultiple(path.node.consequent.body);
-          this.changes++;
-        } else if (t.isBlockStatement(path.node.alternate)) {
-          path.replaceWithMultiple(path.node.alternate.body);
-          this.changes++;
+
+      if (ifEqualsMatcher.match(path.node)) {
+        if (leftLiteral.current === rightLiteral.current) {
+          replace(path, path.node.consequent);
+        } else if (path.node.alternate) {
+          replace(path, path.node.alternate);
+        }
+        this.changes++;
+      }
+      if (ifNotEqualsMatcher.match(path.node)) {
+        if (leftLiteral.current !== rightLiteral.current) {
+          replace(path, path.node.consequent);
+        } else if (path.node.alternate) {
+          replace(path, path.node.alternate);
         }
       }
-      if (notEqualsMatcher.match(path.node)) {
-        if (
-          leftLiteral.current !== rightLiteral.current &&
-          t.isBlockStatement(path.node.consequent)
-        ) {
-          path.replaceWithMultiple(path.node.consequent.body);
-          this.changes++;
-        } else if (t.isBlockStatement(path.node.alternate)) {
-          path.replaceWithMultiple(path.node.alternate.body);
-          this.changes++;
-        }
-      }
+      this.changes++;
     },
     noScope: true,
   }),
 } satisfies Transform;
 
+function replace(path: NodePath, node: t.Node) {
+  if (t.isBlockStatement(node)) {
+    path.replaceWithMultiple(node.body);
+  } else {
+    path.replaceWith(node);
+  }
+}
+
 const leftLiteral = m.capture(m.anyString());
 const rightLiteral = m.capture(m.anyString());
-const equalsMatcher = m.ifStatement(
-  m.or(
-    m.binaryExpression(
-      '===',
-      m.stringLiteral(leftLiteral),
-      m.stringLiteral(rightLiteral)
-    ),
-    m.binaryExpression(
-      '==',
-      m.stringLiteral(leftLiteral),
-      m.stringLiteral(rightLiteral)
-    )
-  )
+const equalsMatcher = m.binaryExpression(
+  m.or('===', '=='),
+  m.stringLiteral(leftLiteral),
+  m.stringLiteral(rightLiteral)
 );
-const notEqualsMatcher = m.ifStatement(
-  m.or(
-    m.binaryExpression(
-      '!==',
-      m.stringLiteral(leftLiteral),
-      m.stringLiteral(rightLiteral)
-    ),
-    m.binaryExpression(
-      '!=',
-      m.stringLiteral(leftLiteral),
-      m.stringLiteral(rightLiteral)
-    )
-  )
+const notEqualsMatcher = m.binaryExpression(
+  m.or('!==', '!='),
+  m.stringLiteral(leftLiteral),
+  m.stringLiteral(rightLiteral)
+);
+const ifEqualsMatcher = m.or(
+  m.ifStatement(equalsMatcher),
+  m.conditionalExpression(equalsMatcher)
+);
+const ifNotEqualsMatcher = m.or(
+  m.ifStatement(notEqualsMatcher),
+  m.conditionalExpression(notEqualsMatcher)
 );

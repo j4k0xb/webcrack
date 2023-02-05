@@ -233,14 +233,21 @@ describe('deterministicIf', () => {
       } else {
         b();
       }
-  `).toMatchInlineSnapshot('a();');
+   `).toMatchInlineSnapshot('a();');
     expectTransform(`
       if ("xyz" !== "abc") {
         a();
       } else {
         b();
       }
-  `).toMatchInlineSnapshot('a();');
+   `).toMatchInlineSnapshot('a();');
+
+    expectTransform(`
+      "xyz" === "xyz" ? a() : b();
+    `).toMatchInlineSnapshot('a();');
+    expectTransform(`
+      "xyz" !== "abc" ? a() : b();
+    `).toMatchInlineSnapshot('a();');
   });
 
   test('always false', ({ expectTransform }) => {
@@ -250,15 +257,21 @@ describe('deterministicIf', () => {
       } else {
         b();
       }
-  `).toMatchInlineSnapshot('b();');
-
+   `).toMatchInlineSnapshot('b();');
     expectTransform(`
       if ("abc" !== "abc") {
         a();
       } else {
         b();
       }
-  `).toMatchInlineSnapshot('b();');
+    `).toMatchInlineSnapshot('b();');
+
+    expectTransform(`
+      "abc" === "xyz" ? a() : b();
+    `).toMatchInlineSnapshot('b();');
+    expectTransform(`
+      "abc" !== "abc" ? a() : b();
+    `).toMatchInlineSnapshot('b();');
   });
 });
 
