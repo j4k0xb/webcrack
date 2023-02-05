@@ -92,23 +92,34 @@ describe('splitVariableDeclarations', () => {
 });
 
 describe('computedProperties', () => {
-  test('convert to identifier', ({ expectTransform }) => {
+  test('member expression', ({ expectTransform }) => {
     expectTransform(`
-      console["log"]("hello");
-    `).toMatchInlineSnapshot('console.log("hello");');
+      require("foo")["default"]?.["bar"];
+    `).toMatchInlineSnapshot('require("foo").default?.bar;');
+  });
+
+  test('object', ({ expectTransform }) => {
     expectTransform(`
-      require("foo")["default"];
-    `).toMatchInlineSnapshot('require("foo").default;');
-    expectTransform(`
-      const x = { ["foo"](){} };
-      const y = { ["foo"]: 1 };
+      const x = { ["foo"](){}, ["bar"]: 1 };
     `).toMatchInlineSnapshot(`
       const x = {
+        foo() {},
+        bar: 1
+      };
+    `);
+  });
+
+  test('class', ({ expectTransform }) => {
+    expectTransform(`
+      class Foo {
+        ["foo"](){}
+        ["bar"] = 1;
+      }
+    `).toMatchInlineSnapshot(`
+      class Foo {
         foo() {}
-      };
-      const y = {
-        foo: 1
-      };
+        bar = 1;
+      }
     `);
   });
 
