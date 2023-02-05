@@ -34,14 +34,6 @@ import { webcrack } from 'webcrack';
 console.log((await webcrack('const a = 1+1;')).code);
 ```
 
-## Pipeline
-
-```mermaid
-graph LR;
-    Deobfuscate-->Unminify-->Save
-    Unminify-->Unpack-Bundle-->Path-Mapping-->Save
-```
-
 ## Deobfuscations
 
 ### [obfuscator.io](https://obfuscator.io)
