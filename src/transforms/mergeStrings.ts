@@ -6,10 +6,17 @@ export default {
   name: 'mergeStrings',
   tags: ['safe', 'readability'],
   visitor: () => ({
-    // On exit to correctly match nested string concatenations
     exit(path) {
       if (matcher.match(path.node)) {
-        path.replaceWith(t.stringLiteral(left.current! + right.current!));
+        // "a" + "b" -> "ab"
+        path.replaceWith(
+          t.stringLiteral(left.current!.value + right.current!.value)
+        );
+        this.changes++;
+      } else if (nestedMatcher.match(path.parent) && path.isStringLiteral()) {
+        // a + "b" + "c" -> a + "bc"
+        left.current!.value += right.current!.value;
+        path.remove();
         this.changes++;
       }
     },
@@ -17,10 +24,12 @@ export default {
   }),
 } satisfies Transform;
 
-const left = m.capture(m.anyString());
-const right = m.capture(m.anyString());
-const matcher = m.binaryExpression(
+const left = m.capture(m.stringLiteral(m.anyString()));
+const right = m.capture(m.stringLiteral(m.anyString()));
+
+const matcher = m.binaryExpression('+', left, right);
+const nestedMatcher = m.binaryExpression(
   '+',
-  m.stringLiteral(left),
-  m.stringLiteral(right)
+  m.binaryExpression('+', m.anything(), left),
+  right
 );

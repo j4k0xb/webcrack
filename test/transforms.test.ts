@@ -294,8 +294,12 @@ describe('ternaryToIf', () => {
 });
 
 describe('mergeStrings', () => {
-  test('multiple', ({ expectTransform }) =>
+  test('only strings', ({ expectTransform }) =>
     expectTransform(`
-      console.log("a" + "b" + "c");
-    `).toMatchInlineSnapshot('console.log("abc");'));
+      "a" + "b" + "c";
+    `).toMatchInlineSnapshot('"abc";'));
+  test('with variables', ({ expectTransform }) =>
+    expectTransform(`
+      "a" + "b" + xyz + "c" + "d";
+    `).toMatchInlineSnapshot('"ab" + xyz + "cd";'));
 });
