@@ -19,11 +19,19 @@ export class Bundle {
   ) {}
 
   applyMappings(mappings: Record<string, m.Matcher<any>>) {
+    const unusedMappings = new Set(Object.keys(mappings));
+
     for (const module of this.modules.values()) {
       traverse(module.ast, {
         enter(path) {
           for (const [name, matcher] of Object.entries(mappings)) {
             if (matcher.match(path.node)) {
+              if (unusedMappings.has(name)) {
+                unusedMappings.delete(name);
+              } else {
+                console.warn(`Mapping ${name} is already used.`);
+                continue;
+              }
               module.path = name;
               path.stop();
               break;
@@ -32,6 +40,12 @@ export class Bundle {
         },
         noScope: true,
       });
+    }
+
+    if (unusedMappings.size > 0) {
+      console.warn(
+        `Unused mappings: ${Array.from(unusedMappings).join(', ')}.`
+      );
     }
   }
 
