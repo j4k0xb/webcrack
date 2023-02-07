@@ -67,9 +67,7 @@ export async function webcrack(
   }
 
   const bundle = extractBundle(ast);
-  if (bundle && options.mappings) bundle.applyMappings(options.mappings(m));
-  bundle?.replaceRequireCalls();
-  console.log('Bundle:', bundle);
+  console.log('Bundle:', bundle?.type);
 
   let outputCode = generate(ast).code;
   outputCode = options.transformCode

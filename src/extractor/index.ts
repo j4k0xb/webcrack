@@ -55,8 +55,14 @@ export class Bundle {
    */
   async save(
     path: string,
-    transformCode = (code: string): Promise<string> | string => code
+    transformCode = (code: string): Promise<string> | string => code,
+    mappings: (
+      m: typeof import('@codemod/matchers')
+    ) => Record<string, m.Matcher<any>> = m => ({})
   ) {
+    this.applyMappings(mappings(m));
+    this.replaceRequireCalls();
+
     const bundleJson = {
       type: this.type,
       entryId: this.entryId,

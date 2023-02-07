@@ -1,9 +1,9 @@
 // Vitest Snapshot v1
 
-exports[`extractor > path mapping 1`] = `const a = require("./3.js");`;
+exports[`extractor > path mapping 1`] = `const a = require(3);`;
 
 exports[`extractor > path mapping 2`] = `
-const a = require("../1.js");
+const a = require(1);
 const _module = 1;
 module.exports.color = "#FBC02D";
 {
@@ -16,10 +16,10 @@ exports.a = 3;
 
 exports[`extractor > path mapping 3`] = `module.exports = 4;`;
 
-exports[`extractor > webpack array 1`] = `const a = require("./3.js");`;
+exports[`extractor > webpack array 1`] = `const a = require(3);`;
 
 exports[`extractor > webpack array 2`] = `
-const a = require("./1.js");
+const a = require(1);
 const _module = 1;
 module.exports.color = "#FBC02D";
 {
@@ -32,6 +32,6 @@ exports.a = 3;
 
 exports[`extractor > webpack array 3`] = `module.exports = 4;`;
 
-exports[`extractor > webpack object 1`] = `const r = require("./387.js").default;`;
+exports[`extractor > webpack object 1`] = `const r = require(387).default;`;
 
 exports[`extractor > webpack object 2`] = `module.exports = "test";`;
