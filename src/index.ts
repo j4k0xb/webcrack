@@ -80,7 +80,7 @@ export async function webcrack(
     async save(path) {
       await mkdir(path, { recursive: true });
       await writeFile(join(path, 'deobfuscated.js'), outputCode, 'utf8');
-      bundle?.save(path, options.transformCode);
+      bundle?.save(path, options.transformCode, options.mappings);
     },
   };
 }
