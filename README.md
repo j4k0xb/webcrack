@@ -2,7 +2,7 @@
 
 [![Test](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml/badge.svg)](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml)
 [![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
-[![license](https://img.shields.io/github/license/j4k0xb/webcrack)](/LICENSE)
+[![license](https://img.shields.io/github/license/j4k0xb/webcrack)](https://github.com/j4k0xb/webcrack/blob/master/LICENSE)
 
 Deobfuscate, unminify and unpack bundled javascript
 
