@@ -1,29 +1,33 @@
 import { parse } from '@babel/parser';
-import { assert, beforeEach, describe, expect, test } from 'vitest';
+import { describe as describeVitest, expect, test } from 'vitest';
 import { transforms } from '../src/transforms';
-import { applyTransform } from '../src/transforms/index';
+import {
+  applyTransform,
+  TransformName,
+  TransformOptions,
+} from '../src/transforms/index';
 
-declare module 'vitest' {
-  export interface TestContext {
-    expectTransform: (actualCode: string, options?: any) => Vi.Assertion<Node>;
-    state: { changes: number };
-  }
+function describe<TName extends TransformName>(
+  name: TName,
+  factory: (
+    expect: (
+      actualCode: string,
+      options?: TransformOptions<TName>
+    ) => Vi.Assertion<Node>
+  ) => void
+) {
+  return describeVitest(name, () => {
+    factory((actualCode, options) => {
+      const ast = parse(actualCode);
+      applyTransform(ast, transforms[name], options as any);
+      return expect(ast);
+    });
+  });
 }
 
-beforeEach((context, suite) => {
-  const transform = transforms.find(t => t.name === suite.name);
-  assert(transform, `Transform ${suite.name} not found`);
-  // TODO: type options
-  context.expectTransform = (actualCode, options) => {
-    const ast = parse(actualCode);
-    applyTransform(ast, transform, options);
-    return expect(ast);
-  };
-});
-
-describe('sequence', () => {
-  test('to statements', ({ expectTransform }) =>
-    expectTransform(`
+describe('sequence', expectJS => {
+  test('to statements', () =>
+    expectJS(`
       if (a) b(), c();
     `).toMatchInlineSnapshot(`
       if (a) {
@@ -32,8 +36,8 @@ describe('sequence', () => {
       }
     `));
 
-  test('rearrange from return', ({ expectTransform }) =>
-    expectTransform(`
+  test('rearrange from return', () =>
+    expectJS(`
       function f() {
         return a(), b(), c();
       }
@@ -45,24 +49,24 @@ describe('sequence', () => {
       }
     `));
 
-  test('rearrange from if', ({ expectTransform }) =>
-    expectTransform(`
+  test('rearrange from if', () =>
+    expectJS(`
       if (a(), b()) c();
     `).toMatchInlineSnapshot(`
       a();
       if (b()) c();
     `));
 
-  test('rearrange from switch', ({ expectTransform }) =>
-    expectTransform(`
+  test('rearrange from switch', () =>
+    expectJS(`
       switch (a(), b()) {}
     `).toMatchInlineSnapshot(`
       a();
       switch (b()) {}
     `));
 
-  test('rearrange from for-in', ({ expectTransform }) =>
-    expectTransform(`
+  test('rearrange from for-in', () =>
+    expectJS(`
       for (let key in a = 1, object) {}
     `).toMatchInlineSnapshot(`
       a = 1;
@@ -70,9 +74,9 @@ describe('sequence', () => {
     `));
 });
 
-describe('splitVariableDeclarations', () => {
-  test('split variable declaration', ({ expectTransform }) =>
-    expectTransform(`
+describe('splitVariableDeclarations', expectJS => {
+  test('split variable declaration', () =>
+    expectJS(`
       const a = 1, b = 2, c = 3;
     `).toMatchInlineSnapshot(`
       const a = 1;
@@ -80,8 +84,8 @@ describe('splitVariableDeclarations', () => {
       const c = 3;
     `));
 
-  test('dont split in for loop', ({ expectTransform }) =>
-    expectTransform(`
+  test('dont split in for loop', () =>
+    expectJS(`
       for (let i = 0, j = 1; i < 10; i++, j++) var a, b;
     `).toMatchInlineSnapshot(`
       for (let i = 0, j = 1; i < 10; i++, j++) {
@@ -91,15 +95,15 @@ describe('splitVariableDeclarations', () => {
     `));
 });
 
-describe('computedProperties', () => {
-  test('member expression', ({ expectTransform }) => {
-    expectTransform(`
+describe('computedProperties', expectJS => {
+  test('member expression', () => {
+    expectJS(`
       require("foo")["default"]?.["bar"];
     `).toMatchInlineSnapshot('require("foo").default?.bar;');
   });
 
-  test('object', ({ expectTransform }) => {
-    expectTransform(`
+  test('object', () => {
+    expectJS(`
       const x = { ["foo"](){}, ["bar"]: 1 };
     `).toMatchInlineSnapshot(`
       const x = {
@@ -109,8 +113,8 @@ describe('computedProperties', () => {
     `);
   });
 
-  test('class', ({ expectTransform }) => {
-    expectTransform(`
+  test('class', () => {
+    expectJS(`
       class Foo {
         ["foo"](){}
         ["bar"] = 1;
@@ -123,15 +127,15 @@ describe('computedProperties', () => {
     `);
   });
 
-  test('ignore invalid identifier', ({ expectTransform }) =>
-    expectTransform(`
+  test('ignore invalid identifier', () =>
+    expectJS(`
       console["1"]("hello");
     `).toMatchInlineSnapshot('console["1"]("hello");'));
 });
 
-describe('extractTernaryCalls', () => {
-  test('extract all', ({ expectTransform }) =>
-    expectTransform(`
+describe('extractTernaryCalls', expectJS => {
+  test('extract all', () =>
+    expectJS(`
       __DECODE__(100 < o ? 10753 : 5 < o ? 2382 : 2820);
       log(p ? 8590 : 5814);
     `).toMatchInlineSnapshot(
@@ -141,8 +145,8 @@ describe('extractTernaryCalls', () => {
     `
     ));
 
-  test('extract with filter', ({ expectTransform }) =>
-    expectTransform(
+  test('extract with filter', () =>
+    expectJS(
       `
     __DECODE__(100 < o ? 10753 : 5 < o ? 2382 : 2820);
     log(p ? 8590 : 5814);
@@ -154,19 +158,17 @@ describe('extractTernaryCalls', () => {
     `));
 });
 
-describe('rawLiterals', () => {
-  test('string', ({ expectTransform }) =>
-    expectTransform(`const a = "\\x61"`).toMatchInlineSnapshot(
-      'const a = "a";'
-    ));
+describe('rawLiterals', expectJS => {
+  test('string', () =>
+    expectJS(`const a = "\\x61"`).toMatchInlineSnapshot('const a = "a";'));
 
-  test('number', ({ expectTransform }) =>
-    expectTransform(`const a = 0x1;`).toMatchInlineSnapshot('const a = 1;'));
+  test('number', () =>
+    expectJS(`const a = 0x1;`).toMatchInlineSnapshot('const a = 1;'));
 });
 
-describe('blockStatement', () => {
-  test('convert to block statement', ({ expectTransform }) =>
-    expectTransform(`
+describe('blockStatement', expectJS => {
+  test('convert to block statement', () =>
+    expectJS(`
       if (a) b();
       while (a) b();
       for (;;) b();
@@ -191,34 +193,34 @@ describe('blockStatement', () => {
     `));
 });
 
-describe('numberExpressions', () => {
-  test('simplify', ({ expectTransform }) =>
-    expectTransform(`
+describe('numberExpressions', expectJS => {
+  test('simplify', () =>
+    expectJS(`
       console.log(-0x1021e + -0x7eac8 + 0x17 * 0xac9c);
     `).toMatchInlineSnapshot('console.log(431390);'));
 
-  test('ignore other node types', ({ expectTransform }) =>
-    expectTransform(`
+  test('ignore other node types', () =>
+    expectJS(`
       console.log(0x1021e + "test");
     `).toMatchInlineSnapshot('console.log(0x1021e + "test");'));
 });
 
-describe('unminifyBooleans', () => {
-  test('true', ({ expectTransform }) => {
-    expectTransform('!0').toMatchInlineSnapshot('true;');
-    expectTransform('!!1').toMatchInlineSnapshot('true;');
-    expectTransform('!![]').toMatchInlineSnapshot('true;');
+describe('unminifyBooleans', expectJS => {
+  test('true', () => {
+    expectJS('!0').toMatchInlineSnapshot('true;');
+    expectJS('!!1').toMatchInlineSnapshot('true;');
+    expectJS('!![]').toMatchInlineSnapshot('true;');
   });
 
-  test('false', ({ expectTransform }) => {
-    expectTransform('!1').toMatchInlineSnapshot('false;');
-    expectTransform('![]').toMatchInlineSnapshot('false;');
+  test('false', () => {
+    expectJS('!1').toMatchInlineSnapshot('false;');
+    expectJS('![]').toMatchInlineSnapshot('false;');
   });
 });
 
-describe('booleanIf', () => {
-  test('and', ({ expectTransform }) =>
-    expectTransform(`
+describe('booleanIf', expectJS => {
+  test('and', () =>
+    expectJS(`
       x && y && z();
     `).toMatchInlineSnapshot(`
       if (x && y) {
@@ -226,8 +228,8 @@ describe('booleanIf', () => {
       }
     `));
 
-  test('or', ({ expectTransform }) =>
-    expectTransform(`
+  test('or', () =>
+    expectJS(`
       x || y || z();
     `).toMatchInlineSnapshot(`
       if (!(x || y)) {
@@ -236,16 +238,16 @@ describe('booleanIf', () => {
     `));
 });
 
-describe('deterministicIf', () => {
-  test('always true', ({ expectTransform }) => {
-    expectTransform(`
+describe('deterministicIf', expectJS => {
+  test('always true', () => {
+    expectJS(`
       if ("xyz" === "xyz") {
         a();
       } else {
         b();
       }
    `).toMatchInlineSnapshot('a();');
-    expectTransform(`
+    expectJS(`
       if ("xyz" !== "abc") {
         a();
       } else {
@@ -253,23 +255,23 @@ describe('deterministicIf', () => {
       }
    `).toMatchInlineSnapshot('a();');
 
-    expectTransform(`
+    expectJS(`
       "xyz" === "xyz" ? a() : b();
     `).toMatchInlineSnapshot('a();');
-    expectTransform(`
+    expectJS(`
       "xyz" !== "abc" ? a() : b();
     `).toMatchInlineSnapshot('a();');
   });
 
-  test('always false', ({ expectTransform }) => {
-    expectTransform(`
+  test('always false', () => {
+    expectJS(`
       if ("abc" === "xyz") {
         a();
       } else {
         b();
       }
    `).toMatchInlineSnapshot('b();');
-    expectTransform(`
+    expectJS(`
       if ("abc" !== "abc") {
         a();
       } else {
@@ -277,18 +279,18 @@ describe('deterministicIf', () => {
       }
     `).toMatchInlineSnapshot('b();');
 
-    expectTransform(`
+    expectJS(`
       "abc" === "xyz" ? a() : b();
     `).toMatchInlineSnapshot('b();');
-    expectTransform(`
+    expectJS(`
       "abc" !== "abc" ? a() : b();
     `).toMatchInlineSnapshot('b();');
   });
 });
 
-describe('ternaryToIf', () => {
-  test('statement', ({ expectTransform }) =>
-    expectTransform(`
+describe('ternaryToIf', expectJS => {
+  test('statement', () =>
+    expectJS(`
       a ? b() : c();
     `).toMatchInlineSnapshot(`
       if (a) {
@@ -298,19 +300,19 @@ describe('ternaryToIf', () => {
       }
     `));
 
-  test('ignore expression', ({ expectTransform }) =>
-    expectTransform(`
+  test('ignore expression', () =>
+    expectJS(`
       const x = a ? b() : c();
     `).toMatchInlineSnapshot('const x = a ? b() : c();'));
 });
 
-describe('mergeStrings', () => {
-  test('only strings', ({ expectTransform }) =>
-    expectTransform(`
+describe('mergeStrings', expectJS => {
+  test('only strings', () =>
+    expectJS(`
       "a" + "b" + "c";
     `).toMatchInlineSnapshot('"abc";'));
-  test('with variables', ({ expectTransform }) =>
-    expectTransform(`
+  test('with variables', () =>
+    expectJS(`
       "a" + "b" + xyz + "c" + "d";
     `).toMatchInlineSnapshot('"ab" + xyz + "cd";'));
 });

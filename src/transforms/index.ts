@@ -12,7 +12,7 @@ import splitVariableDeclarations from './splitVariableDeclarations';
 import ternaryToIf from './ternaryToIf';
 import unminifyBooleans from './unminifyBooleans';
 
-export const transforms: Transform<any>[] = [
+export const transforms = {
   rawLiterals,
   blockStatement,
   mergeStrings,
@@ -25,12 +25,17 @@ export const transforms: Transform<any>[] = [
   booleanIf,
   ternaryToIf,
   deterministicIf,
-];
+};
+
+export type TransformName = keyof typeof transforms;
+
+export type TransformOptions<TName extends TransformName> =
+  typeof transforms[TName] extends Transform<infer TOptions> ? TOptions : never;
 
 export function applyTransforms(ast: Node, tags: Tag[]): { changes: number } {
   const state = { changes: 0 };
-  transforms
-    .filter(t => tags.some(x => t.tags.includes(x)))
+  Object.values(transforms)
+    .filter(t => tags.some(x => (t.tags as Tag[]).includes(x)))
     .forEach(transform => {
       state.changes += applyTransform(ast, transform).changes;
     });
