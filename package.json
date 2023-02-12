@@ -16,6 +16,10 @@
     "start": "node dist/cli.js",
     "test": "vitest"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/j4k0xb/webcrack"
+  },
   "keywords": [
     "webpack",
     "bundle",
