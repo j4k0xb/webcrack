@@ -5,12 +5,6 @@ export default {
   name: 'blockStatement',
   tags: ['safe', 'readability'],
   visitor: () => ({
-    WhileStatement(path) {
-      if (!t.isBlockStatement(path.node.body)) {
-        path.node.body = t.blockStatement([path.node.body]);
-        this.changes++;
-      }
-    },
     IfStatement(path) {
       if (!t.isBlockStatement(path.node.consequent)) {
         path.node.consequent = t.blockStatement([path.node.consequent]);
@@ -21,19 +15,7 @@ export default {
         this.changes++;
       }
     },
-    ForStatement(path) {
-      if (!t.isBlockStatement(path.node.body)) {
-        path.node.body = t.blockStatement([path.node.body]);
-        this.changes++;
-      }
-    },
-    ForInStatement(path) {
-      if (!t.isBlockStatement(path.node.body)) {
-        path.node.body = t.blockStatement([path.node.body]);
-        this.changes++;
-      }
-    },
-    ForOfStatement(path) {
+    Loop(path) {
       if (!t.isBlockStatement(path.node.body)) {
         path.node.body = t.blockStatement([path.node.body]);
         this.changes++;
