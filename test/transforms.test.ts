@@ -320,3 +320,25 @@ describe('mergeStrings', expectJS => {
       "a" + "b" + xyz + "c" + "d";
     `).toMatchInlineSnapshot('"ab" + xyz + "cd";'));
 });
+
+describe('mergeElseIf', expectJS => {
+  test('merge', () =>
+    expectJS(`
+      if (x) {
+      } else {
+        if (y) {}
+      }`).toMatchInlineSnapshot('if (x) {} else if (y) {}'));
+
+  test('ignore when it contains other statements', () =>
+    expectJS(`
+      if (x) {
+      } else {
+        if (y) {}
+        z();
+      }`).toMatchInlineSnapshot(`
+        if (x) {} else {
+          if (y) {}
+          z();
+        }
+      `));
+});

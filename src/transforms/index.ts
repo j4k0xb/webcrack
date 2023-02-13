@@ -4,6 +4,7 @@ import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
 import deterministicIf from './deterministicIf';
 import extractTernaryCalls from './extractTernaryCalls';
+import mergeElseIf from './mergeElseIf';
 import mergeStrings from './mergeStrings';
 import numberExpressions from './numberExpressions';
 import rawLiterals from './rawLiterals';
@@ -15,6 +16,7 @@ import unminifyBooleans from './unminifyBooleans';
 export const transforms = {
   rawLiterals,
   blockStatement,
+  mergeElseIf,
   mergeStrings,
   computedProperties,
   sequence,
