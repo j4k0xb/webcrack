@@ -174,6 +174,7 @@ describe('blockStatement', expectJS => {
       for (;;) b();
       for (const key in object) b();
       for (const item of array) b();
+      const x = () => (a(), b());
     `).toMatchInlineSnapshot(`
       if (a) {
         b();
@@ -190,6 +191,9 @@ describe('blockStatement', expectJS => {
       for (const item of array) {
         b();
       }
+      const x = () => {
+        return a(), b();
+      };
     `));
 });
 

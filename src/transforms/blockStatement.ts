@@ -39,6 +39,12 @@ export default {
         this.changes++;
       }
     },
+    ArrowFunctionExpression(path) {
+      if (t.isSequenceExpression(path.node.body)) {
+        path.node.body = t.blockStatement([t.returnStatement(path.node.body)]);
+        this.changes++;
+      }
+    },
     noScope: true,
   }),
 } satisfies Transform;
