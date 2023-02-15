@@ -11,10 +11,7 @@ export default {
   visitor: options => ({
     CallExpression(path) {
       options?.decoders.forEach(decoder => {
-        const matcher = m.callExpression(
-          m.identifier(decoder.name),
-          m.anything()
-        );
+        const matcher = m.callExpression(m.identifier(decoder.name), m.anything());
 
         if (matcher.match(path.node) && t.isLiteral(path.node.arguments[0])) {
           const args = path.node.arguments.map(arg => {
@@ -22,7 +19,9 @@ export default {
               return arg.value;
             }
           });
-          path.replaceWith(t.stringLiteral(options.vm.decode(decoder, args)));
+
+          let decoded: string | undefined = options.vm.decode(decoder, args);
+          path.replaceWith(decoded ? t.stringLiteral(decoded) : t.tsUndefinedKeyword());
           this.changes++;
         }
       });
