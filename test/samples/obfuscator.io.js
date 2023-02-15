@@ -81,7 +81,8 @@ function hi() {
       !f[l(0xc5)](h + l(0xc6)) || !g[l(0xc5)](h + 'input') ? h('0') : a();
     })();
   })(),
-    console[m(0xc7)](m(0xc8));
+  console[m(0xc7)](m(0xc8));
+  console[m(0xc7)](m(0xc811));
 }
 function d(a, b) {
   var e = c();
