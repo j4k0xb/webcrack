@@ -1,7 +1,7 @@
 import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { Transform } from '../transforms';
-import { inlineFunctionAliases, inlineVariableAliases } from '../utils/ast';
+import { inlineFunctionAliases, inlineVariableAliases } from '../utils/inline';
 
 /**
  * Replaces all references to `var alias = decode;` with `decode`

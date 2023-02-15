@@ -8,12 +8,16 @@ export function infiniteLoop(body?: m.Matcher<t.Statement>) {
   );
 }
 
+export function constKey(name: string | m.Matcher<string>) {
+  return m.or(m.identifier(name), m.stringLiteral(name));
+}
+
 /**
  * Matches both identifier properties and string literal computed properties
  */
 export function constMemberExpression(
   object: m.Matcher<t.Expression>,
-  property: string
+  property?: string | m.Matcher<string>
 ) {
   return m.or(
     m.memberExpression(object, m.identifier(property)),
@@ -27,3 +31,24 @@ const trueMatcher = m.or(
   m.unaryExpression('!', m.unaryExpression('!', m.numericLiteral(1))),
   m.unaryExpression('!', m.unaryExpression('!', m.arrayExpression([])))
 );
+
+/**
+ * Function expression matcher that captures the parameters
+ * and allows them to be referenced in the body.
+ */
+export function createFunctionMatcher(
+  params: number,
+  body: (
+    ...captures: m.Matcher<t.Identifier>[]
+  ) => m.Matcher<t.Statement[]> | m.Matcher<t.Statement>[]
+) {
+  const captures = Array.from({ length: params }, () =>
+    m.capture(m.anyString())
+  );
+
+  return m.functionExpression(
+    undefined,
+    captures.map(m.identifier),
+    m.blockStatement(body(...captures.map(c => m.identifier(m.fromCapture(c)))))
+  );
+}

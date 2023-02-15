@@ -6,7 +6,10 @@ import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { findStringArray } from '../src/deobfuscator/stringArray';
 import { webcrack } from '../src/index';
-import { inlineFunctionAliases, inlineVariableAliases } from '../src/utils/ast';
+import {
+  inlineFunctionAliases,
+  inlineVariableAliases,
+} from '../src/utils/inline';
 
 // Test samples
 test.each([
