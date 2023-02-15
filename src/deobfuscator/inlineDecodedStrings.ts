@@ -20,8 +20,8 @@ export default {
             }
           });
 
-          let decoded: string | undefined = options.vm.decode(decoder, args);
-          path.replaceWith(decoded ? t.stringLiteral(decoded) : t.tsUndefinedKeyword());
+          let decoded = options.vm.decode(decoder, args);
+          path.replaceWith(decoded ? t.stringLiteral(decoded) : t.identifier(String(decoded)));
           this.changes++;
         }
       });
