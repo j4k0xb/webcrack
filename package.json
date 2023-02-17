@@ -39,16 +39,16 @@
     "@babel/template": "^7.20.7",
     "@babel/traverse": "^7.20.13",
     "@babel/types": "^7.20.7",
-    "@codemod/matchers": "^1.2.1",
+    "@codemod/matchers": "^1.4.0",
     "commander": "^10.0.0",
-    "vm2": "^3.9.13"
+    "vm2": "^3.9.14"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
     "@types/babel__template": "^7.4.1",
     "@types/babel__traverse": "^7.18.3",
-    "@types/node": "^18.11.18",
+    "@types/node": "^18.14.0",
     "typescript": "^4.9.5",
-    "vitest": "^0.28.3"
+    "vitest": "^0.28.5"
   }
 }
