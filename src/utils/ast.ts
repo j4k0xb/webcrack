@@ -4,7 +4,10 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
 export function codePreview(node: t.Node) {
-  const { code } = generate(node, { compact: true, comments: false });
+  const { code } = generate(node, {
+    minified: true,
+    shouldPrintComment: () => false,
+  });
   if (code.length > 100) {
     return code.slice(0, 70) + ' … ' + code.slice(-30);
   }
