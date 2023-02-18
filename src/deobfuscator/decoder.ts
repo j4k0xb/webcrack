@@ -18,7 +18,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
     if (!decoderFn) continue;
 
     const functionName = m.capture(m.anyString());
-    const arrayName = m.capture(m.anyString());
+    const arrayIdentifier = m.capture(m.identifier());
     const matcher = m.functionDeclaration(
       m.identifier(functionName),
       m.anything(),
@@ -27,7 +27,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
           // var array = getStringArray();
           m.variableDeclaration(undefined, [
             m.variableDeclarator(
-              m.identifier(arrayName),
+              arrayIdentifier,
               m.callExpression(m.identifier(stringArray.name))
             ),
           ]),
@@ -35,10 +35,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
           // var h = array[e]; return h;
           // or return array[e -= 254];
           m.containerOf(
-            m.memberExpression(
-              m.identifier(m.fromCapture(arrayName)),
-              m.anything()
-            )
+            m.memberExpression(m.fromCapture(arrayIdentifier), m.anything())
           ),
           m.zeroOrMore()
         )

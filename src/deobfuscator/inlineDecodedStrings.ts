@@ -3,6 +3,7 @@ import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
 import numberExpressions from '../transforms/numberExpressions';
 import { Decoder } from './decoder';
+import { VMDecoder } from './vm';
 
 export default {
   name: 'inlineDecodedStrings',
@@ -11,7 +12,10 @@ export default {
   visitor: options => ({
     CallExpression(path) {
       options?.decoders.forEach(decoder => {
-        const matcher = m.callExpression(m.identifier(decoder.name), m.anything());
+        const matcher = m.callExpression(
+          m.identifier(decoder.name),
+          m.anything()
+        );
 
         if (matcher.match(path.node) && t.isLiteral(path.node.arguments[0])) {
           const args = path.node.arguments.map(arg => {
@@ -21,11 +25,13 @@ export default {
           });
 
           let decoded = options.vm.decode(decoder, args);
-          path.replaceWith(decoded ? t.stringLiteral(decoded) : t.identifier(String(decoded)));
+          path.replaceWith(
+            decoded ? t.stringLiteral(decoded) : t.identifier(String(decoded))
+          );
           this.changes++;
         }
       });
     },
     noScope: true,
   }),
-} satisfies Transform<{ decoders: Decoder[]; vm: any }>;
+} satisfies Transform<{ decoders: Decoder[]; vm: VMDecoder }>;

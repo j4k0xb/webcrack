@@ -38,6 +38,7 @@ export function extract(ast: t.Node): Bundle | undefined {
         });
       }
     },
+    noScope: true,
   });
 
   if (modules.size > 0 && entryIdMatcher.current) {

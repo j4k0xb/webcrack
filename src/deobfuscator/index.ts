@@ -11,7 +11,7 @@ import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
 import { findStringArray } from './stringArray';
-import { createVM } from './vm';
+import { VMDecoder } from './vm';
 
 // https://astexplorer.net/#/gist/b1018df4a8daebfcb1daf9d61fe17557/4ff9ad0e9c40b9616956f17f59a2d9888cd62a4f
 
@@ -56,7 +56,7 @@ export default {
       }).changes;
     }
 
-    const vm = createVM({ stringArray, rotator, decoders });
+    const vm = new VMDecoder(stringArray, decoders, rotator);
     state.changes += applyTransform(ast, inlineDecodedStrings, {
       decoders,
       vm,

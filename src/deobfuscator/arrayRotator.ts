@@ -36,17 +36,14 @@ export function findArrayRotator(ast: t.Node) {
 }
 
 // e.g. 'array'
-const arrayName = m.capture(m.anyString());
+const arrayIdentifier = m.capture(m.identifier());
 
 // e.g. array.push(array.shift())
 const pushShift = m.callExpression(
-  m.memberExpression(m.identifier(arrayName), m.identifier('push')),
+  m.memberExpression(arrayIdentifier, m.identifier('push')),
   [
     m.callExpression(
-      m.memberExpression(
-        m.identifier(m.fromCapture(arrayName)),
-        m.identifier('shift')
-      )
+      m.memberExpression(m.fromCapture(arrayIdentifier), m.identifier('shift'))
     ),
   ]
 );

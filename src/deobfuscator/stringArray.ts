@@ -15,7 +15,7 @@ export function findStringArray(ast: t.Node) {
   traverse(ast, {
     FunctionDeclaration(path) {
       if (matcher.match(path.node)) {
-        const strings = array.current!.elements.map(
+        const strings = arrayExpression.current!.elements.map(
           e => (e as t.StringLiteral).value
         );
         const name = functionName.current!;
@@ -35,8 +35,10 @@ export function findStringArray(ast: t.Node) {
 }
 
 const functionName = m.capture(m.anyString());
-const arrayName = m.capture(m.anyString());
-const array = m.capture(m.arrayExpression(m.arrayOf(m.stringLiteral())));
+const arrayIdentifier = m.capture(m.identifier());
+const arrayExpression = m.capture(
+  m.arrayExpression(m.arrayOf(m.stringLiteral()))
+);
 // getStringArray = function () { return n; };
 const functionAssignment = m.assignmentExpression(
   '=',
@@ -44,13 +46,11 @@ const functionAssignment = m.assignmentExpression(
   m.functionExpression(
     undefined,
     [],
-    m.blockStatement([
-      m.returnStatement(m.identifier(m.fromCapture(arrayName))),
-    ])
+    m.blockStatement([m.returnStatement(m.fromCapture(arrayIdentifier))])
   )
 );
 const variableDeclaration = m.variableDeclaration(undefined, [
-  m.variableDeclarator(m.identifier(arrayName), array),
+  m.variableDeclarator(arrayIdentifier, arrayExpression),
 ]);
 // function getStringArray() { ... }
 const matcher = m.functionDeclaration(
