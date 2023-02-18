@@ -6,8 +6,7 @@ import { StringArray } from './stringArray';
 
 export class VMDecoder {
   private util = {
-    params: [] as unknown[],
-    decoder: '',
+    calls: [] as { decoder: string; args: unknown[] }[],
     stringArray: [] as string[],
   };
 
@@ -40,26 +39,17 @@ export class VMDecoder {
       .map(decoder => generate(decoder.path.node, { compact: true }).code)
       .join('\n');
 
-    // Precompute the rotated string array to allow for faster decoding
-    // We need to include all decoders because the rotator might call them
-    this.util.stringArray = this.vm.run(`
+    this.script = new VMScript(`
       ${stringArrayCode}
       ${rotatorCode}
       ${decoderCode}
-      ${stringArray.name}();
-    `);
-
-    this.script = new VMScript(`
-      function ${stringArray.name}() { return util.stringArray; }
-      ${decoderCode}
-      var __DECODERS__ = { ${decoders.map(d => d.name).join(', ')} };
-      __DECODERS__[util.decoder](...util.params);
+      const __DECODERS__ = { ${decoders.map(d => d.name).join(', ')} };
+      util.calls.map(({ decoder, args }) => __DECODERS__[decoder](...args));
     `);
   }
 
-  decode(decoder: Decoder, args: unknown[]) {
-    this.util.decoder = decoder.name;
-    this.util.params = args;
+  decode(calls: { decoder: string; args: unknown[] }[]): string[] {
+    this.util.calls = calls;
     return this.vm.run(this.script);
   }
 }

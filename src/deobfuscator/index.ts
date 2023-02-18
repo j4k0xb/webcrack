@@ -57,10 +57,7 @@ export default {
     }
 
     const vm = new VMDecoder(stringArray, decoders, rotator);
-    state.changes += applyTransform(ast, inlineDecodedStrings, {
-      decoders,
-      vm,
-    }).changes;
+    state.changes += applyTransform(ast, inlineDecodedStrings, { vm }).changes;
 
     stringArray.path.remove();
     rotator?.path.remove();
