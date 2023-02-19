@@ -25,7 +25,10 @@ const a = require("./1.js");
 console.log(a.counter);
 `;
 
-exports[`extract webpack-esm.js 2`] = `export class counter {}`;
+exports[`extract webpack-esm.js 2`] = `
+export class counter {}
+let _counter = 1;
+`;
 
 exports[`extract webpack-esm.js 3`] = `export default 1;`;
 

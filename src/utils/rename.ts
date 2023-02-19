@@ -5,7 +5,7 @@ import { Binding } from '@babel/traverse';
  */
 export function fastRename(binding: Binding, newName: string) {
   binding.referencePaths.forEach(ref => {
-    if (ref.isIdentifier()) ref.node.name = newName;
+    if (ref.isIdentifier()) ref.node.name = newName!;
   });
   binding.identifier.name = newName;
 }

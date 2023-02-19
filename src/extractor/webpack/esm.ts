@@ -50,6 +50,9 @@ export function convertESM(module: Module) {
             )
           );
         } else {
+          // In case there's a collision with an existing binding
+          path.scope.rename(exportedName.current!);
+
           // `let f = 1;` -> `default let counter = 1;`
           renameFast(binding, exportedName.current!);
           declaration.replaceWith(t.exportNamedDeclaration(declaration.node));

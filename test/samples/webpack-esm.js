@@ -62,6 +62,7 @@
       return f;
     });
     class f {}
+    let counter = 1;
   },
   function(e, t, i) {
     i.r(t);
