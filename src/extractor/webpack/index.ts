@@ -1,8 +1,8 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Bundle } from './index';
-import { Module } from './module';
+import { Bundle } from '../index';
+import { Module } from '../module';
 
 export function extract(ast: t.Node): Bundle | undefined {
   const modules = new Map<number, Module>();
@@ -26,13 +26,13 @@ export function extract(ast: t.Node): Bundle | undefined {
 
           if (moduleWrapper.isFunctionExpression()) {
             renameParams(moduleWrapper);
-
             const file = t.file(t.program(moduleWrapper.node.body.body));
             const module = new Module(
               id,
               file,
               id === entryIdMatcher.current?.value
             );
+
             modules.set(id, module);
           }
         });

@@ -1,8 +1,26 @@
+import * as m from '@codemod/matchers';
 import assert from 'assert';
 import { readFile } from 'fs/promises';
+import { join } from 'path';
 import { describe, expect, test } from 'vitest';
 import webcrack from '../src/index';
 import { relativePath } from '../src/utils/path';
+
+// Test samples
+test.each(['webpack.js', 'webpack_object.js', 'webpack-esm.js'])(
+  `extract %s`,
+  async filename => {
+    const { bundle } = await webcrack(
+      await readFile(join('./test/samples', filename), 'utf8')
+    );
+    assert(bundle);
+    bundle.replaceRequireCalls();
+    bundle.convertESM();
+    for (const module of bundle.modules.values()) {
+      expect(module.ast).toMatchSnapshot();
+    }
+  }
+);
 
 describe('extractor', async () => {
   test('webpack array', async () => {
@@ -13,10 +31,6 @@ describe('extractor', async () => {
     assert(bundle);
     expect(bundle.type).toBe('webpack');
     expect(bundle.entryId).toBe(2);
-    expect(bundle.modules.size).toBe(3);
-    for (const module of bundle.modules.values()) {
-      expect(module.ast).toMatchSnapshot();
-    }
   });
 
   test('webpack object', async () => {
@@ -27,19 +41,17 @@ describe('extractor', async () => {
     assert(bundle);
     expect(bundle.type).toBe('webpack');
     expect(bundle.entryId).toBe(386);
-    expect(bundle.modules.size).toBe(2);
-    for (const module of bundle.modules.values()) {
-      expect(module.ast).toMatchSnapshot();
-    }
   });
 
   test('path mapping', async () => {
     const { bundle } = await webcrack(
-      await readFile('./test/samples/webpack.js', 'utf8'),
-      { mappings: m => ({ './utils/color.js': m.stringLiteral('#FBC02D') }) }
+      await readFile('./test/samples/webpack.js', 'utf8')
     );
     expect(bundle).toBeDefined();
     assert(bundle);
+    bundle.applyMappings({ './utils/color.js': m.stringLiteral('#FBC02D') });
+    bundle.replaceRequireCalls();
+
     for (const module of bundle.modules.values()) {
       expect(module.ast).toMatchSnapshot();
     }

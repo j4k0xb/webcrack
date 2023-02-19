@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import { relativePath } from '../utils/path';
 import { Module } from './module';
 import * as webpack from './webpack';
+import { convertESM } from './webpack/esm';
 
 export function extractBundle(ast: t.Node): Bundle | undefined {
   return webpack.extract(ast);
@@ -62,6 +63,7 @@ export class Bundle {
   ) {
     this.applyMappings(mappings(m));
     this.replaceRequireCalls();
+    this.convertESM();
 
     const bundleJson = {
       type: this.type,
@@ -113,5 +115,9 @@ export class Bundle {
         noScope: true,
       });
     });
+  }
+
+  convertESM() {
+    this.modules.forEach(convertESM);
   }
 }
