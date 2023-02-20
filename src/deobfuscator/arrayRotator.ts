@@ -2,7 +2,7 @@ import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { callExpression } from '@codemod/matchers';
-import { infiniteLoop } from '../utils/matcher';
+import { constMemberExpression, infiniteLoop } from '../utils/matcher';
 
 export interface ArrayRotator {
   path: NodePath<t.ExpressionStatement>;
@@ -40,10 +40,10 @@ const arrayIdentifier = m.capture(m.identifier());
 
 // e.g. array.push(array.shift())
 const pushShift = m.callExpression(
-  m.memberExpression(arrayIdentifier, m.identifier('push')),
+  constMemberExpression(arrayIdentifier, 'push'),
   [
     m.callExpression(
-      m.memberExpression(m.fromCapture(arrayIdentifier), m.identifier('shift'))
+      constMemberExpression(m.fromCapture(arrayIdentifier), 'shift')
     ),
   ]
 );

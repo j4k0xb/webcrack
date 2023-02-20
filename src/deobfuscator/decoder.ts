@@ -35,7 +35,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
           // var h = array[e]; return h;
           // or return array[e -= 254];
           m.containerOf(
-            m.memberExpression(m.fromCapture(arrayIdentifier), m.anything())
+            m.memberExpression(m.fromCapture(arrayIdentifier))
           ),
           m.zeroOrMore()
         )

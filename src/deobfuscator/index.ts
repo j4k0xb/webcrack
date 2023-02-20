@@ -20,10 +20,8 @@ export default {
   tags: ['unsafe'],
   preTransforms: [
     blockStatement,
-    computedProperties,
     sequence,
     splitVariableDeclarations,
-    unminifyBooleans,
   ],
   run(ast, state) {
     const stringArray = findStringArray(ast);
