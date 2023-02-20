@@ -5,7 +5,7 @@ export class Module {
   path: string;
 
   constructor(public id: number, public ast: t.File, public isEntry: boolean) {
-    this.path = `./${id}.js`;
+    this.path = `./${isEntry ? 'index' : id}.js`;
   }
 
   get code() {
