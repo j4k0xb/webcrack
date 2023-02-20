@@ -59,6 +59,8 @@
     const bDefault = i.n(b);
     const cDefault = i.n(c);
     console.log(a.counter);
+    console.log(bDefault().VERSION);
+    console.log(cDefault.a.VERSION);
   },
   function (e, t, i) {
     i.r(t);
@@ -76,6 +78,8 @@
     let x = 1;
   },
   function(e, t, i) {
-    e.exports = 1;
+    e.exports = {
+      VERSION: 1
+    }
   }
 ]);

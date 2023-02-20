@@ -6,7 +6,8 @@ import { dirname, join } from 'node:path';
 import { relativePath } from '../utils/path';
 import { Module } from './module';
 import * as webpack from './webpack';
-import { convertDefaultRequire, convertESM } from './webpack/esm';
+import { convertESM } from './webpack/esm';
+import { convertDefaultRequire } from './webpack/getDefaultExport';
 import { inlineVarInjections } from './webpack/varInjection';
 
 export function extractBundle(ast: t.Node): Bundle | undefined {

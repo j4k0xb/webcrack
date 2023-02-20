@@ -1,8 +1,6 @@
-import { expression } from '@babel/template';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Bundle } from '..';
 import { renameFast } from '../../utils/rename';
 import { Module } from '../module';
 
@@ -60,54 +58,6 @@ export function convertESM(module: Module) {
         path.remove();
       }
     },
-  });
-}
-
-/**
- * Convert require.n calls to require the default export depending on the target module type
- */
-export function convertDefaultRequire(bundle: Bundle) {
-  const requiredModuleId = m.capture(m.numericLiteral());
-  const requireMatcher = m.callExpression(m.identifier('require'), [
-    requiredModuleId,
-  ]);
-
-  // E.g. t
-  const moduleArg = m.capture(m.identifier());
-  // E.g. require.n(t)
-  const defaultRequireMatcher = m.callExpression(
-    m.memberExpression(m.identifier('require'), m.identifier('n')),
-    [moduleArg]
-  );
-
-  function getRequiredModule(path: NodePath, moduleArg: t.Expression) {
-    if (t.isNumericLiteral(moduleArg)) {
-      return bundle.modules.get(moduleArg.value);
-    } else if (t.isIdentifier(moduleArg)) {
-      const binding = path.scope.getBinding(moduleArg.name);
-      const declarator = binding?.path.node;
-      if (
-        t.isVariableDeclarator(declarator) &&
-        requireMatcher.match(declarator.init)
-      ) {
-        return bundle.modules.get(requiredModuleId.current!.value);
-      }
-    }
-  }
-
-  bundle.modules.forEach(module => {
-    traverse(module.ast, {
-      enter(path) {
-        if (defaultRequireMatcher.match(path.node)) {
-          const requiredModule = getRequiredModule(path, moduleArg.current!);
-          if (requiredModule?.ast.program.sourceType === 'module') {
-            path.replaceWith(expression`${moduleArg.current!}.default`());
-          } else {
-            path.replaceWith(moduleArg.current!);
-          }
-        }
-      },
-    });
   });
 }
 

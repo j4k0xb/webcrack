@@ -27,6 +27,8 @@ const c = require("./3.js");
 const bDefault = b.default;
 const cDefault = c;
 console.log(a.counter);
+console.log(bDefault.VERSION);
+console.log(cDefault.VERSION);
 `;
 
 exports[`extract webpack-esm.js 2`] = `
@@ -36,7 +38,11 @@ let _counter = 1;
 
 exports[`extract webpack-esm.js 3`] = `export default 1;`;
 
-exports[`extract webpack-esm.js 4`] = `module.exports = 1;`;
+exports[`extract webpack-esm.js 4`] = `
+module.exports = {
+  VERSION: 1
+};
+`;
 
 exports[`extract webpack-var-injection.js 1`] = `
 var m = require("./1.js");
