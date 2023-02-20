@@ -64,9 +64,7 @@ export class Bundle {
     ) => Record<string, m.Matcher<any>> = m => ({})
   ) {
     this.applyMappings(mappings(m));
-    this.inlineVarInjections();
-    this.convertESM();
-    this.replaceRequireCalls();
+    this.applyTransforms();
 
     const bundleJson = {
       type: this.type,
@@ -95,14 +93,20 @@ export class Bundle {
     );
   }
 
-  inlineVarInjections() {
+  /**
+   * Undoes some of the transformations that Webpack injected into the modules.
+   */
+  applyTransforms() {
     this.modules.forEach(inlineVarInjections);
+    this.modules.forEach(convertESM);
+    convertDefaultRequire(this);
+    this.replaceRequireCalls();
   }
 
   /**
    * Replaces `require(id)` calls with `require("./relative/path.js")` calls.
    */
-  replaceRequireCalls() {
+  private replaceRequireCalls() {
     const idMatcher = m.capture(m.numericLiteral());
     const matcher = m.callExpression(m.identifier('require'), [idMatcher]);
 
@@ -122,10 +126,5 @@ export class Bundle {
         noScope: true,
       });
     });
-  }
-
-  convertESM() {
-    this.modules.forEach(convertESM);
-    convertDefaultRequire(this);
   }
 }

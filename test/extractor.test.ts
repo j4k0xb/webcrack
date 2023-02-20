@@ -17,9 +17,7 @@ test.each([
     await readFile(join('./test/samples', filename), 'utf8')
   );
   assert(bundle);
-  bundle.inlineVarInjections();
-  bundle.convertESM();
-  bundle.replaceRequireCalls();
+  bundle.applyTransforms();
   for (const module of bundle.modules.values()) {
     expect(module.ast).toMatchSnapshot();
   }
@@ -53,7 +51,7 @@ describe('extractor', async () => {
     expect(bundle).toBeDefined();
     assert(bundle);
     bundle.applyMappings({ './utils/color.js': m.stringLiteral('#FBC02D') });
-    bundle.replaceRequireCalls();
+    bundle.applyTransforms();
 
     for (const module of bundle.modules.values()) {
       expect(module.ast).toMatchSnapshot();
