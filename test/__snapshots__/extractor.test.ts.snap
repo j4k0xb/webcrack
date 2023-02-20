@@ -22,6 +22,10 @@ exports[`extract webpack_object.js 2`] = `module.exports = "test";`;
 
 exports[`extract webpack-esm.js 1`] = `
 const a = require("./1.js");
+const b = require("./2.js");
+const c = require("./3.js");
+const bDefault = b.default;
+const cDefault = c;
 console.log(a.counter);
 `;
 
@@ -31,6 +35,8 @@ let _counter = 1;
 `;
 
 exports[`extract webpack-esm.js 3`] = `export default 1;`;
+
+exports[`extract webpack-esm.js 4`] = `module.exports = 1;`;
 
 exports[`extract webpack-var-injection.js 1`] = `
 var m = require("./1.js");

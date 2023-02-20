@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { relativePath } from '../utils/path';
 import { Module } from './module';
 import * as webpack from './webpack';
-import { convertESM } from './webpack/esm';
+import { convertDefaultRequire, convertESM } from './webpack/esm';
 import { inlineVarInjections } from './webpack/varInjection';
 
 export function extractBundle(ast: t.Node): Bundle | undefined {
@@ -63,9 +63,9 @@ export class Bundle {
     ) => Record<string, m.Matcher<any>> = m => ({})
   ) {
     this.applyMappings(mappings(m));
-    this.replaceRequireCalls();
     this.inlineVarInjections();
     this.convertESM();
+    this.replaceRequireCalls();
 
     const bundleJson = {
       type: this.type,
@@ -125,5 +125,6 @@ export class Bundle {
 
   convertESM() {
     this.modules.forEach(convertESM);
+    convertDefaultRequire(this);
   }
 }

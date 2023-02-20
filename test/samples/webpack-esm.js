@@ -54,6 +54,10 @@
 })([
   function (e, t, i) {
     const a = i(1);
+    const b = i(2);
+    const c = i(3);
+    const bDefault = i.n(b);
+    const cDefault = i.n(c);
     console.log(a.counter);
   },
   function (e, t, i) {
@@ -70,5 +74,8 @@
       return x;
     });
     let x = 1;
+  },
+  function(e, t, i) {
+    e.exports = 1;
   }
 ]);

@@ -17,9 +17,9 @@ test.each([
     await readFile(join('./test/samples', filename), 'utf8')
   );
   assert(bundle);
-  bundle.replaceRequireCalls();
   bundle.inlineVarInjections();
   bundle.convertESM();
+  bundle.replaceRequireCalls();
   for (const module of bundle.modules.values()) {
     expect(module.ast).toMatchSnapshot();
   }
