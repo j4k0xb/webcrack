@@ -3,7 +3,7 @@ import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Bundle } from '..';
-import { fastRename as renameFast } from '../../utils/rename';
+import { renameFast } from '../../utils/rename';
 import { Module } from '../module';
 
 /**
@@ -52,9 +52,6 @@ export function convertESM(module: Module) {
             )
           );
         } else {
-          // In case there's a collision with an existing binding
-          path.scope.rename(exportedName.current!);
-
           // `let f = 1;` -> `default let counter = 1;`
           renameFast(binding, exportedName.current!);
           declaration.replaceWith(t.exportNamedDeclaration(declaration.node));

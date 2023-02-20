@@ -1,11 +1,15 @@
 import { Binding } from '@babel/traverse';
 
 /**
- * Warning: doesn't update the scope data structures.
+ * Warning: only works when the reference is an identifier
  */
-export function fastRename(binding: Binding, newName: string) {
+export function renameFast(binding: Binding, newName: string) {
   binding.referencePaths.forEach(ref => {
+    // To avoid conflicts with other bindings of the same name
+    ref.scope.rename(newName);
     if (ref.isIdentifier()) ref.node.name = newName!;
   });
+  binding.scope.removeOwnBinding(binding.identifier.name);
+  binding.scope.bindings[newName] = binding;
   binding.identifier.name = newName;
 }
