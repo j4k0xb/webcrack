@@ -18,8 +18,8 @@ test.each([
   );
   assert(bundle);
   bundle.replaceRequireCalls();
-  bundle.convertESM();
   bundle.inlineVarInjections();
+  bundle.convertESM();
   for (const module of bundle.modules.values()) {
     expect(module.ast).toMatchSnapshot();
   }

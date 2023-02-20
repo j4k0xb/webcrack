@@ -64,8 +64,8 @@ export class Bundle {
   ) {
     this.applyMappings(mappings(m));
     this.replaceRequireCalls();
-    this.convertESM();
     this.inlineVarInjections();
+    this.convertESM();
 
     const bundleJson = {
       type: this.type,

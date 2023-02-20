@@ -1,7 +1,6 @@
 import { statement } from '@babel/template';
 import { Statement } from '@babel/types';
 import * as m from '@codemod/matchers';
-import { writeFileSync } from 'node:fs';
 import { Module } from '../module';
 
 // var because the same name could already be declared
@@ -23,15 +22,19 @@ export function inlineVarInjections(module: Module) {
   const { program } = module.ast;
   const newBody: Statement[] = [];
 
-  if (program.body.length === 1 && matcher.match(program.body[0])) {
-    const vars = params.current!.map((param, i) =>
-      buildVar({ NAME: param, VALUE: args.current![i + 1] })
-    );
-    newBody.push(...vars);
-    newBody.push(...body.current!.body);
-    program.body = newBody;
-    // We can skip replacing uses of `this` because it always refers to the exports
+  for (const statement of program.body) {
+    if (matcher.match(statement)) {
+      const vars = params.current!.map((param, i) =>
+        buildVar({ NAME: param, VALUE: args.current![i + 1] })
+      );
+      newBody.push(...vars);
+      newBody.push(...body.current!.body);
+      // We can skip replacing uses of `this` because it always refers to the exports
+    } else {
+      newBody.push(statement);
+    }
   }
+  program.body = newBody;
 }
 
 const body = m.capture(m.blockStatement());
