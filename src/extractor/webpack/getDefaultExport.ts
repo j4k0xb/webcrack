@@ -1,6 +1,5 @@
 import { expression } from '@babel/template';
 import traverse, { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Bundle } from '..';
 
@@ -22,67 +21,71 @@ import { Bundle } from '..';
  * Convert require.n calls to require the default export depending on the target module type
  * ```js
  * const m = require(1);
- * const mDefault = require.n(a);
- * console.log(mDefault.a.prop, mDefault().prop)
+ * const mDefault = require.n(m);
+ * console.log(mDefault.a.prop, mDefault().prop);
+ * ```
+ * ->
+ * ```js
+ * const m = require(1);
+ * console.log(m.prop, m.prop);
  * ```
  */
 export function convertDefaultRequire(bundle: Bundle) {
-  const requiredModuleId = m.capture(m.numericLiteral());
-  const requireMatcher = m.callExpression(m.identifier('require'), [
-    requiredModuleId,
-  ]);
-
-  // E.g. t
-  const moduleArg = m.capture(m.identifier());
-  // E.g. require.n(t)
-  const defaultRequireMatcher = m.callExpression(
-    m.memberExpression(m.identifier('require'), m.identifier('n')),
-    [moduleArg]
-  );
-
-  function getRequiredModule(path: NodePath, moduleArg: t.Expression) {
-    if (t.isNumericLiteral(moduleArg)) {
-      return bundle.modules.get(moduleArg.value);
-    } else if (t.isIdentifier(moduleArg)) {
-      // The variable that's passed to require.n
-      const binding = path.scope.getBinding(moduleArg.name);
-      const declarator = binding?.path.node;
-      if (
-        t.isVariableDeclarator(declarator) &&
-        requireMatcher.match(declarator.init)
-      ) {
-        return bundle.modules.get(requiredModuleId.current!.value);
-      }
+  function getRequiredModule(path: NodePath) {
+    // The variable that's passed to require.n
+    const binding = path.scope.getBinding(moduleArg.current!.name);
+    const declarator = binding?.path.node;
+    if (declaratorMatcher.match(declarator)) {
+      return bundle.modules.get(requiredModuleId.current!.value);
     }
   }
 
   bundle.modules.forEach(module => {
     traverse(module.ast, {
-      enter(path) {
+      VariableDeclarator(path) {
         if (defaultRequireMatcher.match(path.node)) {
-          const requiredModule = getRequiredModule(path, moduleArg.current!);
+          // Replace require.n(m); with m or m.default
+          const requiredModule = getRequiredModule(path);
+          const init = path.get('init');
           if (requiredModule?.ast.program.sourceType === 'module') {
-            path.replaceWith(expression`${moduleArg.current!}.default`());
+            init.replaceWith(expression`${moduleArg.current!}.default`());
           } else {
-            path.replaceWith(moduleArg.current!);
+            init.replaceWith(moduleArg.current!);
           }
 
-          if (t.isVariableDeclarator(path.parent)) {
-            const binding = path.scope.getOwnBinding(
-              (path.parent.id as t.Identifier).name
-            );
-            // Replace mDefault.a.prop and mDefault().prop with mDefault.prop
-            binding?.referencePaths.forEach(refPath => {
-              if (
-                refPath.parentPath?.isCallExpression() ||
-                refPath.parentPath?.isMemberExpression()
-              ) {
-                refPath.parentPath.replaceWith(refPath);
-              }
-            });
-          }
+          // Replace mDefault.a.prop and mDefault().prop with mDefault.prop
+          const binding = path.scope.getOwnBinding(
+            defaultVarName.current!.name
+          );
+          binding?.referencePaths.forEach(refPath => {
+            if (
+              refPath.parentPath?.isCallExpression() ||
+              refPath.parentPath?.isMemberExpression()
+            ) {
+              refPath.parentPath.replaceWith(refPath);
+            }
+          });
         }
       },
     });
   });
 }
+
+const requiredModuleId = m.capture(m.numericLiteral());
+// E.g. const m = require(1);
+const declaratorMatcher = m.variableDeclarator(
+  m.identifier(),
+  m.callExpression(m.identifier('require'), [requiredModuleId])
+);
+
+// E.g. m
+const moduleArg = m.capture(m.identifier());
+const defaultVarName = m.capture(m.identifier());
+// E.g. const mDefault = require.n(m)
+const defaultRequireMatcher = m.variableDeclarator(
+  defaultVarName,
+  m.callExpression(
+    m.memberExpression(m.identifier('require'), m.identifier('n')),
+    [moduleArg]
+  )
+);
