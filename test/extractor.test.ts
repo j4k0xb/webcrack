@@ -7,20 +7,23 @@ import webcrack from '../src/index';
 import { relativePath } from '../src/utils/path';
 
 // Test samples
-test.each(['webpack.js', 'webpack_object.js', 'webpack-esm.js'])(
-  `extract %s`,
-  async filename => {
-    const { bundle } = await webcrack(
-      await readFile(join('./test/samples', filename), 'utf8')
-    );
-    assert(bundle);
-    bundle.replaceRequireCalls();
-    bundle.convertESM();
-    for (const module of bundle.modules.values()) {
-      expect(module.ast).toMatchSnapshot();
-    }
+test.each([
+  'webpack.js',
+  'webpack_object.js',
+  'webpack-esm.js',
+  'webpack-var-injection.js',
+])(`extract %s`, async filename => {
+  const { bundle } = await webcrack(
+    await readFile(join('./test/samples', filename), 'utf8')
+  );
+  assert(bundle);
+  bundle.replaceRequireCalls();
+  bundle.convertESM();
+  bundle.inlineVarInjections();
+  for (const module of bundle.modules.values()) {
+    expect(module.ast).toMatchSnapshot();
   }
-);
+});
 
 describe('extractor', async () => {
   test('webpack array', async () => {

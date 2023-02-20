@@ -32,6 +32,16 @@ let _counter = 1;
 
 exports[`extract webpack-esm.js 3`] = `export default 1;`;
 
+exports[`extract webpack-var-injection.js 1`] = `
+var m = require("./1.js");
+var n = require("./2.js");
+console.log(m, n);
+`;
+
+exports[`extract webpack-var-injection.js 2`] = `module.exports = 1;`;
+
+exports[`extract webpack-var-injection.js 3`] = `module.exports = 2;`;
+
 exports[`extractor > path mapping 1`] = `const a = require("./3.js");`;
 
 exports[`extractor > path mapping 2`] = `

@@ -7,6 +7,7 @@ import { relativePath } from '../utils/path';
 import { Module } from './module';
 import * as webpack from './webpack';
 import { convertESM } from './webpack/esm';
+import { inlineVarInjections } from './webpack/varInjection';
 
 export function extractBundle(ast: t.Node): Bundle | undefined {
   return webpack.extract(ast);
@@ -64,6 +65,7 @@ export class Bundle {
     this.applyMappings(mappings(m));
     this.replaceRequireCalls();
     this.convertESM();
+    this.inlineVarInjections();
 
     const bundleJson = {
       type: this.type,
@@ -90,6 +92,10 @@ export class Bundle {
         await writeFile(modulePath, code, 'utf8');
       })
     );
+  }
+
+  inlineVarInjections() {
+    this.modules.forEach(inlineVarInjections);
   }
 
   /**
