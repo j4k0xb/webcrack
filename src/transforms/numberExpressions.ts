@@ -5,7 +5,7 @@ import { Transform } from '.';
 
 export default {
   name: 'numberExpressions',
-  tags: ['unsafe', 'readability'],
+  tags: ['unsafe', 'readability', 'once'],
   visitor: () => ({
     BinaryExpression(path) {
       if (onlyHasNumericLiteralChildren(path.node)) {

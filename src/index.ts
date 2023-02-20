@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import { Bundle, extractBundle } from './extractor';
 import { applyTransform, applyTransforms } from './transforms';
+import { resetRunState } from './transforms/index';
 
 export interface WebcrackResult {
   code: string;
@@ -57,6 +58,7 @@ export async function webcrack(
 
   applyTransform(ast, deobfuscator);
 
+  resetRunState();
   for (
     let i = 1;
     i <= (options.maxIterations ?? defaultOptions.maxIterations);
@@ -65,6 +67,7 @@ export async function webcrack(
     console.log('\n== Iteration', i, '==');
     if (applyTransforms(ast, ['readability']).changes === 0) break;
   }
+  resetRunState();
 
   const bundle = extractBundle(ast);
   console.log('Bundle:', bundle?.type);

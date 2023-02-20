@@ -5,7 +5,7 @@ import { Transform } from '.';
 
 export default {
   name: 'deterministicIf',
-  tags: ['unsafe', 'readability'],
+  tags: ['unsafe', 'readability', 'once'],
   visitor: () => ({
     enter(path) {
       // TODO: check binding conflicts

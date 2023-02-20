@@ -34,12 +34,20 @@ export type TransformName = keyof typeof transforms;
 export type TransformOptions<TName extends TransformName> =
   typeof transforms[TName] extends Transform<infer TOptions> ? TOptions : never;
 
+export function resetRunState() {
+  Object.values(transforms as Record<string, Transform>).forEach(
+    transform => (transform.hasRun = false)
+  );
+}
+
 export function applyTransforms(ast: Node, tags: Tag[]): { changes: number } {
   const state = { changes: 0 };
-  Object.values(transforms)
-    .filter(t => tags.some(x => (t.tags as Tag[]).includes(x)))
+  Object.values(transforms as Record<string, Transform>)
+    .filter(transform => tags.some(tag => transform.tags.includes(tag)))
     .forEach(transform => {
+      if (transform.hasRun && transform.tags.includes('once')) return;
       state.changes += applyTransform(ast, transform).changes;
+      transform.hasRun = true;
     });
   return state;
 }
@@ -82,8 +90,9 @@ export interface Transform<TOptions = any> {
   tags: Tag[];
   preTransforms?: Transform[];
   postTransforms?: Transform[];
+  hasRun?: boolean;
   run?: (ast: Node, state: { changes: number }, options?: TOptions) => void;
   visitor?: (options?: TOptions) => TraverseOptions<{ changes: number }>;
 }
 
-export type Tag = 'safe' | 'unsafe' | 'readability';
+export type Tag = 'safe' | 'unsafe' | 'readability' | 'once';
