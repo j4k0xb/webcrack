@@ -74,8 +74,18 @@ if ((a(), b())) c(); // a(); if (b()) c();
 
 Currently supported bundlers: **webpack v4**
 
-Extracts each module of a webpack bundle into a separate file
-and allows the paths to be remapped based on AST matching.
+- Each module of a bundle gets extracted into a separate file
+- Webpack's runtime code gets removed
+- Modules can get converted to ESM
+- You can modify the unpacked modules and bundle them again: `npx webpack-cli ./webcrack-out`
+
+### Path-Mapping
+
+Useful for reverse-engineering and tracking changes across multiple versions of a bundle.
+
+The values are matchers. If they match a node in the AST, the module's path is changed to the corresponding key.
+
+Example:
 
 ```js
 import { webcrack } from 'webcrack';
@@ -83,10 +93,14 @@ import { readFileSync } from 'fs';
 
 const result = await webcrack(readFileSync('webpack-bundle.js', 'utf8'), {
   mappings: m => ({
-    './utils/color.js': m.regExpLiteral('^#([0-9a-f]{3}){1,2}$'),
+    'utils/color.js': m.regExpLiteral('^#([0-9a-f]{3}){1,2}$'),
+    'node_modules/lodash/index.js': m.memberExpression(
+      m.identifier('lodash'),
+      m.identifier('map')
+    ),
   }),
 });
 result.save('output-dir');
 ```
 
-See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers#readme) for more information about the `mappings` option.
+See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers#readme) for more information about matchers.
