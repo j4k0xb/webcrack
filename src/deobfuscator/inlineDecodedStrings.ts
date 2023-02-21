@@ -19,7 +19,7 @@ export default {
     const calls = collectCalls(ast, options.vm);
     const decodedStrings = options.vm.decode(calls);
 
-    calls.forEach(({ path }, i) => {
+    calls.forEach((path, i) => {
       if (decodedStrings[i] === undefined) {
         path.replaceWith(t.identifier('undefined'));
         path.addComment('leading', 'webcrack:decode_error');
@@ -33,11 +33,7 @@ export default {
 } satisfies Transform<{ vm: VMDecoder }>;
 
 function collectCalls(ast: t.Node, vm: VMDecoder) {
-  const calls: {
-    path: NodePath<t.CallExpression>;
-    decoder: string;
-    args: unknown[];
-  }[] = [];
+  const calls: NodePath<t.CallExpression>[] =  [];
 
   const decoderName = m.capture(
     m.matcher<string>(name => vm.decoders.some(d => d.name === name))
@@ -55,11 +51,7 @@ function collectCalls(ast: t.Node, vm: VMDecoder) {
   traverse(ast, {
     CallExpression(path) {
       if (matcher.match(path.node)) {
-        calls.push({
-          path,
-          decoder: decoderName.current!,
-          args: path.get('arguments').map(arg => arg.evaluate().value),
-        });
+        calls.push(path);
       }
     },
     noScope: true,
