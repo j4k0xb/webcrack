@@ -50,7 +50,7 @@ export function convertESM(module: Module) {
             )
           );
         } else {
-          // `let f = 1;` -> `default let counter = 1;`
+          // `let f = 1;` -> `export let counter = 1;`
           renameFast(binding, exportedName.current!);
           declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
         }
