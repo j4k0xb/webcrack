@@ -6,12 +6,13 @@ import { join } from 'node:path';
 import { webcrack } from '.';
 import { defaultOptions } from './index';
 
-const { version } = JSON.parse(
+const { version, description } = JSON.parse(
   readFileSync(join(__dirname, '..', 'package.json'), 'utf8')
 );
 
 program
   .version(version)
+  .description(description)
   .option('-o, --output <path>', 'output directory', 'webcrack-out')
   .option(
     '-m, --max-iterations <number>',
@@ -21,7 +22,6 @@ program
   )
   .option('-f, --force', 'overwrite output directory')
   .argument('<file>', 'input file')
-  .showHelpAfterError()
   .action(async input => {
     const { output, maxIterations, force } = program.opts();
 

@@ -24,6 +24,8 @@ npm install -g webcrack
 ```text
 Usage: webcrack [options] <file>
 
+Deobfuscate, unminify and unpack bundled javascript
+
 Arguments:
   file                           input file
 
