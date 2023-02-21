@@ -9,8 +9,11 @@ export default {
   visitor: () => ({
     BinaryExpression(path) {
       if (onlyHasNumericLiteralChildren(path.node)) {
-        path.replaceWith(t.numericLiteral(eval(path.toString())));
-        this.changes++;
+        const evaluated = path.evaluate();
+        if (evaluated.confident) {
+          path.replaceWith(t.numericLiteral(evaluated.value));
+          this.changes++;
+        }
       }
     },
     noScope: true,

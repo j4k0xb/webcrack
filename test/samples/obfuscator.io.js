@@ -83,6 +83,7 @@ function hi() {
   })(),
   console[m(0xc7)](m(0xc8));
   console[m(0xc7)](m(0xc811));
+  console[m(0xc7)](m(-0x1));
 }
 function d(a, b) {
   var e = c();

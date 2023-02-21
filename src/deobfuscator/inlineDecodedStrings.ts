@@ -42,10 +42,15 @@ function collectCalls(ast: t.Node, vm: VMDecoder) {
   const decoderName = m.capture(
     m.matcher<string>(name => vm.decoders.some(d => d.name === name))
   );
-  const args = m.capture(
-    m.arrayOf(m.or(m.stringLiteral(), m.numericLiteral()))
+  const matcher = m.callExpression(
+    m.identifier(decoderName),
+    m.arrayOf(
+      m.or(
+        m.stringLiteral(),
+        m.or(m.unaryExpression('-', m.numericLiteral()), m.numericLiteral())
+      )
+    )
   );
-  const matcher = m.callExpression(m.identifier(decoderName), args);
 
   traverse(ast, {
     CallExpression(path) {
@@ -53,7 +58,7 @@ function collectCalls(ast: t.Node, vm: VMDecoder) {
         calls.push({
           path,
           decoder: decoderName.current!,
-          args: args.current!.map(a => a.value),
+          args: path.get('arguments').map(arg => arg.evaluate().value),
         });
       }
     },

@@ -32,6 +32,7 @@ function hi() {
   })();
   console.log(\\"Hello World!\\");
   console.log( /*webcrack:decode_error*/undefined);
+  console.log( /*webcrack:decode_error*/undefined);
 }
 hi();
 function a(b) {
