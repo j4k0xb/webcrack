@@ -4,7 +4,14 @@
 [![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
 [![license](https://img.shields.io/github/license/j4k0xb/webcrack)](https://github.com/j4k0xb/webcrack/blob/master/LICENSE)
 
-Deobfuscate, unminify and unpack bundled javascript
+This projects aims to combine the best features of other javascript deobfuscators and unpackers into one tool, while improving on them in the following ways:
+
+- 🚀 **Performance** - Especially for large files
+- 🛡️ **Safety** - Considers variable references and scope
+- 🔬 **Auto-detection** - Finds code patterns without needing a config
+- ✍🏻 **Readability** - Removes obfuscator/bundler artifacts
+- ⌨️ **TypeScript** - All code is written in TypeScript
+- 🧪 **Tests** - To make sure nothing breaks
 
 ## Installation
 
@@ -14,7 +21,7 @@ npm install -g webcrack
 
 ## Usage
 
-```
+```text
 Usage: webcrack [options] <file>
 
 Arguments:
@@ -62,6 +69,8 @@ if ((a(), b())) c(); // a(); if (b()) c();
 ```
 
 ## Bundle Unpacking
+
+Currently supported bundlers: **webpack v4**
 
 Extracts each module of a webpack bundle into a separate file
 and allows the paths to be remapped based on AST matching.
