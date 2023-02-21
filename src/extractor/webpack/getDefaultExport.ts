@@ -21,8 +21,8 @@ import { Bundle } from '..';
  * Convert require.n calls to require the default export depending on the target module type
  * ```js
  * const m = require(1);
- * const mDefault = require.n(m);
- * console.log(mDefault.a.prop, mDefault().prop);
+ * const getter = require.n(m);
+ * console.log(getter.a.prop, getter().prop);
  * ```
  * ->
  * ```js
@@ -42,6 +42,17 @@ export function convertDefaultRequire(bundle: Bundle) {
 
   bundle.modules.forEach(module => {
     traverse(module.ast, {
+      enter(path) {
+        if (defaultRequireMatcherAlternative.match(path.node)) {
+          // Replace require.n(m).a or require.n(m)() with m or m.default
+          const requiredModule = getRequiredModule(path);
+          if (requiredModule?.ast.program.sourceType === 'module') {
+            path.replaceWith(expression`${moduleArg.current!}.default`());
+          } else {
+            path.replaceWith(moduleArg.current!);
+          }
+        }
+      },
       VariableDeclarator(path) {
         if (defaultRequireMatcher.match(path.node)) {
           // Replace require.n(m); with m or m.default
@@ -53,10 +64,8 @@ export function convertDefaultRequire(bundle: Bundle) {
             init.replaceWith(moduleArg.current!);
           }
 
-          // Replace mDefault.a.prop and mDefault().prop with mDefault.prop
-          const binding = path.scope.getOwnBinding(
-            defaultVarName.current!.name
-          );
+          // Replace getter.a.prop and getter().prop with getter.prop
+          const binding = path.scope.getOwnBinding(getterVarName.current!.name);
           binding?.referencePaths.forEach(refPath => {
             if (
               refPath.parentPath?.isCallExpression() ||
@@ -80,12 +89,18 @@ const declaratorMatcher = m.variableDeclarator(
 
 // E.g. m
 const moduleArg = m.capture(m.identifier());
-const defaultVarName = m.capture(m.identifier());
-// E.g. const mDefault = require.n(m)
-const defaultRequireMatcher = m.variableDeclarator(
-  defaultVarName,
-  m.callExpression(
-    m.memberExpression(m.identifier('require'), m.identifier('n')),
-    [moduleArg]
-  )
+// E.g. getter
+const getterVarName = m.capture(m.identifier());
+// E.g. require.n(m)
+const requireN = m.callExpression(
+  m.memberExpression(m.identifier('require'), m.identifier('n')),
+  [moduleArg]
+);
+// E.g. const getter = require.n(m)
+const defaultRequireMatcher = m.variableDeclarator(getterVarName, requireN);
+
+// E.g. require.n(m).a or require.n(m)()
+const defaultRequireMatcherAlternative = m.or(
+  m.memberExpression(requireN, m.identifier('a')),
+  m.callExpression(requireN, [])
 );

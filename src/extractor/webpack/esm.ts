@@ -61,11 +61,11 @@ export function convertESM(module: Module) {
   });
 }
 
-// require.r(exports);
+// E.g. require.r(exports);
 const defineEsModuleMatcher = m.expressionStatement(
   m.callExpression(
     m.memberExpression(m.identifier('require'), m.identifier('r')),
-    [m.identifier('exports')]
+    [m.identifier()]
   )
 );
 
@@ -76,7 +76,7 @@ const defineExportMatcher = m.expressionStatement(
   m.callExpression(
     m.memberExpression(m.identifier('require'), m.identifier('d')),
     [
-      m.identifier('exports'),
+      m.identifier(),
       m.stringLiteral(exportedName),
       m.functionExpression(
         undefined,

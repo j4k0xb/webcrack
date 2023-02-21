@@ -58,6 +58,8 @@
     const c = i(3);
     const bDefault = i.n(b);
     const cDefault = i.n(c);
+    const dDefault = i.n(b).a;
+    const eDefault = i.n(c)();
     console.log(a.counter);
     console.log(bDefault().VERSION);
     console.log(cDefault.a.VERSION);
@@ -71,11 +73,12 @@
     let counter = 1;
   },
   function(e, t, i) {
-    i.r(t);
-    i.d(t, 'default', function () {
-      return x;
+    const x = {};
+    i.r(x);
+    i.d(x, 'default', function () {
+      return y;
     });
-    let x = 1;
+    let y = 1;
   },
   function(e, t, i) {
     e.exports = {

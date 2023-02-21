@@ -26,6 +26,8 @@ const b = require("./2.js");
 const c = require("./3.js");
 const bDefault = b.default;
 const cDefault = c;
+const dDefault = b.default;
+const eDefault = c;
 console.log(a.counter);
 console.log(bDefault.VERSION);
 console.log(cDefault.VERSION);
@@ -36,7 +38,10 @@ export class counter {}
 let _counter = 1;
 `;
 
-exports[`extract webpack-esm.js 3`] = `export default 1;`;
+exports[`extract webpack-esm.js 3`] = `
+const x = {};
+export default 1;
+`;
 
 exports[`extract webpack-esm.js 4`] = `
 module.exports = {
