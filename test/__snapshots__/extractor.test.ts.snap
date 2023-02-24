@@ -36,6 +36,7 @@ console.log(cDefault.VERSION);
 exports[`extract webpack-esm.js 2`] = `
 export class counter {}
 let _counter = 1;
+counter = 2;
 `;
 
 exports[`extract webpack-esm.js 3`] = `

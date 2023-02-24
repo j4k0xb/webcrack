@@ -71,6 +71,7 @@
     });
     class f {}
     let counter = 1;
+    f = 2;
   },
   function(e, t, i) {
     const x = {};
