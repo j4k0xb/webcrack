@@ -7,7 +7,7 @@ import { Decoder } from './decoder';
 import { StringArray } from './stringArray';
 
 const vm = new VM({
-  timeout: 5_000,
+  timeout: 10_000,
   allowAsync: false,
   eval: false,
   wasm: false,
