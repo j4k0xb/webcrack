@@ -6,6 +6,7 @@ import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import controlFlowObject from './controlFlowObject';
+import controlFlowSwitch from './controlFlowSwitch';
 import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
@@ -58,5 +59,6 @@ export default {
     state.changes += 2 + decoders.length;
 
     state.changes += applyTransform(ast, controlFlowObject).changes;
+    state.changes += applyTransform(ast, controlFlowSwitch).changes;
   },
 } satisfies Transform;
