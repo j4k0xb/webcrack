@@ -61,14 +61,15 @@ function a(b) {
 `;
 
 exports[`deobfuscate obfuscator.io-control-flow.js 1`] = `
-"function hi() {
-  const d = 1;
-  const e = 2;
-  if (d < e) {
-    console.log(\\"Hello World!\\");
-  }
-}
-hi();"
+"function applyTransforms() {
+  this.modules.forEach(varInjection_1.inlineVarInjections);
+  this.modules.forEach(esm_1.convertESM);
+  (0, getDefaultExport_1.convertDefaultRequire)(this);
+  this.replaceRequireCalls();
+  var f = m.capture(m.numericLiteral());
+  var g = m.callExpression(m.identifier(\\"require\\"), [f]);
+  return g;
+}"
 `;
 
 exports[`deobfuscate obfuscator.io-function-wrapper.js 1`] = `

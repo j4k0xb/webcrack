@@ -14,7 +14,9 @@ export default {
       const caseStatements = new Map(
         cases.current!.map(c => [
           (c.test as t.StringLiteral).value,
-          c.consequent.slice(0, -1),
+          t.isContinueStatement(c.consequent.at(-1))
+            ? c.consequent.slice(0, -1)
+            : c.consequent,
         ])
       );
 
