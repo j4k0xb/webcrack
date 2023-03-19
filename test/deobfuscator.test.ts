@@ -6,7 +6,10 @@ import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { findStringArray } from '../src/deobfuscator/stringArray';
 import { webcrack } from '../src/index';
-import { inlineFunctionAliases, inlineVariableAliases } from '../src/utils/ast';
+import {
+  inlineFunctionAliases,
+  inlineVariableAliases,
+} from '../src/utils/inline';
 
 // Test samples
 test.each([
@@ -14,6 +17,7 @@ test.each([
   'obfuscator.io-rotator-unary.js',
   'obfuscator.io-multi-encoders.js',
   'obfuscator.io-function-wrapper.js',
+  'obfuscator.io-control-flow.js',
 ])(`deobfuscate %s`, async filename => {
   const result = await webcrack(
     await readFile(join('./test/samples', filename), 'utf8')

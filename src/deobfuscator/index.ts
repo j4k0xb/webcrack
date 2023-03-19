@@ -1,12 +1,13 @@
 import { applyTransform, Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
-import computedProperties from '../transforms/computedProperties';
 import extractTernaryCalls from '../transforms/extractTernaryCalls';
+import mergeStrings from '../transforms/mergeStrings';
 import sequence from '../transforms/sequence';
 import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
-import unminifyBooleans from '../transforms/unminifyBooleans';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
+import controlFlowObject from './controlFlowObject';
+import controlFlowSwitch from './controlFlowSwitch';
 import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
@@ -18,11 +19,7 @@ import { VMDecoder } from './vm';
 export default {
   name: 'deobfuscate',
   tags: ['unsafe'],
-  preTransforms: [
-    blockStatement,
-    sequence,
-    splitVariableDeclarations,
-  ],
+  preTransforms: [blockStatement, sequence, splitVariableDeclarations],
   run(ast, state) {
     const stringArray = findStringArray(ast);
     console.log(`String Array: ${!!stringArray}`);
@@ -61,5 +58,9 @@ export default {
     rotator?.path.remove();
     decoders.forEach(decoder => decoder.path.remove());
     state.changes += 2 + decoders.length;
+
+    state.changes += applyTransform(ast, mergeStrings).changes;
+    state.changes += applyTransform(ast, controlFlowObject).changes;
+    state.changes += applyTransform(ast, controlFlowSwitch).changes;
   },
 } satisfies Transform;

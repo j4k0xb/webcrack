@@ -12,6 +12,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
   const decoders: Decoder[] = [];
 
   for (const ref of stringArray.references) {
+    // TODO: can also be a function assigned to a variable
     const decoderFn = ref.findParent(p =>
       p.isFunctionDeclaration()
     ) as NodePath<t.FunctionDeclaration> | null;
