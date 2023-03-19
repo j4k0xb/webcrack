@@ -60,6 +60,17 @@ function a(b) {
 }"
 `;
 
+exports[`deobfuscate obfuscator.io-control-flow.js 1`] = `
+"function hi() {
+  const d = 1;
+  const e = 2;
+  if (d < e) {
+    console.log(\\"Hello World!\\");
+  }
+}
+hi();"
+`;
+
 exports[`deobfuscate obfuscator.io-function-wrapper.js 1`] = `
 "function hi() {
   console.log(\\"Hello World!\\");
