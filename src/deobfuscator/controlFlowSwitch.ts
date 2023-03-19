@@ -38,7 +38,7 @@ const cases = m.capture(
     m.switchCase(
       m.stringLiteral(m.matcher<string>(s => /^\d+$/.test(s as string))),
       m.or(
-        m.anyList(m.oneOrMore(), m.continueStatement()),
+        m.anyList(m.zeroOrMore(), m.continueStatement()),
         m.oneOf(m.returnStatement())
       )
     )

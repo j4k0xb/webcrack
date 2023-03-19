@@ -1,6 +1,7 @@
 import { applyTransform, Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
 import extractTernaryCalls from '../transforms/extractTernaryCalls';
+import mergeStrings from '../transforms/mergeStrings';
 import sequence from '../transforms/sequence';
 import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
 import { codePreview } from '../utils/ast';
@@ -58,6 +59,7 @@ export default {
     decoders.forEach(decoder => decoder.path.remove());
     state.changes += 2 + decoders.length;
 
+    state.changes += applyTransform(ast, mergeStrings).changes;
     state.changes += applyTransform(ast, controlFlowObject).changes;
     state.changes += applyTransform(ast, controlFlowSwitch).changes;
   },
