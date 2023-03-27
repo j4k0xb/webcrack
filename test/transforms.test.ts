@@ -252,12 +252,22 @@ describe('deterministicIf', expectJS => {
       }
    `).toMatchInlineSnapshot('a();');
     expectJS(`
+      if ("abc" === "xyz") {
+        a();
+      }
+   `).toMatchInlineSnapshot('');
+    expectJS(`
       if ("xyz" !== "abc") {
         a();
       } else {
         b();
       }
    `).toMatchInlineSnapshot('a();');
+    expectJS(`
+      if ("xyz" !== "xyz") {
+        a();
+      }
+   `).toMatchInlineSnapshot('');
 
     expectJS(`
       "xyz" === "xyz" ? a() : b();

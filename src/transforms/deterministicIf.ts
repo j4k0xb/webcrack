@@ -13,20 +13,22 @@ export default {
       if (ifEqualsMatcher.match(path.node)) {
         if (leftLiteral.current === rightLiteral.current) {
           replace(path, path.node.consequent);
-          this.changes++;
         } else if (path.node.alternate) {
           replace(path, path.node.alternate);
-          this.changes++;
+        } else {
+          path.remove();
         }
+        this.changes++;
       }
       if (ifNotEqualsMatcher.match(path.node)) {
         if (leftLiteral.current !== rightLiteral.current) {
           replace(path, path.node.consequent);
-          this.changes++;
         } else if (path.node.alternate) {
           replace(path, path.node.alternate);
-          this.changes++;
+        } else {
+          path.remove();
         }
+        this.changes++;
       }
     },
     noScope: true,
