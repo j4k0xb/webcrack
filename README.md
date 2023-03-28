@@ -53,8 +53,13 @@ console.log((await webcrack('const a = 1+1;')).code);
   - Index Shift
   - Variable/Function Wrapper Type
   - None/Base64/RC4 encoding
+  - Control Flow Flattening
+- Self Defending
+- Domain Lock
+- Disable Console Output
 - Numbers To Expressions
 - Split Strings
+- Dead Code Injection
 
 ### General/Unminifying
 
