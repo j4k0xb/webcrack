@@ -26,6 +26,7 @@ export default {
       node.body.splice(0, 3, ...newStatements);
       this.changes += newStatements.length + 3;
     },
+    noScope: true,
   }),
 } satisfies Transform;
 

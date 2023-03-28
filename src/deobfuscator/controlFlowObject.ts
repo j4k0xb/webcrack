@@ -12,46 +12,63 @@ export default {
   tags: ['safe'],
   visitor: () => ({
     enter(path) {
-      if (varMatcher.match(path.node)) {
-        // Verify all references to make sure they match how the obfuscator
-        // would have generated the code (no reassignments, etc.)
-        const binding = path.scope.getBinding(varId.current!.name);
-        if (!binding) return;
-        if (binding.constantViolations.length > 0) return;
-        if (!binding.referencePaths.every(isValidReference)) return;
-
-        const props = new Map(
-          objectProperties.current!.map(p => [
-            getPropName(p.key),
-            p.value as t.FunctionExpression | t.StringLiteral,
-          ])
-        );
-        if (!props.size) return;
-
-        // Have to loop backwards because we might replace a node that
-        // contains another reference to the binding (https://github.com/babel/babel/issues/12943)
-        [...binding.referencePaths].reverse().forEach(ref => {
-          const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
-          const propName = getPropName(memberPath.node.property)!;
-          const value = props.get(propName)!;
-
-          if (t.isStringLiteral(value)) {
-            memberPath.replaceWith(value);
-          } else {
-            inlineCfFunction(
-              value,
-              memberPath.parentPath as NodePath<t.CallExpression>
-            );
-          }
-          this.changes++;
-        });
-
-        path.remove();
-        this.changes++;
-      }
+      this.changes += transform(path);
     },
   }),
 } satisfies Transform;
+
+function transform(path: NodePath) {
+  let changes = 0;
+  if (varMatcher.match(path.node)) {
+    // Verify all references to make sure they match how the obfuscator
+    // would have generated the code (no reassignments, etc.)
+    const binding = path.scope.getBinding(varId.current!.name);
+    if (!binding) return changes;
+    if (
+      binding.constantViolations.length > 0 &&
+      binding.constantViolations[0] !== path
+    )
+      return changes;
+    if (!binding.referencePaths.every(isValidReference)) return changes;
+
+    const props = new Map(
+      objectProperties.current!.map(p => [
+        getPropName(p.key),
+        p.value as t.FunctionExpression | t.StringLiteral,
+      ])
+    );
+    if (!props.size) return changes;
+
+    const oldRefs = [...binding.referencePaths];
+
+    // Have to loop backwards because we might replace a node that
+    // contains another reference to the binding (https://github.com/babel/babel/issues/12943)
+    [...binding.referencePaths].reverse().forEach(ref => {
+      const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
+      const propName = getPropName(memberPath.node.property)!;
+      const value = props.get(propName)!;
+
+      if (t.isStringLiteral(value)) {
+        memberPath.replaceWith(value);
+      } else {
+        inlineCfFunction(
+          value,
+          memberPath.parentPath as NodePath<t.CallExpression>
+        );
+      }
+      changes++;
+    });
+
+    oldRefs.forEach(ref => {
+      const varDeclarator = ref?.findParent(p => p.isVariableDeclarator());
+      if (varDeclarator) changes += transform(varDeclarator);
+    });
+
+    path.remove();
+    changes++;
+  }
+  return changes;
+}
 
 function isValidReference(path: NodePath) {
   return (
