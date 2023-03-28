@@ -27,10 +27,10 @@ export default {
     console.log(' - length: ' + stringArray.strings.length);
     console.log(` - ${codePreview(stringArray.path.node)}`);
 
-    const rotator = findArrayRotator(ast);
+    const rotator = findArrayRotator(stringArray);
     console.log(`String Array Rotate: ${!!rotator}`);
     if (rotator) {
-      console.log(` - ${codePreview(rotator.path.node)}`);
+      console.log(` - ${codePreview(rotator.node)}`);
     }
 
     const decoders = findDecoders(stringArray);
@@ -55,7 +55,7 @@ export default {
     state.changes += applyTransform(ast, inlineDecodedStrings, { vm }).changes;
 
     stringArray.path.remove();
-    rotator?.path.remove();
+    rotator?.remove();
     decoders.forEach(decoder => decoder.path.remove());
     state.changes += 2 + decoders.length;
 

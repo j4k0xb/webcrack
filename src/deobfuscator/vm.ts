@@ -28,7 +28,7 @@ export class VMDecoder {
       compact: true,
     }).code;
     const rotatorCode = rotator
-      ? generate(rotator.path.node, { compact: true }).code
+      ? generate(rotator.node, { compact: true }).code
       : '';
     const decoderCode = decoders
       .map(decoder => generate(decoder.path.node, { compact: true }).code)

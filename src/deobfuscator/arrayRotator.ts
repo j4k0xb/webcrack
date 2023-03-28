@@ -1,12 +1,12 @@
-import traverse, { NodePath } from '@babel/traverse';
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { callExpression } from '@codemod/matchers';
 import { constMemberExpression, infiniteLoop } from '../utils/matcher';
+import { StringArray } from './stringArray';
 
-export interface ArrayRotator {
-  path: NodePath<t.ExpressionStatement>;
-}
+export type ArrayRotator = NodePath<t.ExpressionStatement>;
+
 /**
  * Structure:
  * ```
@@ -19,20 +19,15 @@ export interface ArrayRotator {
  *    array.push(array.shift())
  * ```
  */
-export function findArrayRotator(ast: t.Node) {
-  let result: ArrayRotator | undefined;
-
-  traverse(ast, {
-    ExpressionStatement(path) {
-      if (matcher.match(path.node)) {
-        result = { path };
-        path.stop();
-      }
-    },
-    noScope: true,
-  });
-
-  return result;
+export function findArrayRotator(
+  stringArray: StringArray
+): ArrayRotator | undefined {
+  for (const ref of stringArray.references) {
+    const rotator = ref.findParent(path => matcher.match(path.node));
+    if (rotator) {
+      return rotator as ArrayRotator;
+    }
+  }
 }
 
 // e.g. 'array'
