@@ -4,32 +4,7 @@ exports[`deobfuscate obfuscator.io.js 1`] = `
 "// v4.0.0
 
 function hi() {
-  var e = function () {
-    var f = true;
-    return function (g, h) {
-      var i = f ? function () {
-        if (h) {
-          var j = h.apply(g, arguments);
-          h = null;
-          return j;
-        }
-      } : function () {};
-      f = false;
-      return i;
-    };
-  }();
-  (function () {
-    e(this, function () {
-      var f = new RegExp(\\"function *\\\\\\\\( *\\\\\\\\)\\");
-      var g = new RegExp(\\"\\\\\\\\+\\\\\\\\+ *(?:[a-zA-Z_$][0-9a-zA-Z_$]*)\\", \\"i\\");
-      var h = a(\\"init\\");
-      if (!f.test(h + \\"chain\\") || !g.test(h + \\"input\\")) {
-        h(\\"0\\");
-      } else {
-        a();
-      }
-    })();
-  })();
+  (function () {})();
   console.log(\\"Hello World!\\");
   console.log( /*webcrack:decode_error*/undefined);
   console.log( /*webcrack:decode_error*/undefined);

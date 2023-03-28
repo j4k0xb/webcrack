@@ -25,11 +25,16 @@ export function constMemberExpression(
   );
 }
 
-const trueMatcher = m.or(
+export const trueMatcher = m.or(
   m.booleanLiteral(true),
   m.unaryExpression('!', m.numericLiteral(0)),
   m.unaryExpression('!', m.unaryExpression('!', m.numericLiteral(1))),
   m.unaryExpression('!', m.unaryExpression('!', m.arrayExpression([])))
+);
+
+export const falseMatcher = m.or(
+  m.booleanLiteral(false),
+  m.unaryExpression('!', m.arrayExpression([]))
 );
 
 /**

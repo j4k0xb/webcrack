@@ -18,5 +18,6 @@ export default {
         this.changes++;
       }
     },
+    noScope: true,
   }),
 } satisfies Transform;
