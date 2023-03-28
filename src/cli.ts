@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { InvalidArgumentError, program } from 'commander';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { webcrack } from '.';
 import { defaultOptions } from './index';
@@ -24,16 +25,15 @@ program
   .argument('<file>', 'input file')
   .action(async input => {
     const { output, maxIterations, force } = program.opts();
+    const code = await readFile(input, 'utf8');
 
     if (force || !existsSync(output)) {
-      rmSync(output, { recursive: true, force: true });
+      await rm(output, { recursive: true, force: true });
     } else {
       program.error('output directory already exists');
     }
 
-    (await webcrack(readFileSync(input, 'utf8'), { maxIterations })).save(
-      output
-    );
+    (await webcrack(code, { maxIterations })).save(output);
   })
   .parse();
 
