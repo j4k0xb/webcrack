@@ -18,6 +18,7 @@ test.each([
   'obfuscator.io-multi-encoders.js',
   'obfuscator.io-function-wrapper.js',
   'obfuscator.io-control-flow.js',
+  'obfuscator.io-high.js',
 ])(`deobfuscate %s`, async filename => {
   const result = await webcrack(
     await readFile(join('./test/samples', filename), 'utf8')

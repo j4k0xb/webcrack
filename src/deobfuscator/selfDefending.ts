@@ -22,21 +22,24 @@ export default {
   visitor: () => ({
     enter(path) {
       if (!matcher.match(path.node)) return;
-
       const binding = path.scope.getBinding(callController.current!)!;
+      // const callControllerFunctionName = (function() { ... })();
+      //       ^ path/binding
+
       binding.referencePaths
         .filter(ref => ref.parent.type === 'CallExpression')
         .forEach(ref => {
           if (ref.parentPath?.parent.type === 'CallExpression') {
-            // IIFE
+            // callControllerFunctionName(this, function () { ... })();
+            // ^ ref
             ref.parentPath.parentPath?.remove();
           } else {
-            // Stored in a variable and called later
-            const block = ref.findParent(p => p.isBlock()) as NodePath<t.Block>;
-            block.node.body.splice(0, 2);
+            // const selfDefendingFunctionName = callControllerFunctionName(this, function () {
+            // selfDefendingFunctionName();      ^ ref
+            removeSelfDefendingRefs(ref);
           }
-          this.changes++;
 
+          this.changes++;
           // TODO: possibly remove empty iife around the self-defending code
         });
 
@@ -47,6 +50,21 @@ export default {
   }),
 } satisfies Transform;
 
+function removeSelfDefendingRefs(path: NodePath) {
+  const varDecl = path.findParent(p =>
+    p.isVariableDeclarator()
+  ) as NodePath<t.VariableDeclarator> | null;
+
+  if (varDecl && t.isIdentifier(varDecl.node.id)) {
+    const binding = varDecl.scope.getBinding(varDecl.node.id.name);
+
+    binding?.referencePaths.forEach(ref =>
+      ref.findParent(p => p.isExpressionStatement())?.remove()
+    );
+    varDecl.remove();
+  }
+}
+
 const callController = m.capture(m.anyString());
 const firstCall = m.capture(m.identifier());
 const rfn = m.capture(m.identifier());
@@ -54,7 +72,7 @@ const context = m.capture(m.identifier());
 const res = m.capture(m.identifier());
 const fn = m.capture(m.identifier());
 
-// const callController = (function() {
+// const callControllerFunctionName = (function() { ... })();
 const matcher = m.variableDeclarator(
   m.identifier(callController),
   m.callExpression(
