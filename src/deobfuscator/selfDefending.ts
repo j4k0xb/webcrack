@@ -3,6 +3,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
 import {
+  buildIife,
   constMemberExpression,
   emptyIife,
   falseMatcher,
@@ -78,87 +79,71 @@ const fn = m.capture(m.identifier());
 // const callControllerFunctionName = (function() { ... })();
 const matcher = m.variableDeclarator(
   m.identifier(callController),
-  m.callExpression(
-    m.functionExpression(
-      null,
-      [],
-      m.blockStatement(
-        [
-          // let firstCall = true;
+  buildIife([
+    // let firstCall = true;
+    m.variableDeclaration(undefined, [
+      m.variableDeclarator(firstCall, trueMatcher),
+    ]),
+    // return function (context, fn) {
+    m.returnStatement(
+      m.functionExpression(
+        null,
+        [context, fn],
+        m.blockStatement([
           m.variableDeclaration(undefined, [
-            m.variableDeclarator(firstCall, trueMatcher),
-          ]),
-          // return function (context, fn) {
-          m.returnStatement(
-            m.functionExpression(
-              null,
-              [context, fn],
-              m.blockStatement([
-                m.variableDeclaration(undefined, [
-                  // const rfn = firstCall ? function() {
-                  m.variableDeclarator(
-                    rfn,
-                    m.conditionalExpression(
-                      m.fromCapture(firstCall),
-                      m.functionExpression(
-                        null,
-                        [],
-                        m.blockStatement([
-                          // if (fn) {
-                          m.ifStatement(
-                            m.fromCapture(fn),
-                            m.blockStatement([
-                              // const res = fn.apply(context, arguments);
-                              m.variableDeclaration(undefined, [
-                                m.variableDeclarator(
-                                  res,
-                                  m.callExpression(
-                                    constMemberExpression(
-                                      m.fromCapture(fn),
-                                      'apply'
-                                    ),
-                                    [
-                                      m.fromCapture(context),
-                                      m.identifier('arguments'),
-                                    ]
-                                  )
-                                ),
-                              ]),
-                              // fn = null;
-                              m.expressionStatement(
-                                m.assignmentExpression(
-                                  '=',
-                                  m.fromCapture(fn),
-                                  m.nullLiteral()
-                                )
-                              ),
-                              // return res;
-                              m.returnStatement(m.fromCapture(res)),
-                            ])
+            // const rfn = firstCall ? function() {
+            m.variableDeclarator(
+              rfn,
+              m.conditionalExpression(
+                m.fromCapture(firstCall),
+                m.functionExpression(
+                  null,
+                  [],
+                  m.blockStatement([
+                    // if (fn) {
+                    m.ifStatement(
+                      m.fromCapture(fn),
+                      m.blockStatement([
+                        // const res = fn.apply(context, arguments);
+                        m.variableDeclaration(undefined, [
+                          m.variableDeclarator(
+                            res,
+                            m.callExpression(
+                              constMemberExpression(m.fromCapture(fn), 'apply'),
+                              [
+                                m.fromCapture(context),
+                                m.identifier('arguments'),
+                              ]
+                            )
                           ),
-                        ])
-                      ),
-                      // : function() {}
-                      m.functionExpression(null, [], m.blockStatement([]))
-                    )
-                  ),
-                ]),
-                // firstCall = false;
-                m.expressionStatement(
-                  m.assignmentExpression(
-                    '=',
-                    m.fromCapture(firstCall),
-                    falseMatcher
-                  )
+                        ]),
+                        // fn = null;
+                        m.expressionStatement(
+                          m.assignmentExpression(
+                            '=',
+                            m.fromCapture(fn),
+                            m.nullLiteral()
+                          )
+                        ),
+                        // return res;
+                        m.returnStatement(m.fromCapture(res)),
+                      ])
+                    ),
+                  ])
                 ),
-                // return rfn;
-                m.returnStatement(m.fromCapture(rfn)),
-              ])
-            )
+                // : function() {}
+                m.functionExpression(null, [], m.blockStatement([]))
+              )
+            ),
+          ]),
+          // firstCall = false;
+          m.expressionStatement(
+            m.assignmentExpression('=', m.fromCapture(firstCall), falseMatcher)
           ),
-        ],
-        []
+          // return rfn;
+          m.returnStatement(m.fromCapture(rfn)),
+        ])
       )
-    )
-  )
+    ),
+  ])
 );
