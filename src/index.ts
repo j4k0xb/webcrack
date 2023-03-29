@@ -53,7 +53,10 @@ export async function webcrack(
   code: string,
   options: Options = defaultOptions
 ): Promise<WebcrackResult> {
-  const ast = parse(code, { sourceType: 'unambiguous' });
+  const ast = parse(code, {
+    sourceType: 'unambiguous',
+    allowReturnOutsideFunction: true,
+  });
 
   applyTransform(ast, deobfuscator);
 
