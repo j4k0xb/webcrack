@@ -43,23 +43,28 @@ import { webcrack } from 'webcrack';
 console.log((await webcrack('const a = 1+1;')).code);
 ```
 
-## Deobfuscations
+## Deobfuscation
 
 ### [obfuscator.io](https://obfuscator.io)
+
+Can be used to deobfuscate code obfuscated with the following options:
 
 - String Array
   - Rotate
   - Shuffle
   - Index Shift
   - Variable/Function Wrapper Type
-  - None/Base64/RC4 encoding
+  - None/Base64/RC4 Encoding
+  - Split Strings
+- Other Transformations
+  - Compact
+  - Simplify
+  - Numbers To Expressions
   - Control Flow Flattening
+  - Dead Code Injection
+- Disable Console Output
 - Self Defending
 - Domain Lock
-- Disable Console Output
-- Numbers To Expressions
-- Split Strings
-- Dead Code Injection
 
 ### General/Unminifying
 
