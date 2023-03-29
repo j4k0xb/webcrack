@@ -4,7 +4,6 @@ exports[`deobfuscate obfuscator.io.js 1`] = `
 "// v4.0.0
 
 function hi() {
-  (function () {})();
   console.log(\\"Hello World!\\");
   console.log( /*webcrack:decode_error*/undefined);
   console.log( /*webcrack:decode_error*/undefined);
@@ -71,7 +70,6 @@ exports[`deobfuscate obfuscator.io-high.js 1`] = `
   _0x152a02.setInterval(_0x40ea98, 4000);
 })();
 function hi() {
-  (function () {})();
   console.log(\\"Hello World!\\");
 }
 hi();
