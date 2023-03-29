@@ -4,6 +4,7 @@ import * as m from '@codemod/matchers';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
+import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
 import { Bundle, extractBundle } from './extractor';
 import { applyTransform, applyTransforms } from './transforms';
@@ -72,6 +73,7 @@ export async function webcrack(
 
   // Have to run this after readability transforms because the function may contain dead code
   applyTransform(ast, selfDefending);
+  applyTransform(ast, debugProtection);
 
   resetRunState();
 

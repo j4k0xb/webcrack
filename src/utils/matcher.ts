@@ -1,5 +1,6 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { Matcher } from '@codemod/matchers';
 
 export function infiniteLoop(body?: m.Matcher<t.Statement>) {
   return m.or(
@@ -11,6 +12,18 @@ export function infiniteLoop(body?: m.Matcher<t.Statement>) {
 export function constKey(name: string | m.Matcher<string>) {
   return m.or(m.identifier(name), m.stringLiteral(name));
 }
+
+export function buildIife(
+  body?: Matcher<Array<t.Statement>> | Array<Matcher<t.Statement>>
+) {
+  return m.callExpression(
+    m.functionExpression(null, [], body ? m.blockStatement(body) : undefined),
+    []
+  );
+}
+
+export const iife = buildIife();
+export const emptyIife = buildIife([]);
 
 /**
  * Matches both identifier properties and string literal computed properties

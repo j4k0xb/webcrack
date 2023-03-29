@@ -64,6 +64,7 @@ Can be used to deobfuscate code obfuscated with the following options:
   - Dead Code Injection
 - Disable Console Output
 - Self Defending
+- Debug Protection
 - Domain Lock
 
 ### General/Unminifying

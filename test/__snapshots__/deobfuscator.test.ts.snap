@@ -8,30 +8,7 @@ function hi() {
   console.log( /*webcrack:decode_error*/undefined);
   console.log( /*webcrack:decode_error*/undefined);
 }
-hi();
-function a(b) {
-  function e(f) {
-    if (typeof f === \\"string\\") {
-      return function (g) {}.constructor(\\"while (true) {}\\").apply(\\"counter\\");
-    } else if ((\\"\\" + f / f).length !== 1 || f % 20 === 0) {
-      (function () {
-        return true;
-      }).constructor(\\"debugger\\").call(\\"action\\");
-    } else {
-      (function () {
-        return false;
-      }).constructor(\\"debugger\\").apply(\\"stateObject\\");
-    }
-    e(++f);
-  }
-  try {
-    if (b) {
-      return e;
-    } else {
-      e(0);
-    }
-  } catch (f) {}
-}"
+hi();"
 `;
 
 exports[`deobfuscate obfuscator.io-control-flow.js 1`] = `
@@ -56,46 +33,10 @@ hi();"
 `;
 
 exports[`deobfuscate obfuscator.io-high.js 1`] = `
-"(function () {
-  var _0x5b07a9 = function () {
-    var _0x3d6989;
-    try {
-      _0x3d6989 = Function(\\"return (function() {}.constructor(\\\\\\"return this\\\\\\")( ));\\")();
-    } catch (_0x4516e9) {
-      _0x3d6989 = window;
-    }
-    return _0x3d6989;
-  };
-  var _0x152a02 = _0x5b07a9();
-  _0x152a02.setInterval(_0x40ea98, 4000);
-})();
-function hi() {
+"function hi() {
   console.log(\\"Hello World!\\");
 }
-hi();
-function _0x40ea98(_0x3857c8) {
-  function _0xb25c5e(_0x22f5f3) {
-    if (typeof _0x22f5f3 === \\"string\\") {
-      return function (_0x40f974) {}.constructor(\\"while (true) {}\\").apply(\\"counter\\");
-    } else if ((\\"\\" + _0x22f5f3 / _0x22f5f3).length !== 1 || _0x22f5f3 % 20 === 0) {
-      (function () {
-        return true;
-      }).constructor(\\"debugger\\").call(\\"action\\");
-    } else {
-      (function () {
-        return false;
-      }).constructor(\\"debugger\\").apply(\\"stateObject\\");
-    }
-    _0xb25c5e(++_0x22f5f3);
-  }
-  try {
-    if (_0x3857c8) {
-      return _0xb25c5e;
-    } else {
-      _0xb25c5e(0);
-    }
-  } catch (_0x3e75bc) {}
-}"
+hi();"
 `;
 
 exports[`deobfuscate obfuscator.io-multi-encoders.js 1`] = `

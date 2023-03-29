@@ -4,6 +4,7 @@ import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
 import {
   constMemberExpression,
+  emptyIife,
   falseMatcher,
   trueMatcher,
 } from '../utils/matcher';
@@ -66,10 +67,6 @@ function removeSelfDefendingRefs(path: NodePath) {
     varDecl.remove();
   }
 }
-
-const emptyIife = m.callExpression(
-  m.functionExpression(null, [], m.blockStatement([]))
-);
 
 const callController = m.capture(m.anyString());
 const firstCall = m.capture(m.identifier());
