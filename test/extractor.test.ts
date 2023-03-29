@@ -3,7 +3,7 @@ import assert from 'assert';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { describe, expect, test } from 'vitest';
-import webcrack from '../src/index';
+import { webcrack } from '../src/index';
 import { relativePath } from '../src/utils/path';
 
 // Test samples

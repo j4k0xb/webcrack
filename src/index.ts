@@ -49,8 +49,6 @@ export const defaultOptions = {
   maxIterations: 5,
 } satisfies Options;
 
-export default webcrack;
-
 export async function webcrack(
   code: string,
   options: Options = defaultOptions
