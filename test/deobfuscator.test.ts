@@ -33,8 +33,8 @@ describe('find string array', async () => {
     const stringArray = findStringArray(ast);
     expect(stringArray).toBeDefined();
     expect(stringArray!.name).toBe('__STRING_ARRAY__');
-    expect(stringArray!.references).toHaveLength(2);
-    expect(stringArray!.strings).toHaveLength(25);
+    expect(stringArray!.references).toHaveLength(3);
+    expect(stringArray!.length).toBe(25);
   });
 });
 

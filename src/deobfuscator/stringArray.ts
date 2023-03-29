@@ -6,7 +6,7 @@ export interface StringArray {
   path: NodePath<t.FunctionDeclaration>;
   references: NodePath[];
   name: string;
-  strings: string[];
+  length: number;
 }
 
 export function findStringArray(ast: t.Node) {
@@ -15,17 +15,17 @@ export function findStringArray(ast: t.Node) {
   traverse(ast, {
     FunctionDeclaration(path) {
       if (matcher.match(path.node)) {
-        const strings = arrayExpression.current!.elements.map(
-          e => (e as t.StringLiteral).value
-        );
+        const length = arrayExpression.current!.elements.length;
         const name = functionName.current!;
-        const binding = path.parentPath.scope.getBinding(name);
-        if (!binding) return;
-        let references = binding.referencePaths;
-        // Skip references in the getStringArray function itself
-        references = references.filter(ref => !ref.findParent(p => p === path));
+        const binding = path.parentPath.scope.getBinding(name)!;
+
         path.parentPath.scope.rename(name, '__STRING_ARRAY__');
-        result = { path, references, name: '__STRING_ARRAY__', strings };
+        result = {
+          path,
+          references: binding.referencePaths,
+          name: '__STRING_ARRAY__',
+          length,
+        };
         path.stop();
       }
     },

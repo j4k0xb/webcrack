@@ -24,7 +24,7 @@ export default {
     const stringArray = findStringArray(ast);
     console.log(`String Array: ${!!stringArray}`);
     if (!stringArray) return;
-    console.log(' - length: ' + stringArray.strings.length);
+    console.log(' - length: ' + stringArray.length);
     console.log(` - ${codePreview(stringArray.path.node)}`);
 
     const rotator = findArrayRotator(stringArray);
