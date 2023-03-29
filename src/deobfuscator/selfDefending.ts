@@ -60,11 +60,15 @@ function removeSelfDefendingRefs(path: NodePath) {
   ) as NodePath<t.VariableDeclarator> | null;
 
   if (varDecl && t.isIdentifier(varDecl.node.id)) {
+    const callMatcher = m.expressionStatement(
+      m.callExpression(m.identifier(varDecl.node.id.name), [])
+    );
     const binding = varDecl.scope.getBinding(varDecl.node.id.name);
 
-    binding?.referencePaths.forEach(ref =>
-      ref.findParent(p => p.isExpressionStatement())?.remove()
-    );
+    binding?.referencePaths.forEach(ref => {
+      if (callMatcher.match(ref.parentPath?.parent))
+        ref.parentPath?.parentPath?.remove();
+    });
     varDecl.remove();
   }
 }
