@@ -14,6 +14,7 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "start": "node dist/cli.js",
+    "lint": "eslint --ext .ts src test",
     "test": "vitest"
   },
   "repository": {
@@ -48,6 +49,9 @@
     "@types/babel__template": "^7.4.1",
     "@types/babel__traverse": "^7.18.3",
     "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint": "^8.37.0",
     "typescript": "^5.0.2",
     "vitest": "^0.29.8"
   }
