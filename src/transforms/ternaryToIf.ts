@@ -30,5 +30,5 @@ const matcher = m.expressionStatement(
 );
 
 const buildIfStatement = statement(
-  `if (CONDITION) { CONSEQUENT; } else { ALTERNATE; }`
+  'if (CONDITION) { CONSEQUENT; } else { ALTERNATE; }'
 );

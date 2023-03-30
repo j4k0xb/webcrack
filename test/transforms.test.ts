@@ -19,7 +19,8 @@ function describe<TName extends TransformName>(
   return describeVitest(name, () => {
     factory((actualCode, options) => {
       const ast = parse(actualCode);
-      applyTransform(ast, transforms[name], options as any);
+      // @ts-expect-error - we know this is a valid transform option
+      applyTransform(ast, transforms[name], options);
       return expect(ast);
     });
   });
@@ -160,10 +161,10 @@ describe('extractTernaryCalls', expectJS => {
 
 describe('rawLiterals', expectJS => {
   test('string', () =>
-    expectJS(`const a = "\\x61"`).toMatchInlineSnapshot('const a = "a";'));
+    expectJS('const a = "\\x61"').toMatchInlineSnapshot('const a = "a";'));
 
   test('number', () =>
-    expectJS(`const a = 0x1;`).toMatchInlineSnapshot('const a = 1;'));
+    expectJS('const a = 0x1;').toMatchInlineSnapshot('const a = 1;'));
 });
 
 describe('blockStatement', expectJS => {

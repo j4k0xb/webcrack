@@ -3,10 +3,10 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
 import {
-  buildIife,
   constMemberExpression,
   emptyIife,
   falseMatcher,
+  matchIife,
   trueMatcher,
 } from '../utils/matcher';
 
@@ -83,7 +83,7 @@ const fn = m.capture(m.identifier());
 // const callControllerFunctionName = (function() { ... })();
 const matcher = m.variableDeclarator(
   m.identifier(callController),
-  buildIife([
+  matchIife([
     // let firstCall = true;
     m.variableDeclaration(undefined, [
       m.variableDeclarator(firstCall, trueMatcher),

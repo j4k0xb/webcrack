@@ -85,7 +85,7 @@ export function applyTransform<TOptions>(
   return state;
 }
 
-export interface Transform<TOptions = any> {
+export interface Transform<TOptions = unknown> {
   name: string;
   tags: Tag[];
   preTransforms?: Transform[];

@@ -31,7 +31,7 @@ export default {
   }),
 } satisfies Transform;
 
-const buildIfStatement = statement(`if (CONDITION) { CONSEQUENT; }`);
-const buildNegatedIfStatement = statement(`if (!CONDITION) { CONSEQUENT; }`);
+const buildIfStatement = statement('if (CONDITION) { CONSEQUENT; }');
+const buildNegatedIfStatement = statement('if (!CONDITION) { CONSEQUENT; }');
 const andMatcher = m.expressionStatement(m.logicalExpression('&&'));
 const orMatcher = m.expressionStatement(m.logicalExpression('||'));

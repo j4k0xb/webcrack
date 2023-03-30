@@ -1,6 +1,7 @@
 import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
+import assert from 'assert';
 import { readFile } from 'fs/promises';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
@@ -19,9 +20,9 @@ test.each([
   'obfuscator.io-function-wrapper.js',
   'obfuscator.io-control-flow.js',
   'obfuscator.io-high.js',
-])(`deobfuscate %s`, async filename => {
+])('deobfuscate %s', async filename => {
   const result = await webcrack(
-    await readFile(join('./test/samples', filename), 'utf8')
+    await readFile(join('test', 'samples', filename), 'utf8')
   );
   expect(result.code).toMatchSnapshot();
 });
@@ -32,9 +33,10 @@ describe('find string array', async () => {
   test('function wrapper', () => {
     const stringArray = findStringArray(ast);
     expect(stringArray).toBeDefined();
-    expect(stringArray!.name).toBe('__STRING_ARRAY__');
-    expect(stringArray!.references).toHaveLength(3);
-    expect(stringArray!.length).toBe(25);
+    assert(stringArray);
+    expect(stringArray.name).toBe('__STRING_ARRAY__');
+    expect(stringArray.references).toHaveLength(3);
+    expect(stringArray.length).toBe(25);
   });
 });
 

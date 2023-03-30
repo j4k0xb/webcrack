@@ -39,7 +39,7 @@ export interface Options {
    */
   mappings?: (
     m: typeof import('@codemod/matchers')
-  ) => Record<string, m.Matcher<any>>;
+  ) => Record<string, m.Matcher<unknown>>;
   /**
    * Maximum number of iterations for readability transforms.
    */

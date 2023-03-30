@@ -21,7 +21,7 @@ export class Bundle {
     public modules: Map<number, Module>
   ) {}
 
-  applyMappings(mappings: Record<string, m.Matcher<any>>) {
+  applyMappings(mappings: Record<string, m.Matcher<unknown>>) {
     const unusedMappings = new Set(Object.keys(mappings));
 
     for (const module of this.modules.values()) {
@@ -61,7 +61,7 @@ export class Bundle {
     transformCode = (code: string): Promise<string> | string => code,
     mappings: (
       m: typeof import('@codemod/matchers')
-    ) => Record<string, m.Matcher<any>> = m => ({})
+    ) => Record<string, m.Matcher<unknown>> = () => ({})
   ) {
     this.applyMappings(mappings(m));
     this.applyTransforms();

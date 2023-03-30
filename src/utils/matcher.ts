@@ -13,7 +13,7 @@ export function constKey(name: string | m.Matcher<string>) {
   return m.or(m.identifier(name), m.stringLiteral(name));
 }
 
-export function buildIife(
+export function matchIife(
   body?: Matcher<Array<t.Statement>> | Array<Matcher<t.Statement>>
 ) {
   return m.callExpression(
@@ -22,8 +22,8 @@ export function buildIife(
   );
 }
 
-export const iife = buildIife();
-export const emptyIife = buildIife([]);
+export const iife = matchIife();
+export const emptyIife = matchIife([]);
 
 /**
  * Matches both identifier properties and string literal computed properties
