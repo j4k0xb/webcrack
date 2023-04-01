@@ -8,46 +8,45 @@ export interface Decoder {
   path: NodePath<t.FunctionDeclaration>;
 }
 
+// TODO: can also be a function assigned to a variable
 export function findDecoders(stringArray: StringArray): Decoder[] {
   const decoders: Decoder[] = [];
 
-  for (const ref of stringArray.references) {
-    // TODO: can also be a function assigned to a variable
-    const decoderFn = ref.findParent(p =>
-      p.isFunctionDeclaration()
-    ) as NodePath<t.FunctionDeclaration> | null;
-    if (!decoderFn) continue;
-
-    const functionName = m.capture(m.anyString());
-    const arrayIdentifier = m.capture(m.identifier());
-    const matcher = m.functionDeclaration(
-      m.identifier(functionName),
-      m.anything(),
-      m.blockStatement(
-        m.anyList(
-          // var array = getStringArray();
-          m.variableDeclaration(undefined, [
-            m.variableDeclarator(
-              arrayIdentifier,
-              m.callExpression(m.identifier(stringArray.name))
-            ),
-          ]),
-          m.zeroOrMore(),
-          // var h = array[e]; return h;
-          // or return array[e -= 254];
-          m.containerOf(
-            m.memberExpression(m.fromCapture(arrayIdentifier))
+  const functionName = m.capture(m.anyString());
+  const arrayIdentifier = m.capture(m.identifier());
+  const matcher = m.functionDeclaration(
+    m.identifier(functionName),
+    m.anything(),
+    m.blockStatement(
+      m.anyList(
+        // var array = getStringArray();
+        m.variableDeclaration(undefined, [
+          m.variableDeclarator(
+            arrayIdentifier,
+            m.callExpression(m.identifier(stringArray.name))
           ),
-          m.zeroOrMore()
-        )
+        ]),
+        m.zeroOrMore(),
+        // var h = array[e]; return h;
+        // or return array[e -= 254];
+        m.containerOf(m.memberExpression(m.fromCapture(arrayIdentifier))),
+        m.zeroOrMore()
       )
-    );
-    if (matcher.match(decoderFn.node)) {
+    )
+  );
+
+  for (const ref of stringArray.references) {
+    const decoderFn = ref.findParent(p =>
+      matcher.match(p.node)
+    ) as NodePath<t.FunctionDeclaration> | null;
+
+    if (decoderFn) {
       const oldName = functionName.current!;
       const newName = `__DECODE_${decoders.length}__`;
       decoderFn.parentPath.scope.rename(oldName, newName);
       decoders.push({ name: newName, path: decoderFn });
     }
   }
+
   return decoders;
 }
