@@ -2,9 +2,9 @@ import { parse } from '@babel/parser';
 import { describe as describeVitest, expect, test } from 'vitest';
 import { transforms } from '../src/transforms';
 import {
-  applyTransform,
   TransformName,
   TransformOptions,
+  applyTransform,
 } from '../src/transforms/index';
 
 function describe<TName extends TransformName>(
@@ -208,6 +208,11 @@ describe('numberExpressions', expectJS => {
     expectJS(`
       console.log(0x1021e + "test");
     `).toMatchInlineSnapshot('console.log(0x1021e + "test");'));
+
+  test('keep divisions', () =>
+    expectJS(`
+      console.log((-0x152f + 0x1281 * -0x1 + -0x18 * -0x1d1) / (0x83 * -0x1a + -0x19ea + 0x5f * 0x6a));
+    `).toMatchInlineSnapshot('console.log(1000 / 30);'));
 });
 
 describe('unminifyBooleans', expectJS => {

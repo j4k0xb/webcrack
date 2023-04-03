@@ -1,14 +1,13 @@
-import traverse from '@babel/traverse';
 import * as t from '@babel/types';
-import { Node } from '@babel/types';
+import * as m from '@codemod/matchers';
 import { Transform } from '.';
 
 export default {
   name: 'numberExpressions',
-  tags: ['unsafe', 'readability', 'once'],
+  tags: ['safe', 'readability', 'once'],
   visitor: () => ({
     BinaryExpression(path) {
-      if (onlyHasNumericLiteralChildren(path.node)) {
+      if (matcher.match(path.node)) {
         const evaluated = path.evaluate();
         if (evaluated.confident) {
           path.replaceWith(t.numericLiteral(evaluated.value));
@@ -20,18 +19,15 @@ export default {
   }),
 } satisfies Transform;
 
-const ALLOWED_TYPES = ['BinaryExpression', 'UnaryExpression', 'NumericLiteral'];
-
-function onlyHasNumericLiteralChildren(node: Node): boolean {
-  let valid = true;
-  traverse(node, {
-    enter(path) {
-      if (!ALLOWED_TYPES.includes(path.type)) {
-        valid = false;
-        path.stop();
-      }
-    },
-    noScope: true,
-  });
-  return valid;
-}
+const matcher: m.Matcher<t.Expression> = m.or(
+  m.binaryExpression(
+    m.or('+', '-', '*'),
+    m.matcher(node => matcher.match(node)),
+    m.matcher(node => matcher.match(node))
+  ),
+  m.unaryExpression(
+    '-',
+    m.matcher(node => matcher.match(node))
+  ),
+  m.numericLiteral()
+);
