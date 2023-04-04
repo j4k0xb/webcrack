@@ -7,7 +7,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  ignorePatterns: ['dist', 'tmp', 'test/samples'],
+  ignorePatterns: ['dist', 'tmp', 'test/samples', 'test/__snapshots__'],
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
