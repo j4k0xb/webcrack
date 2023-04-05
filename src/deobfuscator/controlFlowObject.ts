@@ -11,6 +11,10 @@ import {
   createFunctionMatcher,
 } from '../utils/matcher';
 
+/**
+ * Explanation: https://excalidraw.com/#json=0vehUdrfSS635CNPEQBXl,hDOd-UO9ETfSDWT9MxVX-A
+ */
+
 export default {
   name: 'controlFlowObject',
   tags: ['safe'],
@@ -28,9 +32,9 @@ function transform(path: NodePath) {
     // would have generated the code (no reassignments, etc.)
     const binding = path.scope.getBinding(varId.current!.name);
     if (!binding) return changes;
-    if (binding.constantViolations.length > 0) return changes;
+    if (!isReadonlyBinding(binding)) return changes;
     if (objectProperties.current!.length === 0) transformObjectKeys(binding);
-    if (!binding.referencePaths.every(isValidReference)) return changes;
+    if (!hasValidReads(binding)) return changes;
 
     const props = new Map(
       objectProperties.current!.map(p => [
@@ -71,6 +75,11 @@ function transform(path: NodePath) {
   return changes;
 }
 
+/**
+ * When the `Transform Object Keys` option is enabled, the obfuscator generates an empty
+ * object, assigns the properties later and adds an alias variable to the object.
+ * This function undoes that by converting the assignments to inline object properties.
+ */
 function transformObjectKeys(objBinding: Binding) {
   const refs = objBinding.referencePaths;
 
@@ -80,10 +89,10 @@ function transformObjectKeys(objBinding: Binding) {
   const assignments: NodePath[] = [];
 
   for (let i = 0; i < refs.length - 1; i++) {
-    const expressionStatement = refs[i].parentPath!.parentPath!.parentPath!;
-    if (!assignment.match(expressionStatement.node)) return;
+    const expressionStatement = refs[i].parentPath?.parentPath?.parentPath;
+    if (!assignment.match(expressionStatement?.node)) return;
 
-    assignments.push(expressionStatement);
+    assignments.push(expressionStatement!);
     objectProperties.current!.push(
       t.objectProperty(
         t.identifier(assignedKey.current!),
@@ -93,8 +102,8 @@ function transformObjectKeys(objBinding: Binding) {
   }
 
   const aliasBinding = objBinding.scope.getBinding(aliasId.current!.name)!;
-  if (aliasBinding.constantViolations.length > 0) return;
-  if (!aliasBinding.referencePaths.every(isValidReference)) return;
+  if (!isReadonlyBinding(aliasBinding)) return;
+  if (!hasValidReads(aliasBinding)) return;
 
   objBinding.referencePaths = aliasBinding.referencePaths;
   objBinding.references = aliasBinding.references;
@@ -105,13 +114,22 @@ function transformObjectKeys(objBinding: Binding) {
   aliasBinding.path.remove();
 }
 
-function isValidReference(path: NodePath) {
-  return (
-    refMatcher.match(path.parent) &&
-    !path.parentPath?.parentPath?.isAssignmentExpression({
-      left: path.parent,
-    })
+/**
+ * Returns true if every reference is a member expression whose value is read
+ */
+function hasValidReads(binding: Binding) {
+  return binding.referencePaths.every(
+    path =>
+      memberAccess.match(path.parent) &&
+      !path.parentPath?.parentPath?.isAssignmentExpression({
+        left: path.parent,
+      })
   );
+}
+
+function isReadonlyBinding(binding: Binding) {
+  // Workaround because sometimes babel treats the VariableDeclarator/binding itself as a violation
+  return binding.constant || binding.constantViolations[0] === binding.path;
 }
 
 const varId = m.capture(m.identifier());
@@ -158,7 +176,8 @@ const assignment = m.expressionStatement(
     assignedValue
   )
 );
-const refMatcher = constMemberExpression(
+// E.g. obj.rLxJs
+const memberAccess = constMemberExpression(
   m.or(m.fromCapture(varId), m.fromCapture(aliasId)),
   propertyName
 );
