@@ -73,6 +73,14 @@ describe('sequence', expectJS => {
       a = 1;
       for (let key in object) {}
     `));
+
+  test('rearrange variable declarator', () =>
+    expectJS(`
+    var t = (o = null, o);
+    `).toMatchInlineSnapshot(`
+      o = null;
+      var t = o;
+    `));
 });
 
 describe('splitVariableDeclarations', expectJS => {

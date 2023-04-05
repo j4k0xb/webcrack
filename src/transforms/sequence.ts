@@ -53,6 +53,19 @@ export default {
         this.changes++;
       }
     },
+    VariableDeclaration(path) {
+      const sequence = m.capture(m.sequenceExpression());
+      const matcher = m.variableDeclaration(undefined, [
+        m.variableDeclarator(undefined, sequence),
+      ]);
+      if (matcher.match(path.node)) {
+        const expressions = sequence.current!.expressions;
+        path.node.declarations[0].init = expressions.pop();
+        const statements = expressions.map(expr => t.expressionStatement(expr));
+        path.insertBefore(statements);
+        this.changes++;
+      }
+    },
     noScope: true,
   }),
 } satisfies Transform;
