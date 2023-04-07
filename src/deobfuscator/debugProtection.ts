@@ -17,11 +17,10 @@ export default {
   visitor: () => ({
     enter(path) {
       if (!matcher.match(path.node)) return;
-      path.addComment('leading', 'debugProtection');
+
       const binding = path.scope.getBinding(
         debugProtectionFunctionName.current!
       )!;
-      binding.path.addComment('leading', 'binding');
 
       binding.referencePaths.forEach(ref => {
         if (intervalCall.match(ref.parent)) {
