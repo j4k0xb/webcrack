@@ -38,7 +38,7 @@ export default {
           } else {
             // const selfDefendingFunctionName = callControllerFunctionName(this, function () {
             // selfDefendingFunctionName();      ^ ref
-            removeSelfDefendingRefs(ref);
+            removeSelfDefendingRefs(ref as NodePath<t.Identifier>);
           }
 
           // leftover (function () {})() from debug protection function call
@@ -54,16 +54,21 @@ export default {
   }),
 } satisfies Transform;
 
-function removeSelfDefendingRefs(path: NodePath) {
+function removeSelfDefendingRefs(path: NodePath<t.Identifier>) {
+  const varName = m.capture(m.anyString());
+  const varMatcher = m.variableDeclarator(
+    m.identifier(varName),
+    m.callExpression(m.identifier(path.node.name))
+  );
+  const callMatcher = m.expressionStatement(
+    m.callExpression(m.identifier(m.fromCapture(varName)), [])
+  );
   const varDecl = path.findParent(p =>
-    p.isVariableDeclarator()
+    varMatcher.match(p.node)
   ) as NodePath<t.VariableDeclarator> | null;
 
-  if (varDecl && t.isIdentifier(varDecl.node.id)) {
-    const callMatcher = m.expressionStatement(
-      m.callExpression(m.identifier(varDecl.node.id.name), [])
-    );
-    const binding = varDecl.scope.getBinding(varDecl.node.id.name);
+  if (varDecl) {
+    const binding = varDecl.scope.getBinding(varName.current!);
 
     binding?.referencePaths.forEach(ref => {
       if (callMatcher.match(ref.parentPath?.parent))
