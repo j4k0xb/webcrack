@@ -11,6 +11,18 @@ function hi() {
 hi();"
 `;
 
+exports[`deobfuscate obfuscator.io-calls-transform.js 1`] = `
+"function foo() {
+  var c = \\"string1\\";
+  var d = \\"string2\\";
+  var e = \\"string3\\";
+  var f = \\"string4\\";
+  var g = \\"string5\\";
+  var h = \\"string6\\";
+}
+console.log(foo());"
+`;
+
 exports[`deobfuscate obfuscator.io-control-flow.js 1`] = `
 "function applyTransforms() {
   this.modules.forEach(varInjection_1.inlineVarInjections);

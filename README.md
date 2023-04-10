@@ -53,6 +53,7 @@ Can be used to deobfuscate code obfuscated with the following options:
   - Rotate
   - Shuffle
   - Index Shift
+  - Calls Transform
   - Variable/Function Wrapper Type
   - None/Base64/RC4 Encoding
   - Split Strings

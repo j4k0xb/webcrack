@@ -212,7 +212,12 @@ describe('numberExpressions', expectJS => {
       console.log(-0x1021e + -0x7eac8 + 0x17 * 0xac9c);
     `).toMatchInlineSnapshot('console.log(431390);'));
 
-  test('ignore other node types', () =>
+  test('simplify coerced strings', () =>
+    expectJS(`
+      console.log(-"0xa6" - -331, -"0xa6");
+    `).toMatchInlineSnapshot('console.log(165, -166);'));
+
+  test('ignore string results', () =>
     expectJS(`
       console.log(0x1021e + "test");
     `).toMatchInlineSnapshot('console.log(0x1021e + "test");'));

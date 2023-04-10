@@ -11,6 +11,7 @@ import controlFlowSwitch from './controlFlowSwitch';
 import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
+import objectLiterals from './objectLiterals';
 import { findStringArray } from './stringArray';
 import { VMDecoder } from './vm';
 
@@ -35,6 +36,8 @@ export default {
 
     const decoders = findDecoders(stringArray);
     console.log(`String Array Encodings: ${decoders.length}`);
+
+    state.changes += applyTransform(ast, objectLiterals).changes;
 
     for (const decoder of decoders) {
       console.log(` - ${codePreview(decoder.path.node)}`);

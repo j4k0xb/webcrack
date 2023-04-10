@@ -18,6 +18,7 @@ test.each([
   'obfuscator.io-rotator-unary.js',
   'obfuscator.io-multi-encoders.js',
   'obfuscator.io-function-wrapper.js',
+  'obfuscator.io-calls-transform.js',
   'obfuscator.io-control-flow.js',
   'obfuscator.io-control-flow-keys.js',
   'obfuscator.io-high.js',

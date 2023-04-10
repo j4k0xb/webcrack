@@ -6,11 +6,12 @@ export default {
   name: 'numberExpressions',
   tags: ['safe', 'readability', 'once'],
   visitor: () => ({
-    BinaryExpression(path) {
-      if (matcher.match(path.node)) {
+    enter(path) {
+      if (path.type !== 'NumericLiteral' && matcher.match(path.node)) {
         const evaluated = path.evaluate();
         if (evaluated.confident) {
           path.replaceWith(t.numericLiteral(evaluated.value));
+          path.skip();
           this.changes++;
         }
       }
@@ -25,9 +26,23 @@ const matcher: m.Matcher<t.Expression> = m.or(
     m.matcher(node => matcher.match(node)),
     m.matcher(node => matcher.match(node))
   ),
+  m.binaryExpression(
+    '-',
+    m.or(
+      m.stringLiteral(),
+      m.matcher(node => matcher.match(node))
+    ),
+    m.or(
+      m.stringLiteral(),
+      m.matcher(node => matcher.match(node))
+    )
+  ),
   m.unaryExpression(
     '-',
-    m.matcher(node => matcher.match(node))
+    m.or(
+      m.stringLiteral(),
+      m.matcher(node => matcher.match(node))
+    )
   ),
   m.numericLiteral()
 );
