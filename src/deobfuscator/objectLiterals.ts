@@ -21,7 +21,7 @@ export default {
       const props = new Map(
         objectProperties.current!.map(p => [
           getPropName(p.key),
-          p.value as t.FunctionExpression | t.StringLiteral,
+          p.value as t.StringLiteral | t.NumericLiteral,
         ])
       );
 

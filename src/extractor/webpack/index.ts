@@ -1,6 +1,7 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { constMemberExpression } from '../../utils/matcher';
 import { Bundle } from '../index';
 import { Module } from '../module';
 
@@ -94,7 +95,7 @@ const matcher = m.callExpression(
           // E.g. __webpack_require__.s = 2
           m.assignmentExpression(
             '=',
-            m.memberExpression(m.anything(), m.identifier('s')),
+            constMemberExpression(m.identifier(), 's'),
             entryIdMatcher
           )
         )

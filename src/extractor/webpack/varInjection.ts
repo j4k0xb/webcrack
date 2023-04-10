@@ -1,6 +1,7 @@
 import { statement } from '@babel/template';
 import { Statement } from '@babel/types';
 import * as m from '@codemod/matchers';
+import { constMemberExpression } from '../../utils/matcher';
 import { Module } from '../module';
 
 // var because the same name could already be declared
@@ -44,9 +45,9 @@ const args = m.capture(
 );
 const matcher = m.expressionStatement(
   m.callExpression(
-    m.memberExpression(
+    constMemberExpression(
       m.functionExpression(undefined, params, body),
-      m.identifier('call')
+      'call'
     ),
     args
   )

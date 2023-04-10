@@ -33,7 +33,7 @@ export function constMemberExpression(
   property?: string | m.Matcher<string>
 ) {
   return m.or(
-    m.memberExpression(object, m.identifier(property)),
+    m.memberExpression(object, m.identifier(property), false),
     m.memberExpression(object, m.stringLiteral(property), true)
   );
 }

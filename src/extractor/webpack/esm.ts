@@ -1,6 +1,7 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { constMemberExpression } from '../../utils/matcher';
 import { renameFast } from '../../utils/rename';
 import { Module } from '../module';
 
@@ -63,26 +64,22 @@ export function convertESM(module: Module) {
 
 // E.g. require.r(exports);
 const defineEsModuleMatcher = m.expressionStatement(
-  m.callExpression(
-    m.memberExpression(m.identifier('require'), m.identifier('r')),
-    [m.identifier()]
-  )
+  m.callExpression(constMemberExpression(m.identifier('require'), 'r'), [
+    m.identifier(),
+  ])
 );
 
 const exportedName = m.capture(m.anyString());
 const returnedName = m.capture(m.anyString());
 // E.g. require.d(exports, "counter", function () { return f });
 const defineExportMatcher = m.expressionStatement(
-  m.callExpression(
-    m.memberExpression(m.identifier('require'), m.identifier('d')),
-    [
-      m.identifier(),
-      m.stringLiteral(exportedName),
-      m.functionExpression(
-        undefined,
-        [],
-        m.blockStatement([m.returnStatement(m.identifier(returnedName))])
-      ),
-    ]
-  )
+  m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
+    m.identifier(),
+    m.stringLiteral(exportedName),
+    m.functionExpression(
+      undefined,
+      [],
+      m.blockStatement([m.returnStatement(m.identifier(returnedName))])
+    ),
+  ])
 );

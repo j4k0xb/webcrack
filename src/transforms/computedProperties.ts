@@ -29,8 +29,8 @@ const stringMatcher = m.capture(
   m.stringLiteral(m.matcher(value => isValidProperty(value as string)))
 );
 const propertyMatcher = m.or(
-  m.memberExpression(m.anything(), stringMatcher),
-  m.optionalMemberExpression(m.anything(), stringMatcher)
+  m.memberExpression(m.anything(), stringMatcher, true),
+  m.optionalMemberExpression(m.anything(), stringMatcher, true)
 );
 const keyMatcher = m.or(
   m.objectProperty(stringMatcher),

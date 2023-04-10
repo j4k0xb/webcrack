@@ -2,6 +2,7 @@ import { expression } from '@babel/template';
 import traverse, { NodePath } from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import { Bundle } from '..';
+import { constMemberExpression } from '../../utils/matcher';
 
 /*
  * webpack/runtime/compat get default export
@@ -93,7 +94,7 @@ const moduleArg = m.capture(m.identifier());
 const getterVarName = m.capture(m.identifier());
 // E.g. require.n(m)
 const requireN = m.callExpression(
-  m.memberExpression(m.identifier('require'), m.identifier('n')),
+  constMemberExpression(m.identifier('require'), 'n'),
   [moduleArg]
 );
 // E.g. const getter = require.n(m)
@@ -101,6 +102,6 @@ const defaultRequireMatcher = m.variableDeclarator(getterVarName, requireN);
 
 // E.g. require.n(m).a or require.n(m)()
 const defaultRequireMatcherAlternative = m.or(
-  m.memberExpression(requireN, m.identifier('a')),
+  constMemberExpression(requireN, 'a'),
   m.callExpression(requireN, [])
 );
