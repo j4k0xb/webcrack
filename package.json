@@ -42,17 +42,17 @@
     "@babel/types": "^7.21.4",
     "@codemod/matchers": "^1.6.1",
     "commander": "^10.0.0",
-    "vm2": "^3.9.15"
+    "vm2": "^3.9.16"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
     "@types/babel__template": "^7.4.1",
     "@types/babel__traverse": "^7.18.3",
     "@types/node": "^18.15.11",
-    "@typescript-eslint/eslint-plugin": "^5.57.1",
-    "@typescript-eslint/parser": "^5.57.1",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
     "eslint": "^8.38.0",
     "typescript": "^5.0.4",
-    "vitest": "^0.29.8"
+    "vitest": "^0.30.1"
   }
 }
