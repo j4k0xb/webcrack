@@ -1,7 +1,6 @@
 import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import * as m from '@codemod/matchers';
-import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
@@ -89,9 +88,14 @@ export async function webcrack(
     code: outputCode,
     bundle,
     async save(path) {
-      await mkdir(path, { recursive: true });
-      await writeFile(join(path, 'deobfuscated.js'), outputCode, 'utf8');
-      bundle?.save(path, options.transformCode, options.mappings);
+      if (process.env.browser) {
+        throw new Error('Not implemented.');
+      } else {
+        const { mkdir, writeFile } = await import('node:fs/promises');
+        await mkdir(path, { recursive: true });
+        await writeFile(join(path, 'deobfuscated.js'), outputCode, 'utf8');
+        bundle?.save(path, options.transformCode, options.mappings);
+      }
     },
   };
 }

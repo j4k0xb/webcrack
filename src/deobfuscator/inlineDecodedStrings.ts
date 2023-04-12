@@ -20,11 +20,11 @@ export default {
     const decodedStrings = options.vm.decode(calls);
 
     calls.forEach((path, i) => {
-      if (decodedStrings[i] === undefined) {
+      if (typeof decodedStrings[i] === 'string') {
+        path.replaceWith(t.stringLiteral(decodedStrings[i]));
+      } else {
         path.replaceWith(t.identifier('undefined'));
         path.addComment('leading', 'webcrack:decode_error');
-      } else {
-        path.replaceWith(t.stringLiteral(decodedStrings[i]));
       }
     });
 
@@ -33,7 +33,7 @@ export default {
 } satisfies Transform<{ vm: VMDecoder }>;
 
 function collectCalls(ast: t.Node, vm: VMDecoder) {
-  const calls: NodePath<t.CallExpression>[] =  [];
+  const calls: NodePath<t.CallExpression>[] = [];
 
   const decoderName = m.capture(
     m.matcher<string>(name => vm.decoders.some(d => d.name === name))

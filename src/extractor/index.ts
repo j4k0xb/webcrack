@@ -1,7 +1,6 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { relativePath } from '../utils/path';
 import { Module } from './module';
@@ -75,22 +74,27 @@ export class Bundle {
       })),
     };
 
-    await mkdir(path, { recursive: true });
+    if (process.env.browser) {
+      throw new Error('Not implemented.');
+    } else {
+      const { mkdir, writeFile } = await import('node:fs/promises');
+      await mkdir(path, { recursive: true });
 
-    await writeFile(
-      join(path, 'bundle.json'),
-      JSON.stringify(bundleJson, null, 2),
-      'utf8'
-    );
+      await writeFile(
+        join(path, 'bundle.json'),
+        JSON.stringify(bundleJson, null, 2),
+        'utf8'
+      );
 
-    await Promise.all(
-      Array.from(this.modules.values(), async module => {
-        const modulePath = join(path, module.path);
-        const code = await transformCode(module.code);
-        await mkdir(dirname(modulePath), { recursive: true });
-        await writeFile(modulePath, code, 'utf8');
-      })
-    );
+      await Promise.all(
+        Array.from(this.modules.values(), async module => {
+          const modulePath = join(path, module.path);
+          const code = await transformCode(module.code);
+          await mkdir(dirname(modulePath), { recursive: true });
+          await writeFile(modulePath, code, 'utf8');
+        })
+      );
+    }
   }
 
   /**

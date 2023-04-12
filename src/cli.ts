@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 
 import { InvalidArgumentError, program } from 'commander';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { readFile, rm } from 'node:fs/promises';
-import { join } from 'node:path';
 import { webcrack } from '.';
+import { description, version } from '../package.json';
 import { defaultOptions } from './index';
-
-const { version, description } = JSON.parse(
-  readFileSync(join(__dirname, '..', 'package.json'), 'utf8')
-);
 
 program
   .version(version)
