@@ -19,7 +19,6 @@ function describe<TName extends TransformName>(
   return describeVitest(name, () => {
     factory((actualCode, options) => {
       const ast = parse(actualCode);
-      // @ts-expect-error - we know this is a valid transform option
       applyTransform(ast, transforms[name], options);
       return expect(ast);
     });
@@ -140,31 +139,6 @@ describe('computedProperties', expectJS => {
     expectJS(`
       console["1"]("hello");
     `).toMatchInlineSnapshot('console["1"]("hello");'));
-});
-
-describe('extractTernaryCalls', expectJS => {
-  test('extract all', () =>
-    expectJS(`
-      __DECODE__(100 < o ? 10753 : 5 < o ? 2382 : 2820);
-      log(p ? 8590 : 5814);
-    `).toMatchInlineSnapshot(
-      `
-      100 < o ? __DECODE__(10753) : 5 < o ? __DECODE__(2382) : __DECODE__(2820);
-      p ? log(8590) : log(5814);
-    `
-    ));
-
-  test('extract with filter', () =>
-    expectJS(
-      `
-    __DECODE__(100 < o ? 10753 : 5 < o ? 2382 : 2820);
-    log(p ? 8590 : 5814);
-    `,
-      { callee: '__DECODE__' }
-    ).toMatchInlineSnapshot(`
-      100 < o ? __DECODE__(10753) : 5 < o ? __DECODE__(2382) : __DECODE__(2820);
-      log(p ? 8590 : 5814);
-    `));
 });
 
 describe('rawLiterals', expectJS => {

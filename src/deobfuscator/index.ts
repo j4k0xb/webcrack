@@ -1,6 +1,5 @@
 import { applyTransform, Transform } from '../transforms';
 import blockStatement from '../transforms/blockStatement';
-import extractTernaryCalls from '../transforms/extractTernaryCalls';
 import mergeStrings from '../transforms/mergeStrings';
 import sequence from '../transforms/sequence';
 import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
@@ -47,11 +46,6 @@ export default {
         inlineDecoderWrappers,
         decoder.path
       ).changes;
-
-      // Needed so the decoder calls only contain literal arguments
-      state.changes += applyTransform(ast, extractTernaryCalls, {
-        callee: decoder.name,
-      }).changes;
     }
 
     const vm = new VMDecoder(stringArray, decoders, rotator);

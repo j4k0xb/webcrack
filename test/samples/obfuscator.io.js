@@ -84,6 +84,8 @@ function hi() {
   console[m(0xc7)](m(0xc8));
   console[m(0xc7)](m(0xc811));
   console[m(0xc7)](m(-0x1));
+  const p = true;
+  console[m(0xc7)](m(p ? 0xc7 : 0xc8));
 }
 function d(a, b) {
   var e = c();
