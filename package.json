@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "node esbuild.config.mjs",
-    "postbuild": "tsc --emitDeclarationOnly --declaration --outFile dist/index.d.ts --project tsconfig.json",
+    "postbuild": "tsc",
     "watch": "node esbuild.config.mjs --watch",
     "start": "node dist/cli.js",
     "lint": "eslint --ext .ts src test",
