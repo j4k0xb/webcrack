@@ -46,8 +46,7 @@
     "@babel/types": "^7.21.4",
     "@codemod/matchers": "^1.6.1",
     "commander": "^10.0.0",
-    "quickjs-emscripten": "^0.22.0",
-    "vm2": "^3.9.16"
+    "quickjs-emscripten": "^0.22.0"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
