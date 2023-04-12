@@ -9,11 +9,7 @@ export default {
     enter(path) {
       if (matcher.match(path.node)) {
         path.replaceWith(
-          buildIfStatement({
-            CONDITION: test.current,
-            CONSEQUENT: consequent.current,
-            ALTERNATE: alternate.current,
-          })
+          statement`if (${test.current}) { ${consequent.current}; } else { ${alternate.current}; }`()
         );
         this.changes++;
       }
@@ -27,8 +23,4 @@ const consequent = m.capture(m.anyExpression());
 const alternate = m.capture(m.anyExpression());
 const matcher = m.expressionStatement(
   m.conditionalExpression(test, consequent, alternate)
-);
-
-const buildIfStatement = statement(
-  'if (CONDITION) { CONSEQUENT; } else { ALTERNATE; }'
 );

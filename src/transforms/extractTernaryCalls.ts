@@ -4,11 +4,11 @@ import { Transform } from '.';
 
 /**
  * ```js
- * callee(condition ? 1 : 2)
+ * callee(test ? 1 : 2)
  * ```
  * ->
  * ```js
- * condition ? callee(1) : callee(2)
+ * test ? callee(1) : callee(2)
  * ```
  */
 export default {
@@ -18,17 +18,13 @@ export default {
     CallExpression(path) {
       if (
         matcher.match(path.node) &&
-        (!options || options.callee === identifierMatch.current)
+        (!options || options.callee === calleeName.current)
       ) {
-        const conditional = conditionalMatch.current!;
+        const { test, consequent, alternate } = conditional.current!;
+        const callee = calleeName.current!;
 
         path.replaceWith(
-          buildTernary({
-            CONDITION: conditional.test,
-            CALLEE: identifierMatch.current,
-            ARG1: conditional.consequent,
-            ARG2: conditional.alternate,
-          })
+          expression`${test} ? ${callee}(${consequent}) : ${callee}(${alternate})`()
         );
         this.changes++;
       }
@@ -37,10 +33,6 @@ export default {
   }),
 } satisfies Transform<{ callee: string }>;
 
-const buildTernary = expression('CONDITION ? CALLEE(ARG1) : CALLEE(ARG2)');
-
-const conditionalMatch = m.capture(m.conditionalExpression());
-const identifierMatch = m.capture(m.anyString());
-const matcher = m.callExpression(m.identifier(identifierMatch), [
-  conditionalMatch,
-]);
+const conditional = m.capture(m.conditionalExpression());
+const calleeName = m.capture(m.anyString());
+const matcher = m.callExpression(m.identifier(calleeName), [conditional]);

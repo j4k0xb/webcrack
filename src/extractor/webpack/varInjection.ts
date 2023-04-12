@@ -4,9 +4,6 @@ import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
 import { Module } from '../module';
 
-// var because the same name could already be declared
-const buildVar = statement`var NAME = VALUE;`;
-
 /**
  * ```js
  * (function(global) {
@@ -23,16 +20,16 @@ export function inlineVarInjections(module: Module) {
   const { program } = module.ast;
   const newBody: Statement[] = [];
 
-  for (const statement of program.body) {
-    if (matcher.match(statement)) {
+  for (const node of program.body) {
+    if (matcher.match(node)) {
       const vars = params.current!.map((param, i) =>
-        buildVar({ NAME: param, VALUE: args.current![i + 1] })
+        statement`var ${param} = ${args.current![i + 1]};`()
       );
       newBody.push(...vars);
       newBody.push(...body.current!.body);
       // We can skip replacing uses of `this` because it always refers to the exports
     } else {
-      newBody.push(statement);
+      newBody.push(node);
     }
   }
   program.body = newBody;
