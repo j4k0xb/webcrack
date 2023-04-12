@@ -1,6 +1,4 @@
 // @ts-check
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
-import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
 import esbuild from 'esbuild';
 
 const args = process.argv.slice(2);
@@ -38,29 +36,24 @@ const configs = [
     platform: 'node',
     entryPoints: ['src/index.ts', 'src/cli.ts'],
     outdir: 'dist',
-    packages: 'external',
-    plugins: [babelImportPlugin],
   },
   {
     platform: 'browser',
     entryPoints: ['src/index.ts'],
     outfile: 'dist/browser.js',
-    plugins: [
-      NodeGlobalsPolyfillPlugin({ buffer: true }),
-      NodeModulesPolyfillPlugin(),
-      babelImportPlugin,
-    ],
   },
 ];
 
 for (const config of configs) {
   const ctx = await esbuild.context({
     bundle: true,
-    // minify: true,
+    minify: true,
     format: 'esm',
     define: {
       'process.env.browser': String(config.platform === 'browser'),
     },
+    packages: 'external',
+    plugins: [babelImportPlugin],
     logLevel: 'info',
     ...config,
   });
