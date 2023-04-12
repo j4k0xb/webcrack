@@ -4,15 +4,18 @@
   "description": "Deobfuscate, unminify and unpack bundled javascript",
   "author": "j4k0xb",
   "license": "MIT",
+  "type": "module",
   "main": "dist/index.js",
+  "browser": "dist/browser.js",
   "bin": "dist/cli.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
+    "build": "node esbuild.config.mjs",
+    "postbuild": "tsc",
+    "watch": "node esbuild.config.mjs --watch",
     "start": "node dist/cli.js",
     "lint": "eslint --ext .ts src test",
     "test": "vitest"
@@ -42,6 +45,7 @@
     "@babel/types": "^7.21.4",
     "@codemod/matchers": "^1.6.1",
     "commander": "^10.0.0",
+    "quickjs-emscripten": "^0.22.0",
     "vm2": "^3.9.16"
   },
   "devDependencies": {
@@ -51,6 +55,7 @@
     "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
+    "esbuild": "^0.17.16",
     "eslint": "^8.38.0",
     "typescript": "^5.0.4",
     "vitest": "^0.30.1"

@@ -1,18 +1,12 @@
 import generate from '@babel/generator';
 import { NodePath } from '@babel/traverse';
 import { CallExpression } from '@babel/types';
-import { VM } from 'vm2';
+import { getQuickJS, shouldInterruptAfterDeadline } from 'quickjs-emscripten';
 import { ArrayRotator } from './arrayRotator';
 import { Decoder } from './decoder';
 import { StringArray } from './stringArray';
 
-const vm = new VM({
-  timeout: 10_000,
-  allowAsync: false,
-  eval: false,
-  wasm: false,
-  sandbox: { debugger: {} },
-});
+const QuickJS = await getQuickJS();
 
 export class VMDecoder {
   private setupCode: string;
@@ -38,9 +32,8 @@ export class VMDecoder {
   }
 
   decode(calls: NodePath<CallExpression>[]): string[] {
-    return vm.run(`
-      ${this.setupCode}
-      [${calls.join(',')}]
-    `);
+    return QuickJS.evalCode(`${this.setupCode};[${calls.join(',')}]`, {
+      shouldInterrupt: shouldInterruptAfterDeadline(Date.now() + 10_000),
+    }) as string[];
   }
 }
