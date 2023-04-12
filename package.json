@@ -24,6 +24,7 @@
     "type": "git",
     "url": "https://github.com/j4k0xb/webcrack"
   },
+  "homepage": "https://webcrack.netlify.app",
   "keywords": [
     "webpack",
     "bundle",

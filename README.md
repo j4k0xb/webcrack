@@ -3,6 +3,7 @@
 [![Test](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml/badge.svg)](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml)
 [![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
 [![license](https://img.shields.io/github/license/j4k0xb/webcrack)](https://github.com/j4k0xb/webcrack/blob/master/LICENSE)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/ba64bf80-7053-4ed8-a282-d3762742c0dd/deploy-status)](https://app.netlify.com/sites/webcrack/deploys)
 
 This projects aims to combine the best features of other javascript deobfuscators and unpackers into one tool, while improving on them in the following ways:
 
@@ -20,6 +21,8 @@ npm install -g webcrack
 ```
 
 ## Usage
+
+Online version: [webcrack.netlify.app](https://webcrack.netlify.app/)
 
 ```text
 Usage: webcrack [options] <file>
