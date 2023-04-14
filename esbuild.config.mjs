@@ -47,7 +47,6 @@ const configs = [
 for (const config of configs) {
   const ctx = await esbuild.context({
     bundle: true,
-    minify: true,
     format: 'esm',
     define: {
       'process.env.browser': String(config.platform === 'browser'),
