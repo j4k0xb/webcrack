@@ -19,6 +19,28 @@ import { Module } from '../module';
  * ```
  */
 export function convertESM(module: Module) {
+  // E.g. require.r(exports);
+  const defineEsModuleMatcher = m.expressionStatement(
+    m.callExpression(constMemberExpression(m.identifier('require'), 'r'), [
+      m.identifier(),
+    ])
+  );
+
+  const exportedName = m.capture(m.anyString());
+  const returnedName = m.capture(m.anyString());
+  // E.g. require.d(exports, "counter", function () { return f });
+  const defineExportMatcher = m.expressionStatement(
+    m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
+      m.identifier(),
+      m.stringLiteral(exportedName),
+      m.functionExpression(
+        undefined,
+        [],
+        m.blockStatement([m.returnStatement(m.identifier(returnedName))])
+      ),
+    ])
+  );
+
   traverse(module.ast, {
     enter(path) {
       // Only traverse the top-level
@@ -61,25 +83,3 @@ export function convertESM(module: Module) {
     },
   });
 }
-
-// E.g. require.r(exports);
-const defineEsModuleMatcher = m.expressionStatement(
-  m.callExpression(constMemberExpression(m.identifier('require'), 'r'), [
-    m.identifier(),
-  ])
-);
-
-const exportedName = m.capture(m.anyString());
-const returnedName = m.capture(m.anyString());
-// E.g. require.d(exports, "counter", function () { return f });
-const defineExportMatcher = m.expressionStatement(
-  m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
-    m.identifier(),
-    m.stringLiteral(exportedName),
-    m.functionExpression(
-      undefined,
-      [],
-      m.blockStatement([m.returnStatement(m.identifier(returnedName))])
-    ),
-  ])
-);

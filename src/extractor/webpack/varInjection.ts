@@ -20,6 +20,21 @@ export function inlineVarInjections(module: Module) {
   const { program } = module.ast;
   const newBody: Statement[] = [];
 
+  const body = m.capture(m.blockStatement());
+  const params = m.capture(m.arrayOf(m.identifier()));
+  const args = m.capture(
+    m.anyList(m.or(m.thisExpression(), m.identifier('exports')), m.oneOrMore())
+  );
+  const matcher = m.expressionStatement(
+    m.callExpression(
+      constMemberExpression(
+        m.functionExpression(undefined, params, body),
+        'call'
+      ),
+      args
+    )
+  );
+
   for (const node of program.body) {
     if (matcher.match(node)) {
       const vars = params.current!.map((param, i) =>
@@ -34,18 +49,3 @@ export function inlineVarInjections(module: Module) {
   }
   program.body = newBody;
 }
-
-const body = m.capture(m.blockStatement());
-const params = m.capture(m.arrayOf(m.identifier()));
-const args = m.capture(
-  m.anyList(m.or(m.thisExpression(), m.identifier('exports')), m.oneOrMore())
-);
-const matcher = m.expressionStatement(
-  m.callExpression(
-    constMemberExpression(
-      m.functionExpression(undefined, params, body),
-      'call'
-    ),
-    args
-  )
-);

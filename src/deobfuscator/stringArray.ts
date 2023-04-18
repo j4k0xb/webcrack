@@ -11,6 +11,45 @@ export interface StringArray {
 
 export function findStringArray(ast: t.Node) {
   let result: StringArray | undefined;
+  const functionName = m.capture(m.anyString());
+  const arrayIdentifier = m.capture(m.identifier());
+  const arrayExpression = m.capture(
+    m.arrayExpression(m.arrayOf(m.stringLiteral()))
+  );
+  // getStringArray = function () { return n; };
+  const functionAssignment = m.assignmentExpression(
+    '=',
+    m.identifier(m.fromCapture(functionName)),
+    m.functionExpression(
+      undefined,
+      [],
+      m.blockStatement([m.returnStatement(m.fromCapture(arrayIdentifier))])
+    )
+  );
+  const variableDeclaration = m.variableDeclaration(undefined, [
+    m.variableDeclarator(arrayIdentifier, arrayExpression),
+  ]);
+  // function getStringArray() { ... }
+  const matcher = m.functionDeclaration(
+    m.identifier(functionName),
+    [],
+    m.or(
+      // var array = ["hello", "world"];
+      // return (getStringArray = function () { return array; })();
+      m.blockStatement([
+        variableDeclaration,
+        m.returnStatement(m.callExpression(functionAssignment)),
+      ]),
+      // var array = ["hello", "world"];
+      // getStringArray = function () { return n; });
+      // return getStringArray();
+      m.blockStatement([
+        variableDeclaration,
+        m.expressionStatement(functionAssignment),
+        m.returnStatement(m.callExpression(m.identifier(functionName))),
+      ])
+    )
+  );
 
   traverse(ast, {
     FunctionDeclaration(path) {
@@ -33,43 +72,3 @@ export function findStringArray(ast: t.Node) {
 
   return result;
 }
-
-const functionName = m.capture(m.anyString());
-const arrayIdentifier = m.capture(m.identifier());
-const arrayExpression = m.capture(
-  m.arrayExpression(m.arrayOf(m.stringLiteral()))
-);
-// getStringArray = function () { return n; };
-const functionAssignment = m.assignmentExpression(
-  '=',
-  m.identifier(m.fromCapture(functionName)),
-  m.functionExpression(
-    undefined,
-    [],
-    m.blockStatement([m.returnStatement(m.fromCapture(arrayIdentifier))])
-  )
-);
-const variableDeclaration = m.variableDeclaration(undefined, [
-  m.variableDeclarator(arrayIdentifier, arrayExpression),
-]);
-// function getStringArray() { ... }
-const matcher = m.functionDeclaration(
-  m.identifier(functionName),
-  [],
-  m.or(
-    // var array = ["hello", "world"];
-    // return (getStringArray = function () { return array; })();
-    m.blockStatement([
-      variableDeclaration,
-      m.returnStatement(m.callExpression(functionAssignment)),
-    ]),
-    // var array = ["hello", "world"];
-    // getStringArray = function () { return n; });
-    // return getStringArray();
-    m.blockStatement([
-      variableDeclaration,
-      m.expressionStatement(functionAssignment),
-      m.returnStatement(m.callExpression(m.identifier(functionName))),
-    ])
-  )
-);

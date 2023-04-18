@@ -8,6 +8,41 @@ import { Module } from '../module';
 export function extract(ast: t.Node): Bundle | undefined {
   const modules = new Map<number, Module>();
 
+  const entryIdMatcher = m.capture(m.numericLiteral());
+  const moduleFunctionsMatcher = m.capture(
+    m.or(
+      // E.g. [,,function (e, t, i) {...}, ...], index is the module ID
+      m.arrayExpression(m.arrayOf(m.or(m.functionExpression(), null))),
+      // E.g. {0: function (e, t, i) {...}, ...}, key is the module ID
+      m.objectExpression(
+        m.arrayOf(m.objectProperty(m.numericLiteral(), m.functionExpression()))
+      )
+    )
+  );
+
+  const matcher = m.callExpression(
+    m.functionExpression(
+      undefined,
+      undefined,
+      m.blockStatement(
+        m.anyList<t.Statement>(
+          m.zeroOrMore(),
+          m.functionDeclaration(),
+          m.zeroOrMore(),
+          m.containerOf(
+            // E.g. __webpack_require__.s = 2
+            m.assignmentExpression(
+              '=',
+              constMemberExpression(m.identifier(), 's'),
+              entryIdMatcher
+            )
+          )
+        )
+      )
+    ),
+    [moduleFunctionsMatcher]
+  );
+
   traverse(ast, {
     CallExpression(path) {
       if (matcher.match(path.node)) {
@@ -69,38 +104,3 @@ function renameParams(moduleWrapper: NodePath<t.FunctionExpression>) {
     );
   });
 }
-
-const entryIdMatcher = m.capture(m.numericLiteral());
-const moduleFunctionsMatcher = m.capture(
-  m.or(
-    // E.g. [,,function (e, t, i) {...}, ...], index is the module ID
-    m.arrayExpression(m.arrayOf(m.or(m.functionExpression(), null))),
-    // E.g. {0: function (e, t, i) {...}, ...}, key is the module ID
-    m.objectExpression(
-      m.arrayOf(m.objectProperty(m.numericLiteral(), m.functionExpression()))
-    )
-  )
-);
-
-const matcher = m.callExpression(
-  m.functionExpression(
-    undefined,
-    undefined,
-    m.blockStatement(
-      m.anyList<t.Statement>(
-        m.zeroOrMore(),
-        m.functionDeclaration(),
-        m.zeroOrMore(),
-        m.containerOf(
-          // E.g. __webpack_require__.s = 2
-          m.assignmentExpression(
-            '=',
-            constMemberExpression(m.identifier(), 's'),
-            entryIdMatcher
-          )
-        )
-      )
-    )
-  ),
-  [moduleFunctionsMatcher]
-);

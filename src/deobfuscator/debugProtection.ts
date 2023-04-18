@@ -14,87 +14,92 @@ import { constMemberExpression, iife } from '../utils/matcher';
 export default {
   name: 'debugProtection',
   tags: ['safe', 'readability'],
-  visitor: () => ({
-    enter(path) {
-      if (!matcher.match(path.node)) return;
-
-      const binding = path.scope.getBinding(
-        debugProtectionFunctionName.current!
-      )!;
-
-      binding.referencePaths.forEach(ref => {
-        if (intervalCall.match(ref.parent)) {
-          ref.findParent(p => iife.match(p.node))?.remove();
-        }
-      });
-
-      path.remove();
-    },
-    noScope: true,
-  }),
-} satisfies Transform;
-
-const ret = m.capture(m.identifier());
-const debugProtectionFunctionName = m.capture(m.anyString());
-const debuggerProtection = m.capture(m.identifier());
-const counter = m.capture(m.identifier());
-const debuggerTemplate = m.ifStatement(
-  undefined,
-  undefined,
-  m.containerOf(
-    m.or(
-      m.debuggerStatement(),
-      m.callExpression(
-        constMemberExpression(m.anyExpression(), 'constructor'),
-        [m.stringLiteral('debugger')]
+  visitor() {
+    const ret = m.capture(m.identifier());
+    const debugProtectionFunctionName = m.capture(m.anyString());
+    const debuggerProtection = m.capture(m.identifier());
+    const counter = m.capture(m.identifier());
+    const debuggerTemplate = m.ifStatement(
+      undefined,
+      undefined,
+      m.containerOf(
+        m.or(
+          m.debuggerStatement(),
+          m.callExpression(
+            constMemberExpression(m.anyExpression(), 'constructor'),
+            [m.stringLiteral('debugger')]
+          )
+        )
       )
-    )
-  )
-);
-// that.setInterval(debugProtectionFunctionName, 4000);
-const intervalCall = m.callExpression(
-  constMemberExpression(m.anyExpression(), 'setInterval'),
-  [m.identifier(m.fromCapture(debugProtectionFunctionName)), m.numericLiteral()]
-);
+    );
+    // that.setInterval(debugProtectionFunctionName, 4000);
+    const intervalCall = m.callExpression(
+      constMemberExpression(m.anyExpression(), 'setInterval'),
+      [
+        m.identifier(m.fromCapture(debugProtectionFunctionName)),
+        m.numericLiteral(),
+      ]
+    );
 
-// function debugProtectionFunctionName(ret) {
-const matcher = m.functionDeclaration(
-  m.identifier(debugProtectionFunctionName),
-  [ret],
-  m.blockStatement([
-    // function debuggerProtection (counter) {
-    m.functionDeclaration(
-      debuggerProtection,
-      [counter],
+    // function debugProtectionFunctionName(ret) {
+    const matcher = m.functionDeclaration(
+      m.identifier(debugProtectionFunctionName),
+      [ret],
       m.blockStatement([
-        debuggerTemplate,
-        // debuggerProtection(++counter);
-        m.expressionStatement(
-          m.callExpression(m.fromCapture(debuggerProtection), [
-            m.updateExpression('++', m.fromCapture(counter), true),
-          ])
-        ),
-      ])
-    ),
-    m.tryStatement(
-      m.blockStatement([
-        // if (ret) {
-        ifStatement(
-          m.fromCapture(ret),
-          // return debuggerProtection;
+        // function debuggerProtection (counter) {
+        m.functionDeclaration(
+          debuggerProtection,
+          [counter],
           m.blockStatement([
-            m.returnStatement(m.fromCapture(debuggerProtection)),
-          ]),
-          // } else { debuggerProtection(0); }
-          m.blockStatement([
+            debuggerTemplate,
+            // debuggerProtection(++counter);
             m.expressionStatement(
               m.callExpression(m.fromCapture(debuggerProtection), [
-                m.numericLiteral(0),
+                m.updateExpression('++', m.fromCapture(counter), true),
+              ])
+            ),
+          ])
+        ),
+        m.tryStatement(
+          m.blockStatement([
+            // if (ret) {
+            ifStatement(
+              m.fromCapture(ret),
+              // return debuggerProtection;
+              m.blockStatement([
+                m.returnStatement(m.fromCapture(debuggerProtection)),
+              ]),
+              // } else { debuggerProtection(0); }
+              m.blockStatement([
+                m.expressionStatement(
+                  m.callExpression(m.fromCapture(debuggerProtection), [
+                    m.numericLiteral(0),
+                  ])
+                ),
               ])
             ),
           ])
         ),
       ])
-    ),
-  ])
-);
+    );
+
+    return {
+      enter(path) {
+        if (!matcher.match(path.node)) return;
+
+        const binding = path.scope.getBinding(
+          debugProtectionFunctionName.current!
+        )!;
+
+        binding.referencePaths.forEach(ref => {
+          if (intervalCall.match(ref.parent)) {
+            ref.findParent(p => iife.match(p.node))?.remove();
+          }
+        });
+
+        path.remove();
+      },
+      noScope: true,
+    };
+  },
+} satisfies Transform;

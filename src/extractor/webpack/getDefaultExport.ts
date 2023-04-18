@@ -41,6 +41,31 @@ export function convertDefaultRequire(bundle: Bundle) {
     }
   }
 
+  const requiredModuleId = m.capture(m.numericLiteral());
+  // E.g. const m = require(1);
+  const declaratorMatcher = m.variableDeclarator(
+    m.identifier(),
+    m.callExpression(m.identifier('require'), [requiredModuleId])
+  );
+
+  // E.g. m
+  const moduleArg = m.capture(m.identifier());
+  // E.g. getter
+  const getterVarName = m.capture(m.identifier());
+  // E.g. require.n(m)
+  const requireN = m.callExpression(
+    constMemberExpression(m.identifier('require'), 'n'),
+    [moduleArg]
+  );
+  // E.g. const getter = require.n(m)
+  const defaultRequireMatcher = m.variableDeclarator(getterVarName, requireN);
+
+  // E.g. require.n(m).a or require.n(m)()
+  const defaultRequireMatcherAlternative = m.or(
+    constMemberExpression(requireN, 'a'),
+    m.callExpression(requireN, [])
+  );
+
   bundle.modules.forEach(module => {
     traverse(module.ast, {
       enter(path) {
@@ -80,28 +105,3 @@ export function convertDefaultRequire(bundle: Bundle) {
     });
   });
 }
-
-const requiredModuleId = m.capture(m.numericLiteral());
-// E.g. const m = require(1);
-const declaratorMatcher = m.variableDeclarator(
-  m.identifier(),
-  m.callExpression(m.identifier('require'), [requiredModuleId])
-);
-
-// E.g. m
-const moduleArg = m.capture(m.identifier());
-// E.g. getter
-const getterVarName = m.capture(m.identifier());
-// E.g. require.n(m)
-const requireN = m.callExpression(
-  constMemberExpression(m.identifier('require'), 'n'),
-  [moduleArg]
-);
-// E.g. const getter = require.n(m)
-const defaultRequireMatcher = m.variableDeclarator(getterVarName, requireN);
-
-// E.g. require.n(m).a or require.n(m)()
-const defaultRequireMatcherAlternative = m.or(
-  constMemberExpression(requireN, 'a'),
-  m.callExpression(requireN, [])
-);
