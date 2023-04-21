@@ -11,6 +11,7 @@ import sequence from './sequence';
 import splitVariableDeclarations from './splitVariableDeclarations';
 import ternaryToIf from './ternaryToIf';
 import unminifyBooleans from './unminifyBooleans';
+import void0ToUndefined from './void0ToUndefined';
 
 export const transforms = {
   rawLiterals,
@@ -25,12 +26,15 @@ export const transforms = {
   booleanIf,
   ternaryToIf,
   deterministicIf,
+  void0ToUndefined,
 };
 
 export type TransformName = keyof typeof transforms;
 
 export type TransformOptions<TName extends TransformName> =
-  typeof transforms[TName] extends Transform<infer TOptions> ? TOptions : never;
+  (typeof transforms)[TName] extends Transform<infer TOptions>
+    ? TOptions
+    : never;
 
 export function resetRunState() {
   Object.values(transforms as Record<string, Transform>).forEach(

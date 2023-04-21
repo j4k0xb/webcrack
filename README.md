@@ -87,6 +87,7 @@ x || y || z(); // if (!(x || y)) z();
 !![]; // true
 return a(), b(), c(); // a(); b(); return c();
 if ((a(), b())) c(); // a(); if (b()) c();
+void 0; // undefined
 ```
 
 ## Bundle Unpacking

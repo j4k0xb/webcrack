@@ -345,3 +345,8 @@ describe('mergeElseIf', expectJS => {
         }
       `));
 });
+
+describe('void0ToUndefined', expectJS => {
+  test('void 0', () => expectJS('void 0').toMatchInlineSnapshot('undefined;'));
+});
+
