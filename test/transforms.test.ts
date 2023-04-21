@@ -350,3 +350,25 @@ describe('void0ToUndefined', expectJS => {
   test('void 0', () => expectJS('void 0').toMatchInlineSnapshot('undefined;'));
 });
 
+describe('yoda', expectJS => {
+  test('strict equality', () =>
+    expectJS('"red" === color').toMatchInlineSnapshot('color === "red";'));
+  test('loose equality', () =>
+    expectJS('null == x').toMatchInlineSnapshot('x == null;'));
+  test('strict inequality', () =>
+    expectJS('"red" !== color').toMatchInlineSnapshot('color !== "red";'));
+  test('loose inequality', () =>
+    expectJS('null != x').toMatchInlineSnapshot('x != null;'));
+  test('less than', () => expectJS('0 < x').toMatchInlineSnapshot('x < 0;'));
+  test('less or equal', () =>
+    expectJS('0 <= x').toMatchInlineSnapshot('x <= 0;'));
+  test('greater than', () => expectJS('0 > x').toMatchInlineSnapshot('x > 0;'));
+  test('greater or equal', () =>
+    expectJS('0 >= x').toMatchInlineSnapshot('x >= 0;'));
+
+  test('ignore other operators', () =>
+    expectJS('2 + x').toMatchInlineSnapshot('2 + x;'));
+
+  test('ignore when right side is a literal', () =>
+    expectJS('1 === 2').toMatchInlineSnapshot('1 === 2;'));
+});

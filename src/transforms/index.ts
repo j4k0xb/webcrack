@@ -12,6 +12,7 @@ import splitVariableDeclarations from './splitVariableDeclarations';
 import ternaryToIf from './ternaryToIf';
 import unminifyBooleans from './unminifyBooleans';
 import void0ToUndefined from './void0ToUndefined';
+import yoda from './yoda';
 
 export const transforms = {
   rawLiterals,
@@ -27,6 +28,7 @@ export const transforms = {
   ternaryToIf,
   deterministicIf,
   void0ToUndefined,
+  yoda,
 };
 
 export type TransformName = keyof typeof transforms;
