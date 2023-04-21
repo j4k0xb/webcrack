@@ -106,8 +106,8 @@ describe('splitVariableDeclarations', expectJS => {
 describe('computedProperties', expectJS => {
   test('member expression', () => {
     expectJS(`
-      require("foo")["default"]?.["bar"];
-    `).toMatchInlineSnapshot('require("foo").default?.bar;');
+      require("foo")["default"]?.["_"];
+    `).toMatchInlineSnapshot('require("foo").default?._;');
   });
 
   test('object', () => {

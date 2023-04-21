@@ -38,5 +38,5 @@ export default {
 } satisfies Transform;
 
 function isValidProperty(name: string) {
-  return /^[a-z$][\w$]+$/i.test(name);
+  return /^[a-z$_][\w$]*$/i.test(name);
 }
