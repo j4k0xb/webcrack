@@ -6,7 +6,7 @@ export default {
   visitor: () => ({
     StringLiteral(path) {
       if (path.node.extra) {
-        delete path.node.extra;
+        path.node.extra.raw = JSON.stringify(path.node.extra.rawValue);
         this.changes++;
       }
     },

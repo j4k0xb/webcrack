@@ -143,7 +143,9 @@ describe('computedProperties', expectJS => {
 
 describe('rawLiterals', expectJS => {
   test('string', () =>
-    expectJS('const a = "\\x61"').toMatchInlineSnapshot('const a = "a";'));
+    expectJS(String.raw`f("\x61", '"', "\u270F\uFE0F")`).toMatchInlineSnapshot(
+      'f("a", "\\"", "✏️");'
+    ));
 
   test('number', () =>
     expectJS('const a = 0x1;').toMatchInlineSnapshot('const a = 1;'));
