@@ -4,7 +4,7 @@ import { Transform } from '.';
 
 export default {
   name: 'unminifyBooleans',
-  tags: ['safe', 'readability', 'once'],
+  tags: ['safe'],
   visitor: () => ({
     enter(path) {
       if (trueMatcher.match(path.node)) {

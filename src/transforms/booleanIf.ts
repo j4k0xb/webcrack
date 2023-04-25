@@ -5,21 +5,23 @@ import { Transform } from '.';
 
 export default {
   name: 'booleanIf',
-  tags: ['safe', 'readability'],
+  tags: ['safe'],
   visitor: () => ({
-    ExpressionStatement(path) {
-      const expression = path.node.expression as t.LogicalExpression;
-      if (andMatcher.match(path.node)) {
-        path.replaceWith(
-          statement`if (${expression.left}) { ${expression.right}; }`()
-        );
-        this.changes++;
-      } else if (orMatcher.match(path.node)) {
-        path.replaceWith(
-          statement`if (!${expression.left}) { ${expression.right}; }`()
-        );
-        this.changes++;
-      }
+    ExpressionStatement: {
+      exit(path) {
+        const expression = path.node.expression as t.LogicalExpression;
+        if (andMatcher.match(path.node)) {
+          path.replaceWith(
+            statement`if (${expression.left}) { ${expression.right}; }`()
+          );
+          this.changes++;
+        } else if (orMatcher.match(path.node)) {
+          path.replaceWith(
+            statement`if (!${expression.left}) { ${expression.right}; }`()
+          );
+          this.changes++;
+        }
+      },
     },
     noScope: true,
   }),

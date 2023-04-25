@@ -4,7 +4,7 @@ import { Transform } from '.';
 
 export default {
   name: 'computedProperties',
-  tags: ['safe', 'readability'],
+  tags: ['safe'],
   visitor() {
     const stringMatcher = m.capture(
       m.stringLiteral(m.matcher(value => isValidProperty(value as string)))
@@ -21,7 +21,7 @@ export default {
     );
 
     return {
-      enter(path) {
+      exit(path) {
         if (propertyMatcher.match(path.node)) {
           path.node.computed = false;
           path.node.property = t.identifier(stringMatcher.current!.value);

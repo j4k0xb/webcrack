@@ -20,7 +20,7 @@ import {
 
 export default {
   name: 'selfDefending',
-  tags: ['safe', 'readability'],
+  tags: ['safe'],
   visitor() {
     const callController = m.capture(m.anyString());
     const firstCall = m.capture(m.identifier());

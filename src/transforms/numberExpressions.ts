@@ -4,9 +4,9 @@ import { Transform } from '.';
 
 export default {
   name: 'numberExpressions',
-  tags: ['safe', 'readability', 'once'],
+  tags: ['safe'],
   visitor: () => ({
-    enter(path) {
+    exit(path) {
       if (path.type !== 'NumericLiteral' && matcher.match(path.node)) {
         const evaluated = path.evaluate();
         if (evaluated.confident) {

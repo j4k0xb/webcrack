@@ -17,7 +17,7 @@ const flippedOperators = {
 
 export default {
   name: 'yoda',
-  tags: ['safe', 'readability', 'once'],
+  tags: ['safe'],
   visitor: () => {
     const matcher = m.binaryExpression(
       // @ts-expect-error m.or overload doesn't support arbitrary number of arguments
@@ -33,7 +33,7 @@ export default {
     );
 
     return {
-      enter({ node }) {
+      exit({ node }) {
         if (matcher.match(node)) {
           [node.left, node.right] = [node.right, node.left as t.Expression];
           this.changes++;

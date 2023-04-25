@@ -4,7 +4,7 @@ import { Transform } from '.';
 
 export default {
   name: 'ternaryToIf',
-  tags: ['safe', 'readability'],
+  tags: ['safe'],
   visitor() {
     const test = m.capture(m.anyExpression());
     const consequent = m.capture(m.anyExpression());
@@ -14,7 +14,7 @@ export default {
     );
 
     return {
-      enter(path) {
+      exit(path) {
         if (matcher.match(path.node)) {
           path.replaceWith(
             statement`if (${test.current}) { ${consequent.current}; } else { ${alternate.current}; }`()

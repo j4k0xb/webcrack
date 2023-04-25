@@ -2,7 +2,7 @@ import { Transform } from '.';
 
 export default {
   name: 'rawLiterals',
-  tags: ['safe', 'readability', 'once'],
+  tags: ['safe'],
   visitor: () => ({
     StringLiteral(path) {
       if (path.node.extra) {

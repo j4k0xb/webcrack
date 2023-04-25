@@ -22,7 +22,8 @@ const babelImportPlugin = {
       return {
         resolveDir: 'node_modules',
         contents: `import module from '${args.path}/lib/index.js';
-          export default module.default ?? module;`,
+          export default module.default ?? module;
+          export * from '${args.path}/lib/index.js';`,
       };
     });
   },

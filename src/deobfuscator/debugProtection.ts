@@ -13,7 +13,7 @@ import { constMemberExpression, iife } from '../utils/matcher';
 
 export default {
   name: 'debugProtection',
-  tags: ['safe', 'readability'],
+  tags: ['safe'],
   visitor() {
     const ret = m.capture(m.identifier());
     const debugProtectionFunctionName = m.capture(m.anyString());
