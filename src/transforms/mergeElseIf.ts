@@ -15,12 +15,14 @@ export default {
     );
 
     return {
-      exit(path) {
-        if (matcher.match(path.node)) {
-          const alternate = path.get('alternate') as NodePath<t.IfStatement>;
-          alternate.replaceWith(nestedIf.current!);
-          this.changes++;
-        }
+      IfStatement: {
+        exit(path) {
+          if (matcher.match(path.node)) {
+            const alternate = path.get('alternate') as NodePath<t.IfStatement>;
+            alternate.replaceWith(nestedIf.current!);
+            this.changes++;
+          }
+        },
       },
       noScope: true,
     };

@@ -22,7 +22,6 @@ export default {
     const traverseOptions = [
       rawLiterals.visitor(),
       blockStatement.visitor(),
-      mergeElseIf.visitor(),
       mergeStrings.visitor(),
       computedProperties.visitor(),
       splitVariableDeclarations.visitor(),
@@ -32,6 +31,7 @@ export default {
       booleanIf.visitor(),
       ternaryToIf.visitor(),
       deterministicIf.visitor(),
+      mergeElseIf.visitor(),
       void0ToUndefined.visitor(),
       yoda.visitor(),
     ];
