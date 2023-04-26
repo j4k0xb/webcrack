@@ -39,19 +39,11 @@ export interface Options {
   mappings?: (
     m: typeof import('@codemod/matchers')
   ) => Record<string, m.Matcher<unknown>>;
-  /**
-   * Maximum number of iterations for readability transforms.
-   */
-  maxIterations?: number;
 }
-
-export const defaultOptions = {
-  maxIterations: 5,
-} satisfies Options;
 
 export async function webcrack(
   code: string,
-  options: Options = defaultOptions
+  options: Options = {}
 ): Promise<WebcrackResult> {
   const ast = parse(code, {
     sourceType: 'unambiguous',
