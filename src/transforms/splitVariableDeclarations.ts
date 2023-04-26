@@ -3,20 +3,22 @@ import { Transform } from '.';
 
 export default {
   name: 'splitVariableDeclarations',
-  tags: ['safe', 'readability', 'once'],
+  tags: ['safe'],
   visitor: () => ({
-    VariableDeclaration(path) {
-      if (
-        path.node.declarations.length > 1 &&
-        !(path.parentPath.isForStatement() && path.key === 'init')
-      ) {
-        path.replaceWithMultiple(
-          path.node.declarations.map(declaration =>
-            t.variableDeclaration(path.node.kind, [declaration])
-          )
-        );
-        this.changes++;
-      }
+    VariableDeclaration: {
+      exit(path) {
+        if (
+          path.node.declarations.length > 1 &&
+          !(path.parentPath.isForStatement() && path.key === 'init')
+        ) {
+          path.replaceWithMultiple(
+            path.node.declarations.map(declaration =>
+              t.variableDeclaration(path.node.kind, [declaration])
+            )
+          );
+          this.changes++;
+        }
+      },
     },
     noScope: true,
   }),

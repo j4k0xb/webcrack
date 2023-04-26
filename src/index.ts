@@ -6,8 +6,8 @@ import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
 import { Bundle, extractBundle } from './extractor';
-import { applyTransform, applyTransforms } from './transforms';
-import { resetRunState } from './transforms/index';
+import { applyTransform } from './transforms';
+import unminify from './transforms/unminify';
 
 export interface WebcrackResult {
   code: string;
@@ -39,19 +39,11 @@ export interface Options {
   mappings?: (
     m: typeof import('@codemod/matchers')
   ) => Record<string, m.Matcher<unknown>>;
-  /**
-   * Maximum number of iterations for readability transforms.
-   */
-  maxIterations?: number;
 }
-
-export const defaultOptions = {
-  maxIterations: 5,
-} satisfies Options;
 
 export async function webcrack(
   code: string,
-  options: Options = defaultOptions
+  options: Options = {}
 ): Promise<WebcrackResult> {
   const ast = parse(code, {
     sourceType: 'unambiguous',
@@ -59,22 +51,11 @@ export async function webcrack(
   });
 
   applyTransform(ast, deobfuscator);
-
-  resetRunState();
-  for (
-    let i = 1;
-    i <= (options.maxIterations ?? defaultOptions.maxIterations);
-    i++
-  ) {
-    console.log('\n== Iteration', i, '==');
-    if (applyTransforms(ast, ['readability']).changes === 0) break;
-  }
+  applyTransform(ast, unminify);
 
   // Have to run this after readability transforms because the function may contain dead code
   applyTransform(ast, selfDefending);
   applyTransform(ast, debugProtection);
-
-  resetRunState();
 
   const bundle = extractBundle(ast);
   console.log('Bundle:', bundle?.type);

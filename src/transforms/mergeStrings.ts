@@ -4,7 +4,7 @@ import { Transform } from '.';
 
 export default {
   name: 'mergeStrings',
-  tags: ['safe', 'readability'],
+  tags: ['safe'],
   visitor() {
     const left = m.capture(m.stringLiteral(m.anyString()));
     const right = m.capture(m.stringLiteral(m.anyString()));

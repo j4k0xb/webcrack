@@ -5,7 +5,7 @@ import { Transform } from '.';
 
 export default {
   name: 'deterministicIf',
-  tags: ['unsafe', 'readability', 'once'],
+  tags: ['unsafe'],
   visitor() {
     const leftLiteral = m.capture(m.anyString());
     const rightLiteral = m.capture(m.anyString());
@@ -29,9 +29,8 @@ export default {
     );
 
     return {
-      enter(path) {
+      exit(path) {
         // TODO: check binding conflicts
-
         if (ifEqualsMatcher.match(path.node)) {
           if (leftLiteral.current === rightLiteral.current) {
             replace(path, path.node.consequent);
@@ -39,6 +38,7 @@ export default {
             replace(path, path.node.alternate);
           } else {
             path.remove();
+            [path];
           }
           this.changes++;
         }
@@ -49,11 +49,11 @@ export default {
             replace(path, path.node.alternate);
           } else {
             path.remove();
+            [path];
           }
           this.changes++;
         }
       },
-
       noScope: true,
     };
   },
@@ -61,8 +61,8 @@ export default {
 
 function replace(path: NodePath, node: t.Node) {
   if (t.isBlockStatement(node)) {
-    path.replaceWithMultiple(node.body);
+    return path.replaceWithMultiple(node.body);
   } else {
-    path.replaceWith(node);
+    return path.replaceWith(node);
   }
 }
