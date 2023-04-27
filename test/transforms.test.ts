@@ -1,6 +1,5 @@
 import { parse } from '@babel/parser';
 import { describe as describeVitest, expect, test } from 'vitest';
-import { webcrack } from '../src/index';
 import { transforms } from '../src/transforms';
 import {
   TransformName,
@@ -376,13 +375,13 @@ describe('yoda', expectJS => {
     expectJS('1 === 2').toMatchInlineSnapshot('1 === 2;'));
 });
 
-test('mixed unminify', async () => {
-  const result = await webcrack(`
-    if (x) {} else {y && z();}
-  `);
-  expect(result.code).toMatchInlineSnapshot(`
-    "if (x) {} else if (y) {
-      z();
-    }"
-  `);
+describe('unminify', expectJS => {
+  test('logical expression to if and merge else-if', () =>
+    expectJS(`
+      if (x) {} else {y && z();}
+    `).toMatchInlineSnapshot(`
+      if (x) {} else if (y) {
+        z();
+      }
+    `));
 });
