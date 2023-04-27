@@ -1,3 +1,4 @@
+import { isIdentifierName } from '@babel/helper-validator-identifier';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
@@ -7,7 +8,7 @@ export default {
   tags: ['safe'],
   visitor() {
     const stringMatcher = m.capture(
-      m.stringLiteral(m.matcher(value => isValidProperty(value as string)))
+      m.stringLiteral(m.matcher(value => isIdentifierName(value as string)))
     );
     const propertyMatcher = m.or(
       m.memberExpression(m.anything(), stringMatcher, true),
@@ -36,7 +37,3 @@ export default {
     };
   },
 } satisfies Transform;
-
-function isValidProperty(name: string) {
-  return /^[a-z$_][\w$]*$/i.test(name);
-}
