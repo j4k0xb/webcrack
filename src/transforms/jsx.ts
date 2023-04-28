@@ -11,7 +11,7 @@ export default {
     const props = m.capture(m.objectExpression());
 
     // React.createElement(type, props, ...children)
-    const matcher = m.callExpression(
+    const elementMatcher = m.callExpression(
       constMemberExpression(m.identifier('React'), 'createElement'),
       m.anyList<t.Expression>(
         m.stringLiteral(type),
@@ -20,10 +20,20 @@ export default {
       )
     );
 
+    // React.createElement(React.Fragment, null, ...children)
+    const fragmentMatcher = m.callExpression(
+      constMemberExpression(m.identifier('React'), 'createElement'),
+      m.anyList<t.Expression>(
+        constMemberExpression(m.identifier('React'), 'Fragment'),
+        m.nullLiteral(),
+        m.zeroOrMore()
+      )
+    );
+
     return {
       CallExpression: {
         exit(path) {
-          if (matcher.match(path.node)) {
+          if (elementMatcher.match(path.node)) {
             const attributes = props.current
               ? convertAttributes(props.current!)
               : [];
@@ -36,8 +46,21 @@ export default {
               attributes
             );
             const closing = t.jsxClosingElement(t.jsxIdentifier(type.current!));
-            const jsx = t.jsxElement(opening, closing, children);
-            path.replaceWith(jsx);
+            const element = t.jsxElement(opening, closing, children);
+            path.replaceWith(element);
+            this.changes++;
+          }
+
+          if (fragmentMatcher.match(path.node)) {
+            // FIXME: dont assume children are expressions
+            const children = convertChildren(
+              path.node.arguments.slice(2) as t.Expression[]
+            );
+            const opening = t.jSXOpeningFragment();
+            const closing = t.jsxClosingFragment();
+            const fragment = t.jsxFragment(opening, closing, children);
+            path.replaceWith(fragment);
+            this.changes++;
           }
         },
       },

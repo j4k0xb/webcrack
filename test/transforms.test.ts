@@ -400,4 +400,9 @@ describe('jsx', expectJS => {
     expectJS(
       'React.createElement("div", null, React.createElement("span", null, "Hello ", name));'
     ).toMatchInlineSnapshot('<div><span>Hello {name}</span></div>;'));
+
+  test('fragment', () =>
+    expectJS(
+      'React.createElement(React.Fragment, null, React.createElement("span", null), "test");'
+    ).toMatchInlineSnapshot('<><span></span>test</>;'));
 });
