@@ -385,3 +385,14 @@ describe('unminify', expectJS => {
       }
     `));
 });
+
+describe('jsx', expectJS => {
+  test('attributes', () =>
+    expectJS(
+      'React.createElement("div", { className: "setBodH", style: { display: "block" } });'
+    ).toMatchInlineSnapshot(`
+      <div className="setBodH" style={{
+        display: "block"
+      }} />;
+    `));
+});

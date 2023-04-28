@@ -7,6 +7,7 @@ import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
 import { Bundle, extractBundle } from './extractor';
 import { applyTransform } from './transforms';
+import jsx from './transforms/jsx';
 import unminify from './transforms/unminify';
 
 export interface WebcrackResult {
@@ -56,6 +57,8 @@ export async function webcrack(
   // Have to run this after readability transforms because the function may contain dead code
   applyTransform(ast, selfDefending);
   applyTransform(ast, debugProtection);
+
+  applyTransform(ast, jsx);
 
   const bundle = extractBundle(ast);
   console.log('Bundle:', bundle?.type);

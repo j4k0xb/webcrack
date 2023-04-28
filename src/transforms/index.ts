@@ -3,6 +3,7 @@ import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
 import deterministicIf from './deterministicIf';
+import jsx from './jsx';
 import mergeElseIf from './mergeElseIf';
 import mergeStrings from './mergeStrings';
 import numberExpressions from './numberExpressions';
@@ -10,10 +11,10 @@ import rawLiterals from './rawLiterals';
 import sequence from './sequence';
 import splitVariableDeclarations from './splitVariableDeclarations';
 import ternaryToIf from './ternaryToIf';
+import unminify from './unminify';
 import unminifyBooleans from './unminifyBooleans';
 import void0ToUndefined from './void0ToUndefined';
 import yoda from './yoda';
-import unminify from './unminify';
 
 export const transforms = {
   unminify,
@@ -31,6 +32,7 @@ export const transforms = {
   deterministicIf,
   void0ToUndefined,
   yoda,
+  jsx,
 };
 
 export type TransformName = keyof typeof transforms;
