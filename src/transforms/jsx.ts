@@ -27,12 +27,16 @@ export default {
             const attributes = props.current
               ? convertAttributes(props.current!)
               : [];
+            // FIXME: dont assume children are expressions
+            const children = convertChildren(
+              path.node.arguments.slice(2) as t.Expression[]
+            );
             const opening = t.jsxOpeningElement(
               t.jsxIdentifier(type.current!),
-              attributes,
-              true
+              attributes
             );
-            const jsx = t.jsxElement(opening, null, []);
+            const closing = t.jsxClosingElement(t.jsxIdentifier(type.current!));
+            const jsx = t.jsxElement(opening, closing, children);
             path.replaceWith(jsx);
           }
         },
@@ -63,5 +67,19 @@ function convertAttributes(object: t.ObjectExpression): t.JSXAttribute[] {
     }
     // TODO: maybe a property is a SpreadElement or ObjectMethod?
     throw new Error('Not implemented');
+  });
+}
+
+function convertChildren(
+  children: t.Expression[]
+): (t.JSXText | t.JSXElement | t.JSXExpressionContainer)[] {
+  return children.map(child => {
+    if (t.isJSXElement(child)) {
+      return child;
+    } else if (t.isStringLiteral(child)) {
+      return t.jsxText(child.value);
+    } else {
+      return t.jsxExpressionContainer(child);
+    }
   });
 }

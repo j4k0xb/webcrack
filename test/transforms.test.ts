@@ -393,6 +393,11 @@ describe('jsx', expectJS => {
     ).toMatchInlineSnapshot(`
       <div className="setBodH" style={{
         display: "block"
-      }} />;
+      }}></div>;
     `));
+
+  test('children', () =>
+    expectJS(
+      'React.createElement("div", null, React.createElement("span", null, "Hello ", name));'
+    ).toMatchInlineSnapshot('<div><span>Hello {name}</span></div>;'));
 });

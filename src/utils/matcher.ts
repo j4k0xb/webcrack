@@ -1,6 +1,7 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Matcher } from '@codemod/matchers';
+import { Matcher, Spacer } from '@codemod/matchers';
+import { distributeAcrossSpacers } from '@codemod/matchers/build/utils/distributeAcrossSpacers';
 
 export function infiniteLoop(body?: m.Matcher<t.Statement>) {
   return m.or(
