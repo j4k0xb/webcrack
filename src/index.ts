@@ -7,6 +7,7 @@ import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
 import { Bundle, extractBundle } from './extractor';
 import { applyTransform } from './transforms';
+import parseEnum from './transforms/parseEnum';
 import unminify from './transforms/unminify';
 
 export interface WebcrackResult {
@@ -52,6 +53,7 @@ export async function webcrack(
 
   applyTransform(ast, deobfuscator);
   applyTransform(ast, unminify);
+  applyTransform(ast, parseEnum);
 
   // Have to run this after readability transforms because the function may contain dead code
   applyTransform(ast, selfDefending);
