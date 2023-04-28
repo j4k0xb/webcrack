@@ -2,6 +2,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
 import { constMemberExpression } from '../utils/matcher';
+import { renameFast } from '../utils/rename';
 
 export default {
   name: 'jsx',
@@ -34,6 +35,20 @@ export default {
       CallExpression: {
         exit(path) {
           if (elementMatcher.match(path.node)) {
+            let tag = type.current!;
+
+            // rename component to avoid conflict with built-in html tags
+            // https://react.dev/reference/react/createElement#caveats
+            if (
+              path.node.arguments[0].type === 'Identifier' &&
+              /^[a-z]/.test(tag)
+            ) {
+              const binding = path.scope.getBinding(tag);
+              if (!binding) return;
+              tag = path.scope.generateUid('Component');
+              renameFast(binding, tag);
+            }
+
             const attributes = props.current
               ? convertAttributes(props.current!)
               : [];
@@ -42,10 +57,10 @@ export default {
               path.node.arguments.slice(2) as t.Expression[]
             );
             const opening = t.jsxOpeningElement(
-              t.jsxIdentifier(type.current!),
+              t.jsxIdentifier(tag),
               attributes
             );
-            const closing = t.jsxClosingElement(t.jsxIdentifier(type.current!));
+            const closing = t.jsxClosingElement(t.jsxIdentifier(tag));
             const element = t.jsxElement(opening, closing, children);
             path.replaceWith(element);
             this.changes++;

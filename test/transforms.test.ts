@@ -1,4 +1,5 @@
 import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
 import { describe as describeVitest, expect, test } from 'vitest';
 import { transforms } from '../src/transforms';
 import {
@@ -19,6 +20,7 @@ function describe<TName extends TransformName>(
   return describeVitest(name, () => {
     factory((actualCode, options) => {
       const ast = parse(actualCode);
+      traverse(ast); // to crawl scope and get bindings
       applyTransform(ast, transforms[name], options);
       return expect(ast);
     });
@@ -397,9 +399,12 @@ describe('jsx', expectJS => {
       '<TodoList></TodoList>;'
     ));
 
-  test.todo('component type with invalid name', () =>
+  test('rename component with conflicting name', () =>
     expectJS('function a(){} React.createElement(a, null);')
-  );
+      .toMatchInlineSnapshot(`
+      function _Component() {}
+      <_Component></_Component>;
+    `));
 
   test('attributes', () =>
     expectJS(
