@@ -48,25 +48,20 @@ export default {
  * `className='foo' style={{ display: 'block' }}`
  */
 function convertAttributes(object: t.ObjectExpression): t.JSXAttribute[] {
-  const attributes: t.JSXAttribute[] = [];
-
   const name = m.capture(m.anyString());
   const value = m.capture(m.anyExpression());
   const matcher = m.objectProperty(m.identifier(name), value);
 
-  for (const property of object.properties) {
+  return object.properties.map(property => {
     if (matcher.match(property)) {
-      attributes.push(
-        t.jsxAttribute(
-          // TODO: jsxNameSpacedName?
-          t.jsxIdentifier(name.current!),
-          value.current!.type === 'StringLiteral'
-            ? value.current
-            : t.jsxExpressionContainer(value.current!)
-        )
-      );
+      const jsxName = t.jsxIdentifier(name.current!);
+      const jsxValue =
+        value.current!.type === 'StringLiteral'
+          ? value.current!
+          : t.jsxExpressionContainer(value.current!);
+      return t.jsxAttribute(jsxName, jsxValue);
     }
-  }
-
-  return attributes;
+    // TODO: maybe a property is a SpreadElement or ObjectMethod?
+    throw new Error('Not implemented');
+  });
 }
