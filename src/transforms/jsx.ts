@@ -14,7 +14,7 @@ export default {
     const elementMatcher = m.callExpression(
       constMemberExpression(m.identifier('React'), 'createElement'),
       m.anyList<t.Expression>(
-        m.stringLiteral(type),
+        m.or(m.stringLiteral(type), m.identifier(type)),
         m.or(props, m.nullLiteral()),
         m.zeroOrMore()
       )

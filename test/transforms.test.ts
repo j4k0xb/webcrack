@@ -387,6 +387,20 @@ describe('unminify', expectJS => {
 });
 
 describe('jsx', expectJS => {
+  test('tag name type', () =>
+    expectJS('React.createElement("div", null);').toMatchInlineSnapshot(
+      '<div></div>;'
+    ));
+
+  test('component type', () =>
+    expectJS('React.createElement(TodoList, null);').toMatchInlineSnapshot(
+      '<TodoList></TodoList>;'
+    ));
+
+  test.todo('component type with invalid name', () =>
+    expectJS('function a(){} React.createElement(a, null);')
+  );
+
   test('attributes', () =>
     expectJS(
       'React.createElement("div", { className: "setBodH", style: { display: "block" } });'
