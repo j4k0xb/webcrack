@@ -36,6 +36,8 @@ export default {
       exit({ node }) {
         if (matcher.match(node)) {
           [node.left, node.right] = [node.right, node.left as t.Expression];
+          node.operator =
+            flippedOperators[node.operator as keyof typeof flippedOperators];
           this.changes++;
         }
       },

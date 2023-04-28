@@ -361,12 +361,12 @@ describe('yoda', expectJS => {
     expectJS('"red" !== color').toMatchInlineSnapshot('color !== "red";'));
   test('loose inequality', () =>
     expectJS('null != x').toMatchInlineSnapshot('x != null;'));
-  test('less than', () => expectJS('0 < x').toMatchInlineSnapshot('x < 0;'));
+  test('less than', () => expectJS('0 < x').toMatchInlineSnapshot('x > 0;'));
   test('less or equal', () =>
-    expectJS('0 <= x').toMatchInlineSnapshot('x <= 0;'));
-  test('greater than', () => expectJS('0 > x').toMatchInlineSnapshot('x > 0;'));
+    expectJS('0 <= x').toMatchInlineSnapshot('x >= 0;'));
+  test('greater than', () => expectJS('0 > x').toMatchInlineSnapshot('x < 0;'));
   test('greater or equal', () =>
-    expectJS('0 >= x').toMatchInlineSnapshot('x >= 0;'));
+    expectJS('0 >= x').toMatchInlineSnapshot('x <= 0;'));
 
   test('ignore other operators', () =>
     expectJS('2 + x').toMatchInlineSnapshot('2 + x;'));
