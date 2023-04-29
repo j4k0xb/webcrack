@@ -11,24 +11,19 @@ export default {
   name: 'jsx',
   tags: ['unsafe'],
   visitor: () => {
-    const typeName = m.capture(m.anyString()); // Component
     const type = m.capture(
       m.or(
-        m.identifier(typeName), // React.createElement(Component, ...)
+        m.identifier(), // React.createElement(Component, ...)
         m.stringLiteral(), // React.createElement('div', ...)
         deepIdentifierMemberExpression // React.createElement(Component.SubComponent, ...)
       )
     );
-    const props = m.capture(m.objectExpression());
+    const props = m.capture(m.or(m.objectExpression(), m.nullLiteral()));
 
     // React.createElement(type, props, ...children)
     const elementMatcher = m.callExpression(
       constMemberExpression(m.identifier('React'), 'createElement'),
-      m.anyList<t.Expression>(
-        type,
-        m.or(props, m.nullLiteral()),
-        m.zeroOrMore(m.anyExpression())
-      )
+      m.anyList<t.Expression>(type, props, m.zeroOrMore(m.anyExpression()))
     );
 
     // React.createElement(React.Fragment, null, ...children)
@@ -60,15 +55,18 @@ export default {
 
             // rename component to avoid conflict with built-in html tags
             // https://react.dev/reference/react/createElement#caveats
-            if (typeName.current! && /^[a-z]/.test(typeName.current)) {
-              const binding = path.scope.getBinding(typeName.current!);
+            if (
+              t.isIdentifier(type.current!) &&
+              /^[a-z]/.test(type.current.name)
+            ) {
+              const binding = path.scope.getBinding(type.current.name);
               if (!binding) return;
               name = t.jsxIdentifier(path.scope.generateUid('Component'));
               renameFast(binding, name.name);
             }
 
-            const attributes = props.current
-              ? convertAttributes(props.current!)
+            const attributes = t.isObjectExpression(props.current)
+              ? convertAttributes(props.current)
               : [];
             const children = convertChildren(
               path.node.arguments.slice(2) as t.Expression[]
