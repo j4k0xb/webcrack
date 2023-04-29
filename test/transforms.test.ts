@@ -402,7 +402,9 @@ describe('jsx', expectJS => {
   test('deeply nested member expression type', () =>
     expectJS(
       'React.createElement(components.list.TodoList, null);'
-    ).toMatchInlineSnapshot('<components.list.TodoList></components.list.TodoList>;'));
+    ).toMatchInlineSnapshot(
+      '<components.list.TodoList></components.list.TodoList>;'
+    ));
 
   test('rename component with conflicting name', () =>
     expectJS('function a(){} React.createElement(a, null);')
@@ -419,6 +421,11 @@ describe('jsx', expectJS => {
         display: "block"
       }}></div>;
     `));
+
+  test('spread attributes', () =>
+    expectJS('React.createElement("div", {...props});').toMatchInlineSnapshot(
+      '<div {...props}></div>;'
+    ));
 
   test('children', () =>
     expectJS(

@@ -110,7 +110,9 @@ function convertType(
  * ->
  * `className='foo' style={{ display: 'block' }}`
  */
-function convertAttributes(object: t.ObjectExpression): t.JSXAttribute[] {
+function convertAttributes(
+  object: t.ObjectExpression
+): (t.JSXAttribute | t.JSXSpreadAttribute)[] {
   const name = m.capture(m.anyString());
   const value = m.capture(m.anyExpression());
   const matcher = m.objectProperty(m.identifier(name), value);
@@ -123,8 +125,10 @@ function convertAttributes(object: t.ObjectExpression): t.JSXAttribute[] {
           ? value.current!
           : t.jsxExpressionContainer(value.current!);
       return t.jsxAttribute(jsxName, jsxValue);
+    } else if (t.isSpreadElement(property)) {
+      return t.jsxSpreadAttribute(property.argument);
     }
-    // TODO: maybe a property is a SpreadElement or ObjectMethod?
+    // TODO: ObjectMethod?
     throw new Error('Not implemented');
   });
 }
