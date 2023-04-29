@@ -11,11 +11,11 @@ export default {
   name: 'jsx',
   tags: ['unsafe'],
   visitor: () => {
-    const tag = m.capture(m.anyString()); // Component or 'div'
+    const typeName = m.capture(m.anyString()); // Component
     const type = m.capture(
       m.or(
-        m.identifier(tag), // React.createElement(Component, ...)
-        m.stringLiteral(tag), // React.createElement('div', ...)
+        m.identifier(typeName), // React.createElement(Component, ...)
+        m.stringLiteral(), // React.createElement('div', ...)
         deepIdentifierMemberExpression // React.createElement(Component.SubComponent, ...)
       )
     );
@@ -27,7 +27,7 @@ export default {
       m.anyList<t.Expression>(
         type,
         m.or(props, m.nullLiteral()),
-        m.zeroOrMore()
+        m.zeroOrMore(m.anyExpression())
       )
     );
 
@@ -37,7 +37,7 @@ export default {
       m.anyList<t.Expression>(
         constMemberExpression(m.identifier('React'), 'Fragment'),
         m.nullLiteral(),
-        m.zeroOrMore()
+        m.zeroOrMore(m.anyExpression())
       )
     );
 
@@ -45,7 +45,6 @@ export default {
       CallExpression: {
         exit(path) {
           if (fragmentMatcher.match(path.node)) {
-            // FIXME: dont assume children are expressions
             const children = convertChildren(
               path.node.arguments.slice(2) as t.Expression[]
             );
@@ -61,12 +60,8 @@ export default {
 
             // rename component to avoid conflict with built-in html tags
             // https://react.dev/reference/react/createElement#caveats
-            if (
-              tag.current! &&
-              path.node.arguments[0].type === 'Identifier' &&
-              /^[a-z]/.test(tag.current)
-            ) {
-              const binding = path.scope.getBinding(tag.current!);
+            if (typeName.current! && /^[a-z]/.test(typeName.current)) {
+              const binding = path.scope.getBinding(typeName.current!);
               if (!binding) return;
               name = t.jsxIdentifier(path.scope.generateUid('Component'));
               renameFast(binding, name.name);
@@ -75,7 +70,6 @@ export default {
             const attributes = props.current
               ? convertAttributes(props.current!)
               : [];
-            // FIXME: dont assume children are expressions
             const children = convertChildren(
               path.node.arguments.slice(2) as t.Expression[]
             );
@@ -92,6 +86,11 @@ export default {
   },
 } satisfies Transform;
 
+/**
+ * - `Component` -> `Component`
+ * - `Component.SubComponent` -> `Component.SubComponent`
+ * - `'div'` -> `div`
+ */
 function convertType(
   type: t.Identifier | t.MemberExpression | t.StringLiteral
 ): t.JSXIdentifier | t.JSXMemberExpression {
@@ -107,6 +106,7 @@ function convertType(
     return t.jsxMemberExpression(object, property);
   }
 }
+
 /**
  * `{ className: 'foo', style: { display: 'block' } }`
  * ->
