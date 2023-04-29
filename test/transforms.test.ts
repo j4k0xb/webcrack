@@ -415,9 +415,9 @@ describe('jsx', expectJS => {
 
   test('attributes', () =>
     expectJS(
-      'React.createElement("div", { className: "setBodH", style: { display: "block" } });'
+      'React.createElement("div", { "data-hover": "tooltip", style: { display: "block" } });'
     ).toMatchInlineSnapshot(`
-      <div className="setBodH" style={{
+      <div data-hover="tooltip" style={{
         display: "block"
       }}></div>;
     `));

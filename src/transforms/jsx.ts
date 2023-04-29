@@ -1,6 +1,7 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
+import { codePreview } from '../utils/ast';
 import {
   constMemberExpression,
   deepIdentifierMemberExpression,
@@ -115,7 +116,10 @@ function convertAttributes(
 ): (t.JSXAttribute | t.JSXSpreadAttribute)[] {
   const name = m.capture(m.anyString());
   const value = m.capture(m.anyExpression());
-  const matcher = m.objectProperty(m.identifier(name), value);
+  const matcher = m.objectProperty(
+    m.or(m.identifier(name), m.stringLiteral(name)),
+    value
+  );
 
   return object.properties.map(property => {
     if (matcher.match(property)) {
@@ -127,9 +131,11 @@ function convertAttributes(
       return t.jsxAttribute(jsxName, jsxValue);
     } else if (t.isSpreadElement(property)) {
       return t.jsxSpreadAttribute(property.argument);
+    } else {
+      throw new Error(
+        `jsx: property type not implemented ${codePreview(object)}`
+      );
     }
-    // TODO: ObjectMethod?
-    throw new Error('Not implemented');
   });
 }
 
