@@ -1,7 +1,6 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Matcher, Spacer } from '@codemod/matchers';
-import { distributeAcrossSpacers } from '@codemod/matchers/build/utils/distributeAcrossSpacers';
+import { Matcher } from '@codemod/matchers';
 
 export function infiniteLoop(body?: m.Matcher<t.Statement>) {
   return m.or(
@@ -71,3 +70,16 @@ export function createFunctionMatcher(
     m.blockStatement(body(...captures.map(c => m.identifier(m.fromCapture(c)))))
   );
 }
+
+/**
+ * Matches a deeply nested member expression that only contains identifiers
+ * - e.g. `a.b` or `a.b.c` but not `[].b`
+ */
+export const deepIdentifierMemberExpression = m.memberExpression(
+  m.or(
+    m.identifier(),
+    m.matcher(node => deepIdentifierMemberExpression.match(node))
+  ),
+  m.identifier(),
+  false
+);

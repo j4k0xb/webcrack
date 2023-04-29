@@ -1,21 +1,31 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
-import { constMemberExpression } from '../utils/matcher';
+import {
+  constMemberExpression,
+  deepIdentifierMemberExpression,
+} from '../utils/matcher';
 import { renameFast } from '../utils/rename';
 
 export default {
   name: 'jsx',
   tags: ['unsafe'],
   visitor: () => {
-    const type = m.capture(m.anyString());
+    const tag = m.capture(m.anyString()); // Component or 'div'
+    const type = m.capture(
+      m.or(
+        m.identifier(tag), // React.createElement(Component, ...)
+        m.stringLiteral(tag), // React.createElement('div', ...)
+        deepIdentifierMemberExpression // React.createElement(Component.SubComponent, ...)
+      )
+    );
     const props = m.capture(m.objectExpression());
 
     // React.createElement(type, props, ...children)
     const elementMatcher = m.callExpression(
       constMemberExpression(m.identifier('React'), 'createElement'),
       m.anyList<t.Expression>(
-        m.or(m.stringLiteral(type), m.identifier(type)),
+        type,
         m.or(props, m.nullLiteral()),
         m.zeroOrMore()
       )
@@ -34,38 +44,6 @@ export default {
     return {
       CallExpression: {
         exit(path) {
-          if (elementMatcher.match(path.node)) {
-            let tag = type.current!;
-
-            // rename component to avoid conflict with built-in html tags
-            // https://react.dev/reference/react/createElement#caveats
-            if (
-              path.node.arguments[0].type === 'Identifier' &&
-              /^[a-z]/.test(tag)
-            ) {
-              const binding = path.scope.getBinding(tag);
-              if (!binding) return;
-              tag = path.scope.generateUid('Component');
-              renameFast(binding, tag);
-            }
-
-            const attributes = props.current
-              ? convertAttributes(props.current!)
-              : [];
-            // FIXME: dont assume children are expressions
-            const children = convertChildren(
-              path.node.arguments.slice(2) as t.Expression[]
-            );
-            const opening = t.jsxOpeningElement(
-              t.jsxIdentifier(tag),
-              attributes
-            );
-            const closing = t.jsxClosingElement(t.jsxIdentifier(tag));
-            const element = t.jsxElement(opening, closing, children);
-            path.replaceWith(element);
-            this.changes++;
-          }
-
           if (fragmentMatcher.match(path.node)) {
             // FIXME: dont assume children are expressions
             const children = convertChildren(
@@ -77,6 +55,36 @@ export default {
             path.replaceWith(fragment);
             this.changes++;
           }
+
+          if (elementMatcher.match(path.node)) {
+            let name = convertType(type.current!);
+
+            // rename component to avoid conflict with built-in html tags
+            // https://react.dev/reference/react/createElement#caveats
+            if (
+              tag.current! &&
+              path.node.arguments[0].type === 'Identifier' &&
+              /^[a-z]/.test(tag.current)
+            ) {
+              const binding = path.scope.getBinding(tag.current!);
+              if (!binding) return;
+              name = t.jsxIdentifier(path.scope.generateUid('Component'));
+              renameFast(binding, name.name);
+            }
+
+            const attributes = props.current
+              ? convertAttributes(props.current!)
+              : [];
+            // FIXME: dont assume children are expressions
+            const children = convertChildren(
+              path.node.arguments.slice(2) as t.Expression[]
+            );
+            const opening = t.jsxOpeningElement(name, attributes);
+            const closing = t.jsxClosingElement(name);
+            const element = t.jsxElement(opening, closing, children);
+            path.replaceWith(element);
+            this.changes++;
+          }
         },
       },
       noScope: true,
@@ -84,6 +92,21 @@ export default {
   },
 } satisfies Transform;
 
+function convertType(
+  type: t.Identifier | t.MemberExpression | t.StringLiteral
+): t.JSXIdentifier | t.JSXMemberExpression {
+  if (t.isIdentifier(type)) {
+    return t.jsxIdentifier(type.name);
+  } else if (t.isStringLiteral(type)) {
+    return t.jsxIdentifier(type.value);
+  } else {
+    const object = convertType(
+      type.object as t.Identifier | t.MemberExpression
+    );
+    const property = t.jsxIdentifier((type.property as t.Identifier).name);
+    return t.jsxMemberExpression(object, property);
+  }
+}
 /**
  * `{ className: 'foo', style: { display: 'block' } }`
  * ->

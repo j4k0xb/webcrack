@@ -399,6 +399,11 @@ describe('jsx', expectJS => {
       '<TodoList></TodoList>;'
     ));
 
+  test('deeply nested member expression type', () =>
+    expectJS(
+      'React.createElement(components.list.TodoList, null);'
+    ).toMatchInlineSnapshot('<components.list.TodoList></components.list.TodoList>;'));
+
   test('rename component with conflicting name', () =>
     expectJS('function a(){} React.createElement(a, null);')
       .toMatchInlineSnapshot(`
@@ -424,4 +429,9 @@ describe('jsx', expectJS => {
     expectJS(
       'React.createElement(React.Fragment, null, React.createElement("span", null), "test");'
     ).toMatchInlineSnapshot('<><span></span>test</>;'));
+
+  test('fragment with key', () =>
+    expectJS(
+      'React.createElement(React.Fragment, { key: o })'
+    ).toMatchInlineSnapshot('<React.Fragment key={o}></React.Fragment>;'));
 });
