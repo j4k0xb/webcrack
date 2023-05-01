@@ -83,7 +83,11 @@ export default {
           const statements = expressions.map(expr =>
             t.expressionStatement(expr)
           );
-          path.insertBefore(statements);
+          if (path.parentPath.isForStatement() && path.key === 'init') {
+            path.parentPath.insertBefore(statements);
+          } else {
+            path.insertBefore(statements);
+          }
           this.changes++;
         }
       },

@@ -80,6 +80,14 @@ describe('sequence', expectJS => {
       o = null;
       var t = o;
     `));
+
+  test('dont rearrange variable declarator in for loop', () =>
+    expectJS(`
+      for(let a = (b, c);;) {}
+    `).toMatchInlineSnapshot(`
+      b;
+      for (let a = c;;) {}
+    `));
 });
 
 describe('splitVariableDeclarations', expectJS => {
