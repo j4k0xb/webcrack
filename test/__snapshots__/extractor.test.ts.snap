@@ -60,12 +60,22 @@ exports[`extract webpack-var-injection.js 2`] = `module.exports = 1;`;
 
 exports[`extract webpack-var-injection.js 3`] = `module.exports = 2;`;
 
-exports[`extract webpack5_object.js 1`] = `
+exports[`extract webpack5-esm.js 1`] = `
 const lib = require("./3.js");
 console.log(lib);
 `;
 
-exports[`extract webpack5_object.js 2`] = `module.exports = "foo";`;
+exports[`extract webpack5-esm.js 2`] = `
+export default 1;
+export const version = "2.0.0";
+`;
+
+exports[`extract webpack5-object.js 1`] = `
+const lib = require("./3.js");
+console.log(lib);
+`;
+
+exports[`extract webpack5-object.js 2`] = `module.exports = "foo";`;
 
 exports[`extractor > path mapping 1`] = `const a = require("./3.js");`;
 
