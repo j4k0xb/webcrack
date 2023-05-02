@@ -67,7 +67,10 @@ console.log(lib);
 
 exports[`extract webpack5-esm.js 2`] = `
 export default 1;
-export const version = "2.0.0";
+const obj = {
+  version: "2.0.0"
+};
+export let version = obj.version;
 `;
 
 exports[`extract webpack5-object.js 1`] = `

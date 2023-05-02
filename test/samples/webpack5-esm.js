@@ -8,13 +8,15 @@
     3: (module, exports) => {
       'use strict';
       require.r(exports);
-      require.d(exports, {
-        default: () => a,
-        version: () => b,
-      });
 
       const a = 1;
-      const b = '2.0.0';
+      const obj = {
+        version: '2.0.0',
+      };
+      require.d(exports, {
+        default: () => a,
+        version: () => obj.version,
+      });
     },
   };
   var installedModules = {};

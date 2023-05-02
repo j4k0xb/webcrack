@@ -1,4 +1,5 @@
-import traverse, { NodePath, Scope } from '@babel/traverse';
+import { statement } from '@babel/template';
+import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
@@ -27,7 +28,7 @@ export function convertESM(module: Module) {
   );
 
   const exportedName = m.capture(m.anyString());
-  const returnedName = m.capture(m.anyString());
+  const returnedValue = m.capture(m.anyExpression());
   // E.g. require.d(exports, "counter", function () { return f });
   const defineExportMatcher = m.expressionStatement(
     m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
@@ -36,7 +37,7 @@ export function convertESM(module: Module) {
       m.functionExpression(
         undefined,
         [],
-        m.blockStatement([m.returnStatement(m.identifier(returnedName))])
+        m.blockStatement([m.returnStatement(returnedValue)])
       ),
     ])
   );
@@ -45,7 +46,7 @@ export function convertESM(module: Module) {
     m.arrayOf(
       m.objectProperty(
         m.identifier(),
-        m.arrowFunctionExpression([], m.identifier())
+        m.arrowFunctionExpression([], m.anyExpression())
       )
     )
   );
@@ -71,45 +72,56 @@ export function convertESM(module: Module) {
       if (defineExportsMatcher.match(path.node)) {
         for (const property of properties.current!) {
           const exportName = (property.key as t.Identifier).name;
-          const returnedName = ((property.value as t.ArrowFunctionExpression).body as t.Identifier).name;
-          exportVariable(path.scope, returnedName, exportName);
+          const returnedValue = (property.value as t.ArrowFunctionExpression)
+            .body as t.Expression;
+          exportVariable(path, returnedValue, exportName);
         }
         path.remove();
       } else if (defineExportMatcher.match(path.node)) {
-        exportVariable(
-          path.scope,
-          returnedName.current!,
-          exportedName.current!
-        );
+        exportVariable(path, returnedValue.current!, exportedName.current!);
         path.remove();
       }
     },
   });
 }
 
-function exportVariable(scope: Scope, varName: string, exportName: string) {
-  const binding = scope.getBinding(varName);
-  if (!binding) return;
+function exportVariable(
+  requireDPath: NodePath,
+  value: t.Expression,
+  exportName: string
+) {
+  if (value.type === 'Identifier') {
+    const binding = requireDPath.scope.getBinding(value.name);
+    if (!binding) return;
 
-  const declaration = binding.path.find(path =>
-    path.isDeclaration()
-  ) as NodePath<
-    t.VariableDeclaration | t.ClassDeclaration | t.FunctionDeclaration
-  > | null;
-  if (!declaration) return;
+    const declaration = binding.path.find(path =>
+      path.isDeclaration()
+    ) as NodePath<
+      t.VariableDeclaration | t.ClassDeclaration | t.FunctionDeclaration
+    > | null;
+    if (!declaration) return;
 
-  if (exportName === 'default') {
-    // `let f = 1;` -> `export default 1;`
-    declaration.replaceWith(
-      t.exportDefaultDeclaration(
-        t.isVariableDeclaration(declaration.node)
-          ? declaration.node.declarations[0].init!
-          : declaration.node
-      )
-    );
+    if (exportName === 'default') {
+      // `let f = 1;` -> `export default 1;`
+      declaration.replaceWith(
+        t.exportDefaultDeclaration(
+          t.isVariableDeclaration(declaration.node)
+            ? declaration.node.declarations[0].init!
+            : declaration.node
+        )
+      );
+    } else {
+      // `let f = 1;` -> `export let counter = 1;`
+      renameFast(binding, exportName);
+      declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
+    }
   } else {
-    // `let f = 1;` -> `export let counter = 1;`
-    renameFast(binding, exportName);
-    declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
+    if (exportName === 'default') {
+      requireDPath.insertAfter(statement`export default ${value}`());
+    } else {
+      requireDPath.insertAfter(
+        statement`export let ${exportName} = ${value}`()
+      );
+    }
   }
 }
