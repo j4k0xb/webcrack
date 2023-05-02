@@ -2,6 +2,7 @@ import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
+import { renameParameters } from '../../utils/rename';
 import { Bundle } from '../index';
 import { Module } from '../module';
 
@@ -61,7 +62,7 @@ export function extract(ast: t.Node): Bundle | undefined {
           }
 
           if (moduleWrapper.isFunctionExpression()) {
-            renameParams(moduleWrapper);
+            renameParameters(moduleWrapper, ['module', 'exports', 'require']);
             const file = t.file(t.program(moduleWrapper.node.body.body));
             const module = new Module(
               id,
@@ -80,27 +81,4 @@ export function extract(ast: t.Node): Bundle | undefined {
   if (modules.size > 0 && entryIdMatcher.current) {
     return new Bundle('webpack', entryIdMatcher.current.value, modules);
   }
-}
-
-/**
- * `function (e, t, i) {...}` -> `function (module, exports, require) {...}`
- */
-function renameParams(moduleWrapper: NodePath<t.FunctionExpression>) {
-  const FACTORY_PARAM_NAMES = ['module', 'exports', 'require'];
-
-  // Rename existing bindings with this name so there's no risk of conflicts
-  moduleWrapper.traverse({
-    Identifier(path) {
-      if (FACTORY_PARAM_NAMES.includes(path.node.name)) {
-        path.scope.rename(path.node.name);
-      }
-    },
-  });
-
-  moduleWrapper.node.params.forEach((param, index) => {
-    moduleWrapper.scope.rename(
-      (param as t.Identifier).name,
-      FACTORY_PARAM_NAMES[index]
-    );
-  });
 }
