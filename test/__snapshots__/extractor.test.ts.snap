@@ -74,7 +74,13 @@ export let version = obj.version;
 export default a.foo;
 `;
 
-exports[`extract webpack5-esm.js 3`] = `export const foo = 2;`;
+exports[`extract webpack5-esm.js 3`] = `
+export const foo = 2;
+export var obj = {
+  Console: bar
+};
+function bar() {}
+`;
 
 exports[`extract webpack5-object.js 1`] = `
 const lib = require("./3.js");

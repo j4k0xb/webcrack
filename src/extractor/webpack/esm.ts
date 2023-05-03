@@ -27,12 +27,13 @@ export function convertESM(module: Module) {
     ])
   );
 
+  const exportsName = m.capture(m.identifier());
   const exportedName = m.capture(m.anyString());
   const returnedValue = m.capture(m.anyExpression());
   // E.g. require.d(exports, "counter", function () { return f });
   const defineExportMatcher = m.expressionStatement(
     m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
-      m.identifier(),
+      exportsName,
       m.stringLiteral(exportedName),
       m.functionExpression(
         undefined,
@@ -40,6 +41,11 @@ export function convertESM(module: Module) {
         m.blockStatement([m.returnStatement(returnedValue)])
       ),
     ])
+  );
+
+  const emptyObjectVarMatcher = m.variableDeclarator(
+    m.fromCapture(exportsName),
+    m.objectExpression([])
   );
 
   const properties = m.capture(
@@ -53,7 +59,7 @@ export function convertESM(module: Module) {
   // E.g. require.d(exports, { foo: () => a, bar: () => b });
   const defineExportsMatcher = m.expressionStatement(
     m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
-      m.identifier('exports'),
+      exportsName,
       m.objectExpression(properties),
     ])
   );
@@ -88,12 +94,26 @@ export function convertESM(module: Module) {
           )}";`()
         );
       } else if (defineExportsMatcher.match(path.node)) {
+        const exportsBinding = path.scope.getBinding(exportsName.current!.name);
+        const emptyObject = emptyObjectVarMatcher.match(
+          exportsBinding?.path.node
+        )
+          ? (exportsBinding!.path.node.init as t.ObjectExpression)
+          : null;
+
         for (const property of properties.current!) {
-          const exportName = (property.key as t.Identifier).name;
+          const exportedKey = property.key as t.Identifier;
           const returnedValue = (property.value as t.ArrowFunctionExpression)
             .body as t.Expression;
-          exportVariable(path, returnedValue, exportName);
+          if (emptyObject) {
+            emptyObject.properties.push(
+              t.objectProperty(exportedKey, returnedValue)
+            );
+          } else {
+            exportVariable(path, returnedValue, exportedKey.name);
+          }
         }
+
         path.remove();
       } else if (defineExportMatcher.match(path.node)) {
         exportVariable(path, returnedValue.current!, exportedName.current!);

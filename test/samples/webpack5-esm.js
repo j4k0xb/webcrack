@@ -25,7 +25,15 @@
       const b = 2;
       require.d(exports, {
         foo: () => b,
+        obj: () => x,
       });
+
+      var x = {};
+      require.r(x);
+      require.d(x, {
+        Console: () => bar,
+      });
+      function bar() {}
     }
   };
   var installedModules = {};
