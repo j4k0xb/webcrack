@@ -83,7 +83,7 @@ export function convertESM(module: Module) {
         requireMatcher.match(path.node)
       ) {
         path.replaceWith(
-          statement`import ${requireVariable.current} from "${String(
+          statement`import * as ${requireVariable.current} from "${String(
             requiredModuleId.current
           )}";`()
         );
