@@ -76,6 +76,15 @@ export function convertESM(module: Module) {
     ),
   ]);
 
+  // module = require.hmd(module);
+  const hmdMatcher = m.expressionStatement(
+    m.assignmentExpression(
+      '=',
+      m.identifier('module'),
+      m.callExpression(constMemberExpression(m.identifier('require'), 'hmd'))
+    )
+  );
+
   traverse(module.ast, {
     enter(path) {
       // Only traverse the top-level
@@ -117,6 +126,8 @@ export function convertESM(module: Module) {
         path.remove();
       } else if (defineExportMatcher.match(path.node)) {
         exportVariable(path, returnedValue.current!, exportedName.current!);
+        path.remove();
+      } else if (hmdMatcher.match(path.node)) {
         path.remove();
       }
     },

@@ -65,6 +65,7 @@
     console.log(cDefault.a.VERSION);
   },
   function (e, t, i) {
+    e = require.hmd(e);
     i.r(t);
     i.d(t, 'counter', function () {
       return f;
