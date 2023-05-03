@@ -9,15 +9,24 @@
       'use strict';
       require.r(exports);
 
-      const a = 1;
+      const a = require(4);
       const obj = {
         version: '2.0.0',
       };
       require.d(exports, {
-        default: () => a,
+        default: () => a.foo,
         version: () => obj.version,
       });
     },
+    4: (module, exports) => {
+      'use strict';
+      require.r(exports);
+
+      const b = 2;
+      require.d(exports, {
+        foo: () => b,
+      });
+    }
   };
   var installedModules = {};
   function __webpack_require__(moduleId) {

@@ -58,6 +58,18 @@ export function convertESM(module: Module) {
     ])
   );
 
+  // E.g. const lib = require("./lib.js");
+  const requireVariable = m.capture(m.identifier());
+  const requiredModuleId = m.capture(m.anyNumber());
+  const requireMatcher = m.variableDeclaration(undefined, [
+    m.variableDeclarator(
+      requireVariable,
+      m.callExpression(m.identifier('require'), [
+        m.numericLiteral(requiredModuleId),
+      ])
+    ),
+  ]);
+
   traverse(module.ast, {
     enter(path) {
       // Only traverse the top-level
@@ -66,10 +78,16 @@ export function convertESM(module: Module) {
       if (defineEsModuleMatcher.match(path.node)) {
         module.ast.program.sourceType = 'module';
         path.remove();
-        return;
-      }
-
-      if (defineExportsMatcher.match(path.node)) {
+      } else if (
+        module.ast.program.sourceType === 'module' &&
+        requireMatcher.match(path.node)
+      ) {
+        path.replaceWith(
+          statement`import ${requireVariable.current} from "${String(
+            requiredModuleId.current
+          )}";`()
+        );
+      } else if (defineExportsMatcher.match(path.node)) {
         for (const property of properties.current!) {
           const exportName = (property.key as t.Identifier).name;
           const returnedValue = (property.value as t.ArrowFunctionExpression)

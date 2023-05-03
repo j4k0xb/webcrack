@@ -51,8 +51,8 @@ module.exports = {
 `;
 
 exports[`extract webpack-var-injection.js 1`] = `
-var m = require("./1.js");
-var n = require("./2.js");
+import m from "./1.js";
+import n from "./2.js";
 console.log(m, n);
 `;
 
@@ -66,12 +66,15 @@ console.log(lib);
 `;
 
 exports[`extract webpack5-esm.js 2`] = `
-export default 1;
+import a from "./4.js";
 const obj = {
   version: "2.0.0"
 };
 export let version = obj.version;
+export default a.foo;
 `;
+
+exports[`extract webpack5-esm.js 3`] = `export const foo = 2;`;
 
 exports[`extract webpack5-object.js 1`] = `
 const lib = require("./3.js");
