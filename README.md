@@ -92,7 +92,7 @@ void 0; // undefined
 
 ## Bundle Unpacking
 
-Currently supported bundlers: **webpack v4**
+Currently supported bundlers: **webpack v4, v5**
 
 - Each module of a bundle gets extracted into a separate file
 - Webpack's runtime code gets removed

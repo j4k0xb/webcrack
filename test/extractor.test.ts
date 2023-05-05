@@ -12,6 +12,8 @@ test.each([
   'webpack_object.js',
   'webpack-esm.js',
   'webpack-var-injection.js',
+  'webpack5-object.js',
+  'webpack5-esm.js',
 ])('extract %s', async filename => {
   const { bundle } = await webcrack(
     await readFile(join('test', 'samples', filename), 'utf8')

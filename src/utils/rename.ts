@@ -1,4 +1,4 @@
-import { Binding } from '@babel/traverse';
+import { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 
 export function renameFast(binding: Binding, newName: string) {
@@ -18,4 +18,15 @@ export function renameFast(binding: Binding, newName: string) {
   binding.scope.removeOwnBinding(binding.identifier.name);
   binding.scope.bindings[newName] = binding;
   binding.identifier.name = newName;
+}
+
+export function renameParameters(
+  path: NodePath<t.Function>,
+  newNames: string[]
+) {
+  const params = path.node.params as t.Identifier[];
+  for (let i = 0; i < params.length; i++) {
+    const binding = path.scope.getBinding((params[i] as t.Identifier).name)!;
+    renameFast(binding, newNames[i]);
+  }
 }

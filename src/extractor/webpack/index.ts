@@ -2,7 +2,8 @@ import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
-import { Bundle } from '../index';
+import { renameParameters } from '../../utils/rename';
+import { Bundle } from '../bundle';
 import { Module } from '../module';
 
 export function extract(ast: t.Node): Bundle | undefined {
@@ -12,15 +13,24 @@ export function extract(ast: t.Node): Bundle | undefined {
   const moduleFunctionsMatcher = m.capture(
     m.or(
       // E.g. [,,function (e, t, i) {...}, ...], index is the module ID
-      m.arrayExpression(m.arrayOf(m.or(m.functionExpression(), null))),
+      m.arrayExpression(
+        m.arrayOf(
+          m.or(m.functionExpression(), m.arrowFunctionExpression(), null)
+        )
+      ),
       // E.g. {0: function (e, t, i) {...}, ...}, key is the module ID
       m.objectExpression(
-        m.arrayOf(m.objectProperty(m.numericLiteral(), m.functionExpression()))
+        m.arrayOf(
+          m.objectProperty(
+            m.numericLiteral(),
+            m.or(m.functionExpression(), m.arrowFunctionExpression())
+          )
+        )
       )
     )
   );
 
-  const matcher = m.callExpression(
+  const webpack4Matcher = m.callExpression(
     m.functionExpression(
       undefined,
       undefined,
@@ -43,16 +53,57 @@ export function extract(ast: t.Node): Bundle | undefined {
     [moduleFunctionsMatcher]
   );
 
+  const webpack5Matcher = m.callExpression(
+    m.arrowFunctionExpression(
+      undefined,
+      m.blockStatement(
+        m.anyList<t.Statement>(
+          m.zeroOrMore(),
+          m.variableDeclaration(undefined, [
+            m.variableDeclarator(undefined, moduleFunctionsMatcher),
+          ]),
+          // var installedModules = {};
+          m.variableDeclaration(),
+          m.zeroOrMore(),
+          // function __webpack_require__(moduleId) { ... }
+          m.functionDeclaration(),
+          m.zeroOrMore(),
+          m.containerOf(
+            // __webpack_require__.s = 2
+            m.assignmentExpression(
+              '=',
+              constMemberExpression(m.identifier(), 's'),
+              entryIdMatcher
+            )
+          ),
+          // module.exports = entryModule
+          m.expressionStatement(
+            m.assignmentExpression(
+              '=',
+              constMemberExpression(m.identifier(), 'exports'),
+              m.identifier()
+            )
+          )
+        )
+      )
+    )
+  );
+
   traverse(ast, {
     CallExpression(path) {
-      if (matcher.match(path.node)) {
+      if (
+        webpack4Matcher.match(path.node) ||
+        webpack5Matcher.match(path.node)
+      ) {
         path.stop();
 
-        const argumentPath = path.get('arguments')[0];
+        const modulesPath = path.get(
+          moduleFunctionsMatcher.currentKeys!.join('.')
+        ) as NodePath<t.Node>;
 
-        const moduleWrappers = argumentPath.isArrayExpression()
-          ? (argumentPath.get('elements') as NodePath<t.Node | null>[])
-          : (argumentPath.get('properties') as NodePath<t.Node>[]);
+        const moduleWrappers = modulesPath.isArrayExpression()
+          ? (modulesPath.get('elements') as NodePath<t.Node | null>[])
+          : (modulesPath.get('properties') as NodePath<t.Node>[]);
 
         moduleWrappers.forEach((moduleWrapper, id) => {
           if (t.isObjectProperty(moduleWrapper.node)) {
@@ -60,8 +111,11 @@ export function extract(ast: t.Node): Bundle | undefined {
             moduleWrapper = moduleWrapper.get('value') as NodePath<t.Node>;
           }
 
-          if (moduleWrapper.isFunctionExpression()) {
-            renameParams(moduleWrapper);
+          if (
+            moduleWrapper.isFunction() &&
+            moduleWrapper.node.body.type === 'BlockStatement'
+          ) {
+            renameParameters(moduleWrapper, ['module', 'exports', 'require']);
             const file = t.file(t.program(moduleWrapper.node.body.body));
             const module = new Module(
               id,
@@ -80,27 +134,4 @@ export function extract(ast: t.Node): Bundle | undefined {
   if (modules.size > 0 && entryIdMatcher.current) {
     return new Bundle('webpack', entryIdMatcher.current.value, modules);
   }
-}
-
-/**
- * `function (e, t, i) {...}` -> `function (module, exports, require) {...}`
- */
-function renameParams(moduleWrapper: NodePath<t.FunctionExpression>) {
-  const FACTORY_PARAM_NAMES = ['module', 'exports', 'require'];
-
-  // Rename existing bindings with this name so there's no risk of conflicts
-  moduleWrapper.traverse({
-    Identifier(path) {
-      if (FACTORY_PARAM_NAMES.includes(path.node.name)) {
-        path.scope.rename(path.node.name);
-      }
-    },
-  });
-
-  moduleWrapper.node.params.forEach((param, index) => {
-    moduleWrapper.scope.rename(
-      (param as t.Identifier).name,
-      FACTORY_PARAM_NAMES[index]
-    );
-  });
 }

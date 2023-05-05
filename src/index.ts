@@ -5,7 +5,8 @@ import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
-import { Bundle, extractBundle } from './extractor';
+import { extractBundle } from './extractor';
+import { Bundle } from './extractor/bundle';
 import { applyTransform } from './transforms';
 import unminify from './transforms/unminify';
 

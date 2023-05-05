@@ -51,14 +51,44 @@ module.exports = {
 `;
 
 exports[`extract webpack-var-injection.js 1`] = `
-var m = require("./1.js");
-var n = require("./2.js");
+import * as m from "./1.js";
+import * as n from "./2.js";
 console.log(m, n);
 `;
 
 exports[`extract webpack-var-injection.js 2`] = `module.exports = 1;`;
 
 exports[`extract webpack-var-injection.js 3`] = `module.exports = 2;`;
+
+exports[`extract webpack5-esm.js 1`] = `
+const lib = require("./3.js");
+console.log(lib);
+`;
+
+exports[`extract webpack5-esm.js 2`] = `
+import * as a from "./4.js";
+const obj = {
+  version: "2.0.0"
+};
+export let version = obj.version;
+export default a.foo;
+`;
+
+exports[`extract webpack5-esm.js 3`] = `
+export const foo = 2;
+export var obj = {
+  Console: bar
+};
+function bar() {}
+`;
+
+exports[`extract webpack5-object.js 1`] = `
+const lib = require("./3.js");
+console.log(lib);
+const _0x8da276 = require(require.ab + "build/Release/spdlog.node");
+`;
+
+exports[`extract webpack5-object.js 2`] = `module.exports = "foo";`;
 
 exports[`extractor > path mapping 1`] = `const a = require("./3.js");`;
 
