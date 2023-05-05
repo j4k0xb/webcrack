@@ -4,6 +4,7 @@
       "use strict";
       const lib = require(3);
       console.log(lib);
+      const _0x8da276 = require(require.ab + "build/Release/spdlog.node");
     },
     3: module => {
       "use strict";

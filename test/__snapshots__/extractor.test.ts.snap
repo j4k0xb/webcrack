@@ -85,6 +85,7 @@ function bar() {}
 exports[`extract webpack5-object.js 1`] = `
 const lib = require("./3.js");
 console.log(lib);
+const _0x8da276 = require(require.ab + "build/Release/spdlog.node");
 `;
 
 exports[`extract webpack5-object.js 2`] = `module.exports = "foo";`;
