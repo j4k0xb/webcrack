@@ -3,7 +3,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
 import { renameParameters } from '../../utils/rename';
-import { Bundle } from '../index';
+import { Bundle } from '../bundle';
 import { Module } from '../module';
 
 export function extract(ast: t.Node): Bundle | undefined {
