@@ -7,7 +7,10 @@ import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
 import { Bundle, extractBundle } from './extractor';
 import { applyTransform } from './transforms';
+import blockStatement from './transforms/blockStatement';
 import jsx from './transforms/jsx';
+import sequence from './transforms/sequence';
+import splitVariableDeclarations from './transforms/splitVariableDeclarations';
 import unminify from './transforms/unminify';
 
 export interface WebcrackResult {
@@ -21,6 +24,21 @@ export interface WebcrackResult {
 }
 
 export interface Options {
+  /**
+   * Decompile react components to JSX.
+   * @default true
+   */
+  jsx?: boolean;
+  /**
+   * Extract modules from the bundle.
+   * @default true
+   */
+  unpack?: boolean;
+  /**
+   * Deobfuscate the code.
+   * @default true
+   */
+  deobfuscate?: boolean;
   /**
    * Run for every module after generating the code and before saving it.
    * This can be used to format the code or apply other transformations.
@@ -46,21 +64,29 @@ export async function webcrack(
   code: string,
   options: Options = {}
 ): Promise<WebcrackResult> {
+  options = { jsx: true, unpack: true, deobfuscate: true, ...options };
+
   const ast = parse(code, {
     sourceType: 'unambiguous',
     allowReturnOutsideFunction: true,
   });
 
-  applyTransform(ast, deobfuscator);
+  applyTransform(ast, blockStatement);
+  applyTransform(ast, sequence);
+  applyTransform(ast, splitVariableDeclarations);
+
+  if (options.deobfuscate) applyTransform(ast, deobfuscator);
   applyTransform(ast, unminify);
 
-  // Have to run this after readability transforms because the function may contain dead code
-  applyTransform(ast, selfDefending);
-  applyTransform(ast, debugProtection);
+  // Have to run this after dead code removal
+  if (options.deobfuscate) {
+    applyTransform(ast, selfDefending);
+    applyTransform(ast, debugProtection);
+  }
 
-  applyTransform(ast, jsx);
+  if (options.jsx) applyTransform(ast, jsx);
 
-  const bundle = extractBundle(ast);
+  const bundle = options.unpack ? extractBundle(ast) : undefined;
   console.log('Bundle:', bundle?.type);
 
   let outputCode = generate(ast).code;

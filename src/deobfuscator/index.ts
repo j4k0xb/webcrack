@@ -1,8 +1,5 @@
 import { applyTransform, Transform } from '../transforms';
-import blockStatement from '../transforms/blockStatement';
 import mergeStrings from '../transforms/mergeStrings';
-import sequence from '../transforms/sequence';
-import splitVariableDeclarations from '../transforms/splitVariableDeclarations';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import controlFlowObject from './controlFlowObject';
@@ -19,7 +16,6 @@ import { VMDecoder } from './vm';
 export default {
   name: 'deobfuscate',
   tags: ['unsafe'],
-  preTransforms: [blockStatement, sequence, splitVariableDeclarations],
   run(ast, state) {
     const stringArray = findStringArray(ast);
     console.log(`String Array: ${!!stringArray}`);

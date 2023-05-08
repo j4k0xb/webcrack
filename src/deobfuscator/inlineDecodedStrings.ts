@@ -2,7 +2,7 @@ import { expression } from '@babel/template';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '../transforms';
+import { Transform, applyTransform } from '../transforms';
 import numberExpressions from '../transforms/numberExpressions';
 import { VMDecoder } from './vm';
 
@@ -13,9 +13,9 @@ import { VMDecoder } from './vm';
 export default {
   name: 'inlineDecodedStrings',
   tags: ['unsafe'],
-  preTransforms: [numberExpressions],
   run(ast, state, options) {
     if (!options) return;
+    applyTransform(ast, numberExpressions);
 
     const calls = collectCalls(ast, options.vm);
     const decodedStrings = options.vm.decode(calls);
