@@ -45,7 +45,7 @@
     "@babel/template": "^7.20.7",
     "@babel/traverse": "^7.21.4",
     "@babel/types": "^7.21.4",
-    "@codemod/matchers": "^1.6.1",
+    "@codemod/matchers": "^1.7.0",
     "commander": "^10.0.0",
     "quickjs-emscripten": "^0.22.0"
   },

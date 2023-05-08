@@ -70,3 +70,16 @@ export function createFunctionMatcher(
     m.blockStatement(body(...captures.map(c => m.identifier(m.fromCapture(c)))))
   );
 }
+
+/**
+ * Matches a deeply nested member expression that only contains identifiers
+ * - e.g. `a.b` or `a.b.c` but not `[].b`
+ */
+export const deepIdentifierMemberExpression = m.memberExpression(
+  m.or(
+    m.identifier(),
+    m.matcher(node => deepIdentifierMemberExpression.match(node))
+  ),
+  m.identifier(),
+  false
+);
