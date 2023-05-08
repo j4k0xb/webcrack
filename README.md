@@ -90,6 +90,26 @@ void 0; // undefined
 'red' === color; // color === 'red'
 ```
 
+## JSX Decompiling
+
+Convert react components to JSX.
+
+```js
+React.createElement(
+  'div',
+  null,
+  React.createElement('span', null, 'Hello ', name)
+);
+```
+
+->
+
+```jsx
+<div>
+  <span>Hello {name}</span>
+</div>
+```
+
 ## Bundle Unpacking
 
 Currently supported bundlers: **webpack v4**
