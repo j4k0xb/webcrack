@@ -9,7 +9,7 @@ export function infiniteLoop(body?: m.Matcher<t.Statement>) {
   );
 }
 
-export function constKey(name: string | m.Matcher<string>) {
+export function constKey(name?: string | m.Matcher<string>) {
   return m.or(m.identifier(name), m.stringLiteral(name));
 }
 

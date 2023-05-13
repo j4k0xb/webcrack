@@ -10,7 +10,7 @@ import { inlineVarInjections } from './webpack/varInjection';
 
 export class Bundle {
   constructor(
-    public type: 'webpack',
+    public type: 'webpack' | 'browserify',
     public entryId: number,
     public modules: Map<number, Module>
   ) {}
