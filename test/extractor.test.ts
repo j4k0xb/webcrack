@@ -14,6 +14,7 @@ test.each([
   'webpack-var-injection.js',
   'webpack5-object.js',
   'webpack5-esm.js',
+  'browserify.js',
 ])('extract %s', async filename => {
   const { bundle } = await webcrack(
     await readFile(join('test', 'samples', filename), 'utf8')

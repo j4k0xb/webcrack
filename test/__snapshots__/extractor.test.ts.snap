@@ -1,5 +1,39 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`extract browserify.js 1`] = `
+function add(a, b) {
+  return a + b;
+}
+module.exports = add;
+`;
+
+exports[`extract browserify.js 2`] = `
+var sum = require("./sum");
+var numbers = [1, 2, 3];
+var result = sum(numbers);
+var outputElement = document.getElementById("output");
+outputElement.innerHTML = result;
+`;
+
+exports[`extract browserify.js 3`] = `
+function reduce(list, iteratee, memo) {
+  list.forEach(function (item) {
+    memo = iteratee(item, memo);
+  });
+  return memo;
+}
+module.exports = reduce;
+`;
+
+exports[`extract browserify.js 4`] = `
+var reduce = require("./reduce");
+var add = require("./add");
+function sum(list) {
+  return reduce(list, add, 0);
+}
+module.exports = sum;
+`;
+
 exports[`extract webpack.js 1`] = `const a = require("./3.js");`;
 
 exports[`extract webpack.js 2`] = `
