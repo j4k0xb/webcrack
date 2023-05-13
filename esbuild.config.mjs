@@ -52,6 +52,7 @@ for (const config of configs) {
     define: {
       'process.env.browser': String(config.platform === 'browser'),
     },
+    sourcemap: true,
     packages: 'external',
     plugins: [babelImportPlugin],
     logLevel: 'info',

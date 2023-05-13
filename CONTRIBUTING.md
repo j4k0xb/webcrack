@@ -9,10 +9,10 @@ The `package.json` version shouldn't be changed.
 1. Fork and clone the repo
 2. Install dependencies: `npm install`
 
-If you want to run the CLI:
+Debugging in VSCode:
 
-1. Compile TypeScript: `npm run watch`
-2. Run: `npm start -- someFile.js`
+1. Create a `tmp` directory with `test.js` inside and paste your code
+2. Press `F5` to build the project and launch the debugger
 
 ## Tests
 

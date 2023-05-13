@@ -17,6 +17,7 @@
     "postbuild": "tsc",
     "watch": "node esbuild.config.mjs --watch",
     "start": "node dist/cli.js",
+    "dev": "node esbuild.config.mjs && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
     "lint": "eslint --ext .ts src test",
     "test": "vitest"
   },
