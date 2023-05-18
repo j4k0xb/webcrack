@@ -2,7 +2,7 @@ import { expression } from '@babel/template';
 import traverse, { NodePath } from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
-import { Bundle } from '../bundle';
+import { WebpackBundle } from './bundle';
 
 /*
  * webpack/runtime/compat get default export
@@ -31,7 +31,7 @@ import { Bundle } from '../bundle';
  * console.log(m.prop, m.prop);
  * ```
  */
-export function convertDefaultRequire(bundle: Bundle) {
+export function convertDefaultRequire(bundle: WebpackBundle) {
   function getRequiredModule(path: NodePath) {
     // The variable that's passed to require.n
     const binding = path.scope.getBinding(moduleArg.current!.name);

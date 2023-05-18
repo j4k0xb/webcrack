@@ -2,7 +2,7 @@ import { statement } from '@babel/template';
 import { Statement } from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
-import { Module } from '../module';
+import { WebpackModule } from './module';
 
 /**
  * ```js
@@ -16,7 +16,7 @@ import { Module } from '../module';
  * // ...
  * ```
  */
-export function inlineVarInjections(module: Module) {
+export function inlineVarInjections(module: WebpackModule) {
   const { program } = module.ast;
   const newBody: Statement[] = [];
 

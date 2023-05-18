@@ -3,11 +3,11 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
 import { renameParameters } from '../../utils/rename';
-import { Bundle } from '../bundle';
-import { Module } from '../module';
+import { WebpackBundle } from './bundle';
+import { WebpackModule } from './module';
 
-export function extract(ast: t.Node): Bundle | undefined {
-  const modules = new Map<number, Module>();
+export function extract(ast: t.Node): WebpackBundle | undefined {
+  const modules = new Map<number, WebpackModule>();
 
   const entryIdMatcher = m.capture(m.numericLiteral());
   const moduleFunctionsMatcher = m.capture(
@@ -117,7 +117,7 @@ export function extract(ast: t.Node): Bundle | undefined {
           ) {
             renameParameters(moduleWrapper, ['module', 'exports', 'require']);
             const file = t.file(t.program(moduleWrapper.node.body.body));
-            const module = new Module(
+            const module = new WebpackModule(
               id,
               file,
               id === entryIdMatcher.current?.value
@@ -132,6 +132,6 @@ export function extract(ast: t.Node): Bundle | undefined {
   });
 
   if (modules.size > 0 && entryIdMatcher.current) {
-    return new Bundle('webpack', entryIdMatcher.current.value, modules);
+    return new WebpackBundle(entryIdMatcher.current.value, modules);
   }
 }

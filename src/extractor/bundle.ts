@@ -1,12 +1,7 @@
-import traverse, { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import traverse from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import { dirname, join } from 'node:path';
-import { relativePath } from '../utils/path';
 import { Module } from './module';
-import { convertESM } from './webpack/esm';
-import { convertDefaultRequire } from './webpack/getDefaultExport';
-import { inlineVarInjections } from './webpack/varInjection';
 
 export class Bundle {
   constructor(
@@ -92,52 +87,6 @@ export class Bundle {
     }
   }
 
-  /**
-   * Undoes some of the transformations that Webpack injected into the modules.
-   */
-  applyTransforms() {
-    this.modules.forEach(inlineVarInjections);
-    this.modules.forEach(convertESM);
-    convertDefaultRequire(this);
-    this.replaceRequirePaths();
-  }
-
-  /**
-   * Replaces `require(id)` calls with `require("./relative/path.js")` calls.
-   */
-  private replaceRequirePaths() {
-    const requireId = m.capture(m.numericLiteral());
-    const requireMatcher = m.or(
-      m.callExpression(m.identifier('require'), [requireId])
-    );
-    const importId = m.capture(m.stringLiteral());
-    const importMatcher = m.importDeclaration(m.anything(), importId);
-
-    this.modules.forEach(module => {
-      traverse(module.ast, {
-        enter: path => {
-          if (requireMatcher.match(path.node)) {
-            const requiredModule = this.modules.get(requireId.current!.value);
-            if (requiredModule) {
-              const [arg] = path.get('arguments') as NodePath<t.Identifier>[];
-              arg.replaceWith(
-                t.stringLiteral(relativePath(module.path, requiredModule.path))
-              );
-            }
-          } else if (importMatcher.match(path.node)) {
-            const requiredModule = this.modules.get(
-              Number(importId.current!.value)
-            );
-            if (requiredModule) {
-              const arg = path.get('source') as NodePath;
-              arg.replaceWith(
-                t.stringLiteral(relativePath(module.path, requiredModule.path))
-              );
-            }
-          }
-        },
-        noScope: true,
-      });
-    });
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  applyTransforms() {}
 }
