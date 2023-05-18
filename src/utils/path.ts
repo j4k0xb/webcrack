@@ -1,4 +1,5 @@
-import { dirname, relative } from 'node:path/posix';
+import assert from 'node:assert';
+import { dirname, join, relative } from 'node:path/posix';
 
 export function relativePath(from: string, to: string) {
   const relativePath = relative(dirname(from), to);
@@ -34,6 +35,7 @@ export function resolveDependencyTree(
         ? path
         : join(prefix, path);
       assert(!newPath.includes('..'));
+      assert(!newPath.startsWith('/'));
       return [id, newPath];
     })
   );
