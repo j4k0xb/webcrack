@@ -112,12 +112,14 @@ React.createElement(
 
 ## Bundle Unpacking
 
-Currently supported bundlers: **webpack v4, v5**
+Currently supported bundlers: **webpack v4, v5**, **browserify**
 
 - Each module of a bundle gets extracted into a separate file
-- Webpack's runtime code gets removed
-- Modules can get converted to ESM
-- You can modify the unpacked modules and bundle them again: `npx webpack-cli ./webcrack-out`
+- The require/runtime code gets transformed
+- Modules may get converted to ESM
+- You can modify the unpacked modules and bundle them again¹: `npx webpack-cli ./webcrack-out`
+
+¹: only for webpack bundles, may require a custom config
 
 ### Path-Mapping
 
