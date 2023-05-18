@@ -2,7 +2,7 @@ import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { getPropName } from '../../utils/ast';
-import { constKey } from '../../utils/matcher';
+import { constKey, matchIife } from '../../utils/matcher';
 import { resolveDependencyTree } from '../../utils/path';
 import { renameParameters } from '../../utils/rename';
 import { BrowserifyBundle } from './bundle';
@@ -28,13 +28,24 @@ export function extract(ast: t.Node): BrowserifyBundle | undefined {
   );
   const entryId = m.capture(m.numericLiteral());
 
-  // (function (files, cache, entryIds) {...})(...)
   const matcher = m.callExpression(
-    m.functionExpression(undefined, [
-      m.identifier(),
-      m.identifier(),
-      m.identifier(),
-    ]),
+    m.or(
+      // (function (files, cache, entryIds) {...})(...)
+      m.functionExpression(undefined, [
+        m.identifier(),
+        m.identifier(),
+        m.identifier(),
+      ]),
+      // (function () { function init(files, cache, entryIds) {...} return init; })()(...)
+      matchIife([
+        m.functionDeclaration(undefined, [
+          m.identifier(),
+          m.identifier(),
+          m.identifier(),
+        ]),
+        m.returnStatement(m.identifier()),
+      ])
+    ),
     [
       m.objectExpression(files),
       m.objectExpression(),

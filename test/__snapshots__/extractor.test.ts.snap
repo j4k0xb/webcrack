@@ -34,6 +34,13 @@ function sum(list) {
 module.exports = sum;
 `;
 
+exports[`extract browserify-2.js 1`] = `module.exports = 1;`;
+
+exports[`extract browserify-2.js 2`] = `
+const lib = require("./lib");
+console.log(lib);
+`;
+
 exports[`extract webpack.js 1`] = `const a = require("./3.js");`;
 
 exports[`extract webpack.js 2`] = `
