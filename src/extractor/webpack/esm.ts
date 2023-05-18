@@ -4,7 +4,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
 import { renameFast } from '../../utils/rename';
-import { Module } from '../module';
+import { WebpackModule } from './module';
 
 /**
  * ```js
@@ -19,7 +19,7 @@ import { Module } from '../module';
  * export let counter = 1;
  * ```
  */
-export function convertESM(module: Module) {
+export function convertESM(module: WebpackModule) {
   // E.g. require.r(exports);
   const defineEsModuleMatcher = m.expressionStatement(
     m.callExpression(constMemberExpression(m.identifier('require'), 'r'), [
