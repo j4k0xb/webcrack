@@ -13,12 +13,12 @@ import { VMDecoder } from './vm';
 export default {
   name: 'inlineDecodedStrings',
   tags: ['unsafe'],
-  run(ast, state, options) {
+  async run(ast, state, options) {
     if (!options) return;
     applyTransform(ast, numberExpressions);
 
     const calls = collectCalls(ast, options.vm);
-    const decodedStrings = options.vm.decode(calls);
+    const decodedStrings = await options.vm.decode(calls);
 
     calls.forEach((path, i) => {
       if (typeof decodedStrings[i] === 'string') {

@@ -1,17 +1,32 @@
 import generate from '@babel/generator';
 import { NodePath } from '@babel/traverse';
 import { CallExpression } from '@babel/types';
-import { getQuickJS, shouldInterruptAfterDeadline } from 'quickjs-emscripten';
 import { ArrayRotator } from './arrayRotator';
 import { Decoder } from './decoder';
 import { StringArray } from './stringArray';
 
-const QuickJS = await getQuickJS();
+export type Sandbox = (code: string) => Promise<unknown>;
+
+export async function createNodeSandbox() {
+  const {
+    default: { Isolate },
+  } = await import('isolated-vm');
+  return async (code: string) => {
+    const isolate = new Isolate();
+    const context = await isolate.createContext();
+    return await context.eval(code, {
+      timeout: 10_000,
+      copy: true,
+      filename: 'file:///obfuscated.js',
+    });
+  };
+}
 
 export class VMDecoder {
   private setupCode: string;
 
   constructor(
+    public sandbox: Sandbox,
     public stringArray: StringArray,
     public decoders: Decoder[],
     public rotator?: ArrayRotator
@@ -31,9 +46,12 @@ export class VMDecoder {
     this.setupCode = stringArrayCode + rotatorCode + decoderCode;
   }
 
-  decode(calls: NodePath<CallExpression>[]): string[] {
-    return QuickJS.evalCode(`${this.setupCode};[${calls.join(',')}]`, {
-      shouldInterrupt: shouldInterruptAfterDeadline(Date.now() + 10_000),
-    }) as string[];
+  async decode(calls: NodePath<CallExpression>[]): Promise<string[]> {
+    return (await this.sandbox(
+      `(() => {
+        ${this.setupCode}
+        return [${calls.join(',')}]
+      })()`
+    )) as string[];
   }
 }

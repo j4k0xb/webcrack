@@ -1,4 +1,4 @@
-import { applyTransform, Transform } from '../transforms';
+import { applyTransform, applyTransformAsync, Transform } from '../transforms';
 import mergeStrings from '../transforms/mergeStrings';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
@@ -9,14 +9,19 @@ import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
 import objectLiterals from './objectLiterals';
 import { findStringArray } from './stringArray';
-import { VMDecoder } from './vm';
+import { createNodeSandbox, Sandbox, VMDecoder } from './vm';
 
 // https://astexplorer.net/#/gist/b1018df4a8daebfcb1daf9d61fe17557/4ff9ad0e9c40b9616956f17f59a2d9888cd62a4f
 
 export default {
   name: 'deobfuscate',
   tags: ['unsafe'],
-  run(ast, state) {
+  async run(ast, state, options) {
+    if (!process.env.browser && !options) {
+      options = { sandbox: await createNodeSandbox() };
+    }
+    if (!options) return;
+
     const stringArray = findStringArray(ast);
     console.log(`String Array: ${!!stringArray}`);
     if (!stringArray) return;
@@ -44,8 +49,10 @@ export default {
       ).changes;
     }
 
-    const vm = new VMDecoder(stringArray, decoders, rotator);
-    state.changes += applyTransform(ast, inlineDecodedStrings, { vm }).changes;
+    const vm = new VMDecoder(options.sandbox, stringArray, decoders, rotator);
+    state.changes += (
+      await applyTransformAsync(ast, inlineDecodedStrings, { vm })
+    ).changes;
 
     stringArray.path.remove();
     rotator?.remove();
@@ -56,4 +63,4 @@ export default {
     state.changes += applyTransform(ast, controlFlowObject).changes;
     state.changes += applyTransform(ast, controlFlowSwitch).changes;
   },
-} satisfies Transform;
+} satisfies Transform<{ sandbox: Sandbox }>;

@@ -5,9 +5,10 @@ import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
+import { Sandbox } from './deobfuscator/vm';
 import { extractBundle } from './extractor';
 import { Bundle } from './extractor/bundle';
-import { applyTransform } from './transforms';
+import { applyTransform, applyTransformAsync } from './transforms';
 import blockStatement from './transforms/blockStatement';
 import jsx from './transforms/jsx';
 import sequence from './transforms/sequence';
@@ -59,6 +60,10 @@ export interface Options {
   mappings?: (
     m: typeof import('@codemod/matchers')
   ) => Record<string, m.Matcher<unknown>>;
+  /**
+   * Function that executes a code expression and returns the result (typically from the obfuscator).
+   */
+  sandbox?: Sandbox;
 }
 
 export async function webcrack(
@@ -66,6 +71,9 @@ export async function webcrack(
   options: Options = {}
 ): Promise<WebcrackResult> {
   options = { jsx: true, unpack: true, deobfuscate: true, ...options };
+  const sandboxOptions = options.sandbox
+    ? { sandbox: options.sandbox }
+    : undefined;
 
   const ast = parse(code, {
     sourceType: 'unambiguous',
@@ -76,7 +84,8 @@ export async function webcrack(
   applyTransform(ast, sequence);
   applyTransform(ast, splitVariableDeclarations);
 
-  if (options.deobfuscate) applyTransform(ast, deobfuscator);
+  if (options.deobfuscate)
+    await applyTransformAsync(ast, deobfuscator, sandboxOptions);
   applyTransform(ast, unminify);
 
   // Have to run this after dead code removal

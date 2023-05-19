@@ -42,6 +42,31 @@ export type TransformOptions<TName extends TransformName> =
     ? TOptions
     : never;
 
+export async function applyTransformAsync<TOptions>(
+  ast: Node,
+  transform: Transform<TOptions>,
+  options?: TOptions
+): Promise<TransformState> {
+  const start = performance.now();
+  console.log(`${transform.name}: started`);
+
+  const state: TransformState = { changes: 0 };
+
+  await transform.run?.(ast, state, options);
+  if (transform.visitor)
+    traverse(ast, transform.visitor(options), undefined, state);
+
+  console.log(
+    `${transform.name}: finished in`,
+    Math.floor(performance.now() - start),
+    'ms with',
+    state.changes,
+    'changes'
+  );
+
+  return state;
+}
+
 export function applyTransform<TOptions>(
   ast: Node,
   transform: Transform<TOptions>,
@@ -74,7 +99,11 @@ export interface TransformState {
 export interface Transform<TOptions = unknown> {
   name: string;
   tags: Tag[];
-  run?: (ast: Node, state: TransformState, options?: TOptions) => void;
+  run?: (
+    ast: Node,
+    state: TransformState,
+    options?: TOptions
+  ) => Promise<void> | void;
   visitor?: (options?: TOptions) => TraverseOptions<TransformState>;
 }
 
