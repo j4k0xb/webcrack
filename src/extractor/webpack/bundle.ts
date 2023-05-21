@@ -16,7 +16,7 @@ export class WebpackBundle extends Bundle {
   /**
    * Undoes some of the transformations that Webpack injected into the modules.
    */
-  applyTransforms() {
+  applyTransforms(): void {
     this.modules.forEach(inlineVarInjections);
     this.modules.forEach(convertESM);
     convertDefaultRequire(this);

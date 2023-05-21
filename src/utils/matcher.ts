@@ -1,21 +1,24 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Matcher } from '@codemod/matchers';
 
-export function infiniteLoop(body?: m.Matcher<t.Statement>) {
+export function infiniteLoop(
+  body?: m.Matcher<t.Statement>
+): m.Matcher<t.ForStatement | t.WhileStatement> {
   return m.or(
     m.forStatement(undefined, null, undefined, body),
     m.whileStatement(trueMatcher, body)
   );
 }
 
-export function constKey(name?: string | m.Matcher<string>) {
+export function constKey(
+  name?: string | m.Matcher<string>
+): m.Matcher<t.Identifier | t.StringLiteral> {
   return m.or(m.identifier(name), m.stringLiteral(name));
 }
 
 export function matchIife(
-  body?: Matcher<Array<t.Statement>> | Array<Matcher<t.Statement>>
-) {
+  body?: m.Matcher<t.Statement[]> | m.Matcher<t.Statement>[]
+): m.Matcher<t.CallExpression> {
   return m.callExpression(
     m.functionExpression(null, [], body ? m.blockStatement(body) : undefined),
     []
@@ -31,7 +34,7 @@ export const emptyIife = matchIife([]);
 export function constMemberExpression(
   object: m.Matcher<t.Expression>,
   property?: string | m.Matcher<string>
-) {
+): m.Matcher<t.MemberExpression> {
   return m.or(
     m.memberExpression(object, m.identifier(property), false),
     m.memberExpression(object, m.stringLiteral(property), true)
@@ -59,7 +62,7 @@ export function createFunctionMatcher(
   body: (
     ...captures: m.Matcher<t.Identifier>[]
   ) => m.Matcher<t.Statement[]> | m.Matcher<t.Statement>[]
-) {
+): m.Matcher<t.FunctionExpression> {
   const captures = Array.from({ length: params }, () =>
     m.capture(m.anyString())
   );

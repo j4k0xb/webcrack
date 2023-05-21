@@ -114,7 +114,7 @@ export async function webcrack(
         const { mkdir, writeFile } = await import('node:fs/promises');
         await mkdir(path, { recursive: true });
         await writeFile(join(path, 'deobfuscated.js'), outputCode, 'utf8');
-        bundle?.save(path, options.transformCode, options.mappings);
+        await bundle?.save(path, options.transformCode, options.mappings);
       }
     },
   };

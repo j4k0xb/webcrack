@@ -16,7 +16,7 @@ import { WebpackModule } from './module';
  * // ...
  * ```
  */
-export function inlineVarInjections(module: WebpackModule) {
+export function inlineVarInjections(module: WebpackModule): void {
   const { program } = module.ast;
   const newBody: Statement[] = [];
 

@@ -11,7 +11,12 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const { version, description } = JSON.parse(
   readFileSync(join(__dirname, '..', 'package.json'), 'utf8')
-);
+) as { version: string; description: string };
+
+interface Options {
+  force: boolean;
+  output: string;
+}
 
 program
   .version(version)
@@ -19,8 +24,8 @@ program
   .option('-o, --output <path>', 'output directory', 'webcrack-out')
   .option('-f, --force', 'overwrite output directory')
   .argument('<file>', 'input file')
-  .action(async input => {
-    const { output, force } = program.opts();
+  .action(async (input: string) => {
+    const { output, force } = program.opts<Options>();
     const code = await readFile(input, 'utf8');
 
     if (force || !existsSync(output)) {
@@ -29,6 +34,7 @@ program
       program.error('output directory already exists');
     }
 
-    (await webcrack(code)).save(output);
+    const result = await webcrack(code);
+    await result.save(output);
   })
   .parse();

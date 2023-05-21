@@ -13,7 +13,7 @@ import * as m from '@codemod/matchers';
 export function inlineCfFunction(
   fn: t.FunctionExpression,
   caller: NodePath<t.CallExpression>
-) {
+): void {
   const returnedValue = (fn.body.body[0] as t.ReturnStatement).argument!;
   const clone = t.cloneNode(returnedValue, true);
 
@@ -155,7 +155,7 @@ export function inlineVariableAliases(
         }
       } else if (ref.parentPath?.isVariableDeclarator()) {
         // Remove `alias = decoder;` of declarator
-        ref.parentPath!.remove();
+        ref.parentPath.remove();
       }
       state.changes++;
     } else {

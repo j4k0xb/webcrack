@@ -2,7 +2,7 @@ import { expression } from '@babel/template';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, applyTransform } from '../transforms';
+import { AsyncTransform, applyTransform } from '../transforms';
 import numberExpressions from '../transforms/numberExpressions';
 import { VMDecoder } from './vm';
 
@@ -31,7 +31,7 @@ export default {
 
     state.changes += calls.length;
   },
-} satisfies Transform<{ vm: VMDecoder }>;
+} satisfies AsyncTransform<{ vm: VMDecoder }>;
 
 function collectCalls(ast: t.Node, vm: VMDecoder) {
   const calls: NodePath<t.CallExpression>[] = [];

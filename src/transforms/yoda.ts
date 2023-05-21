@@ -29,7 +29,7 @@ export default {
         m.nullLiteral(),
         m.identifier('undefined')
       ),
-      m.matcher(node => !t.isLiteral(node!))
+      m.matcher(node => !t.isLiteral(node as object))
     );
 
     return {

@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { dirname, join, relative } from 'node:path/posix';
 
-export function relativePath(from: string, to: string) {
+export function relativePath(from: string, to: string): string {
   const relativePath = relative(dirname(from), to);
   return relativePath.startsWith('.') ? relativePath : './' + relativePath;
 }

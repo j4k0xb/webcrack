@@ -57,7 +57,7 @@ export default {
             // rename component to avoid conflict with built-in html tags
             // https://react.dev/reference/react/createElement#caveats
             if (
-              t.isIdentifier(type.current!) &&
+              t.isIdentifier(type.current) &&
               /^[a-z]/.test(type.current.name)
             ) {
               const binding = path.scope.getBinding(type.current.name);
@@ -126,7 +126,7 @@ function convertAttributes(
       const jsxName = t.jsxIdentifier(name.current!);
       const jsxValue =
         value.current!.type === 'StringLiteral'
-          ? value.current!
+          ? value.current
           : t.jsxExpressionContainer(value.current!);
       return t.jsxAttribute(jsxName, jsxValue);
     } else if (t.isSpreadElement(property)) {

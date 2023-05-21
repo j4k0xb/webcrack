@@ -27,7 +27,7 @@ test.each([
   }
 });
 
-describe('extractor', async () => {
+describe('extractor', () => {
   test('webpack array', async () => {
     const { bundle } = await webcrack(
       await readFile('./test/samples/webpack.js', 'utf8')

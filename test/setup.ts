@@ -3,6 +3,6 @@ import * as t from '@babel/types';
 import { expect } from 'vitest';
 
 expect.addSnapshotSerializer({
-  test: val => t.isNode(val),
-  serialize: val => generate(val).code,
+  test: (val: unknown) => t.isNode(val),
+  serialize: (val: t.Node) => generate(val).code,
 });

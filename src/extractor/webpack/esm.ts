@@ -19,7 +19,7 @@ import { WebpackModule } from './module';
  * export let counter = 1;
  * ```
  */
-export function convertESM(module: WebpackModule) {
+export function convertESM(module: WebpackModule): void {
   // E.g. require.r(exports);
   const defineEsModuleMatcher = m.expressionStatement(
     m.callExpression(constMemberExpression(m.identifier('require'), 'r'), [

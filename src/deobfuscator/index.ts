@@ -1,4 +1,8 @@
-import { applyTransform, applyTransformAsync, Transform } from '../transforms';
+import {
+  applyTransform,
+  applyTransformAsync,
+  AsyncTransform,
+} from '../transforms';
 import mergeStrings from '../transforms/mergeStrings';
 import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
@@ -18,18 +22,18 @@ export default {
   tags: ['unsafe'],
   async run(ast, state, options) {
     if (!process.env.browser && !options) {
-      options = { sandbox: await createNodeSandbox() };
+      options = { sandbox: createNodeSandbox() };
     }
     if (!options) return;
 
     const stringArray = findStringArray(ast);
-    console.log(`String Array: ${!!stringArray}`);
+    console.log(`String Array: ${stringArray ? 'yes' : 'no'}`);
     if (!stringArray) return;
-    console.log(' - length: ' + stringArray.length);
+    console.log(` - length: ${stringArray.length}`);
     console.log(` - ${codePreview(stringArray.path.node)}`);
 
     const rotator = findArrayRotator(stringArray);
-    console.log(`String Array Rotate: ${!!rotator}`);
+    console.log(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
     if (rotator) {
       console.log(` - ${codePreview(rotator.node)}`);
     }
@@ -63,4 +67,4 @@ export default {
     state.changes += applyTransform(ast, controlFlowObject).changes;
     state.changes += applyTransform(ast, controlFlowSwitch).changes;
   },
-} satisfies Transform<{ sandbox: Sandbox }>;
+} satisfies AsyncTransform<{ sandbox: Sandbox }>;

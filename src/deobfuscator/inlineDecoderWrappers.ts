@@ -10,7 +10,7 @@ export default {
   name: 'inlineDecoderWrappers',
   tags: ['unsafe'],
   run(ast, state, decoder) {
-    if (!decoder || !decoder.node.id) return;
+    if (!decoder?.node.id) return;
 
     const decoderName = decoder.node.id.name;
     const decoderBinding = decoder.parentPath.scope.getBinding(decoderName);

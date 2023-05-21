@@ -18,7 +18,7 @@ export default {
       IfStatement: {
         exit(path) {
           if (matcher.match(path.node)) {
-            const alternate = path.get('alternate') as NodePath<t.IfStatement>;
+            const alternate = path.get('alternate') as NodePath<t.BlockStatement>;
             alternate.replaceWith(nestedIf.current!);
             this.changes++;
           }

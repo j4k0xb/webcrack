@@ -9,7 +9,7 @@ export interface StringArray {
   length: number;
 }
 
-export function findStringArray(ast: t.Node) {
+export function findStringArray(ast: t.Node): StringArray | undefined {
   let result: StringArray | undefined;
   const functionName = m.capture(m.anyString());
   const arrayIdentifier = m.capture(m.identifier());

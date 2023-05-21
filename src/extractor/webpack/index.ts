@@ -99,16 +99,16 @@ export function extract(ast: t.Node): WebpackBundle | undefined {
 
         const modulesPath = path.get(
           moduleFunctionsMatcher.currentKeys!.join('.')
-        ) as NodePath<t.Node>;
+        ) as NodePath;
 
         const moduleWrappers = modulesPath.isArrayExpression()
           ? (modulesPath.get('elements') as NodePath<t.Node | null>[])
-          : (modulesPath.get('properties') as NodePath<t.Node>[]);
+          : (modulesPath.get('properties') as NodePath[]);
 
         moduleWrappers.forEach((moduleWrapper, id) => {
           if (t.isObjectProperty(moduleWrapper.node)) {
             id = (moduleWrapper.node.key as t.NumericLiteral).value;
-            moduleWrapper = moduleWrapper.get('value') as NodePath<t.Node>;
+            moduleWrapper = moduleWrapper.get('value') as NodePath;
           }
 
           if (

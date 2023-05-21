@@ -13,12 +13,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "node esbuild.config.mjs",
-    "postbuild": "tsc",
-    "watch": "node esbuild.config.mjs --watch",
+    "build": "node esbuild.config.js",
+    "postbuild": "tsc -p tsconfig.build.json",
+    "watch": "node esbuild.config.js --watch",
     "start": "node dist/cli.js",
-    "dev": "node esbuild.config.mjs && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
-    "lint": "eslint --ext .ts src test",
+    "dev": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
+    "lint": "eslint --ext .ts .",
     "test": "vitest"
   },
   "repository": {

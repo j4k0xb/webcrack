@@ -44,7 +44,7 @@ export type TransformOptions<TName extends TransformName> =
 
 export async function applyTransformAsync<TOptions>(
   ast: Node,
-  transform: Transform<TOptions>,
+  transform: AsyncTransform<TOptions>,
   options?: TOptions
 ): Promise<TransformState> {
   const start = performance.now();
@@ -99,12 +99,13 @@ export interface TransformState {
 export interface Transform<TOptions = unknown> {
   name: string;
   tags: Tag[];
-  run?: (
-    ast: Node,
-    state: TransformState,
-    options?: TOptions
-  ) => Promise<void> | void;
+  run?: (ast: Node, state: TransformState, options?: TOptions) => void;
   visitor?: (options?: TOptions) => TraverseOptions<TransformState>;
+}
+
+export interface AsyncTransform<TOptions = unknown>
+  extends Transform<TOptions> {
+  run?: (ast: Node, state: TransformState, options?: TOptions) => Promise<void>;
 }
 
 export type Tag = 'safe' | 'unsafe';

@@ -7,30 +7,35 @@ import { StringArray } from './stringArray';
 
 export type Sandbox = (code: string) => Promise<unknown>;
 
-export async function createNodeSandbox() {
-  const {
-    default: { Isolate },
-  } = await import('isolated-vm');
+export function createNodeSandbox(): (code: string) => Promise<unknown> {
   return async (code: string) => {
+    const {
+      default: { Isolate },
+    } = await import('isolated-vm');
     const isolate = new Isolate();
     const context = await isolate.createContext();
-    return await context.eval(code, {
+    return (await context.eval(code, {
       timeout: 10_000,
       copy: true,
       filename: 'file:///obfuscated.js',
-    });
+    })) as unknown;
   };
 }
 
 export class VMDecoder {
+  decoders: Decoder[];
   private setupCode: string;
+  private sandbox: Sandbox;
 
   constructor(
-    public sandbox: Sandbox,
-    public stringArray: StringArray,
-    public decoders: Decoder[],
-    public rotator?: ArrayRotator
+    sandbox: Sandbox,
+    stringArray: StringArray,
+    decoders: Decoder[],
+    rotator?: ArrayRotator
   ) {
+    this.sandbox = sandbox;
+    this.decoders = decoders;
+
     // Generate as compact to bypass the self defense
     // (which tests someFunction.toString against a regex)
     const stringArrayCode = generate(stringArray.path.node, {

@@ -4,13 +4,21 @@ import { dirname, join } from 'node:path';
 import { Module } from './module';
 
 export class Bundle {
-  constructor(
-    public type: 'webpack' | 'browserify',
-    public entryId: number,
-    public modules: Map<number, Module>
-  ) {}
+  type: 'webpack' | 'browserify';
+  entryId: number;
+  modules: Map<number, Module>;
 
-  applyMappings(mappings: Record<string, m.Matcher<unknown>>) {
+  constructor(
+    type: 'webpack' | 'browserify',
+    entryId: number,
+    modules: Map<number, Module>
+  ) {
+    this.type = type;
+    this.entryId = entryId;
+    this.modules = modules;
+  }
+
+  applyMappings(mappings: Record<string, m.Matcher<unknown>>): void {
     const unusedMappings = new Set(Object.keys(mappings));
 
     for (const module of this.modules.values()) {
@@ -51,7 +59,7 @@ export class Bundle {
     mappings: (
       m: typeof import('@codemod/matchers')
     ) => Record<string, m.Matcher<unknown>> = () => ({})
-  ) {
+  ): Promise<void> {
     this.applyMappings(mappings(m));
     this.applyTransforms();
 
@@ -88,5 +96,5 @@ export class Bundle {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  applyTransforms() {}
+  applyTransforms(): void {}
 }

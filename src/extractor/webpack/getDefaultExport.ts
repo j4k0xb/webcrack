@@ -31,7 +31,7 @@ import { WebpackBundle } from './bundle';
  * console.log(m.prop, m.prop);
  * ```
  */
-export function convertDefaultRequire(bundle: WebpackBundle) {
+export function convertDefaultRequire(bundle: WebpackBundle): void {
   function getRequiredModule(path: NodePath) {
     // The variable that's passed to require.n
     const binding = path.scope.getBinding(moduleArg.current!.name);

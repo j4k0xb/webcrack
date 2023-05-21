@@ -4,5 +4,5 @@ import { Bundle } from './bundle';
 import * as webpack from './webpack';
 
 export function extractBundle(ast: t.Node): Bundle | undefined {
-  return webpack.extract(ast) || browserify.extract(ast);
+  return webpack.extract(ast) ?? browserify.extract(ast);
 }

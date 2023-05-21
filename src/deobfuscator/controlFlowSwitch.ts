@@ -63,7 +63,6 @@ export default {
       enter(path) {
         if (!matcher.match(path.node)) return;
 
-        const node = path.node as t.BlockStatement;
         const caseStatements = new Map(
           cases.current!.map(c => [
             (c.test as t.StringLiteral).value,
@@ -76,7 +75,7 @@ export default {
         const sequence = sequenceString.current!.split('|');
         const newStatements = sequence.flatMap(s => caseStatements.get(s)!);
 
-        node.body.splice(0, 3, ...newStatements);
+        path.node.body.splice(0, 3, ...newStatements);
         this.changes += newStatements.length + 3;
       },
       noScope: true,

@@ -1,4 +1,3 @@
-// @ts-check
 import esbuild from 'esbuild';
 
 const args = process.argv.slice(2);

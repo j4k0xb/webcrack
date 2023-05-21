@@ -1,5 +1,5 @@
-import { visitors } from '@babel/traverse';
-import { Transform } from '.';
+import { Visitor, visitors } from '@babel/traverse';
+import { Transform, TransformState } from '.';
 import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
@@ -19,7 +19,7 @@ export default {
   name: 'unminify',
   tags: ['safe'],
   visitor() {
-    const traverseOptions = [
+    const traverseOptions: Visitor<TransformState>[] = [
       rawLiterals.visitor(),
       blockStatement.visitor(),
       mergeStrings.visitor(),

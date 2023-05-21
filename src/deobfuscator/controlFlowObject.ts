@@ -134,7 +134,7 @@ export default {
         });
 
         oldRefs.forEach(ref => {
-          const varDeclarator = ref?.findParent(p => p.isVariableDeclarator());
+          const varDeclarator = ref.findParent(p => p.isVariableDeclarator());
           if (varDeclarator) changes += transform(varDeclarator);
         });
 
