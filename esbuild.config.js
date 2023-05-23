@@ -34,8 +34,14 @@ const babelImportPlugin = {
 const configs = [
   {
     platform: 'node',
-    entryPoints: ['src/index.ts', 'src/cli.ts'],
+    entryPoints: ['src/index.ts'],
     outdir: 'dist',
+  },
+  {
+    platform: 'node',
+    entryPoints: ['src/cli.ts'],
+    outdir: 'dist',
+    bundle: false,
   },
   {
     platform: 'browser',
