@@ -1,7 +1,8 @@
 import { isIdentifierName } from '@babel/helper-validator-identifier';
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '.';
+import { Transform, TransformState } from '.';
 
 export default {
   name: 'computedProperties',
@@ -22,16 +23,25 @@ export default {
     );
 
     return {
-      exit(path) {
-        if (propertyMatcher.match(path.node)) {
-          path.node.computed = false;
-          path.node.property = t.identifier(stringMatcher.current!.value);
-          this.changes++;
-        } else if (keyMatcher.match(path.node)) {
-          path.node.computed = false;
-          path.node.key = t.identifier(stringMatcher.current!.value);
-          this.changes++;
-        }
+      // https://github.com/babel/babel/pull/14862/files
+      // isn't included in the @types/babel__traverse package and can't be augmented
+      ['MemberExpression|OptionalMemberExpression' as 'Expression']: {
+        exit(this: TransformState, path: NodePath) {
+          if (propertyMatcher.match(path.node)) {
+            path.node.computed = false;
+            path.node.property = t.identifier(stringMatcher.current!.value);
+            this.changes++;
+          }
+        },
+      },
+      ['ObjectProperty|ClassProperty|ObjectMethod|ClassMethod' as 'Expression']: {
+        exit(this: TransformState, path: NodePath) {
+          if (keyMatcher.match(path.node)) {
+            path.node.computed = false;
+            path.node.key = t.identifier(stringMatcher.current!.value);
+            this.changes++;
+          }
+        },
       },
       noScope: true,
     };

@@ -8,11 +8,13 @@ export default {
   visitor: () => {
     const matcher = m.unaryExpression('void', m.numericLiteral(0));
     return {
-      exit(path) {
-        if (matcher.match(path.node)) {
-          path.replaceWith(t.identifier('undefined'));
-          this.changes++;
-        }
+      UnaryExpression: {
+        exit(path) {
+          if (matcher.match(path.node)) {
+            path.replaceWith(t.identifier('undefined'));
+            this.changes++;
+          }
+        },
       },
       noScope: true,
     };

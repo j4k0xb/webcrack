@@ -66,14 +66,18 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
     m.callExpression(requireN, [])
   );
 
+  const buildDefaultAccess = expression`OBJECT.default`;
+
   bundle.modules.forEach(module => {
     traverse(module.ast, {
-      enter(path) {
+      ['CallExpression|MemberExpression' as 'Expression'](path: NodePath) {
         if (defaultRequireMatcherAlternative.match(path.node)) {
           // Replace require.n(m).a or require.n(m)() with m or m.default
           const requiredModule = getRequiredModule(path);
           if (requiredModule?.ast.program.sourceType === 'module') {
-            path.replaceWith(expression`${moduleArg.current!}.default`());
+            path.replaceWith(
+              buildDefaultAccess({ OBJECT: moduleArg.current! })
+            );
           } else {
             path.replaceWith(moduleArg.current!);
           }
@@ -85,7 +89,9 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
           const requiredModule = getRequiredModule(path);
           const init = path.get('init');
           if (requiredModule?.ast.program.sourceType === 'module') {
-            init.replaceWith(expression`${moduleArg.current!}.default`());
+            init.replaceWith(
+              buildDefaultAccess({ OBJECT: moduleArg.current! })
+            );
           } else {
             init.replaceWith(moduleArg.current!);
           }

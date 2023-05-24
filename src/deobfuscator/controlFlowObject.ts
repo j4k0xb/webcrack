@@ -93,7 +93,7 @@ export default {
       return binding.constant || binding.constantViolations[0] === binding.path;
     }
 
-    function transform(path: NodePath) {
+    function transform(path: NodePath<t.VariableDeclarator>) {
       let changes = 0;
       if (varMatcher.match(path.node)) {
         // Verify all references to make sure they match how the obfuscator
@@ -135,7 +135,10 @@ export default {
 
         oldRefs.forEach(ref => {
           const varDeclarator = ref.findParent(p => p.isVariableDeclarator());
-          if (varDeclarator) changes += transform(varDeclarator);
+          if (varDeclarator)
+            changes += transform(
+              varDeclarator as NodePath<t.VariableDeclarator>
+            );
         });
 
         path.remove();
@@ -187,7 +190,7 @@ export default {
     }
 
     return {
-      enter(path) {
+      VariableDeclarator(path) {
         this.changes += transform(path);
       },
     };

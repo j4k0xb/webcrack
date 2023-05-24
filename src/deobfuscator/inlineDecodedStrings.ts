@@ -54,6 +54,8 @@ function collectCalls(ast: t.Node, vm: VMDecoder) {
     conditional,
   ]);
 
+  const buildExtractedConditional = expression`TEST ? CALLEE(CONSEQUENT) : CALLEE(ALTERNATE)`;
+
   traverse(ast, {
     CallExpression(path) {
       // decode(test ? 1 : 2) -> test ? decode(1) : decode(2)
@@ -62,7 +64,12 @@ function collectCalls(ast: t.Node, vm: VMDecoder) {
         const { test, consequent, alternate } = conditional.current!;
 
         path.replaceWith(
-          expression`${test} ? ${callee}(${consequent}) : ${callee}(${alternate})`()
+          buildExtractedConditional({
+            TEST: test,
+            CALLEE: callee,
+            CONSEQUENT: consequent,
+            ALTERNATE: alternate,
+          })
         );
       } else if (matcher.match(path.node)) {
         calls.push(path);

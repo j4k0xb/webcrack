@@ -4,6 +4,8 @@ import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../utils/matcher';
 import { WebpackModule } from './module';
 
+const buildVar = statement`var NAME = INIT;`;
+
 /**
  * ```js
  * (function(global) {
@@ -38,7 +40,7 @@ export function inlineVarInjections(module: WebpackModule): void {
   for (const node of program.body) {
     if (matcher.match(node)) {
       const vars = params.current!.map((param, i) =>
-        statement`var ${param} = ${args.current![i + 1]};`()
+        buildVar({ NAME: param, INIT: args.current![i + 1] })
       );
       newBody.push(...vars);
       newBody.push(...body.current!.body);

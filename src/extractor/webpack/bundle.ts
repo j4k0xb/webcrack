@@ -36,7 +36,7 @@ export class WebpackBundle extends Bundle {
 
     this.modules.forEach(module => {
       traverse(module.ast, {
-        enter: path => {
+        CallExpression: path => {
           if (requireMatcher.match(path.node)) {
             const requiredModule = this.modules.get(requireId.current!.value);
             if (requiredModule) {
@@ -45,7 +45,10 @@ export class WebpackBundle extends Bundle {
                 t.stringLiteral(relativePath(module.path, requiredModule.path))
               );
             }
-          } else if (importMatcher.match(path.node)) {
+          }
+        },
+        ImportDeclaration: path => {
+          if (importMatcher.match(path.node)) {
             const requiredModule = this.modules.get(
               Number(importId.current!.value)
             );

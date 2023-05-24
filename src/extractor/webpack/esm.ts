@@ -85,6 +85,8 @@ export function convertESM(module: WebpackModule): void {
     )
   );
 
+  const buildImport = statement`import * as NAME from "PATH";`;
+
   traverse(module.ast, {
     enter(path) {
       // Only traverse the top-level
@@ -98,9 +100,10 @@ export function convertESM(module: WebpackModule): void {
         requireMatcher.match(path.node)
       ) {
         path.replaceWith(
-          statement`import * as ${requireVariable.current} from "${String(
-            requiredModuleId.current
-          )}";`()
+          buildImport({
+            NAME: requireVariable.current,
+            PATH: String(requiredModuleId.current),
+          })
         );
       } else if (defineExportsMatcher.match(path.node)) {
         const exportsBinding = path.scope.getBinding(exportsName.current!.name);
@@ -164,13 +167,9 @@ function exportVariable(
       renameFast(binding, exportName);
       declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
     }
+  } else if (exportName === 'default') {
+    requireDPath.insertAfter(statement`export default ${value}`());
   } else {
-    if (exportName === 'default') {
-      requireDPath.insertAfter(statement`export default ${value}`());
-    } else {
-      requireDPath.insertAfter(
-        statement`export let ${exportName} = ${value}`()
-      );
-    }
+    requireDPath.insertAfter(statement`export let ${exportName} = ${value}`());
   }
 }

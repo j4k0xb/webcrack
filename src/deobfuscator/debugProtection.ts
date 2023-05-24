@@ -84,7 +84,7 @@ export default {
     );
 
     return {
-      enter(path) {
+      FunctionDeclaration(path) {
         if (!matcher.match(path.node)) return;
 
         const binding = path.scope.getBinding(

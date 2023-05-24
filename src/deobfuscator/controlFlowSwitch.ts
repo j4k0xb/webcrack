@@ -60,7 +60,7 @@ export default {
     );
 
     return {
-      enter(path) {
+      BlockStatement(path) {
         if (!matcher.match(path.node)) return;
 
         const caseStatements = new Map(

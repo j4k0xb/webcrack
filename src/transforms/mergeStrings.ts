@@ -17,19 +17,26 @@ export default {
     );
 
     return {
-      exit(path) {
-        if (matcher.match(path.node)) {
-          // "a" + "b" -> "ab"
-          path.replaceWith(
-            t.stringLiteral(left.current!.value + right.current!.value)
-          );
-          this.changes++;
-        } else if (nestedMatcher.match(path.parent) && path.isStringLiteral()) {
-          // a + "b" + "c" -> a + "bc"
-          left.current!.value += right.current!.value;
-          path.remove();
-          this.changes++;
-        }
+      BinaryExpression: {
+        exit(path) {
+          if (matcher.match(path.node)) {
+            // "a" + "b" -> "ab"
+            path.replaceWith(
+              t.stringLiteral(left.current!.value + right.current!.value)
+            );
+            this.changes++;
+          }
+        },
+      },
+      StringLiteral: {
+        exit(path) {
+          if (nestedMatcher.match(path.parent)) {
+            // a + "b" + "c" -> a + "bc"
+            left.current!.value += right.current!.value;
+            path.remove();
+            this.changes++;
+          }
+        },
       },
 
       noScope: true,

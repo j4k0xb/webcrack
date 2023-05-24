@@ -13,14 +13,22 @@ export default {
       m.conditionalExpression(test, consequent, alternate)
     );
 
+    const buildIf = statement`if (TEST) { CONSEQUENT; } else { ALTERNATE; }`;
+
     return {
-      exit(path) {
-        if (matcher.match(path.node)) {
-          path.replaceWith(
-            statement`if (${test.current}) { ${consequent.current}; } else { ${alternate.current}; }`()
-          );
-          this.changes++;
-        }
+      ExpressionStatement: {
+        exit(path) {
+          if (matcher.match(path.node)) {
+            path.replaceWith(
+              buildIf({
+                TEST: test.current,
+                CONSEQUENT: consequent.current,
+                ALTERNATE: alternate.current,
+              })
+            );
+            this.changes++;
+          }
+        },
       },
       noScope: true,
     };

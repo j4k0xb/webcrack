@@ -34,7 +34,7 @@ export default {
     );
 
     return {
-      enter(path) {
+      VariableDeclarator(path) {
         if (!varMatcher.match(path.node)) return;
 
         const binding = path.scope.getBinding(varId.current!.name);

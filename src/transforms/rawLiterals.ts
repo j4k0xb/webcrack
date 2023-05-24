@@ -12,7 +12,7 @@ export default {
     },
     NumericLiteral(path) {
       if (path.node.extra) {
-        delete path.node.extra;
+        path.node.extra = undefined;
         this.changes++;
       }
     },

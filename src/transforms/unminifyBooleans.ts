@@ -6,7 +6,7 @@ export default {
   name: 'unminifyBooleans',
   tags: ['safe'],
   visitor: () => ({
-    enter(path) {
+    UnaryExpression(path) {
       if (trueMatcher.match(path.node)) {
         path.replaceWith(t.booleanLiteral(true));
         this.changes++;

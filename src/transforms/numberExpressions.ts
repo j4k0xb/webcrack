@@ -1,20 +1,25 @@
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '.';
+import { Transform, TransformState } from '.';
 
 export default {
   name: 'numberExpressions',
   tags: ['safe'],
   visitor: () => ({
-    exit(path) {
-      if (path.type !== 'NumericLiteral' && matcher.match(path.node)) {
-        const evaluated = path.evaluate();
-        if (evaluated.confident) {
-          path.replaceWith(t.numericLiteral(evaluated.value as number));
-          path.skip();
-          this.changes++;
+    // https://github.com/babel/babel/pull/14862/files
+    // isn't included in the @types/babel__traverse package and can't be augmented
+    ['BinaryExpression|UnaryExpression' as 'Expression']: {
+      exit(this: TransformState, path: NodePath) {
+        if (matcher.match(path.node)) {
+          const evaluated = path.evaluate();
+          if (evaluated.confident) {
+            path.replaceWith(t.numericLiteral(evaluated.value as number));
+            path.skip();
+            this.changes++;
+          }
         }
-      }
+      },
     },
     noScope: true,
   }),
