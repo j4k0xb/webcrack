@@ -14,7 +14,15 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Cache node modules
+        id: nodemodules-cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
+
       - name: Install dependencies
+        if: steps.nodemodules-cache.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: build
