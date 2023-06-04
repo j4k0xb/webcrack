@@ -22,32 +22,10 @@ test.each([
   );
   assert(bundle);
   bundle.applyTransforms();
-  for (const module of bundle.modules.values()) {
-    expect(module.ast).toMatchSnapshot();
-  }
+  expect(bundle).toMatchSnapshot();
 });
 
 describe('extractor', () => {
-  test('webpack array', async () => {
-    const { bundle } = await webcrack(
-      await readFile('./test/samples/webpack.js', 'utf8')
-    );
-    expect(bundle).toBeDefined();
-    assert(bundle);
-    expect(bundle.type).toBe('webpack');
-    expect(bundle.entryId).toBe(2);
-  });
-
-  test('webpack object', async () => {
-    const { bundle } = await webcrack(
-      await readFile('./test/samples/webpack_object.js', 'utf8')
-    );
-    expect(bundle).toBeDefined();
-    assert(bundle);
-    expect(bundle.type).toBe('webpack');
-    expect(bundle.entryId).toBe(386);
-  });
-
   test('path mapping', async () => {
     const { bundle } = await webcrack(
       await readFile('./test/samples/webpack.js', 'utf8')
@@ -56,10 +34,7 @@ describe('extractor', () => {
     assert(bundle);
     bundle.applyMappings({ './utils/color.js': m.stringLiteral('#FBC02D') });
     bundle.applyTransforms();
-
-    for (const module of bundle.modules.values()) {
-      expect(module.ast).toMatchSnapshot();
-    }
+    expect(bundle).toMatchSnapshot();
   });
 });
 

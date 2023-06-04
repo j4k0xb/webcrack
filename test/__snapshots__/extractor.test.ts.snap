@@ -1,50 +1,103 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`extract browserify.js 1`] = `
-function add(a, b) {
+BrowserifyBundle {
+  "entryId": 2,
+  "modules": Map {
+    1 => BrowserifyModule {
+      "ast": function add(a, b) {
   return a + b;
 }
-module.exports = add;
-`;
-
-exports[`extract browserify.js 2`] = `
-var sum = require("./sum");
+module.exports = add;,
+      "dependencies": {},
+      "id": 1,
+      "isEntry": false,
+      "path": "add.js",
+    },
+    2 => BrowserifyModule {
+      "ast": var sum = require("./sum");
 var numbers = [1, 2, 3];
 var result = sum(numbers);
 var outputElement = document.getElementById("output");
-outputElement.innerHTML = result;
-`;
-
-exports[`extract browserify.js 3`] = `
-function reduce(list, iteratee, memo) {
+outputElement.innerHTML = result;,
+      "dependencies": {
+        "4": "./sum",
+      },
+      "id": 2,
+      "isEntry": true,
+      "path": "index.js",
+    },
+    3 => BrowserifyModule {
+      "ast": function reduce(list, iteratee, memo) {
   list.forEach(function (item) {
     memo = iteratee(item, memo);
   });
   return memo;
 }
-module.exports = reduce;
-`;
-
-exports[`extract browserify.js 4`] = `
-var reduce = require("./reduce");
+module.exports = reduce;,
+      "dependencies": {},
+      "id": 3,
+      "isEntry": false,
+      "path": "reduce.js",
+    },
+    4 => BrowserifyModule {
+      "ast": var reduce = require("./reduce");
 var add = require("./add");
 function sum(list) {
   return reduce(list, add, 0);
 }
-module.exports = sum;
+module.exports = sum;,
+      "dependencies": {
+        "1": "./add",
+        "3": "./reduce",
+      },
+      "id": 4,
+      "isEntry": false,
+      "path": "sum.js",
+    },
+  },
+  "type": "browserify",
+}
 `;
 
-exports[`extract browserify-2.js 1`] = `module.exports = 1;`;
-
-exports[`extract browserify-2.js 2`] = `
-const lib = require("./lib");
-console.log(lib);
+exports[`extract browserify-2.js 1`] = `
+BrowserifyBundle {
+  "entryId": 2,
+  "modules": Map {
+    1 => BrowserifyModule {
+      "ast": module.exports = 1;,
+      "dependencies": {},
+      "id": 1,
+      "isEntry": false,
+      "path": "lib.js",
+    },
+    2 => BrowserifyModule {
+      "ast": const lib = require("./lib");
+console.log(lib);,
+      "dependencies": {
+        "1": "./lib",
+      },
+      "id": 2,
+      "isEntry": true,
+      "path": "index.js",
+    },
+  },
+  "type": "browserify",
+}
 `;
 
-exports[`extract webpack.js 1`] = `const a = require("./3.js");`;
-
-exports[`extract webpack.js 2`] = `
-const a = require("./1.js");
+exports[`extract webpack.js 1`] = `
+WebpackBundle {
+  "entryId": 2,
+  "modules": Map {
+    1 => WebpackModule {
+      "ast": const a = require("./3.js");,
+      "id": 1,
+      "isEntry": false,
+      "path": "./1.js",
+    },
+    2 => WebpackModule {
+      "ast": const a = require("./1.js");
 const _module = 1;
 module.exports.color = "#FBC02D";
 {
@@ -52,17 +105,49 @@ module.exports.color = "#FBC02D";
   console.log(_module2);
   console.log(module);
 }
-exports.a = 3;
+exports.a = 3;,
+      "id": 2,
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    3 => WebpackModule {
+      "ast": module.exports = 4;,
+      "id": 3,
+      "isEntry": false,
+      "path": "./3.js",
+    },
+  },
+  "type": "webpack",
+}
 `;
 
-exports[`extract webpack.js 3`] = `module.exports = 4;`;
-
-exports[`extract webpack_object.js 1`] = `const r = require("./387.js").default;`;
-
-exports[`extract webpack_object.js 2`] = `module.exports = "test";`;
+exports[`extract webpack_object.js 1`] = `
+WebpackBundle {
+  "entryId": 386,
+  "modules": Map {
+    386 => WebpackModule {
+      "ast": const r = require("./387.js").default;,
+      "id": 386,
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    387 => WebpackModule {
+      "ast": module.exports = "test";,
+      "id": 387,
+      "isEntry": false,
+      "path": "./387.js",
+    },
+  },
+  "type": "webpack",
+}
+`;
 
 exports[`extract webpack-esm.js 1`] = `
-const a = require("./1.js");
+WebpackBundle {
+  "entryId": 0,
+  "modules": Map {
+    0 => WebpackModule {
+      "ast": const a = require("./1.js");
 const b = require("./2.js");
 const c = require("./3.js");
 const bDefault = b.default;
@@ -71,70 +156,140 @@ const dDefault = b.default;
 const eDefault = c;
 console.log(a.counter);
 console.log(bDefault.VERSION);
-console.log(cDefault.VERSION);
-`;
-
-exports[`extract webpack-esm.js 2`] = `
-export class counter {}
+console.log(cDefault.VERSION);,
+      "id": 0,
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    1 => WebpackModule {
+      "ast": export class counter {}
 let _counter = 1;
-counter = 2;
-`;
-
-exports[`extract webpack-esm.js 3`] = `
-const x = {};
-export default 1;
-`;
-
-exports[`extract webpack-esm.js 4`] = `
-module.exports = {
+counter = 2;,
+      "id": 1,
+      "isEntry": false,
+      "path": "./1.js",
+    },
+    2 => WebpackModule {
+      "ast": const x = {};
+export default 1;,
+      "id": 2,
+      "isEntry": false,
+      "path": "./2.js",
+    },
+    3 => WebpackModule {
+      "ast": module.exports = {
   VERSION: 1
-};
+};,
+      "id": 3,
+      "isEntry": false,
+      "path": "./3.js",
+    },
+  },
+  "type": "webpack",
+}
 `;
 
 exports[`extract webpack-var-injection.js 1`] = `
-import * as m from "./1.js";
+WebpackBundle {
+  "entryId": 0,
+  "modules": Map {
+    0 => WebpackModule {
+      "ast": import * as m from "./1.js";
 import * as n from "./2.js";
-console.log(m, n);
+console.log(m, n);,
+      "id": 0,
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    1 => WebpackModule {
+      "ast": module.exports = 1;,
+      "id": 1,
+      "isEntry": false,
+      "path": "./1.js",
+    },
+    2 => WebpackModule {
+      "ast": module.exports = 2;,
+      "id": 2,
+      "isEntry": false,
+      "path": "./2.js",
+    },
+  },
+  "type": "webpack",
+}
 `;
-
-exports[`extract webpack-var-injection.js 2`] = `module.exports = 1;`;
-
-exports[`extract webpack-var-injection.js 3`] = `module.exports = 2;`;
 
 exports[`extract webpack5-esm.js 1`] = `
-const lib = require("./3.js");
-console.log(lib);
-`;
-
-exports[`extract webpack5-esm.js 2`] = `
-import * as a from "./4.js";
+WebpackBundle {
+  "entryId": 2,
+  "modules": Map {
+    2 => WebpackModule {
+      "ast": const lib = require("./3.js");
+console.log(lib);,
+      "id": 2,
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    3 => WebpackModule {
+      "ast": import * as a from "./4.js";
 const obj = {
   version: "2.0.0"
 };
 export let version = obj.version;
-export default a.foo;
-`;
-
-exports[`extract webpack5-esm.js 3`] = `
-export const foo = 2;
+export default a.foo;,
+      "id": 3,
+      "isEntry": false,
+      "path": "./3.js",
+    },
+    4 => WebpackModule {
+      "ast": export const foo = 2;
 export var obj = {
   Console: bar
 };
-function bar() {}
+function bar() {},
+      "id": 4,
+      "isEntry": false,
+      "path": "./4.js",
+    },
+  },
+  "type": "webpack",
+}
 `;
 
 exports[`extract webpack5-object.js 1`] = `
-const lib = require("./3.js");
+WebpackBundle {
+  "entryId": 2,
+  "modules": Map {
+    2 => WebpackModule {
+      "ast": const lib = require("./3.js");
 console.log(lib);
-const _0x8da276 = require(require.ab + "build/Release/spdlog.node");
+const _0x8da276 = require(require.ab + "build/Release/spdlog.node");,
+      "id": 2,
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    3 => WebpackModule {
+      "ast": module.exports = "foo";,
+      "id": 3,
+      "isEntry": false,
+      "path": "./3.js",
+    },
+  },
+  "type": "webpack",
+}
 `;
 
-exports[`extract webpack5-object.js 2`] = `module.exports = "foo";`;
-
-exports[`extractor > path mapping 1`] = `const a = require("./3.js");`;
-
-exports[`extractor > path mapping 2`] = `
-const a = require("../1.js");
+exports[`extractor > path mapping 1`] = `
+WebpackBundle {
+  "entryId": 2,
+  "modules": Map {
+    1 => WebpackModule {
+      "ast": const a = require("./3.js");,
+      "id": 1,
+      "isEntry": false,
+      "path": "./1.js",
+    },
+    2 => WebpackModule {
+      "ast": const a = require("../1.js");
 const _module = 1;
 module.exports.color = "#FBC02D";
 {
@@ -142,7 +297,18 @@ module.exports.color = "#FBC02D";
   console.log(_module2);
   console.log(module);
 }
-exports.a = 3;
+exports.a = 3;,
+      "id": 2,
+      "isEntry": true,
+      "path": "./utils/color.js",
+    },
+    3 => WebpackModule {
+      "ast": module.exports = 4;,
+      "id": 3,
+      "isEntry": false,
+      "path": "./3.js",
+    },
+  },
+  "type": "webpack",
+}
 `;
-
-exports[`extractor > path mapping 3`] = `module.exports = 4;`;
