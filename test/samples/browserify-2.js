@@ -45,10 +45,11 @@
     ],
     2: [
       function (require, module, exports) {
+        const vscode = require('vscode');
         const lib = require('./lib');
         console.log(lib);
       },
-      { './lib': 1 },
+      { './lib': 1, 'vscode': undefined },
     ],
   },
   {},

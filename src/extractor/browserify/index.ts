@@ -20,7 +20,12 @@ export function extract(ast: t.Node): BrowserifyBundle | undefined {
           m.functionExpression(),
           // dependencies: { './add': 1, 'lib': 3 }
           m.objectExpression(
-            m.arrayOf(m.objectProperty(constKey(), m.numericLiteral()))
+            m.arrayOf(
+              m.objectProperty(
+                constKey(),
+                m.or(m.numericLiteral(), m.identifier('undefined'))
+              )
+            )
           ),
         ])
       )
@@ -75,8 +80,11 @@ export function extract(ast: t.Node): BrowserifyBundle | undefined {
         ).node.properties as t.ObjectProperty[];
 
         for (const dependency of dependencyProperties) {
+          // skip external dependencies like { vscode: undefined }
+          if (dependency.value.type !== 'NumericLiteral') continue;
+
           const filePath = getPropName(dependency.key)!;
-          const id = (dependency.value as t.NumericLiteral).value;
+          const id = dependency.value.value;
           dependencies[id] = filePath;
         }
 
