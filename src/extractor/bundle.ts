@@ -4,14 +4,14 @@ import { dirname, join } from 'node:path';
 import { Module } from './module';
 
 export class Bundle {
-  type: 'webpack' | 'browserify';
-  entryId: number;
-  modules: Map<number, Module>;
+  type: 'webpack' | 'browserify' | 'parcel';
+  entryId: string | number;
+  modules: Map<string | number, Module>;
 
   constructor(
-    type: 'webpack' | 'browserify',
-    entryId: number,
-    modules: Map<number, Module>
+    type: 'webpack' | 'browserify' | 'parcel',
+    entryId: string | number,
+    modules: Map<string | number, Module>
   ) {
     this.type = type;
     this.entryId = entryId;

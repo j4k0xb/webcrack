@@ -13,9 +13,9 @@ export function relativePath(from: string, to: string): string {
  * @param entry entry module id
  */
 export function resolveDependencyTree(
-  tree: Record<number, Record<number, string>>,
-  entry: number
-): Record<number, string> {
+  tree: Record<string | number, Record<string | number, string>>,
+  entry: string | number
+): Record<string | number, string> {
   const paths = resolveTreePaths(tree, entry);
   paths[entry] = './index.js';
 
@@ -45,12 +45,15 @@ export function resolveDependencyTree(
  * Recursively resolve the paths of a dependency tree.
  */
 function resolveTreePaths(
-  graph: Record<number, Record<number, string>>,
-  entry: number,
+  graph: Record<string | number, Record<string | number, string>>,
+  entry: string | number,
   cwd = '.'
 ) {
-  const paths: Record<number, string> = {};
-  const entries = Object.entries(graph[entry]) as unknown as [number, string][];
+  const paths: Record<string | number, string> = {};
+  const entries = Object.entries(graph[entry]) as unknown as [
+    string | number,
+    string
+  ][];
 
   for (const [id, key] of entries) {
     let path: string;
