@@ -15,7 +15,9 @@ export function extract(ast: t.Node): ParcelBundle | undefined {
   );
   const parcelRequire = m.capture(m.identifier());
 
-  const moduleId = m.capture(m.anyString());
+  const moduleId = m.capture(
+    m.matcher<string>(name => /^\w+$/.test(name as string))
+  );
   const moduleWrapper = m.capture(m.functionExpression());
   // parcelRequire.register("YChVI", function (module, exports) { ... });
   const register = m.expressionStatement(
