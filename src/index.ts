@@ -78,6 +78,7 @@ export async function webcrack(
   const ast = parse(code, {
     sourceType: 'unambiguous',
     allowReturnOutsideFunction: true,
+    plugins: ['jsx'],
   });
 
   applyTransform(ast, blockStatement);

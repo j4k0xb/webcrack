@@ -6,6 +6,7 @@ export function infiniteLoop(
 ): m.Matcher<t.ForStatement | t.WhileStatement> {
   return m.or(
     m.forStatement(undefined, null, undefined, body),
+    m.forStatement(undefined, m.arrayExpression([]), undefined, body),
     m.whileStatement(trueMatcher, body)
   );
 }
@@ -74,15 +75,3 @@ export function createFunctionMatcher(
   );
 }
 
-/**
- * Matches a deeply nested member expression that only contains identifiers
- * - e.g. `a.b` or `a.b.c` but not `[].b`
- */
-export const deepIdentifierMemberExpression = m.memberExpression(
-  m.or(
-    m.identifier(),
-    m.matcher(node => deepIdentifierMemberExpression.match(node))
-  ),
-  m.identifier(),
-  false
-);

@@ -2,16 +2,22 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
 import { codePreview } from '../utils/ast';
-import {
-  constMemberExpression,
-  deepIdentifierMemberExpression,
-} from '../utils/matcher';
+import { constMemberExpression } from '../utils/matcher';
 import { renameFast } from '../utils/rename';
 
 export default {
   name: 'jsx',
   tags: ['unsafe'],
   visitor: () => {
+    const deepIdentifierMemberExpression = m.memberExpression(
+      m.or(
+        m.identifier(),
+        m.matcher(node => deepIdentifierMemberExpression.match(node))
+      ),
+      m.identifier(),
+      false
+    );
+
     const type = m.capture(
       m.or(
         m.identifier(), // React.createElement(Component, ...)
