@@ -70,7 +70,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
 
   bundle.modules.forEach(module => {
     traverse(module.ast, {
-      ['CallExpression|MemberExpression' as 'Expression'](path: NodePath) {
+      'CallExpression|MemberExpression'(path) {
         if (defaultRequireMatcherAlternative.match(path.node)) {
           // Replace require.n(m).a or require.n(m)() with m or m.default
           const requiredModule = getRequiredModule(path);

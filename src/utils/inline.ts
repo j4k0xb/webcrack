@@ -146,7 +146,7 @@ export function inlineVariableAliases(
         // Remove `var alias;` when the assignment happens separately
         varBinding.path.remove();
 
-        if (t.isExpressionStatement(ref.parentPath.parentPath)) {
+        if (t.isExpressionStatement(ref.parentPath.parent)) {
           // Remove `alias = decoder;`
           ref.parentPath.remove();
         } else {

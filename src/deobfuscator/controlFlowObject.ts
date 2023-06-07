@@ -39,7 +39,7 @@ export default {
       // E.g. function (a, b, c) { return a(b, c) } with an arbitrary number of arguments
       m.matcher<FunctionExpression>(node => {
         return (
-          !!node &&
+          t.isNode(node) &&
           t.isFunctionExpression(node) &&
           createFunctionMatcher(node.params.length, (...params) => [
             m.returnStatement(m.callExpression(params[0], params.slice(1))),

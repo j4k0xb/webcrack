@@ -1,16 +1,13 @@
-import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, TransformState } from '.';
+import { Transform } from '.';
 
 export default {
   name: 'numberExpressions',
   tags: ['safe'],
   visitor: () => ({
-    // https://github.com/babel/babel/pull/14862/files
-    // isn't included in the @types/babel__traverse package and can't be augmented
-    ['BinaryExpression|UnaryExpression' as 'Expression']: {
-      exit(this: TransformState, path: NodePath) {
+    'BinaryExpression|UnaryExpression': {
+      exit(path) {
         if (matcher.match(path.node)) {
           const evaluated = path.evaluate();
           if (evaluated.confident) {

@@ -1,6 +1,6 @@
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
-import { describe as describeVitest, expect, test } from 'vitest';
+import { Assertion, describe as describeVitest, expect, test } from 'vitest';
 import { transforms } from '../src/transforms';
 import {
   TransformName,
@@ -14,7 +14,7 @@ function describe<TName extends TransformName>(
     expect: (
       actualCode: string,
       options?: TransformOptions<TName>
-    ) => Vi.Assertion<Node>
+    ) => Assertion<Node>
   ) => void
 ) {
   return describeVitest(name, () => {
