@@ -1,4 +1,4 @@
-import traverse, { Node, TraverseOptions } from '@babel/traverse';
+import traverse, { Node, TraverseOptions, visitors } from '@babel/traverse';
 import debug from 'debug';
 import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
@@ -79,6 +79,31 @@ export function applyTransform<TOptions>(
     traverse(ast, transform.visitor(options), undefined, state);
 
   logger(`${transform.name}: finished with ${state.changes} changes`);
+
+  return state;
+}
+
+export function applyTransforms(
+  ast: Node,
+  transforms: Transform[],
+  name?: string
+): TransformState {
+  name ??= transforms.map(t => t.name).join(', ');
+  logger(`${name}: started`);
+
+  const state: TransformState = { changes: 0 };
+
+  for (const transform of transforms) {
+    transform.run?.(ast, state);
+  }
+
+  const traverseOptions = transforms.flatMap(t => t.visitor?.() ?? []);
+  if (traverseOptions.length > 0) {
+    const visitor = visitors.merge(traverseOptions);
+    traverse(ast, visitor, undefined, state);
+  }
+
+  logger(`${name}: finished with ${state.changes} changes`);
 
   return state;
 }

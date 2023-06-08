@@ -37,12 +37,6 @@ export default {
       yoda.visitor(),
       jsonParse.visitor(),
     ];
-    const visitor = visitors.merge(traverseOptions);
-    // https://github.com/babel/babel/issues/15587
-    // @ts-expect-error bug in the babel types, array of functions works
-    visitor.enter = traverseOptions.flatMap(({ enter }) => enter ?? []);
-    // @ts-expect-error bug in the babel types, array of functions works
-    visitor.exit = traverseOptions.flatMap(({ exit }) => exit ?? []);
-    return visitor;
+    return visitors.merge(traverseOptions);
   },
 } satisfies Transform;

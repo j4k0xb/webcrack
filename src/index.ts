@@ -9,7 +9,11 @@ import selfDefending from './deobfuscator/selfDefending';
 import { Sandbox } from './deobfuscator/vm';
 import { unpackBundle } from './extractor';
 import { Bundle } from './extractor/bundle';
-import { applyTransform, applyTransformAsync } from './transforms';
+import {
+  applyTransform,
+  applyTransformAsync,
+  applyTransforms,
+} from './transforms';
 import blockStatement from './transforms/blockStatement';
 import jsx from './transforms/jsx';
 import sequence from './transforms/sequence';
@@ -86,18 +90,20 @@ export async function webcrack(
     plugins: ['jsx'],
   });
 
-  applyTransform(ast, blockStatement);
-  applyTransform(ast, sequence);
-  applyTransform(ast, splitVariableDeclarations);
+  applyTransforms(
+    ast,
+    [blockStatement, sequence, splitVariableDeclarations],
+    'prepare'
+  );
 
   if (options.deobfuscate)
     await applyTransformAsync(ast, deobfuscator, sandboxOptions);
+
   applyTransform(ast, unminify);
 
   // Have to run this after dead code removal
   if (options.deobfuscate) {
-    applyTransform(ast, selfDefending);
-    applyTransform(ast, debugProtection);
+    applyTransforms(ast, [selfDefending, debugProtection]);
   }
 
   if (options.jsx) applyTransform(ast, jsx);

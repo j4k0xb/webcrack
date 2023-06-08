@@ -7,52 +7,41 @@ export default {
   name: 'deterministicIf',
   tags: ['unsafe'],
   visitor() {
-    const leftLiteral = m.capture(m.anyString());
-    const rightLiteral = m.capture(m.anyString());
-    const equalsMatcher = m.binaryExpression(
-      m.or('===', '=='),
-      m.stringLiteral(leftLiteral),
-      m.stringLiteral(rightLiteral)
-    );
-    const notEqualsMatcher = m.binaryExpression(
-      m.or('!==', '!='),
-      m.stringLiteral(leftLiteral),
-      m.stringLiteral(rightLiteral)
-    );
-    const ifEqualsMatcher = m.or(
-      m.ifStatement(equalsMatcher),
-      m.conditionalExpression(equalsMatcher)
-    );
-    const ifNotEqualsMatcher = m.or(
-      m.ifStatement(notEqualsMatcher),
-      m.conditionalExpression(notEqualsMatcher)
+    const testMatcher = m.binaryExpression(
+      m.or('===', '==', '!==', '!='),
+      m.stringLiteral(),
+      m.stringLiteral()
     );
 
     return {
-      exit(path) {
-        // TODO: check binding conflicts
-        if (ifEqualsMatcher.match(path.node)) {
-          if (leftLiteral.current === rightLiteral.current) {
-            replace(path, path.node.consequent);
-          } else if (path.node.alternate) {
-            replace(path, path.node.alternate);
-          } else {
-            path.remove();
-            [path];
+      IfStatement: {
+        exit(path) {
+          const test = path.get('test');
+          if (testMatcher.match(test.node)) {
+            // TODO: check binding conflicts
+            if (test.evaluateTruthy() === true) {
+              replace(path, path.node.consequent);
+            } else if (path.node.alternate) {
+              replace(path, path.node.alternate);
+            } else {
+              path.remove();
+            }
+            this.changes++;
           }
-          this.changes++;
-        }
-        if (ifNotEqualsMatcher.match(path.node)) {
-          if (leftLiteral.current !== rightLiteral.current) {
-            replace(path, path.node.consequent);
-          } else if (path.node.alternate) {
-            replace(path, path.node.alternate);
-          } else {
-            path.remove();
-            [path];
+        },
+      },
+      ConditionalExpression: {
+        exit(path) {
+          const test = path.get('test');
+          if (testMatcher.match(test.node)) {
+            if (test.evaluateTruthy() === true) {
+              replace(path, path.node.consequent);
+            } else {
+              replace(path, path.node.alternate);
+            }
+            this.changes++;
           }
-          this.changes++;
-        }
+        },
       },
       noScope: true,
     };
