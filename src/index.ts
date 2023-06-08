@@ -1,6 +1,7 @@
 import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import * as m from '@codemod/matchers';
+import debug from 'debug';
 import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
@@ -75,6 +76,10 @@ export async function webcrack(
     ? { sandbox: options.sandbox }
     : undefined;
 
+  if (process.env.browser) {
+    debug.enable('webcrack:*');
+  }
+
   const ast = parse(code, {
     sourceType: 'unambiguous',
     allowReturnOutsideFunction: true,
@@ -98,7 +103,7 @@ export async function webcrack(
   if (options.jsx) applyTransform(ast, jsx);
 
   const bundle = options.unpack ? unpackBundle(ast) : undefined;
-  console.log('Bundle:', bundle?.type);
+  debug('webcrack:unpack')('Bundle:', bundle?.type);
 
   let outputCode = generate(ast).code;
   outputCode = options.transformCode

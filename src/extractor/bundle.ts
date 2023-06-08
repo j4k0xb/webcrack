@@ -1,7 +1,10 @@
 import traverse from '@babel/traverse';
 import * as m from '@codemod/matchers';
+import debug from 'debug';
 import { dirname, join } from 'node:path';
 import { Module } from './module';
+
+const logger = debug('webcrack:unpack');
 
 export class Bundle {
   type: 'webpack' | 'browserify';
@@ -32,7 +35,7 @@ export class Bundle {
               if (unusedMappings.has(mappingPath)) {
                 unusedMappings.delete(mappingPath);
               } else {
-                console.warn(`Mapping ${mappingPath} is already used.`);
+                logger(`Mapping ${mappingPath} is already used.`);
                 continue;
               }
               module.path = mappingPath;
@@ -46,9 +49,7 @@ export class Bundle {
     }
 
     if (unusedMappings.size > 0) {
-      console.warn(
-        `Unused mappings: ${Array.from(unusedMappings).join(', ')}.`
-      );
+      logger(`Unused mappings: ${Array.from(unusedMappings).join(', ')}.`);
     }
   }
 

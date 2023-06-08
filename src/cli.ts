@@ -6,6 +6,7 @@ import { readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import * as url from 'url';
 import { webcrack } from './index.js';
+import debug from 'debug';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -33,7 +34,7 @@ program
     } else {
       program.error('output directory already exists');
     }
-
+    debug.enable('webcrack:*');
     const result = await webcrack(code);
     await result.save(output);
   })

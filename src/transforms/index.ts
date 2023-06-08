@@ -1,4 +1,5 @@
 import traverse, { Node, TraverseOptions } from '@babel/traverse';
+import debug from 'debug';
 import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
@@ -35,6 +36,8 @@ export const transforms = {
   jsx,
 };
 
+const logger = debug('webcrack:transforms');
+
 export type TransformName = keyof typeof transforms;
 
 export type TransformOptions<TName extends TransformName> =
@@ -47,8 +50,7 @@ export async function applyTransformAsync<TOptions>(
   transform: AsyncTransform<TOptions>,
   options?: TOptions
 ): Promise<TransformState> {
-  const start = performance.now();
-  console.log(`${transform.name}: started`);
+  logger(`${transform.name}: started`);
 
   const state: TransformState = { changes: 0 };
 
@@ -56,13 +58,7 @@ export async function applyTransformAsync<TOptions>(
   if (transform.visitor)
     traverse(ast, transform.visitor(options), undefined, state);
 
-  console.log(
-    `${transform.name}: finished in`,
-    Math.floor(performance.now() - start),
-    'ms with',
-    state.changes,
-    'changes'
-  );
+  logger(`${transform.name}: finished with ${state.changes} changes`);
 
   return state;
 }
@@ -72,8 +68,7 @@ export function applyTransform<TOptions>(
   transform: Transform<TOptions>,
   options?: TOptions
 ): TransformState {
-  const start = performance.now();
-  console.log(`${transform.name}: started`);
+  logger(`${transform.name}: started`);
 
   const state: TransformState = { changes: 0 };
 
@@ -81,13 +76,7 @@ export function applyTransform<TOptions>(
   if (transform.visitor)
     traverse(ast, transform.visitor(options), undefined, state);
 
-  console.log(
-    `${transform.name}: finished in`,
-    Math.floor(performance.now() - start),
-    'ms with',
-    state.changes,
-    'changes'
-  );
+  logger(`${transform.name}: finished with ${state.changes} changes`);
 
   return state;
 }

@@ -1,3 +1,4 @@
+import debug from 'debug';
 import {
   applyTransform,
   applyTransformAsync,
@@ -21,30 +22,31 @@ export default {
   name: 'deobfuscate',
   tags: ['unsafe'],
   async run(ast, state, options) {
+    const logger = debug('webcrack:deobfuscate');
     if (!process.env.browser && !options) {
       options = { sandbox: createNodeSandbox() };
     }
     if (!options) return;
 
     const stringArray = findStringArray(ast);
-    console.log(`String Array: ${stringArray ? 'yes' : 'no'}`);
+    logger(`String Array: ${stringArray ? 'yes' : 'no'}`);
     if (!stringArray) return;
-    console.log(` - length: ${stringArray.length}`);
-    console.log(` - ${codePreview(stringArray.path.node)}`);
+    logger(` - length: ${stringArray.length}`);
+    logger(` - ${codePreview(stringArray.path.node)}`);
 
     const rotator = findArrayRotator(stringArray);
-    console.log(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
+    logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
     if (rotator) {
-      console.log(` - ${codePreview(rotator.node)}`);
+      logger(` - ${codePreview(rotator.node)}`);
     }
 
     const decoders = findDecoders(stringArray);
-    console.log(`String Array Encodings: ${decoders.length}`);
+    logger(`String Array Encodings: ${decoders.length}`);
 
     state.changes += applyTransform(ast, objectLiterals).changes;
 
     for (const decoder of decoders) {
-      console.log(` - ${codePreview(decoder.path.node)}`);
+      logger(` - ${codePreview(decoder.path.node)}`);
 
       state.changes += applyTransform(
         ast,
