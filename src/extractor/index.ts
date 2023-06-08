@@ -1,8 +1,15 @@
+import traverse, { visitors } from '@babel/traverse';
 import * as t from '@babel/types';
-import * as browserify from './browserify';
+import { unpackBrowserify } from './browserify';
 import { Bundle } from './bundle';
-import * as webpack from './webpack';
+import { unpackWebpack } from './webpack';
 
-export function extractBundle(ast: t.Node): Bundle | undefined {
-  return webpack.extract(ast) ?? browserify.extract(ast);
+export function unpackBundle(ast: t.Node): Bundle | undefined {
+  const options: { bundle: Bundle | undefined } = { bundle: undefined };
+  const visitor = visitors.merge([
+    unpackWebpack.visitor(options),
+    unpackBrowserify.visitor(options),
+  ]);
+  traverse(ast, visitor, undefined, { changes: 0 });
+  return options.bundle;
 }

@@ -6,7 +6,7 @@ import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
 import { Sandbox } from './deobfuscator/vm';
-import { extractBundle } from './extractor';
+import { unpackBundle } from './extractor';
 import { Bundle } from './extractor/bundle';
 import { applyTransform, applyTransformAsync } from './transforms';
 import blockStatement from './transforms/blockStatement';
@@ -97,7 +97,7 @@ export async function webcrack(
 
   if (options.jsx) applyTransform(ast, jsx);
 
-  const bundle = options.unpack ? extractBundle(ast) : undefined;
+  const bundle = options.unpack ? unpackBundle(ast) : undefined;
   console.log('Bundle:', bundle?.type);
 
   let outputCode = generate(ast).code;

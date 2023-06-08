@@ -1,100 +1,106 @@
-import traverse, { NodePath } from '@babel/traverse';
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { Transform } from '../../transforms';
 import { constMemberExpression } from '../../utils/matcher';
 import { renameParameters } from '../../utils/rename';
+import { Bundle } from '../bundle';
 import { WebpackBundle } from './bundle';
 import { WebpackModule } from './module';
 
-export function extract(ast: t.Node): WebpackBundle | undefined {
-  const modules = new Map<number, WebpackModule>();
+export const unpackWebpack = {
+  name: 'unpack-webpack',
+  tags: ['unsafe'],
+  visitor(options) {
+    const modules = new Map<number, WebpackModule>();
 
-  const entryIdMatcher = m.capture(m.numericLiteral());
-  const moduleFunctionsMatcher = m.capture(
-    m.or(
-      // E.g. [,,function (e, t, i) {...}, ...], index is the module ID
-      m.arrayExpression(
-        m.arrayOf(
-          m.or(m.functionExpression(), m.arrowFunctionExpression(), null)
+    const entryIdMatcher = m.capture(m.numericLiteral());
+    const moduleFunctionsMatcher = m.capture(
+      m.or(
+        // E.g. [,,function (e, t, i) {...}, ...], index is the module ID
+        m.arrayExpression(
+          m.arrayOf(
+            m.or(m.functionExpression(), m.arrowFunctionExpression(), null)
+          )
+        ),
+        // E.g. {0: function (e, t, i) {...}, ...}, key is the module ID
+        m.objectExpression(
+          m.arrayOf(
+            m.objectProperty(
+              m.numericLiteral(),
+              m.or(m.functionExpression(), m.arrowFunctionExpression())
+            )
+          )
+        )
+      )
+    );
+
+    const webpack4Matcher = m.callExpression(
+      m.functionExpression(
+        undefined,
+        undefined,
+        m.blockStatement(
+          m.anyList<t.Statement>(
+            m.zeroOrMore(),
+            m.functionDeclaration(),
+            m.zeroOrMore(),
+            m.containerOf(
+              // E.g. __webpack_require__.s = 2
+              m.assignmentExpression(
+                '=',
+                constMemberExpression(m.identifier(), 's'),
+                entryIdMatcher
+              )
+            )
+          )
         )
       ),
-      // E.g. {0: function (e, t, i) {...}, ...}, key is the module ID
-      m.objectExpression(
-        m.arrayOf(
-          m.objectProperty(
-            m.numericLiteral(),
-            m.or(m.functionExpression(), m.arrowFunctionExpression())
-          )
-        )
-      )
-    )
-  );
+      [moduleFunctionsMatcher]
+    );
 
-  const webpack4Matcher = m.callExpression(
-    m.functionExpression(
-      undefined,
-      undefined,
-      m.blockStatement(
-        m.anyList<t.Statement>(
-          m.zeroOrMore(),
-          m.functionDeclaration(),
-          m.zeroOrMore(),
-          m.containerOf(
-            // E.g. __webpack_require__.s = 2
-            m.assignmentExpression(
-              '=',
-              constMemberExpression(m.identifier(), 's'),
-              entryIdMatcher
+    const webpack5Matcher = m.callExpression(
+      m.arrowFunctionExpression(
+        undefined,
+        m.blockStatement(
+          m.anyList<t.Statement>(
+            m.zeroOrMore(),
+            m.variableDeclaration(undefined, [
+              m.variableDeclarator(undefined, moduleFunctionsMatcher),
+            ]),
+            // var installedModules = {};
+            m.variableDeclaration(),
+            m.zeroOrMore(),
+            // function __webpack_require__(moduleId) { ... }
+            m.functionDeclaration(),
+            m.zeroOrMore(),
+            m.containerOf(
+              // __webpack_require__.s = 2
+              m.assignmentExpression(
+                '=',
+                constMemberExpression(m.identifier(), 's'),
+                entryIdMatcher
+              )
+            ),
+            // module.exports = entryModule
+            m.expressionStatement(
+              m.assignmentExpression(
+                '=',
+                constMemberExpression(m.identifier(), 'exports'),
+                m.identifier()
+              )
             )
           )
         )
       )
-    ),
-    [moduleFunctionsMatcher]
-  );
+    );
 
-  const webpack5Matcher = m.callExpression(
-    m.arrowFunctionExpression(
-      undefined,
-      m.blockStatement(
-        m.anyList<t.Statement>(
-          m.zeroOrMore(),
-          m.variableDeclaration(undefined, [
-            m.variableDeclarator(undefined, moduleFunctionsMatcher),
-          ]),
-          // var installedModules = {};
-          m.variableDeclaration(),
-          m.zeroOrMore(),
-          // function __webpack_require__(moduleId) { ... }
-          m.functionDeclaration(),
-          m.zeroOrMore(),
-          m.containerOf(
-            // __webpack_require__.s = 2
-            m.assignmentExpression(
-              '=',
-              constMemberExpression(m.identifier(), 's'),
-              entryIdMatcher
-            )
-          ),
-          // module.exports = entryModule
-          m.expressionStatement(
-            m.assignmentExpression(
-              '=',
-              constMemberExpression(m.identifier(), 'exports'),
-              m.identifier()
-            )
-          )
+    return {
+      CallExpression(path) {
+        if (
+          !webpack4Matcher.match(path.node) &&
+          !webpack5Matcher.match(path.node)
         )
-      )
-    )
-  );
-
-  traverse(ast, {
-    CallExpression(path) {
-      if (
-        webpack4Matcher.match(path.node) ||
-        webpack5Matcher.match(path.node)
-      ) {
+          return;
         path.stop();
 
         const modulesPath = path.get(
@@ -126,12 +132,15 @@ export function extract(ast: t.Node): WebpackBundle | undefined {
             modules.set(id, module);
           }
         });
-      }
-    },
-    noScope: true,
-  });
 
-  if (modules.size > 0 && entryIdMatcher.current) {
-    return new WebpackBundle(entryIdMatcher.current.value, modules);
-  }
-}
+        if (modules.size > 0 && entryIdMatcher.current) {
+          options!.bundle = new WebpackBundle(
+            entryIdMatcher.current.value,
+            modules
+          );
+        }
+      },
+      noScope: true,
+    };
+  },
+} satisfies Transform<{ bundle: Bundle | undefined }>;

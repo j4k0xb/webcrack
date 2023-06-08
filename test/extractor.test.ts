@@ -25,6 +25,14 @@ test.each([
   expect(bundle).toMatchSnapshot();
 });
 
+test('detect top-level bundle first', async () => {
+  const { bundle } = await webcrack(
+    await readFile(join('test', 'samples', 'browserify-webpack-nested.js'), 'utf8')
+  );
+  assert(bundle);
+  expect(bundle.type).toBe('browserify');
+});
+
 describe('extractor', () => {
   test('path mapping', async () => {
     const { bundle } = await webcrack(
