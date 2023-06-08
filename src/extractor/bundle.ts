@@ -38,7 +38,10 @@ export class Bundle {
                 logger(`Mapping ${mappingPath} is already used.`);
                 continue;
               }
-              module.path = mappingPath;
+              const resolvedPath = mappingPath.startsWith('./')
+                ? mappingPath
+                : `node_modules/${mappingPath}`;
+              module.path = resolvedPath;
               path.stop();
               break;
             }

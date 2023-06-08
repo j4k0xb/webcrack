@@ -284,7 +284,7 @@ WebpackBundle {
   "entryId": 2,
   "modules": Map {
     1 => WebpackModule {
-      "ast": const a = require("./3.js");,
+      "ast": const a = require("package");,
       "id": 1,
       "isEntry": false,
       "path": "./1.js",
@@ -307,7 +307,7 @@ exports.a = 3;,
       "ast": module.exports = 4;,
       "id": 3,
       "isEntry": false,
-      "path": "./3.js",
+      "path": "node_modules/package",
     },
   },
   "type": "webpack",

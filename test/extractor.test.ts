@@ -27,7 +27,10 @@ test.each([
 
 test('detect top-level bundle first', async () => {
   const { bundle } = await webcrack(
-    await readFile(join('test', 'samples', 'browserify-webpack-nested.js'), 'utf8')
+    await readFile(
+      join('test', 'samples', 'browserify-webpack-nested.js'),
+      'utf8'
+    )
   );
   assert(bundle);
   expect(bundle.type).toBe('browserify');
@@ -40,7 +43,10 @@ describe('extractor', () => {
     );
     expect(bundle).toBeDefined();
     assert(bundle);
-    bundle.applyMappings({ './utils/color.js': m.stringLiteral('#FBC02D') });
+    bundle.applyMappings({
+      './utils/color.js': m.stringLiteral('#FBC02D'),
+      package: m.numericLiteral(4),
+    });
     bundle.applyTransforms();
     expect(bundle).toMatchSnapshot();
   });
@@ -50,6 +56,7 @@ describe('paths', () => {
   test('relative paths', () => {
     expect(relativePath('./a.js', './x/y.js')).toBe('./x/y.js');
     expect(relativePath('./x/y.js', './a.js')).toBe('../a.js');
+    expect(relativePath('./a.js', 'node_modules/lib')).toBe('lib');
   });
 
   test('resolve browserify paths', () => {
