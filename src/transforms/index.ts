@@ -4,6 +4,7 @@ import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
 import deterministicIf from './deterministicIf';
+import jsonParse from './jsonParse';
 import jsx from './jsx';
 import mergeElseIf from './mergeElseIf';
 import mergeStrings from './mergeStrings';
@@ -34,6 +35,7 @@ export const transforms = {
   void0ToUndefined,
   yoda,
   jsx,
+  jsonParse,
 };
 
 const logger = debug('webcrack:transforms');

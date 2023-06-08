@@ -385,6 +385,19 @@ describe('yoda', expectJS => {
     expectJS('1 === 2').toMatchInlineSnapshot('1 === 2;'));
 });
 
+describe('jsonParse', expectJS => {
+  test('array', () =>
+    expectJS('JSON.parse("[1,2,3]")').toMatchInlineSnapshot('[1, 2, 3];'));
+
+  test('large literal', () =>
+    expectJS('JSON.parse("1000000000000000000000")').toMatchInlineSnapshot(
+      '1000000000000000000000;'
+    ));
+
+  test('ignore invalid json', () =>
+    expectJS('JSON.parse("abc")').toMatchInlineSnapshot('JSON.parse("abc");'));
+});
+
 describe('unminify', expectJS => {
   test('logical expression to if and merge else-if', () =>
     expectJS(`

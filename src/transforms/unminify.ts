@@ -4,6 +4,7 @@ import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
 import deterministicIf from './deterministicIf';
+import jsonParse from './jsonParse';
 import mergeElseIf from './mergeElseIf';
 import mergeStrings from './mergeStrings';
 import numberExpressions from './numberExpressions';
@@ -34,6 +35,7 @@ export default {
       mergeElseIf.visitor(),
       void0ToUndefined.visitor(),
       yoda.visitor(),
+      jsonParse.visitor(),
     ];
     const visitor = visitors.merge(traverseOptions);
     // https://github.com/babel/babel/issues/15587
