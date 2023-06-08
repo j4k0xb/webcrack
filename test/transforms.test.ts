@@ -1,33 +1,43 @@
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import { Assertion, describe as describeVitest, expect, test } from 'vitest';
-import { transforms } from '../src/transforms';
-import {
-  TransformName,
-  TransformOptions,
-  applyTransform,
-} from '../src/transforms/index';
+import deadCode from '../src/deobfuscator/deadCode';
+import { Transform } from '../src/transforms';
+import blockStatement from '../src/transforms/blockStatement';
+import booleanIf from '../src/transforms/booleanIf';
+import computedProperties from '../src/transforms/computedProperties';
+import { applyTransform } from '../src/transforms/index';
+import jsonParse from '../src/transforms/jsonParse';
+import jsx from '../src/transforms/jsx';
+import mergeElseIf from '../src/transforms/mergeElseIf';
+import mergeStrings from '../src/transforms/mergeStrings';
+import numberExpressions from '../src/transforms/numberExpressions';
+import rawLiterals from '../src/transforms/rawLiterals';
+import sequence from '../src/transforms/sequence';
+import splitVariableDeclarations from '../src/transforms/splitVariableDeclarations';
+import ternaryToIf from '../src/transforms/ternaryToIf';
+import unminify from '../src/transforms/unminify';
+import unminifyBooleans from '../src/transforms/unminifyBooleans';
+import void0ToUndefined from '../src/transforms/void0ToUndefined';
+import yoda from '../src/transforms/yoda';
 
-function describe<TName extends TransformName>(
-  name: TName,
+function describe<Options>(
+  transform: Transform<Options>,
   factory: (
-    expect: (
-      actualCode: string,
-      options?: TransformOptions<TName>
-    ) => Assertion<Node>
+    expect: (actualCode: string, options?: Options) => Assertion<Node>
   ) => void
 ) {
-  return describeVitest(name, () => {
+  return describeVitest(transform.name, () => {
     factory((actualCode, options) => {
       const ast = parse(actualCode);
       traverse(ast); // to crawl scope and get bindings
-      applyTransform(ast, transforms[name], options);
+      applyTransform(ast, transform, options);
       return expect(ast);
     });
   });
 }
 
-describe('sequence', expectJS => {
+describe(sequence, expectJS => {
   test('to statements', () =>
     expectJS(`
       if (a) b(), c();
@@ -92,7 +102,7 @@ describe('sequence', expectJS => {
     `));
 });
 
-describe('splitVariableDeclarations', expectJS => {
+describe(splitVariableDeclarations, expectJS => {
   test('split variable declaration', () =>
     expectJS(`
       const a = 1, b = 2, c = 3;
@@ -113,7 +123,7 @@ describe('splitVariableDeclarations', expectJS => {
     `));
 });
 
-describe('computedProperties', expectJS => {
+describe(computedProperties, expectJS => {
   test('member expression', () => {
     expectJS(`
       require("foo")["default"]?.["_"];
@@ -151,7 +161,7 @@ describe('computedProperties', expectJS => {
     `).toMatchInlineSnapshot('console["1"]("hello");'));
 });
 
-describe('rawLiterals', expectJS => {
+describe(rawLiterals, expectJS => {
   test('string', () =>
     expectJS(String.raw`f("\x61", '"', "\u270F\uFE0F")`).toMatchInlineSnapshot(
       'f("a", "\\"", "✏️");'
@@ -161,7 +171,7 @@ describe('rawLiterals', expectJS => {
     expectJS('const a = 0x1;').toMatchInlineSnapshot('const a = 1;'));
 });
 
-describe('blockStatement', expectJS => {
+describe(blockStatement, expectJS => {
   test('convert to block statement', () =>
     expectJS(`
       if (a) b();
@@ -192,7 +202,7 @@ describe('blockStatement', expectJS => {
     `));
 });
 
-describe('numberExpressions', expectJS => {
+describe(numberExpressions, expectJS => {
   test('simplify', () =>
     expectJS(`
       console.log(-0x1021e + -0x7eac8 + 0x17 * 0xac9c);
@@ -214,7 +224,7 @@ describe('numberExpressions', expectJS => {
     `).toMatchInlineSnapshot('console.log(1000 / 30);'));
 });
 
-describe('unminifyBooleans', expectJS => {
+describe(unminifyBooleans, expectJS => {
   test('true', () => {
     expectJS('!0').toMatchInlineSnapshot('true;');
     expectJS('!!1').toMatchInlineSnapshot('true;');
@@ -227,7 +237,7 @@ describe('unminifyBooleans', expectJS => {
   });
 });
 
-describe('booleanIf', expectJS => {
+describe(booleanIf, expectJS => {
   test('and', () =>
     expectJS(`
       x && y && z();
@@ -247,7 +257,7 @@ describe('booleanIf', expectJS => {
     `));
 });
 
-describe('deadCode', expectJS => {
+describe(deadCode, expectJS => {
   test('always true', () => {
     expectJS(`
       if ("xyz" === "xyz") {
@@ -314,7 +324,7 @@ describe('deadCode', expectJS => {
   });
 });
 
-describe('ternaryToIf', expectJS => {
+describe(ternaryToIf, expectJS => {
   test('statement', () =>
     expectJS(`
       a ? b() : c();
@@ -332,7 +342,7 @@ describe('ternaryToIf', expectJS => {
     `).toMatchInlineSnapshot('const x = a ? b() : c();'));
 });
 
-describe('mergeStrings', expectJS => {
+describe(mergeStrings, expectJS => {
   test('only strings', () =>
     expectJS(`
       "a" + "b" + "c";
@@ -343,7 +353,7 @@ describe('mergeStrings', expectJS => {
     `).toMatchInlineSnapshot('"ab" + xyz + "cd";'));
 });
 
-describe('mergeElseIf', expectJS => {
+describe(mergeElseIf, expectJS => {
   test('merge', () =>
     expectJS(`
       if (x) {
@@ -365,11 +375,11 @@ describe('mergeElseIf', expectJS => {
       `));
 });
 
-describe('void0ToUndefined', expectJS => {
+describe(void0ToUndefined, expectJS => {
   test('void 0', () => expectJS('void 0').toMatchInlineSnapshot('undefined;'));
 });
 
-describe('yoda', expectJS => {
+describe(yoda, expectJS => {
   test('strict equality', () =>
     expectJS('"red" === color').toMatchInlineSnapshot('color === "red";'));
   test('loose equality', () =>
@@ -392,7 +402,7 @@ describe('yoda', expectJS => {
     expectJS('1 === 2').toMatchInlineSnapshot('1 === 2;'));
 });
 
-describe('jsonParse', expectJS => {
+describe(jsonParse, expectJS => {
   test('array', () =>
     expectJS('JSON.parse("[1,2,3]")').toMatchInlineSnapshot('[1, 2, 3];'));
 
@@ -405,7 +415,7 @@ describe('jsonParse', expectJS => {
     expectJS('JSON.parse("abc")').toMatchInlineSnapshot('JSON.parse("abc");'));
 });
 
-describe('unminify', expectJS => {
+describe(unminify, expectJS => {
   test('logical expression to if and merge else-if', () =>
     expectJS(`
       if (x) {} else {y && z();}
@@ -416,7 +426,7 @@ describe('unminify', expectJS => {
     `));
 });
 
-describe('jsx', expectJS => {
+describe(jsx, expectJS => {
   test('tag name type', () =>
     expectJS('React.createElement("div", null);').toMatchInlineSnapshot(
       '<div></div>;'
