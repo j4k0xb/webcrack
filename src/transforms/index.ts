@@ -1,9 +1,9 @@
 import traverse, { Node, TraverseOptions, visitors } from '@babel/traverse';
 import debug from 'debug';
+import deadCode from '../deobfuscator/deadCode';
 import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
-import deterministicIf from './deterministicIf';
 import jsonParse from './jsonParse';
 import jsx from './jsx';
 import mergeElseIf from './mergeElseIf';
@@ -31,7 +31,7 @@ export const transforms = {
   unminifyBooleans,
   booleanIf,
   ternaryToIf,
-  deterministicIf,
+  deadCode,
   void0ToUndefined,
   yoda,
   jsx,

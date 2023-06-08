@@ -247,7 +247,7 @@ describe('booleanIf', expectJS => {
     `));
 });
 
-describe('deterministicIf', expectJS => {
+describe('deadCode', expectJS => {
   test('always true', () => {
     expectJS(`
       if ("xyz" === "xyz") {
@@ -297,6 +297,13 @@ describe('deterministicIf', expectJS => {
         b();
       }
     `).toMatchInlineSnapshot('b();');
+    expectJS(`
+      if (!("abc" !== "xyz")) {
+        a();
+      } else {
+        b();
+      }
+   `).toMatchInlineSnapshot('b();');
 
     expectJS(`
       "abc" === "xyz" ? a() : b();

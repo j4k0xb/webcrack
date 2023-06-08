@@ -101,7 +101,7 @@ export async function webcrack(
 
   applyTransform(ast, unminify);
 
-  // Have to run this after dead code removal
+  // Have to run this after unminify to properly detect it
   if (options.deobfuscate) {
     applyTransforms(ast, [selfDefending, debugProtection]);
   }

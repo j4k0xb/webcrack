@@ -10,6 +10,7 @@ import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import controlFlowObject from './controlFlowObject';
 import controlFlowSwitch from './controlFlowSwitch';
+import deadCode from './deadCode';
 import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
@@ -66,10 +67,10 @@ export default {
     decoders.forEach(decoder => decoder.path.remove());
     state.changes += 2 + decoders.length;
 
-    state.changes += applyTransforms(ast, [
-      mergeStrings,
-      controlFlowObject,
-      controlFlowSwitch,
-    ], 'mergeStrings, controlFlow').changes;
+    state.changes += applyTransforms(
+      ast,
+      [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
+      'mergeStrings, deadCode, controlFlow'
+    ).changes;
   },
 } satisfies AsyncTransform<{ sandbox: Sandbox }>;

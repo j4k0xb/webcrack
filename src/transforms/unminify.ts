@@ -3,7 +3,6 @@ import { Transform, TransformState } from '.';
 import blockStatement from './blockStatement';
 import booleanIf from './booleanIf';
 import computedProperties from './computedProperties';
-import deterministicIf from './deterministicIf';
 import jsonParse from './jsonParse';
 import mergeElseIf from './mergeElseIf';
 import mergeStrings from './mergeStrings';
@@ -31,7 +30,6 @@ export default {
       unminifyBooleans.visitor(),
       booleanIf.visitor(),
       ternaryToIf.visitor(),
-      deterministicIf.visitor(),
       mergeElseIf.visitor(),
       void0ToUndefined.visitor(),
       yoda.visitor(),
