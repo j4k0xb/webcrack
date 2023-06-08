@@ -60,23 +60,25 @@ export default {
     );
 
     return {
-      BlockStatement(path) {
-        if (!matcher.match(path.node)) return;
+      BlockStatement: {
+        exit(path) {
+          if (!matcher.match(path.node)) return;
 
-        const caseStatements = new Map(
-          cases.current!.map(c => [
-            (c.test as t.StringLiteral).value,
-            t.isContinueStatement(c.consequent.at(-1))
-              ? c.consequent.slice(0, -1)
-              : c.consequent,
-          ])
-        );
+          const caseStatements = new Map(
+            cases.current!.map(c => [
+              (c.test as t.StringLiteral).value,
+              t.isContinueStatement(c.consequent.at(-1))
+                ? c.consequent.slice(0, -1)
+                : c.consequent,
+            ])
+          );
 
-        const sequence = sequenceString.current!.split('|');
-        const newStatements = sequence.flatMap(s => caseStatements.get(s)!);
+          const sequence = sequenceString.current!.split('|');
+          const newStatements = sequence.flatMap(s => caseStatements.get(s)!);
 
-        path.node.body.splice(0, 3, ...newStatements);
-        this.changes += newStatements.length + 3;
+          path.node.body.splice(0, 3, ...newStatements);
+          this.changes += newStatements.length + 3;
+        },
       },
       noScope: true,
     };

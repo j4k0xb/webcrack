@@ -2,6 +2,7 @@ import debug from 'debug';
 import {
   applyTransform,
   applyTransformAsync,
+  applyTransforms,
   AsyncTransform,
 } from '../transforms';
 import mergeStrings from '../transforms/mergeStrings';
@@ -65,8 +66,10 @@ export default {
     decoders.forEach(decoder => decoder.path.remove());
     state.changes += 2 + decoders.length;
 
-    state.changes += applyTransform(ast, mergeStrings).changes;
-    state.changes += applyTransform(ast, controlFlowObject).changes;
-    state.changes += applyTransform(ast, controlFlowSwitch).changes;
+    state.changes += applyTransforms(ast, [
+      mergeStrings,
+      controlFlowObject,
+      controlFlowSwitch,
+    ], 'mergeStrings, controlFlow').changes;
   },
 } satisfies AsyncTransform<{ sandbox: Sandbox }>;

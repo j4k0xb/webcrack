@@ -190,8 +190,10 @@ export default {
     }
 
     return {
-      VariableDeclarator(path) {
-        this.changes += transform(path);
+      VariableDeclarator: {
+        exit(path) {
+          this.changes += transform(path);
+        },
       },
     };
   },
