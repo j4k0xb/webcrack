@@ -60,16 +60,7 @@ export class Bundle {
    * Saves each module to a file and the bundle metadata to a JSON file.
    * @param path Output directory
    */
-  async save(
-    path: string,
-    transformCode = (code: string): Promise<string> | string => code,
-    mappings: (
-      m: typeof import('@codemod/matchers')
-    ) => Record<string, m.Matcher<unknown>> = () => ({})
-  ): Promise<void> {
-    this.applyMappings(mappings(m));
-    this.applyTransforms();
-
+  async save(path: string): Promise<void> {
     const bundleJson = {
       type: this.type,
       entryId: this.entryId,
@@ -94,14 +85,12 @@ export class Bundle {
       await Promise.all(
         Array.from(this.modules.values(), async module => {
           const modulePath = join(path, module.path);
-          const code = await transformCode(module.code);
           await mkdir(dirname(modulePath), { recursive: true });
-          await writeFile(modulePath, code, 'utf8');
+          await writeFile(modulePath, module.code, 'utf8');
         })
       );
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   applyTransforms(): void {}
 }

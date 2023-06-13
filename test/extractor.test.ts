@@ -1,4 +1,3 @@
-import * as m from '@codemod/matchers';
 import assert from 'assert';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -39,15 +38,16 @@ test('detect top-level bundle first', async () => {
 describe('extractor', () => {
   test('path mapping', async () => {
     const { bundle } = await webcrack(
-      await readFile('./test/samples/webpack.js', 'utf8')
+      await readFile('./test/samples/webpack.js', 'utf8'),
+      {
+        mappings: m => ({
+          './utils/color.js': m.stringLiteral('#FBC02D'),
+          package: m.numericLiteral(4),
+        }),
+      }
     );
     expect(bundle).toBeDefined();
     assert(bundle);
-    bundle.applyMappings({
-      './utils/color.js': m.stringLiteral('#FBC02D'),
-      package: m.numericLiteral(4),
-    });
-    bundle.applyTransforms();
     expect(bundle).toMatchSnapshot();
   });
 });

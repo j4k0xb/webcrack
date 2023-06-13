@@ -7,7 +7,7 @@ import { StringArray } from './stringArray';
 
 export type Sandbox = (code: string) => Promise<unknown>;
 
-export function createNodeSandbox(): (code: string) => Promise<unknown> {
+export function createNodeSandbox(): Sandbox {
   return async (code: string) => {
     const { VM } = await import('vm2');
     const vm = new VM({
@@ -18,6 +18,11 @@ export function createNodeSandbox(): (code: string) => Promise<unknown> {
     });
     return vm.run(code) as unknown;
   };
+}
+
+export function createBrowserSandbox(): Sandbox {
+  // TODO: use sandybox (not available in web workers though)
+  throw new Error('Custom Sandbox implementation required.');
 }
 
 export class VMDecoder {

@@ -6,7 +6,11 @@ import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
-import { Sandbox } from './deobfuscator/vm';
+import {
+  Sandbox,
+  createBrowserSandbox,
+  createNodeSandbox,
+} from './deobfuscator/vm';
 import { unpackBundle } from './extractor';
 import { Bundle } from './extractor/bundle';
 import {
@@ -47,11 +51,6 @@ export interface Options {
    */
   deobfuscate?: boolean;
   /**
-   * Run for every module after generating the code and before saving it.
-   * This can be used to format the code or apply other transformations.
-   */
-  transformCode?: (code: string) => Promise<string> | string;
-  /**
    * Assigns paths to modules based on the given matchers.
    * This will also rewrite `require()` calls to use the new paths.
    *
@@ -71,14 +70,23 @@ export interface Options {
   sandbox?: Sandbox;
 }
 
+function mergeOptions(options: Options): asserts options is Required<Options> {
+  const mergedOptions: Required<Options> = {
+    jsx: true,
+    unpack: true,
+    deobfuscate: true,
+    mappings: () => ({}),
+    sandbox: process.env.browser ? createBrowserSandbox() : createNodeSandbox(),
+    ...options,
+  };
+  Object.assign(options, mergedOptions);
+}
+
 export async function webcrack(
   code: string,
   options: Options = {}
 ): Promise<WebcrackResult> {
-  options = { jsx: true, unpack: true, deobfuscate: true, ...options };
-  const sandboxOptions = options.sandbox
-    ? { sandbox: options.sandbox }
-    : undefined;
+  mergeOptions(options);
 
   if (process.env.browser) {
     debug.enable('webcrack:*');
@@ -97,7 +105,7 @@ export async function webcrack(
   );
 
   if (options.deobfuscate)
-    await applyTransformAsync(ast, deobfuscator, sandboxOptions);
+    await applyTransformAsync(ast, deobfuscator, options.sandbox);
 
   applyTransform(ast, unminify);
 
@@ -108,13 +116,13 @@ export async function webcrack(
 
   if (options.jsx) applyTransform(ast, jsx);
 
-  const bundle = options.unpack ? unpackBundle(ast) : undefined;
-  debug('webcrack:unpack')('Bundle:', bundle?.type);
+  // Unpacking modifies the same AST and may result in imports not at top level
+  // so the code has to be generated before
+  const outputCode = generate(ast).code;
 
-  let outputCode = generate(ast).code;
-  outputCode = options.transformCode
-    ? await options.transformCode(outputCode)
-    : outputCode;
+  const bundle = options.unpack
+    ? unpackBundle(ast, options.mappings(m))
+    : undefined;
 
   return {
     code: outputCode,
@@ -126,7 +134,7 @@ export async function webcrack(
         const { mkdir, writeFile } = await import('node:fs/promises');
         await mkdir(path, { recursive: true });
         await writeFile(join(path, 'deobfuscated.js'), outputCode, 'utf8');
-        await bundle?.save(path, options.transformCode, options.mappings);
+        await bundle?.save(path);
       }
     },
   };
