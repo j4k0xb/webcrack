@@ -122,21 +122,259 @@ exports.a = 3;,
 }
 `;
 
-exports[`extract webpack_object.js 1`] = `
+exports[`extract webpack-0.11.x.js 1`] = `
 WebpackBundle {
-  "entryId": 386,
+  "entryId": 0,
   "modules": Map {
-    386 => WebpackModule {
-      "ast": const r = require("./387.js").default;,
-      "id": 386,
+    0 => WebpackModule {
+      "ast": require("./1.js");
+var template = require("./4.js");
+document.write(template({
+  hello: "World!"
+}));,
+      "id": 0,
       "isEntry": true,
       "path": "./index.js",
     },
-    387 => WebpackModule {
-      "ast": module.exports = "test";,
-      "id": 387,
+    1 => WebpackModule {
+      "ast": // style-loader: Adds some css to the DOM by adding a <style> tag
+var dispose = require("./2.js")
+// The css code:
+(require("./3.js"));
+if (false) {
+  module.hot.accept();
+  module.hot.dispose(dispose);
+},
+      "id": 1,
       "isEntry": false,
-      "path": "./387.js",
+      "path": "./1.js",
+    },
+    2 => WebpackModule {
+      "ast": /*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+module.exports = function (cssCode) {
+  var styleElement = document.createElement("style");
+  styleElement.type = "text/css";
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = cssCode;
+  } else {
+    styleElement.appendChild(document.createTextNode(cssCode));
+  }
+  var head = document.getElementsByTagName("head")[0];
+  head.appendChild(styleElement);
+  return function () {
+    head.removeChild(styleElement);
+  };
+};,
+      "id": 2,
+      "isEntry": false,
+      "path": "./2.js",
+    },
+    3 => WebpackModule {
+      "ast": module.exports = "body {\\n\\tbackground: #333;\\n\\tcolor: #EEE;\\n}";,
+      "id": 3,
+      "isEntry": false,
+      "path": "./3.js",
+    },
+    4 => WebpackModule {
+      "ast": var jade = require("./5.js");
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+  attrs = attrs || jade.attrs;
+  escape = escape || jade.escape;
+  rethrow = rethrow || jade.rethrow;
+  merge = merge || jade.merge;
+  var buf = [];
+  with (locals || {}) {
+    var interp;
+    buf.push("<h1>Hello " + escape((interp = hello) == null ? "" : interp) + "</h1>");
+  }
+  return buf.join("");
+};,
+      "id": 4,
+      "isEntry": false,
+      "path": "./4.js",
+    },
+    5 => WebpackModule {
+      "ast": /*!
+ * Jade - runtime
+ * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * Lame Array.isArray() polyfill for now.
+ */
+
+if (!Array.isArray) {
+  Array.isArray = function (arr) {
+    return Object.prototype.toString.call(arr) == "[object Array]";
+  };
+}
+
+/**
+ * Lame Object.keys() polyfill for now.
+ */
+
+if (!Object.keys) {
+  Object.keys = function (obj) {
+    var arr = [];
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        arr.push(key);
+      }
+    }
+    return arr;
+  };
+}
+
+/**
+ * Merge two attribute objects giving precedence
+ * to values in object \`b\`. Classes are special-cased
+ * allowing for arrays and merging/joining appropriately
+ * resulting in a string.
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @return {Object} a
+ * @api private
+ */
+
+exports.merge = function merge(a, b) {
+  var ac = a.class;
+  var bc = b.class;
+  if (ac || bc) {
+    ac = ac || [];
+    bc = bc || [];
+    if (!Array.isArray(ac)) {
+      ac = [ac];
+    }
+    if (!Array.isArray(bc)) {
+      bc = [bc];
+    }
+    ac = ac.filter(nulls);
+    bc = bc.filter(nulls);
+    a.class = ac.concat(bc).join(" ");
+  }
+  for (var key in b) {
+    if (key != "class") {
+      a[key] = b[key];
+    }
+  }
+  return a;
+};
+
+/**
+ * Filter null \`val\`s.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function nulls(val) {
+  return val != null;
+}
+
+/**
+ * Render the given attributes object.
+ *
+ * @param {Object} obj
+ * @param {Object} escaped
+ * @return {String}
+ * @api private
+ */
+
+exports.attrs = function attrs(obj, escaped) {
+  var buf = [];
+  var terse = obj.terse;
+  delete obj.terse;
+  var keys = Object.keys(obj);
+  var len = keys.length;
+  if (len) {
+    buf.push("");
+    for (var i = 0; i < len; ++i) {
+      var key = keys[i];
+      var val = obj[key];
+      if (typeof val == "boolean" || val == null) {
+        if (val) {
+          if (terse) {
+            buf.push(key);
+          } else {
+            buf.push(key + "=\\"" + key + "\\"");
+          }
+        }
+      } else if (key.indexOf("data") == 0 && typeof val != "string") {
+        buf.push(key + "='" + JSON.stringify(val) + "'");
+      } else if (key == "class" && Array.isArray(val)) {
+        buf.push(key + "=\\"" + exports.escape(val.join(" ")) + "\\"");
+      } else if (escaped && escaped[key]) {
+        buf.push(key + "=\\"" + exports.escape(val) + "\\"");
+      } else {
+        buf.push(key + "=\\"" + val + "\\"");
+      }
+    }
+  }
+  return buf.join(" ");
+};
+
+/**
+ * Escape the given string of \`html\`.
+ *
+ * @param {String} html
+ * @return {String}
+ * @api private
+ */
+
+exports.escape = function escape(html) {
+  return String(html).replace(/&(?!(\\w+|\\#\\d+);)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+};
+
+/**
+ * Re-throw the given \`err\` in context to the
+ * the jade in \`filename\` at the given \`lineno\`.
+ *
+ * @param {Error} err
+ * @param {String} filename
+ * @param {String} lineno
+ * @api private
+ */
+
+exports.rethrow = function rethrow(err, filename, lineno) {
+  if (!filename) {
+    throw err;
+  }
+  var context = 3;
+  var str = require("./6.js").readFileSync(filename, "utf8");
+  var lines = str.split("\\n");
+  var start = Math.max(lineno - context, 0);
+  var end = Math.min(lines.length, lineno + context); // Error context
+  var context = lines.slice(start, end).map(function (line, i) {
+    var curr = i + start + 1;
+    return (curr == lineno ? "  > " : "    ") + curr + "| " + line;
+  }).join("\\n");
+
+  // Alter exception message
+  err.path = filename;
+  err.message = (filename || "Jade") + ":" + lineno + "\\n" + context + "\\n\\n" + err.message;
+  throw err;
+};,
+      "id": 5,
+      "isEntry": false,
+      "path": "./5.js",
+    },
+    6 => WebpackModule {
+      "ast": var files = {};
+exports.setFile = function (filename, content) {
+  files[filename] = content;
+};
+exports.readFileSync = function (filename) {
+  return files[filename] || "";
+};,
+      "id": 6,
+      "isEntry": false,
+      "path": "./6.js",
     },
   },
   "type": "webpack",
@@ -184,6 +422,27 @@ export default 1;,
       "id": 3,
       "isEntry": false,
       "path": "./3.js",
+    },
+  },
+  "type": "webpack",
+}
+`;
+
+exports[`extract webpack-object.js 1`] = `
+WebpackBundle {
+  "entryId": 386,
+  "modules": Map {
+    386 => WebpackModule {
+      "ast": const r = require("./387.js").default;,
+      "id": 386,
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    387 => WebpackModule {
+      "ast": module.exports = "test";,
+      "id": 387,
+      "isEntry": false,
+      "path": "./387.js",
     },
   },
   "type": "webpack",

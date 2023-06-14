@@ -8,9 +8,10 @@ import { relativePath, resolveDependencyTree } from '../src/utils/path';
 // Test samples
 test.each([
   'webpack.js',
-  'webpack_object.js',
+  'webpack-object.js',
   'webpack-esm.js',
   'webpack-var-injection.js',
+  'webpack-0.11.x.js',
   'webpack5-object.js',
   'webpack5-esm.js',
   'browserify.js',

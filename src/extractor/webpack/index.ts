@@ -2,7 +2,7 @@ import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../../transforms';
-import { constMemberExpression } from '../../utils/matcher';
+import { constKey, constMemberExpression } from '../../utils/matcher';
 import { renameParameters } from '../../utils/rename';
 import { Bundle } from '../bundle';
 import { WebpackBundle } from './bundle';
@@ -26,9 +26,13 @@ export const unpackWebpack = {
         // E.g. {0: function (e, t, i) {...}, ...}, key is the module ID
         m.objectExpression(
           m.arrayOf(
-            m.objectProperty(
-              m.numericLiteral(),
-              m.or(m.functionExpression(), m.arrowFunctionExpression())
+            m.or(
+              m.objectProperty(
+                m.numericLiteral(),
+                m.or(m.functionExpression(), m.arrowFunctionExpression())
+              ),
+              // __webpack_public_path__ (c: "")
+              m.objectProperty(constKey('c'), m.stringLiteral())
             )
           )
         )
@@ -45,11 +49,15 @@ export const unpackWebpack = {
             m.functionDeclaration(),
             m.zeroOrMore(),
             m.containerOf(
-              // E.g. __webpack_require__.s = 2
-              m.assignmentExpression(
-                '=',
-                constMemberExpression(m.identifier(), 's'),
-                entryIdMatcher
+              m.or(
+                // E.g. __webpack_require__.s = 2
+                m.assignmentExpression(
+                  '=',
+                  constMemberExpression(m.identifier(), 's'),
+                  entryIdMatcher
+                ),
+                // E.g. return require(0);
+                m.callExpression(m.identifier(), [entryIdMatcher])
               )
             )
           )
@@ -123,6 +131,13 @@ export const unpackWebpack = {
           ) {
             renameParameters(moduleWrapper, ['module', 'exports', 'require']);
             const file = t.file(t.program(moduleWrapper.node.body.body));
+
+            // Remove /***/ comments between modules (in webpack development builds)
+            const lastNode = file.program.body.at(-1);
+            if (lastNode?.trailingComments?.[0].value === '*') {
+              lastNode.trailingComments.shift();
+            }
+
             const module = new WebpackModule(
               id,
               file,
