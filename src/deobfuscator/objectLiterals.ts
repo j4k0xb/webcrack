@@ -66,6 +66,7 @@ export default {
         path.remove();
         this.changes++;
       },
+      noScope: true,
     };
   },
 } satisfies Transform;

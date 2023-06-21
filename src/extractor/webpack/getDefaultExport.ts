@@ -108,6 +108,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
           });
         }
       },
+      noScope: true,
     });
   });
 }
