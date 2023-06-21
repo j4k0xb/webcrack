@@ -9,6 +9,7 @@ import {
   constKey,
   constMemberExpression,
   createFunctionMatcher,
+  isReadonlyObject,
 } from '../utils/matcher';
 
 /**
@@ -75,20 +76,7 @@ export default {
       m.capture(m.objectExpression(objectProperties))
     );
 
-    /**
-     * Returns true if every reference is a member expression whose value is read
-     */
-    function hasValidReads(binding: Binding) {
-      return binding.referencePaths.every(
-        path =>
-          memberAccess.match(path.parent) &&
-          !path.parentPath?.parentPath?.isAssignmentExpression({
-            left: path.parent,
-          })
-      );
-    }
-
-    function isReadonlyBinding(binding: Binding) {
+    function isConstantBinding(binding: Binding) {
       // Workaround because sometimes babel treats the VariableDeclarator/binding itself as a violation
       return binding.constant || binding.constantViolations[0] === binding.path;
     }
@@ -100,10 +88,10 @@ export default {
         // would have generated the code (no reassignments, etc.)
         const binding = path.scope.getBinding(varId.current!.name);
         if (!binding) return changes;
-        if (!isReadonlyBinding(binding)) return changes;
+        if (!isConstantBinding(binding)) return changes;
         if (objectProperties.current!.length === 0)
           transformObjectKeys(binding);
-        if (!hasValidReads(binding)) return changes;
+        if (!isReadonlyObject(binding, memberAccess)) return changes;
 
         const props = new Map(
           objectProperties.current!.map(p => [
@@ -174,8 +162,7 @@ export default {
       }
 
       const aliasBinding = objBinding.scope.getBinding(aliasId.current!.name)!;
-      if (!isReadonlyBinding(aliasBinding)) return;
-      if (!hasValidReads(aliasBinding)) return;
+      if (!isReadonlyObject(aliasBinding, memberAccess)) return;
 
       objBinding.referencePaths = aliasBinding.referencePaths;
       objBinding.references = aliasBinding.references;

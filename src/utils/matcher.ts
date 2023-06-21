@@ -1,3 +1,4 @@
+import { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
@@ -75,3 +76,40 @@ export function createFunctionMatcher(
   );
 }
 
+/**
+ * Returns true if every reference is a member expression whose value is read
+ */
+export function isReadonlyObject(
+  binding: Binding,
+  memberAccess: m.Matcher<t.MemberExpression>
+): boolean {
+  // Workaround because sometimes babel treats the VariableDeclarator/binding itself as a violation
+  if (!binding.constant && binding.constantViolations[0] !== binding.path)
+    return false;
+
+  return binding.referencePaths.every(
+    path =>
+      // obj.property
+      memberAccess.match(path.parent) &&
+      // obj.property = 1
+      !path.parentPath?.parentPath?.isAssignmentExpression({
+        left: path.parent,
+      }) &&
+      // obj++
+      !path.parentPath?.isUpdateExpression() &&
+      // obj.property++
+      !path.parentPath?.parentPath?.isUpdateExpression({
+        argument: path.parent,
+      }) &&
+      // delete obj.property
+      !path.parentPath?.parentPath?.isUnaryExpression({
+        argument: path.parent,
+        operator: 'delete',
+      }) &&
+      // [obj.property] = [{}] or ({ property: obj.property } = {})
+      !path.findParent(
+        parentPath =>
+          parentPath.isArrayPattern() || parentPath.isObjectPattern()
+      )
+  );
+}
