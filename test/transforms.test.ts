@@ -30,7 +30,10 @@ function describe<Options>(
 ) {
   return describeVitest(transform.name, () => {
     factory((actualCode, options) => {
-      const ast = parse(actualCode);
+      const ast = parse(actualCode, {
+        sourceType: 'unambiguous',
+        allowReturnOutsideFunction: true,
+      });
       traverse(ast); // to crawl scope and get bindings
       applyTransform(ast, transform, options);
       return expect(ast);
@@ -337,6 +340,17 @@ describe(ternaryToIf, expectJS => {
       }
     `));
 
+  test('returned', () =>
+    expectJS(`
+      return a ? b() : c();
+    `).toMatchInlineSnapshot(`
+      if (a) {
+        return b();
+      } else {
+        return c();
+      }
+    `));
+
   test('ignore expression', () =>
     expectJS(`
       const x = a ? b() : c();
@@ -425,6 +439,18 @@ describe(unminify, expectJS => {
         z();
       }
     `));
+
+  test('returned ternary with sequence', () =>
+    expectJS(`
+    return a ? (b(), c()) : d();
+  `).toMatchInlineSnapshot(`
+    if (a) {
+      b();
+      return c();
+    } else {
+      return d();
+    }
+  `));
 });
 
 describe(jsx, expectJS => {
