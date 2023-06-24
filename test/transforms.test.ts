@@ -81,6 +81,14 @@ describe(sequence, expectJS => {
       switch (b()) {}
     `));
 
+  test('throw', () =>
+    expectJS(`
+      throw a(), b();
+    `).toMatchInlineSnapshot(`
+      a();
+      throw b();
+    `));
+
   test('rearrange from for-in', () =>
     expectJS(`
       for (let key in a = 1, object) {}

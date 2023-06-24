@@ -56,6 +56,19 @@ export default {
         }
       },
     },
+    ThrowStatement: {
+      exit(path) {
+        if (t.isSequenceExpression(path.node.argument)) {
+          const expressions = path.node.argument.expressions;
+          path.node.argument = expressions.pop()!;
+          const statements = expressions.map(expr =>
+            t.expressionStatement(expr)
+          );
+          path.insertBefore(statements);
+          this.changes++;
+        }
+      },
+    },
     ForInStatement: {
       exit(path) {
         const sequence = m.capture(m.sequenceExpression());
