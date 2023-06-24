@@ -84,6 +84,18 @@ export default {
         }
       },
     },
+    ForStatement: {
+      exit(path) {
+        if (t.isSequenceExpression(path.node.init)) {
+          const statements = path.node.init.expressions.map(expr =>
+            t.expressionStatement(expr)
+          );
+          path.insertBefore(statements);
+          path.node.init = null;
+          this.changes++;
+        }
+      },
+    },
     VariableDeclaration: {
       exit(path) {
         const sequence = m.capture(m.sequenceExpression());

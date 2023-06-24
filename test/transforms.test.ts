@@ -97,6 +97,15 @@ describe(sequence, expectJS => {
       for (let key in object) {}
     `));
 
+  test('rearrange from for loop init', () =>
+    expectJS(`
+      for((a(), b());;);
+    `).toMatchInlineSnapshot(`
+      a();
+      b();
+      for (;;);
+    `));
+
   test('rearrange variable declarator', () =>
     expectJS(`
     var t = (o = null, o);
