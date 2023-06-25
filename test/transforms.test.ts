@@ -346,6 +346,20 @@ describe(deadCode, expectJS => {
       "abc" !== "abc" ? a() : b();
     `).toMatchInlineSnapshot('b();');
   });
+
+  test('rename shadowed variables', () => {
+    expectJS(`
+      let x = 1;
+      if ("a" === "a") {
+        let x = 2;
+        let y = 3;
+      }
+    `).toMatchInlineSnapshot(`
+      let x = 1;
+      let _x = 2;
+      let y = 3;
+    `);
+  });
 });
 
 describe(ternaryToIf, expectJS => {

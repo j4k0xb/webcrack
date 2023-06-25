@@ -1,7 +1,8 @@
-import { NodePath } from '@babel/traverse';
+import { NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
+import { renameFast } from '../utils/rename';
 
 export default {
   name: 'deadCode',
@@ -26,10 +27,24 @@ export default {
 
           if (!testMatcher.match(path.node.test)) return;
 
-          // TODO: check binding conflicts
+          const { scope } = path;
+          // If statements can contain variables that shadow variables in the parent scope.
+          // Since the block scope is merged with the parent scope, we need to rename those
+          // variables to avoid duplicate declarations.
+          function renameShadowedVariables(localScope: Scope) {
+            if (localScope === scope) return;
+            for (const name in localScope.bindings) {
+              if (scope.hasBinding(name)) {
+                renameFast(localScope.bindings[name], scope.generateUid(name));
+              }
+            }
+          }
+
           if (path.get('test').evaluateTruthy()) {
+            renameShadowedVariables(path.get('consequent').scope);
             replace(path, path.node.consequent);
           } else if (path.node.alternate) {
+            renameShadowedVariables(path.get('alternate').scope);
             replace(path, path.node.alternate);
           } else {
             path.remove();
