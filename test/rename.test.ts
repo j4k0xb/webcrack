@@ -20,6 +20,29 @@ describe('rename variable', () => {
       let _b = b;
     `);
   });
+
+  test('different types of assignments', () => {
+    const ast = parse(`
+      let a = 1;
+      a++;
+      [a] = [2];
+      ({...a} = {});
+    `);
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('a')!;
+        renameFast(binding, 'b');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot(`
+      let b = 1;
+      b++;
+      [b] = [2];
+      ({
+        ...b
+      } = {});
+    `);
+  });
 });
 
 describe('rename parameters', () => {

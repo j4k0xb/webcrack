@@ -86,5 +86,12 @@
     e.exports = {
       VERSION: 1
     }
-  }
+  },
+  function (e, t, i) {
+    i.r(t);
+    i.d(t, 'default', function () {
+      return f;
+    });
+    class f {}
+  },
 ]);

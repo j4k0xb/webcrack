@@ -40,11 +40,10 @@ export default {
     return {
       VariableDeclarator(path) {
         if (!varMatcher.match(path.node)) return;
+        if (objectProperties.current!.length === 0) return;
 
         const binding = path.scope.getBinding(varId.current!.name);
         if (!binding || !isReadonlyObject(binding, memberAccess)) return;
-
-        if (!objectProperties.current!.length) return;
 
         const props = new Map(
           objectProperties.current!.map(p => [

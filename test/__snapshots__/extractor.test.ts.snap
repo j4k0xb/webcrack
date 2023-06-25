@@ -423,6 +423,12 @@ export default 1;,
       "isEntry": false,
       "path": "./3.js",
     },
+    4 => WebpackModule {
+      "ast": export default class f {},
+      "id": 4,
+      "isEntry": false,
+      "path": "./4.js",
+    },
   },
   "type": "webpack",
 }

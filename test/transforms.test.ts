@@ -335,6 +335,9 @@ describe(deadCode, expectJS => {
         b();
       }
    `).toMatchInlineSnapshot('b();');
+    expectJS(`
+      if ("abc" === "xyz") a();
+   `).toMatchInlineSnapshot('');
 
     expectJS(`
       "abc" === "xyz" ? a() : b();

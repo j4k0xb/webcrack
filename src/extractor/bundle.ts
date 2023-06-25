@@ -23,7 +23,7 @@ export class Bundle {
 
   applyMappings(mappings: Record<string, m.Matcher<unknown>>): void {
     const mappingPaths = Object.keys(mappings);
-    if (!mappingPaths.length) return;
+    if (mappingPaths.length === 0) return;
 
     const unusedMappings = new Set(mappingPaths);
 

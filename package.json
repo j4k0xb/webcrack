@@ -19,7 +19,8 @@
     "start": "node dist/cli.js",
     "dev": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
     "lint": "eslint --ext .ts .",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -60,6 +61,7 @@
     "@types/node": "^20.3.1",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
+    "@vitest/coverage-istanbul": "^0.32.2",
     "esbuild": "^0.18.7",
     "eslint": "^8.43.0",
     "typescript": "^5.1.3",

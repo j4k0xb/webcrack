@@ -5,5 +5,8 @@ export default defineConfig({
     forceRerunTriggers: ['test/samples/**'],
     setupFiles: 'test/setup.ts',
     include: ['test/**/*.test.ts'],
+    coverage: {
+      provider: 'istanbul',
+    },
   },
 });
