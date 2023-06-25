@@ -9,6 +9,7 @@ import {
   constKey,
   constMemberExpression,
   createFunctionMatcher,
+  findParent,
   isReadonlyObject,
 } from '../utils/matcher';
 
@@ -122,11 +123,8 @@ export default {
         });
 
         oldRefs.forEach(ref => {
-          const varDeclarator = ref.findParent(p => p.isVariableDeclarator());
-          if (varDeclarator)
-            changes += transform(
-              varDeclarator as NodePath<t.VariableDeclarator>
-            );
+          const varDeclarator = findParent(ref, m.variableDeclarator());
+          if (varDeclarator) changes += transform(varDeclarator);
         });
 
         path.remove();

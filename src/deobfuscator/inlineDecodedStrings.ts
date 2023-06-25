@@ -18,16 +18,16 @@ export default {
     applyTransform(ast, numberExpressions);
 
     const calls = collectCalls(ast, options.vm);
-    const decodedStrings = await options.vm.decode(calls);
+    const decodedValues = await options.vm.decode(calls);
 
-    calls.forEach((path, i) => {
-      if (typeof decodedStrings[i] === 'string') {
-        path.replaceWith(t.stringLiteral(decodedStrings[i]));
-      } else {
-        path.replaceWith(t.identifier('undefined'));
-        path.addComment('leading', 'webcrack:decode_error');
-      }
-    });
+    for (let i = 0; i < calls.length; i++) {
+      const call = calls[i];
+      const value = decodedValues[i];
+
+      call.replaceWith(t.valueToNode(value));
+      if (typeof value !== 'string')
+        call.addComment('leading', 'webcrack:decode_error');
+    }
 
     state.changes += calls.length;
   },

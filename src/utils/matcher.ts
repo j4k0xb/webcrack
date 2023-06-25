@@ -1,4 +1,4 @@
-import { Binding } from '@babel/traverse';
+import { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
@@ -34,9 +34,10 @@ export const emptyIife = matchIife([]);
  * Matches both identifier properties and string literal computed properties
  */
 export function constMemberExpression(
-  object: m.Matcher<t.Expression>,
+  object: string | m.Matcher<t.Expression>,
   property?: string | m.Matcher<string>
 ): m.Matcher<t.MemberExpression> {
+  if (typeof object === 'string') object = m.identifier(object);
   return m.or(
     m.memberExpression(object, m.identifier(property), false),
     m.memberExpression(object, m.stringLiteral(property), true)
@@ -54,6 +55,32 @@ export const falseMatcher = m.or(
   m.booleanLiteral(false),
   m.unaryExpression('!', m.arrayExpression([]))
 );
+
+/**
+ * Starting at the parent path of the current `NodePath` and going up the
+ * tree, return the first `NodePath` that causes the provided `matcher`
+ * to return true, or `null` if the `matcher` never returns true.
+ */
+export function findParent<T extends t.Node>(
+  path: NodePath,
+  matcher: m.Matcher<T>
+): NodePath<T> | null {
+  return path.findParent(path =>
+    matcher.match(path.node)
+  ) as NodePath<T> | null;
+}
+
+/**
+ * Starting at current `NodePath` and going up the tree, return the first
+ * `NodePath` that causes the provided `matcher` to return true,
+ * or `null` if the `matcher` never returns true.
+ */
+export function findPath<T extends t.Node>(
+  path: NodePath,
+  matcher: m.Matcher<T>
+): NodePath<T> | null {
+  return path.find(path => matcher.match(path.node)) as NodePath<T> | null;
+}
 
 /**
  * Function expression matcher that captures the parameters

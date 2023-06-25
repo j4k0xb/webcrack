@@ -54,12 +54,13 @@ export class VMDecoder {
     this.setupCode = stringArrayCode + rotatorCode + decoderCode;
   }
 
-  async decode(calls: NodePath<CallExpression>[]): Promise<string[]> {
-    return (await this.sandbox(
+  async decode(calls: NodePath<CallExpression>[]): Promise<unknown[]> {
+    const result = await this.sandbox(
       `(() => {
         ${this.setupCode}
         return [${calls.join(',')}]
       })()`
-    )) as string[];
+    );
+    return result as unknown[];
   }
 }

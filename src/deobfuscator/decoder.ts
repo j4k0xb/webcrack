@@ -1,6 +1,7 @@
 import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { findParent } from '../utils/matcher';
 import { StringArray } from './stringArray';
 
 export interface Decoder {
@@ -38,9 +39,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
   );
 
   for (const ref of stringArray.references) {
-    const decoderFn = ref.findParent(p =>
-      matcher.match(p.node)
-    ) as NodePath<t.FunctionDeclaration> | null;
+    const decoderFn = findParent(ref, matcher);
 
     if (decoderFn) {
       const oldName = functionName.current!;

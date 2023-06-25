@@ -53,10 +53,9 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
   // E.g. getter
   const getterVarName = m.capture(m.identifier());
   // E.g. require.n(m)
-  const requireN = m.callExpression(
-    constMemberExpression(m.identifier('require'), 'n'),
-    [moduleArg]
-  );
+  const requireN = m.callExpression(constMemberExpression('require', 'n'), [
+    moduleArg,
+  ]);
   // E.g. const getter = require.n(m)
   const defaultRequireMatcher = m.variableDeclarator(getterVarName, requireN);
 

@@ -8,10 +8,9 @@ export default {
   tags: ['safe'],
   visitor: () => {
     const string = m.capture(m.anyString());
-    const matcher = m.callExpression(
-      constMemberExpression(m.identifier('JSON'), 'parse'),
-      [m.stringLiteral(string)]
-    );
+    const matcher = m.callExpression(constMemberExpression('JSON', 'parse'), [
+      m.stringLiteral(string),
+    ]);
 
     return {
       CallExpression: {

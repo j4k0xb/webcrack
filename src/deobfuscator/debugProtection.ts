@@ -1,7 +1,7 @@
 import * as m from '@codemod/matchers';
 import { ifStatement } from '@codemod/matchers';
 import { Transform } from '../transforms';
-import { constMemberExpression, iife } from '../utils/matcher';
+import { constMemberExpression, findParent, iife } from '../utils/matcher';
 
 // https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/debug-protection/templates/debug-protection-function-interval/DebugProtectionFunctionIntervalTemplate.ts
 
@@ -93,7 +93,7 @@ export default {
 
         binding.referencePaths.forEach(ref => {
           if (intervalCall.match(ref.parent)) {
-            ref.findParent(p => iife.match(p.node))?.remove();
+            findParent(ref, iife)?.remove();
           }
         });
 

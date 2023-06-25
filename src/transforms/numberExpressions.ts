@@ -11,7 +11,7 @@ export default {
         if (matcher.match(path.node)) {
           const evaluated = path.evaluate();
           if (evaluated.confident) {
-            path.replaceWith(t.numericLiteral(evaluated.value as number));
+            path.replaceWith(t.valueToNode(evaluated.value));
             path.skip();
             this.changes++;
           }

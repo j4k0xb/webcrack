@@ -29,15 +29,15 @@ export default {
 
     // React.createElement(type, props, ...children)
     const elementMatcher = m.callExpression(
-      constMemberExpression(m.identifier('React'), 'createElement'),
+      constMemberExpression('React', 'createElement'),
       m.anyList<t.Expression>(type, props, m.zeroOrMore(m.anyExpression()))
     );
 
     // React.createElement(React.Fragment, null, ...children)
     const fragmentMatcher = m.callExpression(
-      constMemberExpression(m.identifier('React'), 'createElement'),
+      constMemberExpression('React', 'createElement'),
       m.anyList<t.Expression>(
-        constMemberExpression(m.identifier('React'), 'Fragment'),
+        constMemberExpression('React', 'Fragment'),
         m.nullLiteral(),
         m.zeroOrMore(m.anyExpression())
       )
