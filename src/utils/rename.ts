@@ -25,7 +25,7 @@ export function renameParameters(
   newNames: string[]
 ): void {
   const params = path.node.params as t.Identifier[];
-  for (let i = 0; i < params.length; i++) {
+  for (let i = 0; i < Math.min(params.length, newNames.length); i++) {
     const binding = path.scope.getBinding(params[i].name)!;
     renameFast(binding, newNames[i]);
   }
