@@ -109,12 +109,15 @@ export async function webcrack(
 
   applyTransform(ast, unminify);
 
-  // Have to run this after unminify to properly detect it
-  if (options.deobfuscate) {
-    applyTransforms(ast, [selfDefending, debugProtection]);
-  }
-
-  if (options.jsx) applyTransform(ast, jsx);
+  // TODO: Also merge unminify visitor (breaks selfDefending/debugProtection atm)
+  applyTransforms(
+    ast,
+    [
+      // Have to run this after unminify to properly detect it
+      options.deobfuscate ? [selfDefending, debugProtection] : [],
+      options.jsx ? [jsx] : [],
+    ].flat()
+  );
 
   // Unpacking modifies the same AST and may result in imports not at top level
   // so the code has to be generated before
