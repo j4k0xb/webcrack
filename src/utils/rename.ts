@@ -8,10 +8,10 @@ export function renameFast(binding: Binding, newName: string): void {
   binding.referencePaths.forEach(ref => {
     assert(
       ref.isIdentifier(),
-      `Unexpected reference: ${codePreview(ref.node)}`
+      `Unexpected reference (${ref.type}): ${codePreview(ref.node)}`
     );
     // To avoid conflicts with other bindings of the same name
-    ref.scope.rename(newName);
+    if (ref.scope.hasBinding(newName)) ref.scope.rename(newName);
     ref.node.name = newName;
   });
 
@@ -21,20 +21,20 @@ export function renameFast(binding: Binding, newName: string): void {
     m.or(m.arrayPattern(), m.objectPattern())
   );
   binding.constantViolations.forEach(ref => {
-    ref.scope.rename(newName);
+    // To avoid conflicts with other bindings of the same name
+    if (ref.scope.hasBinding(newName)) ref.scope.rename(newName);
+
     if (ref.isAssignmentExpression() && t.isIdentifier(ref.node.left)) {
       ref.node.left.name = newName;
     } else if (ref.isUpdateExpression() && t.isIdentifier(ref.node.argument)) {
       ref.node.argument.name = newName;
     } else if (ref.isVariableDeclarator() && t.isIdentifier(ref.node.id)) {
       ref.node.id.name = newName;
-    } else if (patternMatcher.match(ref.node)) {
+    } else if (ref.isFor() || patternMatcher.match(ref.node)) {
       traverse(ref.node, {
         Identifier(path) {
-          if (
-            path.scope === ref.scope &&
-            path.node.name === binding.identifier.name
-          ) {
+          if (path.scope !== ref.scope) return path.skip();
+          if (path.node.name === binding.identifier.name) {
             path.node.name = newName;
           }
         },
@@ -42,7 +42,7 @@ export function renameFast(binding: Binding, newName: string): void {
       });
     } else {
       throw new Error(
-        `Unexpected constant violation: ${codePreview(ref.node)}`
+        `Unexpected constant violation (${ref.type}): ${codePreview(ref.node)}`
       );
     }
   });
