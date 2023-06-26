@@ -22,14 +22,23 @@ export class Decoder {
   collectCalls(): NodePath<t.CallExpression>[] {
     const calls: NodePath<t.CallExpression>[] = [];
 
+    const argumentMatcher: m.Matcher<t.Expression> = m.or(
+      m.binaryExpression(
+        m.anything(),
+        m.matcher(node => argumentMatcher.match(node)),
+        m.matcher(node => argumentMatcher.match(node))
+      ),
+      m.unaryExpression(
+        '-',
+        m.matcher(node => argumentMatcher.match(node))
+      ),
+      m.numericLiteral(),
+      m.stringLiteral()
+    );
+
     const call = m.callExpression(
       m.identifier(this.name),
-      m.arrayOf(
-        m.or(
-          m.stringLiteral(),
-          m.or(m.unaryExpression('-', m.numericLiteral()), m.numericLiteral())
-        )
-      )
+      m.arrayOf(argumentMatcher)
     );
 
     const conditional = m.capture(m.conditionalExpression());

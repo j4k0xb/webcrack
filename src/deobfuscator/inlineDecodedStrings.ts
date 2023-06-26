@@ -1,6 +1,5 @@
 import * as t from '@babel/types';
-import { AsyncTransform, applyTransform } from '../transforms';
-import numberExpressions from '../transforms/numberExpressions';
+import { AsyncTransform } from '../transforms';
 import { VMDecoder } from './vm';
 
 /**
@@ -12,7 +11,6 @@ export default {
   tags: ['unsafe'],
   async run(ast, state, options) {
     if (!options) return;
-    applyTransform(ast, numberExpressions);
 
     const calls = options.vm.decoders.flatMap(decoder =>
       decoder.collectCalls()
