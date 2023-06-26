@@ -26,6 +26,8 @@ export function renameFast(binding: Binding, newName: string): void {
       ref.node.left.name = newName;
     } else if (ref.isUpdateExpression() && t.isIdentifier(ref.node.argument)) {
       ref.node.argument.name = newName;
+    } else if (ref.isVariableDeclarator() && t.isIdentifier(ref.node.id)) {
+      ref.node.id.name = newName;
     } else if (patternMatcher.match(ref.node)) {
       traverse(ref.node, {
         Identifier(path) {

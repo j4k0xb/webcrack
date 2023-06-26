@@ -23,7 +23,8 @@ describe('rename variable', () => {
 
   test('different types of assignments', () => {
     const ast = parse(`
-      let a = 1;
+      var a = 1;
+      var a = 2;
       a++;
       [a] = [2];
       ({...a} = {});
@@ -35,7 +36,8 @@ describe('rename variable', () => {
       },
     });
     expect(ast).toMatchInlineSnapshot(`
-      let b = 1;
+      var b = 1;
+      var b = 2;
       b++;
       [b] = [2];
       ({
