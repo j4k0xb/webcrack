@@ -12,6 +12,7 @@ import {
   findParent,
   isReadonlyObject,
 } from '../utils/matcher';
+import { renameFast } from '../utils/rename';
 
 /**
  * Explanation: https://excalidraw.com/#json=0vehUdrfSS635CNPEQBXl,hDOd-UO9ETfSDWT9MxVX-A
@@ -165,10 +166,7 @@ export default {
       objBinding.referencePaths = aliasBinding.referencePaths;
       objBinding.references = aliasBinding.references;
 
-      objBinding.scope.rename(
-        aliasId.current!.name,
-        objBinding.identifier.name
-      );
+      renameFast(aliasBinding, objBinding.identifier.name);
 
       assignments.forEach(p => p.remove());
       aliasBinding.path.remove();
@@ -180,6 +178,7 @@ export default {
           this.changes += transform(path);
         },
       },
+      noScope: true,
     };
   },
 } satisfies Transform;

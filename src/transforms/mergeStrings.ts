@@ -31,7 +31,8 @@ export default {
       StringLiteral: {
         exit(path) {
           if (nestedMatcher.match(path.parent)) {
-            // a + "b" + "c" -> a + "bc"
+            // (a + "b") + "c" -> a + "bc"
+            //  left ^      ^ right (path)
             left.current!.value += right.current!.value;
             path.remove();
             this.changes++;

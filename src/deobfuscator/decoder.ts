@@ -3,6 +3,7 @@ import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { findParent } from '../utils/matcher';
+import { renameFast } from '../utils/rename';
 import { StringArray } from './stringArray';
 
 /**
@@ -106,7 +107,8 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
     if (decoderFn) {
       const oldName = functionName.current!;
       const newName = `__DECODE_${decoders.length}__`;
-      decoderFn.parentPath.scope.rename(oldName, newName);
+      const binding = decoderFn.scope.getBinding(oldName)!;
+      renameFast(binding, newName);
       decoders.push(new Decoder(newName, decoderFn));
     }
   }

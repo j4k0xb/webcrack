@@ -122,8 +122,6 @@ export function isReadonlyObject(
       !path.parentPath?.parentPath?.isAssignmentExpression({
         left: path.parent,
       }) &&
-      // obj++
-      !path.parentPath?.isUpdateExpression() &&
       // obj.property++
       !path.parentPath?.parentPath?.isUpdateExpression({
         argument: path.parent,

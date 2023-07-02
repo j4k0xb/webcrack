@@ -1,6 +1,7 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { renameFast } from '../utils/rename';
 
 export interface StringArray {
   path: NodePath<t.FunctionDeclaration>;
@@ -56,9 +57,9 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
       if (matcher.match(path.node)) {
         const length = arrayExpression.current!.elements.length;
         const name = functionName.current!;
-        const binding = path.parentPath.scope.getBinding(name)!;
+        const binding = path.scope.getBinding(name)!;
+        renameFast(binding, '__STRING_ARRAY__');
 
-        path.parentPath.scope.rename(name, '__STRING_ARRAY__');
         result = {
           path,
           references: binding.referencePaths,
