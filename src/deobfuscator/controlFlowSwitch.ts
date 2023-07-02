@@ -37,9 +37,9 @@ export default {
             )
           ),
         ]),
-        // E.g. let iterator = 0
+        // E.g. let iterator = 0 or -0x1a70 + 0x93d + 0x275 * 0x7
         m.variableDeclaration(undefined, [
-          m.variableDeclarator(iterator, m.numericLiteral(0)),
+          m.variableDeclarator(iterator),
         ]),
         infiniteLoop(
           m.blockStatement([

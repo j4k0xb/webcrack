@@ -61,7 +61,7 @@ function applyTransforms() {
         'aokfw': b(0x7)
     };
     var d = c[b(0x6)][b(0x4)]('|');
-    var e = 0x0;
+    var e = -0x1a70 + 0x93d + 0x275 * 0x7;
     while (!![]) {
         switch (d[e++]) {
         case '0':
