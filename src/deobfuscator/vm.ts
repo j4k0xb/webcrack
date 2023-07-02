@@ -21,8 +21,10 @@ export function createNodeSandbox(): Sandbox {
 }
 
 export function createBrowserSandbox(): Sandbox {
-  // TODO: use sandybox (not available in web workers though)
-  throw new Error('Custom Sandbox implementation required.');
+  return () => {
+    // TODO: use sandybox (not available in web workers though)
+    throw new Error('Custom Sandbox implementation required.');
+  };
 }
 
 export class VMDecoder {
