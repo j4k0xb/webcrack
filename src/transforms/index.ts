@@ -56,6 +56,8 @@ export function applyTransforms(
   const traverseOptions = transforms.flatMap(t => t.visitor?.() ?? []);
   if (traverseOptions.length > 0) {
     const visitor = visitors.merge(traverseOptions);
+    // @ts-expect-error regression from https://github.com/babel/babel/pull/15702
+    visitor.noScope = traverseOptions.every(t => t.noScope);
     traverse(ast, visitor, undefined, state);
   }
 

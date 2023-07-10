@@ -35,6 +35,9 @@ export default {
       yoda.visitor(),
       jsonParse.visitor(),
     ];
-    return visitors.merge(traverseOptions);
+    const visitor = visitors.merge(traverseOptions);
+    // @ts-expect-error regression from https://github.com/babel/babel/pull/15702
+    visitor.noScope = traverseOptions.every(t => t.noScope);
+    return visitor;
   },
 } satisfies Transform;

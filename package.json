@@ -41,11 +41,11 @@
     "unbundle"
   ],
   "dependencies": {
-    "@babel/generator": "^7.22.5",
+    "@babel/generator": "^7.22.7",
     "@babel/helper-validator-identifier": "^7.22.5",
-    "@babel/parser": "^7.22.6",
+    "@babel/parser": "^7.22.7",
     "@babel/template": "^7.22.5",
-    "@babel/traverse": "^7.22.6",
+    "@babel/traverse": "^7.22.8",
     "@babel/types": "^7.22.5",
     "@codemod/matchers": "^1.7.0",
     "commander": "^11.0.0",
@@ -58,14 +58,14 @@
     "@types/babel__template": "^7.4.1",
     "@types/babel__traverse": "^7.20.1",
     "@types/debug": "^4.1.8",
-    "@types/node": "^20.3.3",
+    "@types/node": "^20.4.1",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
-    "@vitest/coverage-istanbul": "^0.32.4",
+    "@vitest/coverage-istanbul": "^0.33.0",
     "esbuild": "^0.18.11",
     "eslint": "^8.44.0",
     "typescript": "^5.1.6",
-    "vitest": "^0.32.4"
+    "vitest": "^0.33.0"
   },
   "overrides": {
     "semver": "7.5.3"
