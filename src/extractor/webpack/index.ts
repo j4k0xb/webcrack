@@ -78,9 +78,6 @@ export const unpackWebpack = {
             // var installedModules = {};
             m.variableDeclaration(),
             m.zeroOrMore(),
-            // function __webpack_require__(moduleId) { ... }
-            m.functionDeclaration(),
-            m.zeroOrMore(),
             m.containerOf(
               // __webpack_require__.s = 2
               m.assignmentExpression(
