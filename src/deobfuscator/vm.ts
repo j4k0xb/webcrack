@@ -1,6 +1,7 @@
 import generate from '@babel/generator';
 import { NodePath } from '@babel/traverse';
 import { CallExpression } from '@babel/types';
+import debug from 'debug';
 import { ArrayRotator } from './arrayRotator';
 import { Decoder } from './decoder';
 import { StringArray } from './stringArray';
@@ -62,12 +63,17 @@ export class VMDecoder {
   }
 
   async decode(calls: NodePath<CallExpression>[]): Promise<unknown[]> {
-    const result = await this.sandbox(
-      `(() => {
-        ${this.setupCode}
-        return [${calls.join(',')}]
-      })()`
-    );
-    return result as unknown[];
+    const code = `(() => {
+      ${this.setupCode}
+      return [${calls.join(',')}]
+    })()`;
+
+    try {
+      const result = await this.sandbox(code);
+      return result as unknown[];
+    } catch (err) {
+      debug('webcrack:deobfuscate')('vm code:', code);
+      throw err;
+    }
   }
 }
