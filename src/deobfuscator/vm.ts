@@ -10,14 +10,19 @@ export type Sandbox = (code: string) => Promise<unknown>;
 
 export function createNodeSandbox(): Sandbox {
   return async (code: string) => {
-    const { VM } = await import('vm2');
-    const vm = new VM({
-      timeout: 30_000,
-      allowAsync: false,
-      eval: false,
-      wasm: false,
-    });
-    return vm.run(code) as unknown;
+    const {
+      default: { Isolate },
+    } = await import('isolated-vm-prebuilt');
+    const isolate = new Isolate();
+    const context = await isolate.createContext();
+    const result = (await context.eval(code, {
+      timeout: 10_000,
+      copy: true,
+      filename: 'file:///obfuscated.js',
+    })) as unknown;
+    context.release();
+    isolate.dispose();
+    return result;
   };
 }
 

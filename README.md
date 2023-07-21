@@ -23,11 +23,6 @@ Try it in the [online playground](https://webcrack.netlify.app/) or view the [do
 - ⌨️ **TypeScript** - All code is written in TypeScript
 - 🧪 **Tests** - To make sure nothing breaks
 
-## ‼️ Warning ‼️
-
-vm2 was recently deprecated and has unfixable [critical sandbox escape vulnerabilities](https://github.com/patriksimek/vm2/issues/533).
-Use the cli/api for deobfuscation at your own risk, the online version should be safe.
-
 ## Command Line Interface
 
 ```bash

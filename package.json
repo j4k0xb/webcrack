@@ -50,7 +50,7 @@
     "@codemod/matchers": "^1.7.0",
     "commander": "^11.0.0",
     "debug": "^4.3.4",
-    "vm2": "^3.9.19"
+    "isolated-vm-prebuilt": "^4.5.3"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
