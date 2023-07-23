@@ -14,7 +14,7 @@ export const unpackBrowserify = {
   name: 'unpack-browserify',
   tags: ['unsafe'],
   visitor(options) {
-    const modules = new Map<number, BrowserifyModule>();
+    const modules = new Map<string, BrowserifyModule>();
 
     const files = m.capture(
       m.arrayOf(
@@ -36,7 +36,7 @@ export const unpackBrowserify = {
         )
       )
     );
-    const entryId = m.capture(m.numericLiteral());
+    const entryIdMatcher = m.capture(m.numericLiteral());
 
     const matcher = m.callExpression(
       m.or(
@@ -59,7 +59,7 @@ export const unpackBrowserify = {
       [
         m.objectExpression(files),
         m.objectExpression(),
-        m.arrayExpression([entryId]),
+        m.arrayExpression([entryIdMatcher]),
       ]
     );
 
@@ -68,19 +68,23 @@ export const unpackBrowserify = {
         if (!matcher.match(path.node)) return;
         path.stop();
 
+        const entryId = entryIdMatcher.current!.value.toString();
+
         const modulesPath = path.get(
           files.currentKeys!.join('.')
         ) as NodePath<t.ObjectProperty>[];
 
-        const dependencyTree: Record<number, Record<number, string>> = {};
+        const dependencyTree: Record<string, Record<string, string>> = {};
 
         for (const moduleWrapper of modulesPath) {
-          const id = (moduleWrapper.node.key as t.NumericLiteral).value;
+          const id = (
+            moduleWrapper.node.key as t.NumericLiteral
+          ).value.toString();
           const fn = moduleWrapper.get(
             'value.elements.0'
           ) as NodePath<t.FunctionExpression>;
 
-          const dependencies: Record<number, string> = (dependencyTree[id] =
+          const dependencies: Record<string, string> = (dependencyTree[id] =
             {});
           const dependencyProperties = (
             moduleWrapper.get(
@@ -93,8 +97,8 @@ export const unpackBrowserify = {
             if (dependency.value.type !== 'NumericLiteral') continue;
 
             const filePath = getPropName(dependency.key)!;
-            const id = dependency.value.value;
-            dependencies[id] = filePath;
+            const depId = dependency.value.value.toString();
+            dependencies[depId] = filePath;
           }
 
           renameParameters(fn, ['require', 'module', 'exports']);
@@ -102,26 +106,20 @@ export const unpackBrowserify = {
           const module = new BrowserifyModule(
             id,
             file,
-            id === entryId.current!.value,
+            id === entryId,
             dependencies
           );
-          modules.set(id, module);
+          modules.set(id.toString(), module);
         }
 
-        const resolvedPaths = resolveDependencyTree(
-          dependencyTree,
-          entryId.current!.value
-        );
+        const resolvedPaths = resolveDependencyTree(dependencyTree, entryId);
 
         for (const module of modules.values()) {
           module.path = resolvedPaths[module.id];
         }
 
         if (modules.size > 0) {
-          options!.bundle = new BrowserifyBundle(
-            entryId.current!.value,
-            modules
-          );
+          options!.bundle = new BrowserifyBundle(entryId, modules);
         }
       },
       noScope: true,

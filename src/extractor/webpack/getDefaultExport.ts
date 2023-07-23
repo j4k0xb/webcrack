@@ -37,7 +37,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
     const binding = path.scope.getBinding(moduleArg.current!.name);
     const declarator = binding?.path.node;
     if (declaratorMatcher.match(declarator)) {
-      return bundle.modules.get(requiredModuleId.current!.value);
+      return bundle.modules.get(requiredModuleId.current!.value.toString());
     }
   }
 

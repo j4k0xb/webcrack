@@ -2,7 +2,7 @@ import generate from '@babel/generator';
 import * as t from '@babel/types';
 
 export class Module {
-  id: number;
+  id: string;
   isEntry: boolean;
   path: string;
   /**
@@ -11,7 +11,7 @@ export class Module {
   ast: t.File;
   #code: string | undefined;
 
-  constructor(id: number, ast: t.File, isEntry: boolean) {
+  constructor(id: string, ast: t.File, isEntry: boolean) {
     this.id = id;
     this.ast = ast;
     this.isEntry = isEntry;

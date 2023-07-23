@@ -9,7 +9,7 @@ import { WebpackModule } from './module';
 import { inlineVarInjections } from './varInjection';
 
 export class WebpackBundle extends Bundle {
-  constructor(entryId: number, modules: Map<number, WebpackModule>) {
+  constructor(entryId: string, modules: Map<string, WebpackModule>) {
     super('webpack', entryId, modules);
   }
 
@@ -38,7 +38,9 @@ export class WebpackBundle extends Bundle {
       traverse(module.ast, {
         CallExpression: path => {
           if (requireMatcher.match(path.node)) {
-            const requiredModule = this.modules.get(requireId.current!.value);
+            const requiredModule = this.modules.get(
+              requireId.current!.value.toString()
+            );
             if (requiredModule) {
               const [arg] = path.get('arguments') as NodePath<t.Identifier>[];
               arg.replaceWith(
@@ -49,9 +51,7 @@ export class WebpackBundle extends Bundle {
         },
         ImportDeclaration: path => {
           if (importMatcher.match(path.node)) {
-            const requiredModule = this.modules.get(
-              Number(importId.current!.value)
-            );
+            const requiredModule = this.modules.get(importId.current!.value);
             if (requiredModule) {
               const arg = path.get('source') as NodePath;
               arg.replaceWith(

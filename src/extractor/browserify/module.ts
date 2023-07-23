@@ -5,7 +5,7 @@ export class BrowserifyModule extends Module {
   dependencies: Record<number, string>;
 
   constructor(
-    id: number,
+    id: string,
     ast: t.File,
     isEntry: boolean,
     dependencies: Record<number, string>

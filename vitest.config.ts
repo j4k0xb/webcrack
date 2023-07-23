@@ -8,6 +8,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
     },
-    threads: false, // https://github.com/laverdet/isolated-vm/issues/138
+    isolate: false,
+    useAtomics: true,
   },
 });

@@ -68,7 +68,7 @@ describe('paths', () => {
       3: {},
       4: {},
     };
-    expect(resolveDependencyTree(dependencies, 0)).toEqual({
+    expect(resolveDependencyTree(dependencies, '0')).toEqual({
       0: 'tmp0/tmp1/index.js',
       1: 'tmp0/tmp1/a.js',
       2: 'tmp0/bar/b.js',
@@ -87,7 +87,7 @@ describe('paths', () => {
       6: { 3: './lib/bytesToUuid', 4: './lib/rng' },
       7: { 1: 'number', 2: 'uuid' },
     };
-    expect(resolveDependencyTree(dependencies, 7)).toEqual({
+    expect(resolveDependencyTree(dependencies, '7')).toEqual({
       1: 'node_modules/number/index.js',
       2: 'node_modules/uuid/index.js',
       3: 'node_modules/uuid/lib/bytesToUuid.js',

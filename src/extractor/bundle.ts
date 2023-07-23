@@ -8,13 +8,13 @@ const logger = debug('webcrack:unpack');
 
 export class Bundle {
   type: 'webpack' | 'browserify';
-  entryId: number;
-  modules: Map<number, Module>;
+  entryId: string;
+  modules: Map<string, Module>;
 
   constructor(
     type: 'webpack' | 'browserify',
-    entryId: number,
-    modules: Map<number, Module>
+    entryId: string,
+    modules: Map<string, Module>
   ) {
     this.type = type;
     this.entryId = entryId;

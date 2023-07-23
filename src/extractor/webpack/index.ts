@@ -2,6 +2,7 @@ import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../../transforms';
+import { getPropName } from '../../utils/ast';
 import { constKey, constMemberExpression } from '../../utils/matcher';
 import { renameParameters } from '../../utils/rename';
 import { Bundle } from '../bundle';
@@ -12,7 +13,7 @@ export const unpackWebpack = {
   name: 'unpack-webpack',
   tags: ['unsafe'],
   visitor(options) {
-    const modules = new Map<number, WebpackModule>();
+    const modules = new Map<string, WebpackModule>();
 
     const entryIdMatcher = m.capture(m.numericLiteral());
     const moduleFunctionsMatcher = m.capture(
@@ -28,7 +29,7 @@ export const unpackWebpack = {
           m.arrayOf(
             m.or(
               m.objectProperty(
-                m.numericLiteral(),
+                m.or(m.numericLiteral(), m.stringLiteral(), m.identifier()),
                 m.or(m.functionExpression(), m.arrowFunctionExpression())
               ),
               // __webpack_public_path__ (c: "")
@@ -116,9 +117,10 @@ export const unpackWebpack = {
           ? (modulesPath.get('elements') as NodePath<t.Node | null>[])
           : (modulesPath.get('properties') as NodePath[]);
 
-        moduleWrappers.forEach((moduleWrapper, id) => {
+        moduleWrappers.forEach((moduleWrapper, index) => {
+          let moduleId = index.toString();
           if (t.isObjectProperty(moduleWrapper.node)) {
-            id = (moduleWrapper.node.key as t.NumericLiteral).value;
+            moduleId = getPropName(moduleWrapper.node.key)!;
             moduleWrapper = moduleWrapper.get('value') as NodePath;
           }
 
@@ -139,20 +141,18 @@ export const unpackWebpack = {
             }
 
             const module = new WebpackModule(
-              id,
+              moduleId,
               file,
-              id === entryIdMatcher.current?.value
+              moduleId === entryIdMatcher.current?.value.toString()
             );
 
-            modules.set(id, module);
+            modules.set(moduleId, module);
           }
         });
 
-        if (modules.size > 0 && entryIdMatcher.current) {
-          options!.bundle = new WebpackBundle(
-            entryIdMatcher.current.value,
-            modules
-          );
+        if (modules.size > 0) {
+          const entryId = entryIdMatcher.current?.value.toString() ?? '';
+          options!.bundle = new WebpackBundle(entryId, modules);
         }
       },
       noScope: true,
