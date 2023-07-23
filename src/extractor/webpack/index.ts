@@ -100,11 +100,40 @@ export const unpackWebpack = {
       )
     );
 
+    // Examples: self.webpackChunk_N_E, window.webpackJsonp
+    const jsonpGlobal = m.capture(
+      constMemberExpression(
+        m.identifier(m.or('self', 'window')),
+        m.matcher(s => (s as string).startsWith('webpack'))
+      )
+    );
+    // (window.webpackJsonp = window.webpackJsonp || []).push([[0], {...}])
+    const jsonpMatcher = m.callExpression(
+      constMemberExpression(
+        m.assignmentExpression(
+          '=',
+          jsonpGlobal,
+          m.logicalExpression('||', jsonpGlobal, m.arrayExpression([]))
+        ),
+        'push'
+      ),
+      [
+        m.arrayExpression(
+          m.anyList(
+            m.arrayExpression([m.numericLiteral()]), // chunkId
+            moduleFunctionsMatcher,
+            m.slice({ max: 1 }) // optional argument like [[188, 17, 16, 18]]
+          )
+        ),
+      ]
+    );
+
     return {
       CallExpression(path) {
         if (
           !webpack4Matcher.match(path.node) &&
-          !webpack5Matcher.match(path.node)
+          !webpack5Matcher.match(path.node) &&
+          !jsonpMatcher.match(path.node)
         )
           return;
         path.stop();

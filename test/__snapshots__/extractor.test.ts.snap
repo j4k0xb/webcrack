@@ -434,6 +434,27 @@ export default 1;,
 }
 `;
 
+exports[`extract webpack-jsonp-chunk.js 1`] = `
+WebpackBundle {
+  "entryId": "",
+  "modules": Map {
+    "2wwy" => WebpackModule {
+      "ast": const a = require("E8gZ");,
+      "id": "2wwy",
+      "isEntry": false,
+      "path": "./2wwy.js",
+    },
+    "E8gZ" => WebpackModule {
+      "ast": module.exports = 4;,
+      "id": "E8gZ",
+      "isEntry": false,
+      "path": "./E8gZ.js",
+    },
+  },
+  "type": "webpack",
+}
+`;
+
 exports[`extract webpack-object.js 1`] = `
 WebpackBundle {
   "entryId": "386",

@@ -11,6 +11,7 @@ test.each([
   'webpack-object.js',
   'webpack-esm.js',
   'webpack-var-injection.js',
+  'webpack-jsonp-chunk.js',
   'webpack-0.11.x.js',
   'webpack5-object.js',
   'webpack5-esm.js',
