@@ -27,7 +27,7 @@ export class WebpackBundle extends Bundle {
    * Replaces `require(id)` calls with `require("./relative/path.js")` calls.
    */
   private replaceRequirePaths() {
-    const requireId = m.capture(m.numericLiteral());
+    const requireId = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
     const requireMatcher = m.or(
       m.callExpression(m.identifier('require'), [requireId])
     );
@@ -36,28 +36,32 @@ export class WebpackBundle extends Bundle {
 
     this.modules.forEach(module => {
       traverse(module.ast, {
-        CallExpression: path => {
+        'CallExpression|ImportDeclaration': path => {
+          let moduleId: string;
+          let arg: NodePath;
+
           if (requireMatcher.match(path.node)) {
-            const requiredModule = this.modules.get(
-              requireId.current!.value.toString()
-            );
-            if (requiredModule) {
-              const [arg] = path.get('arguments') as NodePath<t.Identifier>[];
-              arg.replaceWith(
-                t.stringLiteral(relativePath(module.path, requiredModule.path))
-              );
-            }
+            moduleId = requireId.current!.value.toString();
+            [arg] = path.get('arguments') as NodePath<t.Identifier>[];
+          } else if (importMatcher.match(path.node)) {
+            moduleId = importId.current!.value;
+            arg = path.get('source') as NodePath;
+          } else {
+            return;
           }
-        },
-        ImportDeclaration: path => {
-          if (importMatcher.match(path.node)) {
-            const requiredModule = this.modules.get(importId.current!.value);
-            if (requiredModule) {
-              const arg = path.get('source') as NodePath;
-              arg.replaceWith(
-                t.stringLiteral(relativePath(module.path, requiredModule.path))
-              );
-            }
+
+          const requiredModule = this.modules.get(moduleId);
+          arg.replaceWith(
+            t.stringLiteral(
+              relativePath(
+                module.path,
+                requiredModule?.path ?? `./${moduleId}.js`
+              )
+            )
+          );
+          // For example if its stored in another chunk
+          if (!requiredModule) {
+            arg.addComment('leading', 'webcrack:missing');
           }
         },
         noScope: true,

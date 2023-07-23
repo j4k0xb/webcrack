@@ -21,8 +21,6 @@ test.each([
   const { bundle } = await webcrack(
     await readFile(join('test', 'samples', filename), 'utf8')
   );
-  assert(bundle);
-  bundle.applyTransforms();
   expect(bundle).toMatchSnapshot();
 });
 

@@ -439,7 +439,8 @@ WebpackBundle {
   "entryId": "",
   "modules": Map {
     "2wwy" => WebpackModule {
-      "ast": const a = require("E8gZ");,
+      "ast": const a = require("./E8gZ.js");
+const b = require( /*webcrack:missing*/"./w6GO.js");,
       "id": "2wwy",
       "isEntry": false,
       "path": "./2wwy.js",
