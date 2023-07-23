@@ -1,4 +1,3 @@
-import * as m from '@codemod/matchers';
 import assert from 'assert';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -9,9 +8,11 @@ import { relativePath, resolveDependencyTree } from '../src/utils/path';
 // Test samples
 test.each([
   'webpack.js',
-  'webpack_object.js',
+  'webpack-object.js',
   'webpack-esm.js',
   'webpack-var-injection.js',
+  'webpack-jsonp-chunk.js',
+  'webpack-0.11.x.js',
   'webpack5-object.js',
   'webpack5-esm.js',
   'browserify.js',
@@ -20,20 +21,33 @@ test.each([
   const { bundle } = await webcrack(
     await readFile(join('test', 'samples', filename), 'utf8')
   );
-  assert(bundle);
-  bundle.applyTransforms();
   expect(bundle).toMatchSnapshot();
+});
+
+test('detect top-level bundle first', async () => {
+  const { bundle } = await webcrack(
+    await readFile(
+      join('test', 'samples', 'browserify-webpack-nested.js'),
+      'utf8'
+    )
+  );
+  assert(bundle);
+  expect(bundle.type).toBe('browserify');
 });
 
 describe('extractor', () => {
   test('path mapping', async () => {
     const { bundle } = await webcrack(
-      await readFile('./test/samples/webpack.js', 'utf8')
+      await readFile('./test/samples/webpack.js', 'utf8'),
+      {
+        mappings: m => ({
+          './utils/color.js': m.stringLiteral('#FBC02D'),
+          package: m.numericLiteral(4),
+        }),
+      }
     );
     expect(bundle).toBeDefined();
     assert(bundle);
-    bundle.applyMappings({ './utils/color.js': m.stringLiteral('#FBC02D') });
-    bundle.applyTransforms();
     expect(bundle).toMatchSnapshot();
   });
 });
@@ -42,6 +56,7 @@ describe('paths', () => {
   test('relative paths', () => {
     expect(relativePath('./a.js', './x/y.js')).toBe('./x/y.js');
     expect(relativePath('./x/y.js', './a.js')).toBe('../a.js');
+    expect(relativePath('./a.js', 'node_modules/lib')).toBe('lib');
   });
 
   test('resolve browserify paths', () => {
@@ -52,7 +67,7 @@ describe('paths', () => {
       3: {},
       4: {},
     };
-    expect(resolveDependencyTree(dependencies, 0)).toEqual({
+    expect(resolveDependencyTree(dependencies, '0')).toEqual({
       0: 'tmp0/tmp1/index.js',
       1: 'tmp0/tmp1/a.js',
       2: 'tmp0/bar/b.js',
@@ -71,7 +86,7 @@ describe('paths', () => {
       6: { 3: './lib/bytesToUuid', 4: './lib/rng' },
       7: { 1: 'number', 2: 'uuid' },
     };
-    expect(resolveDependencyTree(dependencies, 7)).toEqual({
+    expect(resolveDependencyTree(dependencies, '7')).toEqual({
       1: 'node_modules/number/index.js',
       2: 'node_modules/uuid/index.js',
       3: 'node_modules/uuid/lib/bytesToUuid.js',

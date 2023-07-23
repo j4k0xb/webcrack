@@ -2,7 +2,7 @@ import { statement } from '@babel/template';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { constMemberExpression } from '../../utils/matcher';
+import { constMemberExpression, findPath } from '../../utils/matcher';
 import { renameFast } from '../../utils/rename';
 import { WebpackModule } from './module';
 
@@ -22,9 +22,7 @@ import { WebpackModule } from './module';
 export function convertESM(module: WebpackModule): void {
   // E.g. require.r(exports);
   const defineEsModuleMatcher = m.expressionStatement(
-    m.callExpression(constMemberExpression(m.identifier('require'), 'r'), [
-      m.identifier(),
-    ])
+    m.callExpression(constMemberExpression('require', 'r'), [m.identifier()])
   );
 
   const exportsName = m.capture(m.identifier());
@@ -32,7 +30,7 @@ export function convertESM(module: WebpackModule): void {
   const returnedValue = m.capture(m.anyExpression());
   // E.g. require.d(exports, "counter", function () { return f });
   const defineExportMatcher = m.expressionStatement(
-    m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
+    m.callExpression(constMemberExpression('require', 'd'), [
       exportsName,
       m.stringLiteral(exportedName),
       m.functionExpression(
@@ -58,7 +56,7 @@ export function convertESM(module: WebpackModule): void {
   );
   // E.g. require.d(exports, { foo: () => a, bar: () => b });
   const defineExportsMatcher = m.expressionStatement(
-    m.callExpression(constMemberExpression(m.identifier('require'), 'd'), [
+    m.callExpression(constMemberExpression('require', 'd'), [
       exportsName,
       m.objectExpression(properties),
     ])
@@ -81,7 +79,7 @@ export function convertESM(module: WebpackModule): void {
     m.assignmentExpression(
       '=',
       m.identifier('module'),
-      m.callExpression(constMemberExpression(m.identifier('require'), 'hmd'))
+      m.callExpression(constMemberExpression('require', 'hmd'))
     )
   );
 
@@ -146,11 +144,14 @@ function exportVariable(
     const binding = requireDPath.scope.getBinding(value.name);
     if (!binding) return;
 
-    const declaration = binding.path.find(path =>
-      path.isDeclaration()
-    ) as NodePath<
-      t.VariableDeclaration | t.ClassDeclaration | t.FunctionDeclaration
-    > | null;
+    const declaration = findPath(
+      binding.path,
+      m.or(
+        m.variableDeclaration(),
+        m.classDeclaration(),
+        m.functionDeclaration()
+      )
+    );
     if (!declaration) return;
 
     if (exportName === 'default') {

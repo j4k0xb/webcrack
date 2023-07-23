@@ -2,19 +2,19 @@
 
 exports[`extract browserify.js 1`] = `
 BrowserifyBundle {
-  "entryId": 2,
+  "entryId": "2",
   "modules": Map {
-    1 => BrowserifyModule {
+    "1" => BrowserifyModule {
       "ast": function add(a, b) {
   return a + b;
 }
 module.exports = add;,
       "dependencies": {},
-      "id": 1,
+      "id": "1",
       "isEntry": false,
       "path": "add.js",
     },
-    2 => BrowserifyModule {
+    "2" => BrowserifyModule {
       "ast": var sum = require("./sum");
 var numbers = [1, 2, 3];
 var result = sum(numbers);
@@ -23,11 +23,11 @@ outputElement.innerHTML = result;,
       "dependencies": {
         "4": "./sum",
       },
-      "id": 2,
+      "id": "2",
       "isEntry": true,
       "path": "index.js",
     },
-    3 => BrowserifyModule {
+    "3" => BrowserifyModule {
       "ast": function reduce(list, iteratee, memo) {
   list.forEach(function (item) {
     memo = iteratee(item, memo);
@@ -36,11 +36,11 @@ outputElement.innerHTML = result;,
 }
 module.exports = reduce;,
       "dependencies": {},
-      "id": 3,
+      "id": "3",
       "isEntry": false,
       "path": "reduce.js",
     },
-    4 => BrowserifyModule {
+    "4" => BrowserifyModule {
       "ast": var reduce = require("./reduce");
 var add = require("./add");
 function sum(list) {
@@ -51,7 +51,7 @@ module.exports = sum;,
         "1": "./add",
         "3": "./reduce",
       },
-      "id": 4,
+      "id": "4",
       "isEntry": false,
       "path": "sum.js",
     },
@@ -62,23 +62,23 @@ module.exports = sum;,
 
 exports[`extract browserify-2.js 1`] = `
 BrowserifyBundle {
-  "entryId": 2,
+  "entryId": "2",
   "modules": Map {
-    1 => BrowserifyModule {
+    "1" => BrowserifyModule {
       "ast": module.exports = 1;,
       "dependencies": {},
-      "id": 1,
+      "id": "1",
       "isEntry": false,
       "path": "lib.js",
     },
-    2 => BrowserifyModule {
+    "2" => BrowserifyModule {
       "ast": const vscode = require("vscode");
 const lib = require("./lib");
 console.log(lib);,
       "dependencies": {
         "1": "./lib",
       },
-      "id": 2,
+      "id": "2",
       "isEntry": true,
       "path": "index.js",
     },
@@ -89,15 +89,15 @@ console.log(lib);,
 
 exports[`extract webpack.js 1`] = `
 WebpackBundle {
-  "entryId": 2,
+  "entryId": "2",
   "modules": Map {
-    1 => WebpackModule {
+    "1" => WebpackModule {
       "ast": const a = require("./3.js");,
-      "id": 1,
+      "id": "1",
       "isEntry": false,
       "path": "./1.js",
     },
-    2 => WebpackModule {
+    "2" => WebpackModule {
       "ast": const a = require("./1.js");
 const _module = 1;
 module.exports.color = "#FBC02D";
@@ -107,13 +107,13 @@ module.exports.color = "#FBC02D";
   console.log(module);
 }
 exports.a = 3;,
-      "id": 2,
+      "id": "2",
       "isEntry": true,
       "path": "./index.js",
     },
-    3 => WebpackModule {
+    "3" => WebpackModule {
       "ast": module.exports = 4;,
-      "id": 3,
+      "id": "3",
       "isEntry": false,
       "path": "./3.js",
     },
@@ -122,21 +122,259 @@ exports.a = 3;,
 }
 `;
 
-exports[`extract webpack_object.js 1`] = `
+exports[`extract webpack-0.11.x.js 1`] = `
 WebpackBundle {
-  "entryId": 386,
+  "entryId": "0",
   "modules": Map {
-    386 => WebpackModule {
-      "ast": const r = require("./387.js").default;,
-      "id": 386,
+    "0" => WebpackModule {
+      "ast": require("./1.js");
+var template = require("./4.js");
+document.write(template({
+  hello: "World!"
+}));,
+      "id": "0",
       "isEntry": true,
       "path": "./index.js",
     },
-    387 => WebpackModule {
-      "ast": module.exports = "test";,
-      "id": 387,
+    "1" => WebpackModule {
+      "ast": // style-loader: Adds some css to the DOM by adding a <style> tag
+var dispose = require("./2.js")
+// The css code:
+(require("./3.js"));
+if (false) {
+  module.hot.accept();
+  module.hot.dispose(dispose);
+},
+      "id": "1",
       "isEntry": false,
-      "path": "./387.js",
+      "path": "./1.js",
+    },
+    "2" => WebpackModule {
+      "ast": /*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+module.exports = function (cssCode) {
+  var styleElement = document.createElement("style");
+  styleElement.type = "text/css";
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = cssCode;
+  } else {
+    styleElement.appendChild(document.createTextNode(cssCode));
+  }
+  var head = document.getElementsByTagName("head")[0];
+  head.appendChild(styleElement);
+  return function () {
+    head.removeChild(styleElement);
+  };
+};,
+      "id": "2",
+      "isEntry": false,
+      "path": "./2.js",
+    },
+    "3" => WebpackModule {
+      "ast": module.exports = "body {\\n\\tbackground: #333;\\n\\tcolor: #EEE;\\n}";,
+      "id": "3",
+      "isEntry": false,
+      "path": "./3.js",
+    },
+    "4" => WebpackModule {
+      "ast": var jade = require("./5.js");
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+  attrs = attrs || jade.attrs;
+  escape = escape || jade.escape;
+  rethrow = rethrow || jade.rethrow;
+  merge = merge || jade.merge;
+  var buf = [];
+  with (locals || {}) {
+    var interp;
+    buf.push("<h1>Hello " + escape((interp = hello) == null ? "" : interp) + "</h1>");
+  }
+  return buf.join("");
+};,
+      "id": "4",
+      "isEntry": false,
+      "path": "./4.js",
+    },
+    "5" => WebpackModule {
+      "ast": /*!
+ * Jade - runtime
+ * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * Lame Array.isArray() polyfill for now.
+ */
+
+if (!Array.isArray) {
+  Array.isArray = function (arr) {
+    return Object.prototype.toString.call(arr) == "[object Array]";
+  };
+}
+
+/**
+ * Lame Object.keys() polyfill for now.
+ */
+
+if (!Object.keys) {
+  Object.keys = function (obj) {
+    var arr = [];
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        arr.push(key);
+      }
+    }
+    return arr;
+  };
+}
+
+/**
+ * Merge two attribute objects giving precedence
+ * to values in object \`b\`. Classes are special-cased
+ * allowing for arrays and merging/joining appropriately
+ * resulting in a string.
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @return {Object} a
+ * @api private
+ */
+
+exports.merge = function merge(a, b) {
+  var ac = a.class;
+  var bc = b.class;
+  if (ac || bc) {
+    ac = ac || [];
+    bc = bc || [];
+    if (!Array.isArray(ac)) {
+      ac = [ac];
+    }
+    if (!Array.isArray(bc)) {
+      bc = [bc];
+    }
+    ac = ac.filter(nulls);
+    bc = bc.filter(nulls);
+    a.class = ac.concat(bc).join(" ");
+  }
+  for (var key in b) {
+    if (key != "class") {
+      a[key] = b[key];
+    }
+  }
+  return a;
+};
+
+/**
+ * Filter null \`val\`s.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function nulls(val) {
+  return val != null;
+}
+
+/**
+ * Render the given attributes object.
+ *
+ * @param {Object} obj
+ * @param {Object} escaped
+ * @return {String}
+ * @api private
+ */
+
+exports.attrs = function attrs(obj, escaped) {
+  var buf = [];
+  var terse = obj.terse;
+  delete obj.terse;
+  var keys = Object.keys(obj);
+  var len = keys.length;
+  if (len) {
+    buf.push("");
+    for (var i = 0; i < len; ++i) {
+      var key = keys[i];
+      var val = obj[key];
+      if (typeof val == "boolean" || val == null) {
+        if (val) {
+          if (terse) {
+            buf.push(key);
+          } else {
+            buf.push(key + "=\\"" + key + "\\"");
+          }
+        }
+      } else if (key.indexOf("data") == 0 && typeof val != "string") {
+        buf.push(key + "='" + JSON.stringify(val) + "'");
+      } else if (key == "class" && Array.isArray(val)) {
+        buf.push(key + "=\\"" + exports.escape(val.join(" ")) + "\\"");
+      } else if (escaped && escaped[key]) {
+        buf.push(key + "=\\"" + exports.escape(val) + "\\"");
+      } else {
+        buf.push(key + "=\\"" + val + "\\"");
+      }
+    }
+  }
+  return buf.join(" ");
+};
+
+/**
+ * Escape the given string of \`html\`.
+ *
+ * @param {String} html
+ * @return {String}
+ * @api private
+ */
+
+exports.escape = function escape(html) {
+  return String(html).replace(/&(?!(\\w+|\\#\\d+);)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+};
+
+/**
+ * Re-throw the given \`err\` in context to the
+ * the jade in \`filename\` at the given \`lineno\`.
+ *
+ * @param {Error} err
+ * @param {String} filename
+ * @param {String} lineno
+ * @api private
+ */
+
+exports.rethrow = function rethrow(err, filename, lineno) {
+  if (!filename) {
+    throw err;
+  }
+  var context = 3;
+  var str = require("./6.js").readFileSync(filename, "utf8");
+  var lines = str.split("\\n");
+  var start = Math.max(lineno - context, 0);
+  var end = Math.min(lines.length, lineno + context); // Error context
+  var context = lines.slice(start, end).map(function (line, i) {
+    var curr = i + start + 1;
+    return (curr == lineno ? "  > " : "    ") + curr + "| " + line;
+  }).join("\\n");
+
+  // Alter exception message
+  err.path = filename;
+  err.message = (filename || "Jade") + ":" + lineno + "\\n" + context + "\\n\\n" + err.message;
+  throw err;
+};,
+      "id": "5",
+      "isEntry": false,
+      "path": "./5.js",
+    },
+    "6" => WebpackModule {
+      "ast": var files = {};
+exports.setFile = function (filename, content) {
+  files[filename] = content;
+};
+exports.readFileSync = function (filename) {
+  return files[filename] || "";
+};,
+      "id": "6",
+      "isEntry": false,
+      "path": "./6.js",
     },
   },
   "type": "webpack",
@@ -145,9 +383,9 @@ WebpackBundle {
 
 exports[`extract webpack-esm.js 1`] = `
 WebpackBundle {
-  "entryId": 0,
+  "entryId": "0",
   "modules": Map {
-    0 => WebpackModule {
+    "0" => WebpackModule {
       "ast": const a = require("./1.js");
 const b = require("./2.js");
 const c = require("./3.js");
@@ -158,32 +396,81 @@ const eDefault = c;
 console.log(a.counter);
 console.log(bDefault.VERSION);
 console.log(cDefault.VERSION);,
-      "id": 0,
+      "id": "0",
       "isEntry": true,
       "path": "./index.js",
     },
-    1 => WebpackModule {
+    "1" => WebpackModule {
       "ast": export class counter {}
 let _counter = 1;
 counter = 2;,
-      "id": 1,
+      "id": "1",
       "isEntry": false,
       "path": "./1.js",
     },
-    2 => WebpackModule {
+    "2" => WebpackModule {
       "ast": const x = {};
 export default 1;,
-      "id": 2,
+      "id": "2",
       "isEntry": false,
       "path": "./2.js",
     },
-    3 => WebpackModule {
+    "3" => WebpackModule {
       "ast": module.exports = {
   VERSION: 1
 };,
-      "id": 3,
+      "id": "3",
       "isEntry": false,
       "path": "./3.js",
+    },
+    "4" => WebpackModule {
+      "ast": export default class f {},
+      "id": "4",
+      "isEntry": false,
+      "path": "./4.js",
+    },
+  },
+  "type": "webpack",
+}
+`;
+
+exports[`extract webpack-jsonp-chunk.js 1`] = `
+WebpackBundle {
+  "entryId": "",
+  "modules": Map {
+    "2wwy" => WebpackModule {
+      "ast": const a = require("./E8gZ.js");
+const b = require( /*webcrack:missing*/"./w6GO.js");,
+      "id": "2wwy",
+      "isEntry": false,
+      "path": "./2wwy.js",
+    },
+    "E8gZ" => WebpackModule {
+      "ast": module.exports = 4;,
+      "id": "E8gZ",
+      "isEntry": false,
+      "path": "./E8gZ.js",
+    },
+  },
+  "type": "webpack",
+}
+`;
+
+exports[`extract webpack-object.js 1`] = `
+WebpackBundle {
+  "entryId": "386",
+  "modules": Map {
+    "386" => WebpackModule {
+      "ast": const r = require("./387.js").default;,
+      "id": "386",
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    "387" => WebpackModule {
+      "ast": module.exports = "test";,
+      "id": "387",
+      "isEntry": false,
+      "path": "./387.js",
     },
   },
   "type": "webpack",
@@ -192,25 +479,25 @@ export default 1;,
 
 exports[`extract webpack-var-injection.js 1`] = `
 WebpackBundle {
-  "entryId": 0,
+  "entryId": "0",
   "modules": Map {
-    0 => WebpackModule {
+    "0" => WebpackModule {
       "ast": import * as m from "./1.js";
 import * as n from "./2.js";
 console.log(m, n);,
-      "id": 0,
+      "id": "0",
       "isEntry": true,
       "path": "./index.js",
     },
-    1 => WebpackModule {
+    "1" => WebpackModule {
       "ast": module.exports = 1;,
-      "id": 1,
+      "id": "1",
       "isEntry": false,
       "path": "./1.js",
     },
-    2 => WebpackModule {
+    "2" => WebpackModule {
       "ast": module.exports = 2;,
-      "id": 2,
+      "id": "2",
       "isEntry": false,
       "path": "./2.js",
     },
@@ -221,33 +508,33 @@ console.log(m, n);,
 
 exports[`extract webpack5-esm.js 1`] = `
 WebpackBundle {
-  "entryId": 2,
+  "entryId": "2",
   "modules": Map {
-    2 => WebpackModule {
+    "2" => WebpackModule {
       "ast": const lib = require("./3.js");
 console.log(lib);,
-      "id": 2,
+      "id": "2",
       "isEntry": true,
       "path": "./index.js",
     },
-    3 => WebpackModule {
+    "3" => WebpackModule {
       "ast": import * as a from "./4.js";
 const obj = {
   version: "2.0.0"
 };
 export let version = obj.version;
 export default a.foo;,
-      "id": 3,
+      "id": "3",
       "isEntry": false,
       "path": "./3.js",
     },
-    4 => WebpackModule {
+    "4" => WebpackModule {
       "ast": export const foo = 2;
 export var obj = {
   Console: bar
 };
 function bar() {},
-      "id": 4,
+      "id": "4",
       "isEntry": false,
       "path": "./4.js",
     },
@@ -258,19 +545,19 @@ function bar() {},
 
 exports[`extract webpack5-object.js 1`] = `
 WebpackBundle {
-  "entryId": 2,
+  "entryId": "2",
   "modules": Map {
-    2 => WebpackModule {
+    "2" => WebpackModule {
       "ast": const lib = require("./3.js");
 console.log(lib);
 const _0x8da276 = require(require.ab + "build/Release/spdlog.node");,
-      "id": 2,
+      "id": "2",
       "isEntry": true,
       "path": "./index.js",
     },
-    3 => WebpackModule {
+    "3" => WebpackModule {
       "ast": module.exports = "foo";,
-      "id": 3,
+      "id": "3",
       "isEntry": false,
       "path": "./3.js",
     },
@@ -281,15 +568,15 @@ const _0x8da276 = require(require.ab + "build/Release/spdlog.node");,
 
 exports[`extractor > path mapping 1`] = `
 WebpackBundle {
-  "entryId": 2,
+  "entryId": "2",
   "modules": Map {
-    1 => WebpackModule {
-      "ast": const a = require("./3.js");,
-      "id": 1,
+    "1" => WebpackModule {
+      "ast": const a = require("package");,
+      "id": "1",
       "isEntry": false,
       "path": "./1.js",
     },
-    2 => WebpackModule {
+    "2" => WebpackModule {
       "ast": const a = require("../1.js");
 const _module = 1;
 module.exports.color = "#FBC02D";
@@ -299,15 +586,15 @@ module.exports.color = "#FBC02D";
   console.log(module);
 }
 exports.a = 3;,
-      "id": 2,
+      "id": "2",
       "isEntry": true,
       "path": "./utils/color.js",
     },
-    3 => WebpackModule {
+    "3" => WebpackModule {
       "ast": module.exports = 4;,
-      "id": 3,
+      "id": "3",
       "isEntry": false,
-      "path": "./3.js",
+      "path": "node_modules/package",
     },
   },
   "type": "webpack",

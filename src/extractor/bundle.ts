@@ -1,17 +1,20 @@
 import traverse from '@babel/traverse';
 import * as m from '@codemod/matchers';
+import debug from 'debug';
 import { dirname, join } from 'node:path';
 import { Module } from './module';
 
+const logger = debug('webcrack:unpack');
+
 export class Bundle {
   type: 'webpack' | 'browserify' | 'parcel';
-  entryId: string | number;
-  modules: Map<string | number, Module>;
+  entryId: string;
+  modules: Map<string, Module>;
 
   constructor(
     type: 'webpack' | 'browserify' | 'parcel',
-    entryId: string | number,
-    modules: Map<string | number, Module>
+    entryId: string,
+    modules: Map<string, Module>
   ) {
     this.type = type;
     this.entryId = entryId;
@@ -20,7 +23,7 @@ export class Bundle {
 
   applyMappings(mappings: Record<string, m.Matcher<unknown>>): void {
     const mappingPaths = Object.keys(mappings);
-    if (!mappingPaths.length) return;
+    if (mappingPaths.length === 0) return;
 
     const unusedMappings = new Set(mappingPaths);
 
@@ -32,10 +35,13 @@ export class Bundle {
               if (unusedMappings.has(mappingPath)) {
                 unusedMappings.delete(mappingPath);
               } else {
-                console.warn(`Mapping ${mappingPath} is already used.`);
+                logger(`Mapping ${mappingPath} is already used.`);
                 continue;
               }
-              module.path = mappingPath;
+              const resolvedPath = mappingPath.startsWith('./')
+                ? mappingPath
+                : `node_modules/${mappingPath}`;
+              module.path = resolvedPath;
               path.stop();
               break;
             }
@@ -46,9 +52,7 @@ export class Bundle {
     }
 
     if (unusedMappings.size > 0) {
-      console.warn(
-        `Unused mappings: ${Array.from(unusedMappings).join(', ')}.`
-      );
+      logger(`Unused mappings: ${Array.from(unusedMappings).join(', ')}.`);
     }
   }
 
@@ -56,16 +60,7 @@ export class Bundle {
    * Saves each module to a file and the bundle metadata to a JSON file.
    * @param path Output directory
    */
-  async save(
-    path: string,
-    transformCode = (code: string): Promise<string> | string => code,
-    mappings: (
-      m: typeof import('@codemod/matchers')
-    ) => Record<string, m.Matcher<unknown>> = () => ({})
-  ): Promise<void> {
-    this.applyMappings(mappings(m));
-    this.applyTransforms();
-
+  async save(path: string): Promise<void> {
     const bundleJson = {
       type: this.type,
       entryId: this.entryId,
@@ -90,14 +85,12 @@ export class Bundle {
       await Promise.all(
         Array.from(this.modules.values(), async module => {
           const modulePath = join(path, module.path);
-          const code = await transformCode(module.code);
           await mkdir(dirname(modulePath), { recursive: true });
-          await writeFile(modulePath, code, 'utf8');
+          await writeFile(modulePath, module.code, 'utf8');
         })
       );
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   applyTransforms(): void {}
 }

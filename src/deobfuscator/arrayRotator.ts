@@ -2,7 +2,11 @@ import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { callExpression } from '@codemod/matchers';
-import { constMemberExpression, infiniteLoop } from '../utils/matcher';
+import {
+  constMemberExpression,
+  findParent,
+  infiniteLoop,
+} from '../utils/matcher';
 import { StringArray } from './stringArray';
 
 export type ArrayRotator = NodePath<t.ExpressionStatement>;
@@ -69,9 +73,9 @@ export function findArrayRotator(
   );
 
   for (const ref of stringArray.references) {
-    const rotator = ref.findParent(path => matcher.match(path.node));
+    const rotator = findParent(ref, matcher);
     if (rotator) {
-      return rotator as ArrayRotator;
+      return rotator;
     }
   }
 }

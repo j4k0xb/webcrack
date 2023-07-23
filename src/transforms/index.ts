@@ -1,54 +1,14 @@
-import traverse, { Node, TraverseOptions } from '@babel/traverse';
-import blockStatement from './blockStatement';
-import booleanIf from './booleanIf';
-import computedProperties from './computedProperties';
-import deterministicIf from './deterministicIf';
-import jsx from './jsx';
-import mergeElseIf from './mergeElseIf';
-import mergeStrings from './mergeStrings';
-import numberExpressions from './numberExpressions';
-import rawLiterals from './rawLiterals';
-import sequence from './sequence';
-import splitVariableDeclarations from './splitVariableDeclarations';
-import ternaryToIf from './ternaryToIf';
-import unminify from './unminify';
-import unminifyBooleans from './unminifyBooleans';
-import void0ToUndefined from './void0ToUndefined';
-import yoda from './yoda';
+import traverse, { Node, TraverseOptions, visitors } from '@babel/traverse';
+import debug from 'debug';
 
-export const transforms = {
-  unminify,
-  rawLiterals,
-  blockStatement,
-  mergeElseIf,
-  mergeStrings,
-  computedProperties,
-  splitVariableDeclarations,
-  sequence,
-  numberExpressions,
-  unminifyBooleans,
-  booleanIf,
-  ternaryToIf,
-  deterministicIf,
-  void0ToUndefined,
-  yoda,
-  jsx,
-};
-
-export type TransformName = keyof typeof transforms;
-
-export type TransformOptions<TName extends TransformName> =
-  (typeof transforms)[TName] extends Transform<infer TOptions>
-    ? TOptions
-    : never;
+const logger = debug('webcrack:transforms');
 
 export async function applyTransformAsync<TOptions>(
   ast: Node,
   transform: AsyncTransform<TOptions>,
   options?: TOptions
 ): Promise<TransformState> {
-  const start = performance.now();
-  console.log(`${transform.name}: started`);
+  logger(`${transform.name}: started`);
 
   const state: TransformState = { changes: 0 };
 
@@ -56,13 +16,7 @@ export async function applyTransformAsync<TOptions>(
   if (transform.visitor)
     traverse(ast, transform.visitor(options), undefined, state);
 
-  console.log(
-    `${transform.name}: finished in`,
-    Math.floor(performance.now() - start),
-    'ms with',
-    state.changes,
-    'changes'
-  );
+  logger(`${transform.name}: finished with ${state.changes} changes`);
 
   return state;
 }
@@ -72,8 +26,7 @@ export function applyTransform<TOptions>(
   transform: Transform<TOptions>,
   options?: TOptions
 ): TransformState {
-  const start = performance.now();
-  console.log(`${transform.name}: started`);
+  logger(`${transform.name}: started`);
 
   const state: TransformState = { changes: 0 };
 
@@ -81,13 +34,34 @@ export function applyTransform<TOptions>(
   if (transform.visitor)
     traverse(ast, transform.visitor(options), undefined, state);
 
-  console.log(
-    `${transform.name}: finished in`,
-    Math.floor(performance.now() - start),
-    'ms with',
-    state.changes,
-    'changes'
-  );
+  logger(`${transform.name}: finished with ${state.changes} changes`);
+
+  return state;
+}
+
+export function applyTransforms(
+  ast: Node,
+  transforms: Transform[],
+  name?: string
+): TransformState {
+  name ??= transforms.map(t => t.name).join(', ');
+  logger(`${name}: started`);
+
+  const state: TransformState = { changes: 0 };
+
+  for (const transform of transforms) {
+    transform.run?.(ast, state);
+  }
+
+  const traverseOptions = transforms.flatMap(t => t.visitor?.() ?? []);
+  if (traverseOptions.length > 0) {
+    const visitor = visitors.merge(traverseOptions);
+    // @ts-expect-error regression from https://github.com/babel/babel/pull/15702
+    visitor.noScope = traverseOptions.every(t => t.noScope);
+    traverse(ast, visitor, undefined, state);
+  }
+
+  logger(`${name}: finished with ${state.changes} changes`);
 
   return state;
 }

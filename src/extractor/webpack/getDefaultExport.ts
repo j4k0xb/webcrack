@@ -37,7 +37,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
     const binding = path.scope.getBinding(moduleArg.current!.name);
     const declarator = binding?.path.node;
     if (declaratorMatcher.match(declarator)) {
-      return bundle.modules.get(requiredModuleId.current!.value);
+      return bundle.modules.get(requiredModuleId.current!.value.toString());
     }
   }
 
@@ -53,10 +53,9 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
   // E.g. getter
   const getterVarName = m.capture(m.identifier());
   // E.g. require.n(m)
-  const requireN = m.callExpression(
-    constMemberExpression(m.identifier('require'), 'n'),
-    [moduleArg]
-  );
+  const requireN = m.callExpression(constMemberExpression('require', 'n'), [
+    moduleArg,
+  ]);
   // E.g. const getter = require.n(m)
   const defaultRequireMatcher = m.variableDeclarator(getterVarName, requireN);
 
@@ -70,7 +69,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
 
   bundle.modules.forEach(module => {
     traverse(module.ast, {
-      ['CallExpression|MemberExpression' as 'Expression'](path: NodePath) {
+      'CallExpression|MemberExpression'(path) {
         if (defaultRequireMatcherAlternative.match(path.node)) {
           // Replace require.n(m).a or require.n(m)() with m or m.default
           const requiredModule = getRequiredModule(path);
@@ -108,6 +107,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
           });
         }
       },
+      noScope: true,
     });
   });
 }

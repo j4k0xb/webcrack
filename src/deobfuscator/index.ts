@@ -1,6 +1,8 @@
+import debug from 'debug';
 import {
   applyTransform,
   applyTransformAsync,
+  applyTransforms,
   AsyncTransform,
 } from '../transforms';
 import mergeStrings from '../transforms/mergeStrings';
@@ -8,43 +10,42 @@ import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import controlFlowObject from './controlFlowObject';
 import controlFlowSwitch from './controlFlowSwitch';
+import deadCode from './deadCode';
 import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
 import objectLiterals from './objectLiterals';
 import { findStringArray } from './stringArray';
-import { createNodeSandbox, Sandbox, VMDecoder } from './vm';
+import { Sandbox, VMDecoder } from './vm';
 
 // https://astexplorer.net/#/gist/b1018df4a8daebfcb1daf9d61fe17557/4ff9ad0e9c40b9616956f17f59a2d9888cd62a4f
 
 export default {
   name: 'deobfuscate',
   tags: ['unsafe'],
-  async run(ast, state, options) {
-    if (!process.env.browser && !options) {
-      options = { sandbox: createNodeSandbox() };
-    }
-    if (!options) return;
+  async run(ast, state, sandbox) {
+    const logger = debug('webcrack:deobfuscate');
+    if (!sandbox) return;
 
     const stringArray = findStringArray(ast);
-    console.log(`String Array: ${stringArray ? 'yes' : 'no'}`);
+    logger(`String Array: ${stringArray ? 'yes' : 'no'}`);
     if (!stringArray) return;
-    console.log(` - length: ${stringArray.length}`);
-    console.log(` - ${codePreview(stringArray.path.node)}`);
+    logger(` - length: ${stringArray.length}`);
+    logger(` - ${codePreview(stringArray.path.node)}`);
 
     const rotator = findArrayRotator(stringArray);
-    console.log(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
+    logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
     if (rotator) {
-      console.log(` - ${codePreview(rotator.node)}`);
+      logger(` - ${codePreview(rotator.node)}`);
     }
 
     const decoders = findDecoders(stringArray);
-    console.log(`String Array Encodings: ${decoders.length}`);
+    logger(`String Array Encodings: ${decoders.length}`);
 
     state.changes += applyTransform(ast, objectLiterals).changes;
 
     for (const decoder of decoders) {
-      console.log(` - ${codePreview(decoder.path.node)}`);
+      logger(` - ${codePreview(decoder.path.node)}`);
 
       state.changes += applyTransform(
         ast,
@@ -53,7 +54,7 @@ export default {
       ).changes;
     }
 
-    const vm = new VMDecoder(options.sandbox, stringArray, decoders, rotator);
+    const vm = new VMDecoder(sandbox, stringArray, decoders, rotator);
     state.changes += (
       await applyTransformAsync(ast, inlineDecodedStrings, { vm })
     ).changes;
@@ -63,8 +64,10 @@ export default {
     decoders.forEach(decoder => decoder.path.remove());
     state.changes += 2 + decoders.length;
 
-    state.changes += applyTransform(ast, mergeStrings).changes;
-    state.changes += applyTransform(ast, controlFlowObject).changes;
-    state.changes += applyTransform(ast, controlFlowSwitch).changes;
+    state.changes += applyTransforms(
+      ast,
+      [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
+      'mergeStrings, deadCode, controlFlow'
+    ).changes;
   },
-} satisfies AsyncTransform<{ sandbox: Sandbox }>;
+} satisfies AsyncTransform<Sandbox>;

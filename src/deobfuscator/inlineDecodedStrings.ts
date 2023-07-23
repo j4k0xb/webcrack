@@ -1,9 +1,5 @@
-import { expression } from '@babel/template';
-import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import { AsyncTransform, applyTransform } from '../transforms';
-import numberExpressions from '../transforms/numberExpressions';
+import { AsyncTransform } from '../transforms';
 import { VMDecoder } from './vm';
 
 /**
@@ -15,68 +11,21 @@ export default {
   tags: ['unsafe'],
   async run(ast, state, options) {
     if (!options) return;
-    applyTransform(ast, numberExpressions);
 
-    const calls = collectCalls(ast, options.vm);
-    const decodedStrings = await options.vm.decode(calls);
+    const calls = options.vm.decoders.flatMap(decoder =>
+      decoder.collectCalls()
+    );
+    const decodedValues = await options.vm.decode(calls);
 
-    calls.forEach((path, i) => {
-      if (typeof decodedStrings[i] === 'string') {
-        path.replaceWith(t.stringLiteral(decodedStrings[i]));
-      } else {
-        path.replaceWith(t.identifier('undefined'));
-        path.addComment('leading', 'webcrack:decode_error');
-      }
-    });
+    for (let i = 0; i < calls.length; i++) {
+      const call = calls[i];
+      const value = decodedValues[i];
+
+      call.replaceWith(t.valueToNode(value));
+      if (typeof value !== 'string')
+        call.addComment('leading', 'webcrack:decode_error');
+    }
 
     state.changes += calls.length;
   },
 } satisfies AsyncTransform<{ vm: VMDecoder }>;
-
-function collectCalls(ast: t.Node, vm: VMDecoder) {
-  const calls: NodePath<t.CallExpression>[] = [];
-
-  const decoderName = m.capture(
-    m.matcher<string>(name => vm.decoders.some(d => d.name === name))
-  );
-  const matcher = m.callExpression(
-    m.identifier(decoderName),
-    m.arrayOf(
-      m.or(
-        m.stringLiteral(),
-        m.or(m.unaryExpression('-', m.numericLiteral()), m.numericLiteral())
-      )
-    )
-  );
-
-  const conditional = m.capture(m.conditionalExpression());
-  const conditionalMatcher = m.callExpression(m.identifier(decoderName), [
-    conditional,
-  ]);
-
-  const buildExtractedConditional = expression`TEST ? CALLEE(CONSEQUENT) : CALLEE(ALTERNATE)`;
-
-  traverse(ast, {
-    CallExpression(path) {
-      // decode(test ? 1 : 2) -> test ? decode(1) : decode(2)
-      if (conditionalMatcher.match(path.node)) {
-        const { callee } = path.node;
-        const { test, consequent, alternate } = conditional.current!;
-
-        path.replaceWith(
-          buildExtractedConditional({
-            TEST: test,
-            CALLEE: callee,
-            CONSEQUENT: consequent,
-            ALTERNATE: alternate,
-          })
-        );
-      } else if (matcher.match(path.node)) {
-        calls.push(path);
-      }
-    },
-    noScope: true,
-  });
-
-  return calls;
-}

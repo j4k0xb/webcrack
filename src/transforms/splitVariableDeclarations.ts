@@ -7,10 +7,7 @@ export default {
   visitor: () => ({
     VariableDeclaration: {
       exit(path) {
-        if (
-          path.node.declarations.length > 1 &&
-          !(path.parentPath.isForStatement() && path.key === 'init')
-        ) {
+        if (path.node.declarations.length > 1 && path.key !== 'init') {
           path.replaceWithMultiple(
             path.node.declarations.map(declaration =>
               t.variableDeclaration(path.node.kind, [declaration])

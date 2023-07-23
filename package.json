@@ -1,6 +1,6 @@
 {
   "name": "webcrack",
-  "version": "2.5.1",
+  "version": "2.7.0",
   "description": "Deobfuscate, unminify and unpack bundled javascript",
   "author": "j4k0xb",
   "license": "MIT",
@@ -19,7 +19,8 @@
     "start": "node dist/cli.js",
     "dev": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
     "lint": "eslint --ext .ts .",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -40,27 +41,33 @@
     "unbundle"
   ],
   "dependencies": {
-    "@babel/generator": "^7.21.4",
-    "@babel/helper-validator-identifier": "^7.19.1",
-    "@babel/parser": "^7.21.4",
-    "@babel/template": "^7.20.7",
-    "@babel/traverse": "^7.21.4",
-    "@babel/types": "^7.21.4",
+    "@babel/generator": "^7.22.7",
+    "@babel/helper-validator-identifier": "^7.22.5",
+    "@babel/parser": "^7.22.7",
+    "@babel/template": "^7.22.5",
+    "@babel/traverse": "^7.22.8",
+    "@babel/types": "^7.22.5",
     "@codemod/matchers": "^1.7.0",
-    "commander": "^10.0.0",
-    "vm2": "^3.9.19"
+    "commander": "^11.0.0",
+    "debug": "^4.3.4",
+    "isolated-vm-prebuilt": "^4.5.3"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
     "@types/babel__helper-validator-identifier": "^7.15.0",
     "@types/babel__template": "^7.4.1",
-    "@types/babel__traverse": "^7.18.3",
-    "@types/node": "^18.15.11",
-    "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "@typescript-eslint/parser": "^5.58.0",
-    "esbuild": "^0.17.16",
-    "eslint": "^8.38.0",
-    "typescript": "^5.0.4",
-    "vitest": "^0.30.1"
+    "@types/babel__traverse": "^7.20.1",
+    "@types/debug": "^4.1.8",
+    "@types/node": "^20.4.1",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "@vitest/coverage-istanbul": "^0.33.0",
+    "esbuild": "^0.18.11",
+    "eslint": "^8.44.0",
+    "typescript": "^5.1.6",
+    "vitest": "^0.33.0"
+  },
+  "overrides": {
+    "semver": "7.5.3"
   }
 }

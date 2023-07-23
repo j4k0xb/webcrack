@@ -32,11 +32,71 @@ The samples should be as small as possible, but still representative.
 ## Create a new transform
 
 The easiest way to create a new transform is to copy an existing one and modify it.
-Make sure to also add it to the [transforms list](src/transforms/index.ts).
+
+## Performance Optimizations
+
+### Named visitor keys
+
+```diff
+{
+- exit(path) { if (path.isIdentifier()) { ... } }
++ Identifier: { exit(path) { ... } }
+}
+```
+
+### `noScope` visitors
+
+May not work in some cases (accessing `path.scope` when the scope hasn't been crawled before).
+
+```diff
+{
+  Identifier(path) { ... },
++ noScope: true,
+}
+```
+
+### Merging visitors
+
+To only traverse the AST once and avoid missing nodes based on the order of visitors.
+
+```diff
+- applyTransform(ast, transformA);
+- applyTransform(ast, transformB);
++ applyTransforms(ast, [transformA, transformB]);
+```
+
+### Renaming bindings (variables, functions, ...)
+
+This also avoids conflicts by first renaming bindings with the name `b` to something else.
+
+```diff
+- path.scope.rename('a', 'b');
++ const binding = path.scope.getBinding('a')!;
++ renameFast(binding, 'b');
+```
+
+### Following references instead of traversing the AST
+
+For example finding calls to a function `foo` (provided that you already have foo's NodePath):
+
+```diff
+const matcher = m.callExpression(m.identifier('foo'));
+- traverse(ast, {
+-   CallExpression(path) {
+-     if (matcher.match(path.node)) { ... }
+-   }
+- });
++ const binding = fooPath.scope.getBinding('foo')!;
++ for (const reference of binding.referencePaths) {
++   if (matcher.match(reference.parent)) { ... }
++ }
+```
 
 ## Resources
 
-- [Babel Handbook](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/en/plugin-handbook.md) for a general overview of AST and code transformations
-- [AST explorer](https://astexplorer.net) (choose the `@babel/parser` parser)
-- [@codemod/matchers](https://github.com/codemod-js/codemod/blob/main/packages/matchers/README.md) is a much cleaner way of finding AST structures
-- [Vitest](https://vitest.dev/guide) for tests
+- [Babel Handbook](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/en/plugin-handbook.md) - general overview of AST and code transformations
+- [AST Explorer](https://astexplorer.net/#/gist/b2ea907946274ad62ff348f403e58460/0cbd22f94e8b3231fef5d07eeb82d326798f7040) - visualize the AST and test transforms
+- [@codemod/matchers](https://github.com/codemod-js/codemod/blob/main/packages/matchers/README.md) - a much cleaner way of finding AST structures
+- [ReverseJS](https://steakenthusiast.github.io/) - blog posts about creating deobfuscators with Babel
+- [Bubbl.es](https://jsbubbl.es) - scope visualizer
+- [Vitest](https://vitest.dev/guide) - for tests

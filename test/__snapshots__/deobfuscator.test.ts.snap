@@ -98,5 +98,6 @@ decoder(1);
   () => {
     alias(4);
   };
+  decoder(5);
 };"
 `;

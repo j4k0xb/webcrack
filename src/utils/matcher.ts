@@ -1,3 +1,4 @@
+import { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
@@ -6,6 +7,7 @@ export function infiniteLoop(
 ): m.Matcher<t.ForStatement | t.WhileStatement> {
   return m.or(
     m.forStatement(undefined, null, undefined, body),
+    m.forStatement(undefined, m.arrayExpression([]), undefined, body),
     m.whileStatement(trueMatcher, body)
   );
 }
@@ -32,9 +34,10 @@ export const emptyIife = matchIife([]);
  * Matches both identifier properties and string literal computed properties
  */
 export function constMemberExpression(
-  object: m.Matcher<t.Expression>,
+  object: string | m.Matcher<t.Expression>,
   property?: string | m.Matcher<string>
 ): m.Matcher<t.MemberExpression> {
+  if (typeof object === 'string') object = m.identifier(object);
   return m.or(
     m.memberExpression(object, m.identifier(property), false),
     m.memberExpression(object, m.stringLiteral(property), true)
@@ -52,6 +55,32 @@ export const falseMatcher = m.or(
   m.booleanLiteral(false),
   m.unaryExpression('!', m.arrayExpression([]))
 );
+
+/**
+ * Starting at the parent path of the current `NodePath` and going up the
+ * tree, return the first `NodePath` that causes the provided `matcher`
+ * to return true, or `null` if the `matcher` never returns true.
+ */
+export function findParent<T extends t.Node>(
+  path: NodePath,
+  matcher: m.Matcher<T>
+): NodePath<T> | null {
+  return path.findParent(path =>
+    matcher.match(path.node)
+  ) as NodePath<T> | null;
+}
+
+/**
+ * Starting at current `NodePath` and going up the tree, return the first
+ * `NodePath` that causes the provided `matcher` to return true,
+ * or `null` if the `matcher` never returns true.
+ */
+export function findPath<T extends t.Node>(
+  path: NodePath,
+  matcher: m.Matcher<T>
+): NodePath<T> | null {
+  return path.find(path => matcher.match(path.node)) as NodePath<T> | null;
+}
 
 /**
  * Function expression matcher that captures the parameters
@@ -75,14 +104,37 @@ export function createFunctionMatcher(
 }
 
 /**
- * Matches a deeply nested member expression that only contains identifiers
- * - e.g. `a.b` or `a.b.c` but not `[].b`
+ * Returns true if every reference is a member expression whose value is read
  */
-export const deepIdentifierMemberExpression = m.memberExpression(
-  m.or(
-    m.identifier(),
-    m.matcher(node => deepIdentifierMemberExpression.match(node))
-  ),
-  m.identifier(),
-  false
-);
+export function isReadonlyObject(
+  binding: Binding,
+  memberAccess: m.Matcher<t.MemberExpression>
+): boolean {
+  // Workaround because sometimes babel treats the VariableDeclarator/binding itself as a violation
+  if (!binding.constant && binding.constantViolations[0] !== binding.path)
+    return false;
+
+  return binding.referencePaths.every(
+    path =>
+      // obj.property
+      memberAccess.match(path.parent) &&
+      // obj.property = 1
+      !path.parentPath?.parentPath?.isAssignmentExpression({
+        left: path.parent,
+      }) &&
+      // obj.property++
+      !path.parentPath?.parentPath?.isUpdateExpression({
+        argument: path.parent,
+      }) &&
+      // delete obj.property
+      !path.parentPath?.parentPath?.isUnaryExpression({
+        argument: path.parent,
+        operator: 'delete',
+      }) &&
+      // [obj.property] = [{}] or ({ property: obj.property } = {})
+      !path.findParent(
+        parentPath =>
+          parentPath.isArrayPattern() || parentPath.isObjectPattern()
+      )
+  );
+}

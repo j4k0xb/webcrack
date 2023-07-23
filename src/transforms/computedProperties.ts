@@ -1,8 +1,7 @@
 import { isIdentifierName } from '@babel/helper-validator-identifier';
-import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, TransformState } from '.';
+import { Transform } from '.';
 
 export default {
   name: 'computedProperties',
@@ -23,10 +22,8 @@ export default {
     );
 
     return {
-      // https://github.com/babel/babel/pull/14862/files
-      // isn't included in the @types/babel__traverse package and can't be augmented
-      ['MemberExpression|OptionalMemberExpression' as 'Expression']: {
-        exit(this: TransformState, path: NodePath) {
+      'MemberExpression|OptionalMemberExpression': {
+        exit(path) {
           if (propertyMatcher.match(path.node)) {
             path.node.computed = false;
             path.node.property = t.identifier(stringMatcher.current!.value);
@@ -34,8 +31,8 @@ export default {
           }
         },
       },
-      ['ObjectProperty|ClassProperty|ObjectMethod|ClassMethod' as 'Expression']: {
-        exit(this: TransformState, path: NodePath) {
+      'ObjectProperty|ClassProperty|ObjectMethod|ClassMethod': {
+        exit(path) {
           if (keyMatcher.match(path.node)) {
             path.node.computed = false;
             path.node.key = t.identifier(stringMatcher.current!.value);

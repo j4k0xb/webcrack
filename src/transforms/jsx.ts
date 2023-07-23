@@ -2,16 +2,22 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
 import { codePreview } from '../utils/ast';
-import {
-  constMemberExpression,
-  deepIdentifierMemberExpression,
-} from '../utils/matcher';
+import { constMemberExpression } from '../utils/matcher';
 import { renameFast } from '../utils/rename';
 
 export default {
   name: 'jsx',
   tags: ['unsafe'],
   visitor: () => {
+    const deepIdentifierMemberExpression = m.memberExpression(
+      m.or(
+        m.identifier(),
+        m.matcher(node => deepIdentifierMemberExpression.match(node))
+      ),
+      m.identifier(),
+      false
+    );
+
     const type = m.capture(
       m.or(
         m.identifier(), // React.createElement(Component, ...)
@@ -23,15 +29,15 @@ export default {
 
     // React.createElement(type, props, ...children)
     const elementMatcher = m.callExpression(
-      constMemberExpression(m.identifier('React'), 'createElement'),
+      constMemberExpression('React', 'createElement'),
       m.anyList<t.Expression>(type, props, m.zeroOrMore(m.anyExpression()))
     );
 
     // React.createElement(React.Fragment, null, ...children)
     const fragmentMatcher = m.callExpression(
-      constMemberExpression(m.identifier('React'), 'createElement'),
+      constMemberExpression('React', 'createElement'),
       m.anyList<t.Expression>(
-        constMemberExpression(m.identifier('React'), 'Fragment'),
+        constMemberExpression('React', 'Fragment'),
         m.nullLiteral(),
         m.zeroOrMore(m.anyExpression())
       )

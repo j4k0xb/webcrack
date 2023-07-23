@@ -6,6 +6,7 @@ import {
   constMemberExpression,
   emptyIife,
   falseMatcher,
+  findParent,
   matchIife,
   trueMatcher,
 } from '../utils/matcher';
@@ -129,7 +130,7 @@ export default {
             }
 
             // leftover (function () {})() from debug protection function call
-            ref.findParent(p => emptyIife.match(p.node))?.remove();
+            findParent(ref, emptyIife)?.remove();
 
             this.changes++;
           });
@@ -151,9 +152,7 @@ function removeSelfDefendingRefs(path: NodePath<t.Identifier>) {
   const callMatcher = m.expressionStatement(
     m.callExpression(m.identifier(m.fromCapture(varName)), [])
   );
-  const varDecl = path.findParent(p =>
-    varMatcher.match(p.node)
-  ) as NodePath<t.VariableDeclarator> | null;
+  const varDecl = findParent(path, varMatcher);
 
   if (varDecl) {
     const binding = varDecl.scope.getBinding(varName.current!);

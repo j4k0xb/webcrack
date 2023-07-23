@@ -1,117 +1,128 @@
-import traverse, { NodePath } from '@babel/traverse';
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { Transform } from '../../transforms';
 import { getPropName } from '../../utils/ast';
 import { constKey, matchIife } from '../../utils/matcher';
 import { resolveDependencyTree } from '../../utils/path';
 import { renameParameters } from '../../utils/rename';
+import { Bundle } from '../bundle';
 import { BrowserifyBundle } from './bundle';
 import { BrowserifyModule } from './module';
 
-export function extract(ast: t.Node): BrowserifyBundle | undefined {
-  const modules = new Map<number, BrowserifyModule>();
+export const unpackBrowserify = {
+  name: 'unpack-browserify',
+  tags: ['unsafe'],
+  visitor(options) {
+    const modules = new Map<string, BrowserifyModule>();
 
-  const files = m.capture(
-    m.arrayOf(
-      m.objectProperty(
-        m.numericLiteral(),
-        m.arrayExpression([
-          // function(require, module, exports) {...}
-          m.functionExpression(),
-          // dependencies: { './add': 1, 'lib': 3 }
-          m.objectExpression(
-            m.arrayOf(
-              m.objectProperty(
-                constKey(),
-                m.or(m.numericLiteral(), m.identifier('undefined'))
+    const files = m.capture(
+      m.arrayOf(
+        m.objectProperty(
+          m.numericLiteral(),
+          m.arrayExpression([
+            // function(require, module, exports) {...}
+            m.functionExpression(),
+            // dependencies: { './add': 1, 'lib': 3 }
+            m.objectExpression(
+              m.arrayOf(
+                m.objectProperty(
+                  constKey(),
+                  m.or(m.numericLiteral(), m.identifier('undefined'))
+                )
               )
-            )
-          ),
-        ])
+            ),
+          ])
+        )
       )
-    )
-  );
-  const entryId = m.capture(m.numericLiteral());
+    );
+    const entryIdMatcher = m.capture(m.numericLiteral());
 
-  const matcher = m.callExpression(
-    m.or(
-      // (function (files, cache, entryIds) {...})(...)
-      m.functionExpression(undefined, [
-        m.identifier(),
-        m.identifier(),
-        m.identifier(),
-      ]),
-      // (function () { function init(files, cache, entryIds) {...} return init; })()(...)
-      matchIife([
-        m.functionDeclaration(undefined, [
+    const matcher = m.callExpression(
+      m.or(
+        // (function (files, cache, entryIds) {...})(...)
+        m.functionExpression(undefined, [
           m.identifier(),
           m.identifier(),
           m.identifier(),
         ]),
-        m.returnStatement(m.identifier()),
-      ])
-    ),
-    [
-      m.objectExpression(files),
-      m.objectExpression(),
-      m.arrayExpression([entryId]),
-    ]
-  );
+        // (function () { function init(files, cache, entryIds) {...} return init; })()(...)
+        matchIife([
+          m.functionDeclaration(undefined, [
+            m.identifier(),
+            m.identifier(),
+            m.identifier(),
+          ]),
+          m.returnStatement(m.identifier()),
+        ])
+      ),
+      [
+        m.objectExpression(files),
+        m.objectExpression(),
+        m.arrayExpression([entryIdMatcher]),
+      ]
+    );
 
-  traverse(ast, {
-    CallExpression(path) {
-      if (!matcher.match(path.node)) return;
+    return {
+      CallExpression(path) {
+        if (!matcher.match(path.node)) return;
+        path.stop();
 
-      const modulesPath = path.get(
-        files.currentKeys!.join('.')
-      ) as NodePath<t.ObjectProperty>[];
+        const entryId = entryIdMatcher.current!.value.toString();
 
-      const dependencyTree: Record<number, Record<number, string>> = {};
+        const modulesPath = path.get(
+          files.currentKeys!.join('.')
+        ) as NodePath<t.ObjectProperty>[];
 
-      for (const moduleWrapper of modulesPath) {
-        const id = (moduleWrapper.node.key as t.NumericLiteral).value;
-        const fn = moduleWrapper.get(
-          'value.elements.0'
-        ) as NodePath<t.FunctionExpression>;
+        const dependencyTree: Record<string, Record<string, string>> = {};
 
-        const dependencies: Record<number, string> = (dependencyTree[id] = {});
-        const dependencyProperties = (
-          moduleWrapper.get('value.elements.1') as NodePath<t.ObjectExpression>
-        ).node.properties as t.ObjectProperty[];
+        for (const moduleWrapper of modulesPath) {
+          const id = (
+            moduleWrapper.node.key as t.NumericLiteral
+          ).value.toString();
+          const fn = moduleWrapper.get(
+            'value.elements.0'
+          ) as NodePath<t.FunctionExpression>;
 
-        for (const dependency of dependencyProperties) {
-          // skip external dependencies like { vscode: undefined }
-          if (dependency.value.type !== 'NumericLiteral') continue;
+          const dependencies: Record<string, string> = (dependencyTree[id] =
+            {});
+          const dependencyProperties = (
+            moduleWrapper.get(
+              'value.elements.1'
+            ) as NodePath<t.ObjectExpression>
+          ).node.properties as t.ObjectProperty[];
 
-          const filePath = getPropName(dependency.key)!;
-          const id = dependency.value.value;
-          dependencies[id] = filePath;
+          for (const dependency of dependencyProperties) {
+            // skip external dependencies like { vscode: undefined }
+            if (dependency.value.type !== 'NumericLiteral') continue;
+
+            const filePath = getPropName(dependency.key)!;
+            const depId = dependency.value.value.toString();
+            dependencies[depId] = filePath;
+          }
+
+          renameParameters(fn, ['require', 'module', 'exports']);
+          const file = t.file(t.program(fn.node.body.body));
+          const module = new BrowserifyModule(
+            id,
+            file,
+            id === entryId,
+            dependencies
+          );
+          modules.set(id.toString(), module);
         }
 
-        renameParameters(fn, ['require', 'module', 'exports']);
-        const file = t.file(t.program(fn.node.body.body));
-        const module = new BrowserifyModule(
-          id,
-          file,
-          id === entryId.current!.value,
-          dependencies
-        );
-        modules.set(id, module);
-      }
+        const resolvedPaths = resolveDependencyTree(dependencyTree, entryId);
 
-      const resolvedPaths = resolveDependencyTree(
-        dependencyTree,
-        entryId.current!.value
-      );
+        for (const module of modules.values()) {
+          module.path = resolvedPaths[module.id];
+        }
 
-      for (const module of modules.values()) {
-        module.path = resolvedPaths[module.id];
-      }
-    },
-    noScope: true,
-  });
-
-  if (modules.size > 0) {
-    return new BrowserifyBundle(entryId.current!.value, modules);
-  }
-}
+        if (modules.size > 0) {
+          options!.bundle = new BrowserifyBundle(entryId, modules);
+        }
+      },
+      noScope: true,
+    };
+  },
+} satisfies Transform<{ bundle: Bundle | undefined }>;

@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import { dirname, join, relative } from 'node:path/posix';
 
 export function relativePath(from: string, to: string): string {
+  if (to.startsWith('node_modules/')) return to.replace('node_modules/', '');
   const relativePath = relative(dirname(from), to);
   return relativePath.startsWith('.') ? relativePath : './' + relativePath;
 }
@@ -13,9 +14,9 @@ export function relativePath(from: string, to: string): string {
  * @param entry entry module id
  */
 export function resolveDependencyTree(
-  tree: Record<string | number, Record<string | number, string>>,
-  entry: string | number
-): Record<string | number, string> {
+  tree: Record<string, Record<string, string>>,
+  entry: string
+): Record<string, string> {
   const paths = resolveTreePaths(tree, entry);
   paths[entry] = './index.js';
 
@@ -45,15 +46,12 @@ export function resolveDependencyTree(
  * Recursively resolve the paths of a dependency tree.
  */
 function resolveTreePaths(
-  graph: Record<string | number, Record<string | number, string>>,
-  entry: string | number,
+  graph: Record<string, Record<string, string>>,
+  entry: string,
   cwd = '.'
 ) {
-  const paths: Record<string | number, string> = {};
-  const entries = Object.entries(graph[entry]) as unknown as [
-    string | number,
-    string
-  ][];
+  const paths: Record<string, string> = {};
+  const entries = Object.entries(graph[entry]) as unknown as [string, string][];
 
   for (const [id, key] of entries) {
     let path: string;

@@ -19,4 +19,7 @@ export function getPropName(node: t.Node): string | undefined {
   if (t.isStringLiteral(node)) {
     return node.value;
   }
+  if (t.isNumericLiteral(node)) {
+    return node.value.toString();
+  }
 }

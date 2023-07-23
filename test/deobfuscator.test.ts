@@ -55,6 +55,9 @@ describe('inline decoder', () => {
           let alias2;
           (alias2 = alias)(4);
         });
+        let alias4;
+        alias4 = alias;
+        alias4(5);
       });
   `);
     traverse(ast, {

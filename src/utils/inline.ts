@@ -1,6 +1,7 @@
 import traverse, { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { findParent } from './matcher';
 
 /**
  * Inline function used in control flow flattening (that only returns an expression)
@@ -45,9 +46,7 @@ export function inlineFunctionAliases(binding: Binding): { changes: number } {
   const refs = [...binding.referencePaths];
   for (const ref of refs) {
     // TODO: can also be a function assigned to a variable
-    const fn = ref.findParent(p =>
-      p.isFunctionDeclaration()
-    ) as NodePath<t.FunctionDeclaration> | null;
+    const fn = findParent(ref, m.functionDeclaration());
 
     // E.g. alias
     const fnName = m.capture(m.anyString());
@@ -146,7 +145,7 @@ export function inlineVariableAliases(
         // Remove `var alias;` when the assignment happens separately
         varBinding.path.remove();
 
-        if (t.isExpressionStatement(ref.parentPath.parentPath)) {
+        if (t.isExpressionStatement(ref.parentPath.parent)) {
           // Remove `alias = decoder;`
           ref.parentPath.remove();
         } else {

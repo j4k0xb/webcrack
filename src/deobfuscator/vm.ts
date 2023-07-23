@@ -1,22 +1,35 @@
 import generate from '@babel/generator';
 import { NodePath } from '@babel/traverse';
 import { CallExpression } from '@babel/types';
+import debug from 'debug';
 import { ArrayRotator } from './arrayRotator';
 import { Decoder } from './decoder';
 import { StringArray } from './stringArray';
 
 export type Sandbox = (code: string) => Promise<unknown>;
 
-export function createNodeSandbox(): (code: string) => Promise<unknown> {
+export function createNodeSandbox(): Sandbox {
   return async (code: string) => {
-    const { VM } = await import('vm2');
-    const vm = new VM({
-      timeout: 30_000,
-      allowAsync: false,
-      eval: false,
-      wasm: false,
-    });
-    return vm.run(code) as unknown;
+    const {
+      default: { Isolate },
+    } = await import('isolated-vm-prebuilt');
+    const isolate = new Isolate();
+    const context = await isolate.createContext();
+    const result = (await context.eval(code, {
+      timeout: 10_000,
+      copy: true,
+      filename: 'file:///obfuscated.js',
+    })) as unknown;
+    context.release();
+    isolate.dispose();
+    return result;
+  };
+}
+
+export function createBrowserSandbox(): Sandbox {
+  return () => {
+    // TODO: use sandybox (not available in web workers though)
+    throw new Error('Custom Sandbox implementation required.');
   };
 }
 
@@ -36,25 +49,36 @@ export class VMDecoder {
 
     // Generate as compact to bypass the self defense
     // (which tests someFunction.toString against a regex)
-    const stringArrayCode = generate(stringArray.path.node, {
+    const generateOptions = {
       compact: true,
-    }).code;
+      shouldPrintComment: () => false,
+    };
+    const stringArrayCode = generate(
+      stringArray.path.node,
+      generateOptions
+    ).code;
     const rotatorCode = rotator
-      ? generate(rotator.node, { compact: true }).code
+      ? generate(rotator.node, generateOptions).code
       : '';
     const decoderCode = decoders
-      .map(decoder => generate(decoder.path.node, { compact: true }).code)
-      .join('\n');
+      .map(decoder => generate(decoder.path.node, generateOptions).code)
+      .join(';\n');
 
-    this.setupCode = stringArrayCode + rotatorCode + decoderCode;
+    this.setupCode = [stringArrayCode, rotatorCode, decoderCode].join(';\n');
   }
 
-  async decode(calls: NodePath<CallExpression>[]): Promise<string[]> {
-    return (await this.sandbox(
-      `(() => {
-        ${this.setupCode}
-        return [${calls.join(',')}]
-      })()`
-    )) as string[];
+  async decode(calls: NodePath<CallExpression>[]): Promise<unknown[]> {
+    const code = `(() => {
+      ${this.setupCode}
+      return [${calls.join(',')}]
+    })()`;
+
+    try {
+      const result = await this.sandbox(code);
+      return result as unknown[];
+    } catch (err) {
+      debug('webcrack:deobfuscate')('vm code:', code);
+      throw err;
+    }
   }
 }

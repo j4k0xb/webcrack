@@ -1,9 +1,13 @@
-import { Binding, NodePath } from '@babel/traverse';
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
 import { getPropName } from '../utils/ast';
-import { constKey, constMemberExpression } from '../utils/matcher';
+import {
+  constKey,
+  constMemberExpression,
+  isReadonlyObject,
+} from '../utils/matcher';
 
 export default {
   name: 'objectLiterals',
@@ -36,16 +40,10 @@ export default {
     return {
       VariableDeclarator(path) {
         if (!varMatcher.match(path.node)) return;
+        if (objectProperties.current!.length === 0) return;
 
         const binding = path.scope.getBinding(varId.current!.name);
-        if (
-          !binding ||
-          !isReadonlyBinding(binding) ||
-          !hasValidReads(binding, memberAccess)
-        )
-          return;
-
-        if (!objectProperties.current!.length) return;
+        if (!binding || !isReadonlyObject(binding, memberAccess)) return;
 
         const props = new Map(
           objectProperties.current!.map(p => [
@@ -53,6 +51,15 @@ export default {
             p.value as t.StringLiteral | t.NumericLiteral,
           ])
         );
+
+        if (
+          !binding.referencePaths.every(ref => {
+            const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
+            const propName = getPropName(memberPath.node.property)!;
+            return props.has(propName);
+          })
+        )
+          return;
 
         binding.referencePaths.forEach(ref => {
           const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
@@ -66,27 +73,7 @@ export default {
         path.remove();
         this.changes++;
       },
+      noScope: true,
     };
   },
 } satisfies Transform;
-
-/**
- * Returns true if every reference is a member expression whose value is read
- */
-function hasValidReads(
-  binding: Binding,
-  memberAccess: m.Matcher<t.MemberExpression>
-) {
-  return binding.referencePaths.every(
-    path =>
-      memberAccess.match(path.parent) &&
-      !path.parentPath?.parentPath?.isAssignmentExpression({
-        left: path.parent,
-      })
-  );
-}
-
-function isReadonlyBinding(binding: Binding) {
-  // Workaround because sometimes babel treats the VariableDeclarator/binding itself as a violation
-  return binding.constant || binding.constantViolations[0] === binding.path;
-}

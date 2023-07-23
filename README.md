@@ -9,13 +9,50 @@
 
 <h1 align="center">webcrack</h1>
 
-webcrack is a tool for reverse engineering javascript. It can deobfuscate, unminify, and unpack bundles, to resemble the original source code as much as possible.
+webcrack is a tool for reverse engineering javascript.
+It can deobfuscate [obfuscator.io](https://github.com/javascript-obfuscator/javascript-obfuscator), unminify,
+and unpack [webpack](https://webpack.js.org/)/[browserify](https://browserify.org/),
+to resemble the original source code as much as possible.
 
 Try it in the [online playground](https://webcrack.netlify.app/) or view the [documentation](https://webcrack.netlify.app/docs).
 
-- 🚀 **Performance** - Especially for large files
+- 🚀 **Performance** - 500% faster than [synchrony](https://github.com/relative/synchrony)
 - 🛡️ **Safety** - Considers variable references and scope
 - 🔬 **Auto-detection** - Finds code patterns without needing a config
 - ✍🏻 **Readability** - Removes obfuscator/bundler artifacts
 - ⌨️ **TypeScript** - All code is written in TypeScript
 - 🧪 **Tests** - To make sure nothing breaks
+
+## Command Line Interface
+
+```bash
+npm install -g webcrack
+```
+
+Examples:
+
+```bash
+webcrack input.js
+webcrack input.js > output.js
+webcrack bundle.js -o output-dir
+```
+
+## API
+
+```bash
+npm install webcrack
+```
+
+Examples:
+
+```js
+import fs from 'fs';
+import { webcrack } from 'webcrack';
+
+const input = fs.readFileSync('bundle.js', 'utf8');
+
+const result = await webcrack(input);
+console.log(result.code);
+console.log(result.bundle);
+await result.save('output-dir');
+```
