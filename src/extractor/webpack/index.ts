@@ -100,10 +100,10 @@ export const unpackWebpack = {
       )
     );
 
-    // Examples: self.webpackChunk_N_E, window.webpackJsonp
+    // Examples: self.webpackChunk_N_E, window.webpackJsonp, this.webpackJsonp
     const jsonpGlobal = m.capture(
       constMemberExpression(
-        m.identifier(m.or('self', 'window')),
+        m.or(m.identifier(m.or('self', 'window')), m.thisExpression()),
         m.matcher(s => (s as string).startsWith('webpack'))
       )
     );
@@ -113,7 +113,11 @@ export const unpackWebpack = {
         m.assignmentExpression(
           '=',
           jsonpGlobal,
-          m.logicalExpression('||', jsonpGlobal, m.arrayExpression([]))
+          m.logicalExpression(
+            '||',
+            m.fromCapture(jsonpGlobal),
+            m.arrayExpression([])
+          )
         ),
         'push'
       ),
@@ -122,7 +126,7 @@ export const unpackWebpack = {
           m.anyList(
             m.arrayExpression([m.numericLiteral()]), // chunkId
             moduleFunctionsMatcher,
-            m.slice({ max: 1 }) // optional argument like [[188, 17, 16, 18]]
+            m.slice({ max: 1 }) // optional entry point like [["57iH",19,24,25]]
           )
         ),
       ]
