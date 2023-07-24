@@ -443,6 +443,24 @@ describe(yoda, expectJS => {
   test('greater than', () => expectJS('0 > x').toMatchInlineSnapshot('x < 0;'));
   test('greater or equal', () =>
     expectJS('0 >= x').toMatchInlineSnapshot('x <= 0;'));
+  test('multiply', () => expectJS('0 * x').toMatchInlineSnapshot('x * 0;'));
+  test('xor', () => expectJS('0 ^ x').toMatchInlineSnapshot('x ^ 0;'));
+  test('and', () => expectJS('0 & x').toMatchInlineSnapshot('x & 0;'));
+  test('or', () => expectJS('0 | x').toMatchInlineSnapshot('x | 0;'));
+
+  test('string', () =>
+    expectJS('"str" == x').toMatchInlineSnapshot('x == "str";'));
+  test('number', () => expectJS('1 == x').toMatchInlineSnapshot('x == 1;'));
+  test('negative number', () =>
+    expectJS('-1 == x').toMatchInlineSnapshot('x == -1;'));
+  test('boolean', () =>
+    expectJS('true == x').toMatchInlineSnapshot('x == true;'));
+  test('null', () => expectJS('null == x').toMatchInlineSnapshot('x == null;'));
+  test('undefined', () =>
+    expectJS('undefined == x').toMatchInlineSnapshot('x == undefined;'));
+  test('NaN', () => expectJS('NaN == x').toMatchInlineSnapshot('x == NaN;'));
+  test('Infinity', () =>
+    expectJS('Infinity == x').toMatchInlineSnapshot('x == Infinity;'));
 
   test('ignore other operators', () =>
     expectJS('2 + x').toMatchInlineSnapshot('2 + x;'));

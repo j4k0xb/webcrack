@@ -2,7 +2,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '.';
 
-// https://eslint.org/docs/latest/rules/yoda
+// https://eslint.org/docs/latest/rules/yoda and https://babeljs.io/docs/en/babel-plugin-minify-flip-comparisons
 
 const flippedOperators = {
   '==': '==',
@@ -13,6 +13,10 @@ const flippedOperators = {
   '<': '>',
   '>=': '<=',
   '<=': '>=',
+  '*': '*',
+  '^': '^',
+  '&': '&',
+  '|': '|',
 } as const;
 
 export default {
@@ -24,9 +28,12 @@ export default {
       m.or(
         m.stringLiteral(),
         m.numericLiteral(),
+        m.unaryExpression('-', m.numericLiteral()),
         m.booleanLiteral(),
         m.nullLiteral(),
-        m.identifier('undefined')
+        m.identifier('undefined'),
+        m.identifier('NaN'),
+        m.identifier('Infinity')
       ),
       m.matcher(node => !t.isLiteral(node))
     );
