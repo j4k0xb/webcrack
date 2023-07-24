@@ -6,6 +6,9 @@ import { constMemberExpression, findPath } from '../../utils/matcher';
 import { renameFast } from '../../utils/rename';
 import { WebpackModule } from './module';
 
+const buildNamespaceImport = statement`import * as NAME from "PATH";`;
+const buildNamedExportLet = statement`export let NAME = VALUE;`;
+
 /**
  * ```js
  * require.r(exports);
@@ -83,8 +86,6 @@ export function convertESM(module: WebpackModule): void {
     )
   );
 
-  const buildImport = statement`import * as NAME from "PATH";`;
-
   traverse(module.ast, {
     enter(path) {
       // Only traverse the top-level
@@ -98,7 +99,7 @@ export function convertESM(module: WebpackModule): void {
         requireMatcher.match(path.node)
       ) {
         path.replaceWith(
-          buildImport({
+          buildNamespaceImport({
             NAME: requireVariable.current,
             PATH: String(requiredModuleId.current),
           })
@@ -169,8 +170,10 @@ function exportVariable(
       declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
     }
   } else if (exportName === 'default') {
-    requireDPath.insertAfter(statement`export default ${value}`());
+    requireDPath.insertAfter(t.exportDefaultDeclaration(value));
   } else {
-    requireDPath.insertAfter(statement`export let ${exportName} = ${value}`());
+    requireDPath.insertAfter(
+      buildNamedExportLet({ NAME: t.identifier(exportName), VALUE: value })
+    );
   }
 }
