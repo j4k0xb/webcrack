@@ -9,14 +9,14 @@ export default {
   visitor() {
     const sequenceName = m.capture(m.identifier());
     const sequenceString = m.capture(
-      m.matcher<string>(s => /^\d+(\|\d+)*$/.test(s as string))
+      m.matcher<string>(s => /^\d+(\|\d+)*$/.test(s))
     );
     const iterator = m.capture(m.identifier());
 
     const cases = m.capture(
       m.arrayOf(
         m.switchCase(
-          m.stringLiteral(m.matcher<string>(s => /^\d+$/.test(s as string))),
+          m.stringLiteral(m.matcher(s => /^\d+$/.test(s))),
           m.or(
             m.anyList(m.zeroOrMore(), m.continueStatement()),
             m.oneOf(m.returnStatement())
@@ -38,9 +38,7 @@ export default {
           ),
         ]),
         // E.g. let iterator = 0 or -0x1a70 + 0x93d + 0x275 * 0x7
-        m.variableDeclaration(undefined, [
-          m.variableDeclarator(iterator),
-        ]),
+        m.variableDeclaration(undefined, [m.variableDeclarator(iterator)]),
         infiniteLoop(
           m.blockStatement([
             m.switchStatement(

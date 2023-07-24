@@ -23,9 +23,7 @@ export default {
   tags: ['safe'],
   visitor() {
     const varId = m.capture(m.identifier());
-    const propertyName = m.matcher<string>(i =>
-      /^[a-z]{5}$/i.test(i as string)
-    );
+    const propertyName = m.matcher<string>(name => /^[a-z]{5}$/i.test(name));
     const propertyKey = constKey(propertyName);
     const property = m.or(
       // E.g. "6|0|4|3|1|5|2"
@@ -42,7 +40,6 @@ export default {
       // E.g. function (a, b, c) { return a(b, c) } with an arbitrary number of arguments
       m.matcher<FunctionExpression>(node => {
         return (
-          t.isNode(node) &&
           t.isFunctionExpression(node) &&
           createFunctionMatcher(node.params.length, (...params) => [
             m.returnStatement(m.callExpression(params[0], params.slice(1))),

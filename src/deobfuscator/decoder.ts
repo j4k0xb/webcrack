@@ -61,8 +61,8 @@ export class Decoder {
             ALTERNATE: conditional.current!.alternate,
           })
         );
-        binding.reference(replacement.get('consequent.callee') as NodePath);
-        binding.reference(replacement.get('alternate.callee') as NodePath);
+        // some of the scope information is somehow lost after replacing
+        replacement.scope.crawl();
       } else if (call.match(ref.parent)) {
         calls.push(ref.parentPath as NodePath<t.CallExpression>);
       }

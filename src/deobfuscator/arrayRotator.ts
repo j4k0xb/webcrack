@@ -44,10 +44,10 @@ export function findArrayRotator(
       null,
       m.anything(),
       m.blockStatement(
-        m.anyList<t.Statement>(
+        m.anyList(
           m.zeroOrMore(),
           infiniteLoop(
-            m.matcher<t.BlockStatement>(node => {
+            m.matcher(node => {
               return (
                 m
                   .containerOf(callExpression(m.identifier('parseInt')))

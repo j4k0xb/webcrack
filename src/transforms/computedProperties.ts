@@ -8,7 +8,7 @@ export default {
   tags: ['safe'],
   visitor() {
     const stringMatcher = m.capture(
-      m.stringLiteral(m.matcher(value => isIdentifierName(value as string)))
+      m.stringLiteral(m.matcher(value => isIdentifierName(value)))
     );
     const propertyMatcher = m.or(
       m.memberExpression(m.anything(), stringMatcher, true),

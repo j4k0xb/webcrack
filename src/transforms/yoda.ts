@@ -20,8 +20,7 @@ export default {
   tags: ['safe'],
   visitor: () => {
     const matcher = m.binaryExpression(
-      // @ts-expect-error m.or overload doesn't support arbitrary number of arguments
-      m.or(...Object.keys(flippedOperators)),
+      m.or(...Object.values(flippedOperators)),
       m.or(
         m.stringLiteral(),
         m.numericLiteral(),
@@ -29,7 +28,7 @@ export default {
         m.nullLiteral(),
         m.identifier('undefined')
       ),
-      m.matcher(node => !t.isLiteral(node as t.Node))
+      m.matcher(node => !t.isLiteral(node))
     );
 
     return {

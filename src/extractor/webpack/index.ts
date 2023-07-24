@@ -104,7 +104,7 @@ export const unpackWebpack = {
     const jsonpGlobal = m.capture(
       constMemberExpression(
         m.or(m.identifier(m.or('self', 'window')), m.thisExpression()),
-        m.matcher(s => (s as string).startsWith('webpack'))
+        m.matcher(s => s.startsWith('webpack'))
       )
     );
     // (window.webpackJsonp = window.webpackJsonp || []).push([[0], {...}])
