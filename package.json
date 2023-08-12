@@ -48,6 +48,7 @@
     "@babel/traverse": "^7.22.8",
     "@babel/types": "^7.22.5",
     "@codemod/matchers": "^1.7.0",
+    "babel-plugin-minify-mangle-names": "^0.5.1",
     "commander": "^11.0.0",
     "debug": "^4.3.4",
     "isolated-vm-prebuilt": "^4.5.3"

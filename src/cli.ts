@@ -18,6 +18,7 @@ debug.enable('webcrack:*');
 interface Options {
   force: boolean;
   output?: string;
+  mangle?: boolean;
 }
 
 async function readStdin() {
@@ -32,9 +33,10 @@ program
   .description(description)
   .option('-o, --output <path>', 'output directory for bundled files')
   .option('-f, --force', 'overwrite output directory')
+  .option('-m, --mangle', 'mangle variable names')
   .argument('[file]', 'input file, defaults to stdin')
   .action(async (input: string | undefined) => {
-    const { output, force } = program.opts<Options>();
+    const { output, force, mangle } = program.opts<Options>();
     const code = await (input ? readFile(input, 'utf8') : readStdin());
 
     if (output) {
@@ -45,7 +47,7 @@ program
       }
     }
 
-    const result = await webcrack(code);
+    const result = await webcrack(code, { mangle });
 
     if (output) {
       await result.save(output);

@@ -20,6 +20,7 @@ import {
 } from './transforms';
 import blockStatement from './transforms/blockStatement';
 import jsx from './transforms/jsx';
+import mangle from './transforms/mangle';
 import sequence from './transforms/sequence';
 import splitVariableDeclarations from './transforms/splitVariableDeclarations';
 import unminify from './transforms/unminify';
@@ -51,6 +52,11 @@ export interface Options {
    */
   deobfuscate?: boolean;
   /**
+   * Mangle variable names.
+   * @default false
+   */
+  mangle?: boolean;
+  /**
    * Assigns paths to modules based on the given matchers.
    * This will also rewrite `require()` calls to use the new paths.
    *
@@ -75,6 +81,7 @@ function mergeOptions(options: Options): asserts options is Required<Options> {
     jsx: true,
     unpack: true,
     deobfuscate: true,
+    mangle: false,
     mappings: () => ({}),
     sandbox: process.env.browser ? createBrowserSandbox() : createNodeSandbox(),
     ...options,
@@ -108,6 +115,8 @@ export async function webcrack(
     await applyTransformAsync(ast, deobfuscator, options.sandbox);
 
   applyTransform(ast, unminify);
+
+  if (options.mangle) applyTransform(ast, mangle);
 
   // TODO: Also merge unminify visitor (breaks selfDefending/debugProtection atm)
   applyTransforms(

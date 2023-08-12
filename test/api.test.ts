@@ -38,4 +38,9 @@ describe('options', () => {
     await webcrack(obfuscatedSrc, { sandbox });
     expect(sandbox).toHaveBeenCalledOnce();
   });
+
+  test('mangle', async () => {
+    const result = await webcrack('const foo = 1;', { mangle: true });
+    expect(result.code).not.contain('foo');
+  });
 });
