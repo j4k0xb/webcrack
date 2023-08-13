@@ -7,12 +7,15 @@ The `package.json` version shouldn't be changed.
 ## Getting Started
 
 1. Fork and clone the repo
-2. Install dependencies: `npm install`
+2. Check out a new branch: `git checkout -b some-feature`
+3. Install dependencies: `npm install`
 
-Debugging in VSCode:
+## Debugging
 
-1. Create a `tmp` directory with `test.js` inside and paste your code
-2. Press `F5` to build the project and launch the debugger
+1. Create a directory named `tmp` with `test.js` inside and paste your code
+2. Press `F5` in VSCode to build the project and launch the debugger (or run `npm run dev`)
+
+The output will be saved in `tmp/webcrack-out`.
 
 ## Tests
 
@@ -22,10 +25,11 @@ If the snapshots are outdated, make sure the changes are correct and update them
 
 ![failed snapshot](https://user-images.githubusercontent.com/55899582/219093007-825a5056-38a0-4e8b-8512-b56e20174885.png)
 
-### About the tests
+### Types of tests
 
-- When working on a transform, you should add a test for it in [transforms.test.ts](test/transforms.test.ts)
-- When working on the deobfuscator or bundle unpacker, you should add/modify a [sample script](test/samples), and add a unit test if necessary (e.g. for a public JS API)
+- Transforms: add tests in [transforms.test.ts](test/transforms.test.ts)
+- Deobfuscator or bundle unpacker: create/modify a [sample script](test/samples)
+- Public JS API: add tests in [api.test.ts](test/api.test.ts)
 
 The samples should be as small as possible, but still representative.
 
