@@ -1,6 +1,8 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { inlineArray } from '../utils/inline';
+import { isReadonlyObject } from '../utils/matcher';
 import { renameFast } from '../utils/rename';
 
 export interface StringArray {
@@ -53,6 +55,7 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
   );
 
   traverse(ast, {
+    // Wrapped string array from later javascript-obfuscator versions
     FunctionDeclaration(path) {
       if (matcher.match(path.node)) {
         const length = arrayExpression.current!.elements.length;
@@ -68,6 +71,22 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
         };
         path.stop();
       }
+    },
+    // Simple string array inlining (only `array[0]`, `array[1]` etc references, no rotating/decoding).
+    // May be used by older or different obfuscators
+    VariableDeclaration(path) {
+      if (!variableDeclaration.match(path.node)) return;
+
+      const length = arrayExpression.current!.elements.length;
+      const binding = path.scope.getBinding(arrayIdentifier.current!.name)!;
+      const memberAccess = m.memberExpression(
+        m.fromCapture(arrayIdentifier),
+        m.numericLiteral(m.matcher(value => value < length))
+      );
+      if (!isReadonlyObject(binding, memberAccess)) return;
+
+      inlineArray(arrayExpression.current!, binding.referencePaths);
+      path.remove();
     },
   });
 

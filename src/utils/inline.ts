@@ -4,6 +4,24 @@ import * as m from '@codemod/matchers';
 import { findParent } from './matcher';
 
 /**
+ * Make sure the array is immutable and references are valid before using!
+ *
+ * Example:
+ * `const arr = ["foo", "bar"]; console.log(arr[0]);` -> `console.log("foo");`
+ */
+export function inlineArray(
+  array: t.ArrayExpression,
+  references: NodePath[]
+): void {
+  for (const reference of references) {
+    const memberPath = reference.parentPath! as NodePath<t.MemberExpression>;
+    const property = memberPath.node.property as t.NumericLiteral;
+    const index = property.value;
+    const replacement = array.elements[index]!;
+    memberPath.replaceWith(replacement);
+  }
+}
+/**
  * Inline function used in control flow flattening (that only returns an expression)
  * Example:
  * fn: `function (a, b) { return a(b) }`

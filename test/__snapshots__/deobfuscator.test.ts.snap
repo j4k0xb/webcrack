@@ -78,6 +78,8 @@ exports[`deobfuscate obfuscator.io-rotator-unary.js 1`] = `
 hi();"
 `;
 
+exports[`deobfuscate simple-string-array.js 1`] = `"console.log(\\"Hello, World!\\");"`;
+
 exports[`inline decoder > inline function 1`] = `
 "function decoder() {}
 decoder(1);
