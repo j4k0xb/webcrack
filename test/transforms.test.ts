@@ -503,6 +503,9 @@ describe(unminify, expectJS => {
       return d();
     }
   `));
+
+  test('merged string representation', () =>
+    expectJS('x = "\uD83D" + "\uDC40";').toMatchInlineSnapshot('x = "👀";'));
 });
 
 describe(jsx, expectJS => {
