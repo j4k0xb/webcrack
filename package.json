@@ -41,17 +41,17 @@
     "unbundle"
   ],
   "dependencies": {
-    "@babel/generator": "^7.22.7",
+    "@babel/generator": "^7.22.10",
     "@babel/helper-validator-identifier": "^7.22.5",
-    "@babel/parser": "^7.22.7",
+    "@babel/parser": "^7.22.10",
     "@babel/template": "^7.22.5",
-    "@babel/traverse": "^7.22.8",
-    "@babel/types": "^7.22.5",
+    "@babel/traverse": "^7.22.10",
+    "@babel/types": "^7.22.10",
     "@codemod/matchers": "^1.7.0",
     "babel-plugin-minify-mangle-names": "^0.5.1",
     "commander": "^11.0.0",
     "debug": "^4.3.4",
-    "isolated-vm-prebuilt": "^4.5.3"
+    "isolated-vm": "^4.6.0"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
@@ -59,16 +59,13 @@
     "@types/babel__template": "^7.4.1",
     "@types/babel__traverse": "^7.20.1",
     "@types/debug": "^4.1.8",
-    "@types/node": "^20.4.1",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
-    "@vitest/coverage-istanbul": "^0.33.0",
-    "esbuild": "^0.18.11",
-    "eslint": "^8.44.0",
+    "@types/node": "^20.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.3.0",
+    "@typescript-eslint/parser": "^6.3.0",
+    "@vitest/coverage-istanbul": "^0.34.1",
+    "esbuild": "^0.19.2",
+    "eslint": "^8.47.0",
     "typescript": "^5.1.6",
-    "vitest": "^0.33.0"
-  },
-  "overrides": {
-    "semver": "7.5.3"
+    "vitest": "^0.34.1"
   }
 }

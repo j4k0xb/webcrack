@@ -12,7 +12,7 @@ export function createNodeSandbox(): Sandbox {
   return async (code: string) => {
     const {
       default: { Isolate },
-    } = await import('isolated-vm-prebuilt');
+    } = await import('isolated-vm');
     const isolate = new Isolate();
     const context = await isolate.createContext();
     const result = (await context.eval(code, {

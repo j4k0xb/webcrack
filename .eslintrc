@@ -15,15 +15,13 @@
   ],
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:@typescript-eslint/strict"
+    "plugin:@typescript-eslint/recommended-type-checked"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module",
-    "project": "tsconfig.json"
+    "project": true
   },
   "rules": {
     "indent": [
@@ -38,8 +36,6 @@
       "error",
       "always"
     ],
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "error",
-    "@typescript-eslint/no-empty-function": "off"
+    "@typescript-eslint/explicit-module-boundary-types": "error"
   }
 }
