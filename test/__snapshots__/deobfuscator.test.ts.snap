@@ -78,7 +78,14 @@ exports[`deobfuscate obfuscator.io-rotator-unary.js 1`] = `
 hi();"
 `;
 
-exports[`deobfuscate simple-string-array.js 1`] = `"console.log(\\"Hello, World!\\");"`;
+exports[`deobfuscate simple-string-array.js 1`] = `
+"console.log(\\"Hello, World!\\");
+
+// ignore mutable array
+const arr2 = [\\"log\\", \\"Hello, World!\\"];
+arr2[0] = \\"warn\\";
+console[arr2[0]](arr2[1]);"
+`;
 
 exports[`inline decoder > inline function 1`] = `
 "function decoder() {}
