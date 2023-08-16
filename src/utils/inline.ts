@@ -9,7 +9,7 @@ import { findParent } from './matcher';
  * Example:
  * `const arr = ["foo", "bar"]; console.log(arr[0]);` -> `console.log("foo");`
  */
-export function inlineArray(
+export function inlineArrayElements(
   array: t.ArrayExpression,
   references: NodePath[]
 ): void {
@@ -21,6 +21,7 @@ export function inlineArray(
     memberPath.replaceWith(replacement);
   }
 }
+
 /**
  * Inline function used in control flow flattening (that only returns an expression)
  * Example:

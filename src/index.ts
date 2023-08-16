@@ -5,6 +5,7 @@ import debug from 'debug';
 import { join } from 'node:path';
 import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
+import mergeObjectAssignments from './deobfuscator/mergeObjectAssignments';
 import selfDefending from './deobfuscator/selfDefending';
 import {
   Sandbox,
@@ -127,6 +128,8 @@ export async function webcrack(
       options.jsx ? [jsx] : [],
     ].flat()
   );
+
+  if (options.deobfuscate) applyTransform(ast, mergeObjectAssignments);
 
   // Unpacking modifies the same AST and may result in imports not at top level
   // so the code has to be generated before

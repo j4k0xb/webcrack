@@ -9,8 +9,25 @@ import {
   isReadonlyObject,
 } from '../utils/matcher';
 
+/**
+ * Inline objects that only have string or numeric literal properties.
+ * Used by the "String Array Calls Transform" option for moving the
+ * decode call arguments into an object.
+ * Example:
+ * ```js
+ * const obj = {
+ *   c: 0x2f2,
+ *   d: '0x396',
+ * };
+ * console.log(decode(obj.c, obj.d));
+ * ```
+ * ->
+ * ```js
+ * console.log(decode(0x2f2, '0x396'));
+ * ```
+ */
 export default {
-  name: 'objectLiterals',
+  name: 'inlineObjectProps',
   tags: ['safe'],
   visitor() {
     const varId = m.capture(m.identifier());

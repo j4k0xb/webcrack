@@ -18,6 +18,16 @@ export function constKey(
   return m.or(m.identifier(name), m.stringLiteral(name));
 }
 
+export function constObjectProperty(
+  key?: string | m.Matcher<string>,
+  value?: m.Matcher<t.Expression>
+): m.Matcher<t.ObjectProperty> {
+  return m.or(
+    m.objectProperty(m.identifier(key), value, false),
+    m.objectProperty(m.stringLiteral(key), value, true)
+  );
+}
+
 export function matchIife(
   body?: m.Matcher<t.Statement[]> | m.Matcher<t.Statement>[]
 ): m.Matcher<t.CallExpression> {

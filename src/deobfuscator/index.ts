@@ -14,7 +14,7 @@ import deadCode from './deadCode';
 import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inlineDecodedStrings';
 import inlineDecoderWrappers from './inlineDecoderWrappers';
-import objectLiterals from './objectLiterals';
+import inlineObjectProps from './inlineObjectProps';
 import { findStringArray } from './stringArray';
 import { Sandbox, VMDecoder } from './vm';
 
@@ -42,7 +42,7 @@ export default {
     const decoders = findDecoders(stringArray);
     logger(`String Array Encodings: ${decoders.length}`);
 
-    state.changes += applyTransform(ast, objectLiterals).changes;
+    state.changes += applyTransform(ast, inlineObjectProps).changes;
 
     for (const decoder of decoders) {
       logger(` - ${codePreview(decoder.path.node)}`);

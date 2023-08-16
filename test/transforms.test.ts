@@ -2,7 +2,8 @@ import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import { Assertion, describe as describeVitest, expect, test } from 'vitest';
 import deadCode from '../src/deobfuscator/deadCode';
-import objectLiterals from '../src/deobfuscator/objectLiterals';
+import inlineObjectProps from '../src/deobfuscator/inlineObjectProps';
+import mergeObjectAssignments from '../src/deobfuscator/mergeObjectAssignments';
 import { Transform } from '../src/transforms';
 import blockStatement from '../src/transforms/blockStatement';
 import booleanIf from '../src/transforms/booleanIf';
@@ -563,7 +564,7 @@ describe(jsx, expectJS => {
     ).toMatchInlineSnapshot('<React.Fragment key={o}></React.Fragment>;'));
 });
 
-describe(objectLiterals, expectJS => {
+describe(inlineObjectProps, expectJS => {
   test('inline property', () =>
     expectJS(`
       const a = { x: 1 };
@@ -676,5 +677,52 @@ describe(objectLiterals, expectJS => {
       };
       a.x++;
       console.log(a.x);
+    `));
+});
+
+describe(mergeObjectAssignments, expectJS => {
+  test('inline properties without inlining object', () =>
+    expectJS(`
+     const obj = {};
+     obj.foo = foo;
+     obj.bar = 1;
+     foo++;
+     return obj;
+    `).toMatchInlineSnapshot(`
+      const obj = {
+        foo: foo,
+        bar: 1
+      };
+      foo++;
+      return obj;
+    `));
+
+  test('inline properties and object', () =>
+    expectJS(`
+      const obj = {};
+      obj.foo = 'foo';
+      return obj;
+    `).toMatchInlineSnapshot(`
+      return {
+        foo: 'foo'
+      };
+    `));
+
+  test('ignore circular reference', () =>
+    expectJS(`
+      const obj = {};
+      obj.foo = obj;
+    `).toMatchInlineSnapshot(`
+      const obj = {};
+      obj.foo = obj;
+    `));
+
+  test('ignore call with possible circular reference', () =>
+    expectJS(`
+      const obj = {};
+      obj.foo = fn();
+    `).toMatchInlineSnapshot(`
+      const obj = {};
+      obj.foo = fn();
     `));
 });

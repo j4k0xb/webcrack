@@ -1,7 +1,7 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { inlineArray } from '../utils/inline';
+import { inlineArrayElements } from '../utils/inline';
 import { isReadonlyObject } from '../utils/matcher';
 import { renameFast } from '../utils/rename';
 
@@ -85,7 +85,7 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
       );
       if (!isReadonlyObject(binding, memberAccess)) return;
 
-      inlineArray(arrayExpression.current!, binding.referencePaths);
+      inlineArrayElements(arrayExpression.current!, binding.referencePaths);
       path.remove();
     },
   });
