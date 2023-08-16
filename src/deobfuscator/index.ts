@@ -6,7 +6,6 @@ import {
   AsyncTransform,
 } from '../transforms';
 import mergeStrings from '../transforms/mergeStrings';
-import { codePreview } from '../utils/ast';
 import { findArrayRotator } from './arrayRotator';
 import controlFlowObject from './controlFlowObject';
 import controlFlowSwitch from './controlFlowSwitch';
@@ -28,16 +27,15 @@ export default {
     if (!sandbox) return;
 
     const stringArray = findStringArray(ast);
-    logger(`String Array: ${stringArray ? 'yes' : 'no'}`);
+    logger(
+      stringArray
+        ? `String Array: ${stringArray.length} strings`
+        : 'String Array: no'
+    );
     if (!stringArray) return;
-    logger(` - length: ${stringArray.length}`);
-    logger(` - ${codePreview(stringArray.path.node)}`);
 
     const rotator = findArrayRotator(stringArray);
     logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
-    if (rotator) {
-      logger(` - ${codePreview(rotator.node)}`);
-    }
 
     const decoders = findDecoders(stringArray);
     logger(`String Array Encodings: ${decoders.length}`);
@@ -45,8 +43,6 @@ export default {
     state.changes += applyTransform(ast, inlineObjectProps).changes;
 
     for (const decoder of decoders) {
-      logger(` - ${codePreview(decoder.path.node)}`);
-
       state.changes += applyTransform(
         ast,
         inlineDecoderWrappers,
