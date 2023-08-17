@@ -1,5 +1,6 @@
 import assert from 'assert';
 import { readFile } from 'fs/promises';
+import { tmpdir } from 'os';
 import { join } from 'path';
 import { describe, expect, test } from 'vitest';
 import { webcrack } from '../src/index';
@@ -50,6 +51,13 @@ describe('extractor', () => {
     assert(bundle);
     expect(bundle).toMatchSnapshot();
   });
+});
+
+test('prevent path traversal', async () => {
+  const code = await readFile('test/samples/webpack-path-traversal.js', 'utf8');
+  const result = await webcrack(code);
+  const dir = join(tmpdir(), 'path-traversal-test');
+  await expect(result.save(dir)).rejects.toThrow('path traversal');
 });
 
 describe('paths', () => {
