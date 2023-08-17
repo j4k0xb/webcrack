@@ -2,7 +2,7 @@ import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import * as m from '@codemod/matchers';
 import debug from 'debug';
-import { join } from 'node:path';
+import { join, normalize } from 'node:path';
 import deobfuscator from './deobfuscator';
 import debugProtection from './deobfuscator/debugProtection';
 import selfDefending from './deobfuscator/selfDefending';
@@ -131,6 +131,7 @@ export async function webcrack(
     code: outputCode,
     bundle,
     async save(path) {
+      path = normalize(path);
       if (process.env.browser) {
         throw new Error('Not implemented.');
       } else {

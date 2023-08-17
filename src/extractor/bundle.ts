@@ -1,7 +1,7 @@
 import traverse from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import debug from 'debug';
-import { dirname, join } from 'node:path';
+import { dirname, join, normalize } from 'node:path/posix';
 import { Module } from './module';
 
 const logger = debug('webcrack:unpack');
@@ -84,7 +84,10 @@ export class Bundle {
 
       await Promise.all(
         Array.from(this.modules.values(), async module => {
-          const modulePath = join(path, module.path);
+          const modulePath = normalize(join(path, module.path));
+          if (!modulePath.startsWith(path)) {
+            throw new Error(`detected path traversal: ${module.path}`);
+          }
           await mkdir(dirname(modulePath), { recursive: true });
           await writeFile(modulePath, module.code, 'utf8');
         })
