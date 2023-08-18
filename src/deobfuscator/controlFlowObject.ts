@@ -1,8 +1,9 @@
-import { Binding, NodePath } from '@babel/traverse';
+import traverse, { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { FunctionExpression } from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '../transforms';
+import mergeStrings from '../transforms/mergeStrings';
 import { getPropName } from '../utils/ast';
 import { inlineCfFunction } from '../utils/inline';
 import {
@@ -146,6 +147,10 @@ export default {
 
       for (let i = 0; i < refs.length - 1; i++) {
         const expressionStatement = refs[i].parentPath?.parentPath?.parentPath;
+        // Example: _0x29d709["kHAOU"] = "5|1|2" + "|4|3|" + "0|6";
+        traverse(expressionStatement!.node, mergeStrings.visitor(), undefined, {
+          changes: 0,
+        });
         if (!assignment.match(expressionStatement?.node)) return;
 
         assignments.push(expressionStatement!);

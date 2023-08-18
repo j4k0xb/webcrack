@@ -20,6 +20,7 @@ test.each([
   'obfuscator.io-function-wrapper.js',
   'obfuscator.io-calls-transform.js',
   'obfuscator.io-control-flow.js',
+  'obfuscator.io-control-flow-split-strings.js',
   'obfuscator.io-control-flow-keys.js',
   'obfuscator.io-high.js',
   'simple-string-array.js',

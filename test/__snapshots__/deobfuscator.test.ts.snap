@@ -48,6 +48,17 @@ exports[`deobfuscate obfuscator.io-control-flow-keys.js 1`] = `
 hi();"
 `;
 
+exports[`deobfuscate obfuscator.io-control-flow-split-strings.js 1`] = `
+"function _0x225c6a() {
+  console.log(\\"Hello World!\\");
+  console.log(\\"Hello World!\\");
+  console.log(\\"Hello World!\\");
+  console.log(\\"Hello World!\\");
+  console.log(\\"Hello World!\\");
+}
+_0x225c6a();"
+`;
+
 exports[`deobfuscate obfuscator.io-function-wrapper.js 1`] = `
 "function hi() {
   console.log(\\"Hello World!\\");
