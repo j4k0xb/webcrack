@@ -17,9 +17,9 @@ export default {
       m.arrayOf(
         m.switchCase(
           m.stringLiteral(m.matcher(s => /^\d+$/.test(s))),
-          m.or(
-            m.anyList(m.zeroOrMore(), m.continueStatement()),
-            m.oneOf(m.returnStatement())
+          m.anyList(
+            m.zeroOrMore(),
+            m.or(m.continueStatement(), m.returnStatement())
           )
         )
       )
