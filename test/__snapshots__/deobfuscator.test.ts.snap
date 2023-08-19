@@ -78,6 +78,10 @@ exports[`deobfuscate obfuscator.io-function-wrapper.js 1`] = `
   console.log(\\"Hello World!\\");
   console.log(30);
   console.log(undefined);
+  function notAWrapper(c, d) {
+    return \\"log\\";
+  }
+  console.log(notAWrapper(foo(), bar()));
 }
 hi();"
 `;

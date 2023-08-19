@@ -71,15 +71,28 @@ export function inlineFunctionAliases(binding: Binding): { changes: number } {
     const fnName = m.capture(m.anyString());
     // E.g. decode(b - 938, a)
     const returnedCall = m.capture(
-      m.callExpression(m.identifier(binding.identifier.name))
+      m.callExpression(
+        m.identifier(binding.identifier.name),
+        m.anyList(m.slice({ min: 2 }))
+      )
     );
     const matcher = m.functionDeclaration(
       m.identifier(fnName),
-      m.anything(),
+      m.anyList(m.slice({ min: 2 })),
       m.blockStatement([m.returnStatement(returnedCall)])
     );
 
     if (fn && matcher.match(fn.node)) {
+      // Avoid false positives of functions that return a string
+      // It's only a wrapper if the function's params are used in the decode call
+      const paramUsedInDecodeCall = fn.node.params.some(param => {
+        const binding = fn.scope.getBinding((param as t.Identifier).name);
+        return binding?.referencePaths.some(ref =>
+          ref.findParent(p => p.node === returnedCall.current)
+        );
+      });
+      if (!paramUsedInDecodeCall) continue;
+
       const fnBinding = fn.scope.parent.getBinding(fnName.current!);
       if (!fnBinding) continue;
       // Check all further aliases (`function alias2(a, b) { return alias(a - 1, b + 3); }`)
@@ -88,7 +101,11 @@ export function inlineFunctionAliases(binding: Binding): { changes: number } {
 
       // E.g. [alias(1071, 1077), alias(1, 2)]
       const callRefs = fnRefs
-        .filter(ref => ref.parentPath?.isCallExpression())
+        .filter(
+          ref =>
+            t.isCallExpression(ref.parent) &&
+            t.isIdentifier(ref.parent.callee, { name: fnName.current! })
+        )
         .map(ref => ref.parentPath!) as NodePath<t.CallExpression>[];
 
       for (const callRef of callRefs) {

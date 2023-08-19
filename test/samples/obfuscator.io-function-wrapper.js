@@ -55,5 +55,9 @@ function hi() {
       return b(c - -0x57, d);
   }
   console[j(0x175, 0x172)](undefined);
+  function notAWrapper(c, d) {
+      return j(0x175, 0x172);
+  }
+  console[j(0x175, 0x172)](notAWrapper(foo(), bar()));
 }
 hi();
