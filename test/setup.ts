@@ -4,5 +4,6 @@ import { expect } from 'vitest';
 
 expect.addSnapshotSerializer({
   test: (val: unknown) => t.isNode(val) && !('parentPath' in val),
-  serialize: (val: t.Node) => generate(val).code,
+  serialize: (val: t.Node) =>
+    generate(val, { jsescOption: { minimal: true } }).code,
 });

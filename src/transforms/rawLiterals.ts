@@ -6,14 +6,9 @@ export default {
   visitor: () => ({
     StringLiteral(path) {
       if (path.node.extra) {
-        path.node.extra.raw = JSON.stringify(path.node.extra.rawValue);
-      } else {
-        path.node.extra = {
-          rawValue: path.node.value,
-          raw: JSON.stringify(path.node.value),
-        };
+        path.node.extra = undefined;
+        this.changes++;
       }
-      this.changes++;
     },
     NumericLiteral(path) {
       if (path.node.extra) {

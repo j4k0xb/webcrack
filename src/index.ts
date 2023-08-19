@@ -133,7 +133,7 @@ export async function webcrack(
 
   // Unpacking modifies the same AST and may result in imports not at top level
   // so the code has to be generated before
-  const outputCode = generate(ast).code;
+  const outputCode = generate(ast, { jsescOption: { minimal: true } }).code;
 
   const bundle = options.unpack
     ? unpackBundle(ast, options.mappings(m))

@@ -22,7 +22,7 @@ export class Module {
    * @internal
    */
   regenerateCode(): string {
-    this.#code = generate(this.ast).code;
+    this.#code = generate(this.ast, { jsescOption: { minimal: true } }).code;
     return this.#code;
   }
 
