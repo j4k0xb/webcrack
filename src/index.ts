@@ -21,6 +21,7 @@ import {
 } from './transforms';
 import blockStatement from './transforms/blockStatement';
 import jsx from './transforms/jsx';
+import jsxNew from './transforms/jsx-new';
 import mangle from './transforms/mangle';
 import sequence from './transforms/sequence';
 import splitVariableDeclarations from './transforms/splitVariableDeclarations';
@@ -125,7 +126,7 @@ export async function webcrack(
     [
       // Have to run this after unminify to properly detect it
       options.deobfuscate ? [selfDefending, debugProtection] : [],
-      options.jsx ? [jsx] : [],
+      options.jsx ? [jsx, jsxNew] : [],
     ].flat()
   );
 

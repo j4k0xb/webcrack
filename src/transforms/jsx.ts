@@ -3,7 +3,6 @@ import * as m from '@codemod/matchers';
 import { Transform } from '.';
 import { codePreview } from '../utils/ast';
 import { constMemberExpression } from '../utils/matcher';
-import { renameFast } from '../utils/rename';
 
 export default {
   name: 'jsx',
@@ -50,7 +49,7 @@ export default {
             const children = convertChildren(
               path.node.arguments.slice(2) as t.Expression[]
             );
-            const opening = t.jSXOpeningFragment();
+            const opening = t.jsxOpeningFragment();
             const closing = t.jsxClosingFragment();
             const fragment = t.jsxFragment(opening, closing, children);
             path.replaceWith(fragment);
@@ -69,7 +68,7 @@ export default {
               const binding = path.scope.getBinding(type.current.name);
               if (!binding) return;
               name = t.jsxIdentifier(path.scope.generateUid('Component'));
-              renameFast(binding, name.name);
+              path.scope.rename(type.current.name, name.name);
             }
 
             const attributes = t.isObjectExpression(props.current)
