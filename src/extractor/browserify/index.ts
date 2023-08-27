@@ -28,7 +28,11 @@ export const unpackBrowserify = {
               m.arrayOf(
                 m.objectProperty(
                   constKey(),
-                  m.or(m.numericLiteral(), m.identifier('undefined'))
+                  m.or(
+                    m.numericLiteral(),
+                    m.identifier('undefined'),
+                    m.stringLiteral()
+                  )
                 )
               )
             ),
@@ -94,7 +98,11 @@ export const unpackBrowserify = {
 
           for (const dependency of dependencyProperties) {
             // skip external dependencies like { vscode: undefined }
-            if (dependency.value.type !== 'NumericLiteral') continue;
+            if (
+              dependency.value.type !== 'NumericLiteral' &&
+              dependency.value.type !== 'StringLiteral'
+            )
+              continue;
 
             const filePath = getPropName(dependency.key)!;
             const depId = dependency.value.value.toString();

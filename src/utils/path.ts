@@ -48,22 +48,26 @@ export function resolveDependencyTree(
 function resolveTreePaths(
   graph: Record<string, Record<string, string>>,
   entry: string,
-  cwd = '.'
+  cwd = '.',
+  paths: Record<string, string> = {}
 ) {
-  const paths: Record<string, string> = {};
-  const entries = Object.entries(graph[entry]) as unknown as [string, string][];
+  const entries = Object.entries(graph[entry]);
 
-  for (const [id, key] of entries) {
+  for (const [id, name] of entries) {
+    const isCircular = Object.hasOwn(paths, id);
+    if (isCircular) continue;
+
     let path: string;
-    if (key.startsWith('.')) {
-      path = join(cwd, key);
+    if (name.startsWith('.')) {
+      path = join(cwd, name);
       if (!path.endsWith('.js')) path += '.js';
     } else {
-      path = join('node_modules', key, 'index.js');
+      path = join('node_modules', name, 'index.js');
     }
     paths[id] = path;
+
     const newCwd = path.endsWith('.js') ? dirname(path) : path;
-    Object.assign(paths, resolveTreePaths(graph, id, newCwd));
+    resolveTreePaths(graph, id, newCwd, paths);
   }
 
   return paths;

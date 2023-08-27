@@ -104,4 +104,17 @@ describe('paths', () => {
       7: 'index.js',
     });
   });
+
+  test('resolve circular browserify paths', () => {
+    const dependencies = {
+      1: { 2: './utils' },
+      2: { 1: './base64' },
+      3: { 1: './base64' },
+    };
+    expect(resolveDependencyTree(dependencies, '3')).toEqual({
+      1: 'base64.js',
+      2: 'utils.js',
+      3: 'index.js',
+    });
+  });
 });
