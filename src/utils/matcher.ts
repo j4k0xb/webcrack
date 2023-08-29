@@ -7,8 +7,8 @@ export function infiniteLoop(
 ): m.Matcher<t.ForStatement | t.WhileStatement> {
   return m.or(
     m.forStatement(undefined, null, undefined, body),
-    m.forStatement(undefined, m.arrayExpression([]), undefined, body),
-    m.whileStatement(trueMatcher, body)
+    m.forStatement(undefined, truthyMatcher, undefined, body),
+    m.whileStatement(truthyMatcher, body)
   );
 }
 
@@ -65,6 +65,8 @@ export const falseMatcher = m.or(
   m.booleanLiteral(false),
   m.unaryExpression('!', m.arrayExpression([]))
 );
+
+export const truthyMatcher = m.or(trueMatcher, m.arrayExpression([]));
 
 /**
  * Starting at the parent path of the current `NodePath` and going up the
