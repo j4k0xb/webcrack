@@ -14,8 +14,7 @@ const webpackSrc = await readFile(
 );
 
 describe('options', () => {
-  // BUG: crashes
-  test.skip('no deobfuscate', async () => {
+  test('no deobfuscate', async () => {
     await webcrack(webpackSrc, { deobfuscate: false });
   });
 

@@ -105,6 +105,23 @@ describe('paths', () => {
     });
   });
 
+  // FIXME: utils/index.js instead of utils.js, can only know the real path by
+  // checking if all relative paths point to the correct modules?
+  test.skip('resolve browserify paths with index directory', () => {
+    const dependencies = {
+      1: { 2: './utils', 4: './test' },
+      2: { 3: './lib', 4: '../test' },
+      3: {},
+      4: {},
+    };
+    expect(resolveDependencyTree(dependencies, '1')).toEqual({
+      1: 'index.js',
+      2: 'utils/index.js',
+      3: 'utils/lib.js',
+      4: 'test.js',
+    });
+  });
+
   test('resolve circular browserify paths', () => {
     const dependencies = {
       1: { 2: './utils' },

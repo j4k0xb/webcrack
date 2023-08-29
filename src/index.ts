@@ -116,7 +116,13 @@ export async function webcrack(
   if (options.deobfuscate)
     await applyTransformAsync(ast, deobfuscator, options.sandbox);
 
-  applyTransform(ast, unminify);
+  // Normally unminify doesn't crawl the scope again, but when deobfuscation is disabled
+  // we have to do it for other transforms to work
+  const unminifyWrapper: typeof unminify = {
+    ...unminify,
+    visitor: () => ({ ...unminify.visitor(), noScope: options.deobfuscate }),
+  };
+  applyTransform(ast, unminifyWrapper);
 
   if (options.mangle) applyTransform(ast, mangle);
 
