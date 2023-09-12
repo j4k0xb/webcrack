@@ -7,7 +7,10 @@ export default {
   visitor: () => ({
     IfStatement: {
       exit(path) {
-        if (!t.isBlockStatement(path.node.consequent)) {
+        if (
+          !t.isBlockStatement(path.node.consequent) &&
+          !t.isEmptyStatement(path.node.consequent)
+        ) {
           path.node.consequent = t.blockStatement([path.node.consequent]);
 
           this.changes++;
@@ -20,7 +23,10 @@ export default {
     },
     Loop: {
       exit(path) {
-        if (!t.isBlockStatement(path.node.body)) {
+        if (
+          !t.isBlockStatement(path.node.body) &&
+          !t.isEmptyStatement(path.node.body)
+        ) {
           path.node.body = t.blockStatement([path.node.body]);
 
           this.changes++;

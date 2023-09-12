@@ -213,33 +213,65 @@ describe(rawLiterals, expectJS => {
 });
 
 describe(blockStatement, expectJS => {
-  test('convert to block statement', () =>
+  test('if statement', () =>
     expectJS(`
       if (a) b();
-      while (a) b();
-      for (;;) b();
-      for (const key in object) b();
-      for (const item of array) b();
-      const x = () => (a(), b());
     `).toMatchInlineSnapshot(`
       if (a) {
         b();
       }
+    `));
+
+  test('while statement', () =>
+    expectJS(`
+      while (a) b();
+    `).toMatchInlineSnapshot(`
       while (a) {
         b();
       }
+    `));
+
+  test('for statement', () =>
+    expectJS(`
+      for (;;) b();
+    `).toMatchInlineSnapshot(`
       for (;;) {
         b();
       }
+    `));
+
+  test('for in statement', () =>
+    expectJS(`
+      for (const key in object) b();
+    `).toMatchInlineSnapshot(`
       for (const key in object) {
         b();
       }
+    `));
+
+  test('for of statement', () =>
+    expectJS(`
+      for (const item of array) b();
+    `).toMatchInlineSnapshot(`
       for (const item of array) {
         b();
       }
+    `));
+
+  test('arrow function', () =>
+    expectJS(`
+      const x = () => (a(), b());
+    `).toMatchInlineSnapshot(`
       const x = () => {
         return a(), b();
       };
+    `));
+
+  test('ignore empty statement', () =>
+    expectJS(`
+      while (arr.pop());
+    `).toMatchInlineSnapshot(`
+      while (arr.pop());
     `));
 });
 
