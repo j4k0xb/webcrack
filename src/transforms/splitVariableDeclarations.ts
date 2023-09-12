@@ -8,11 +8,21 @@ export default {
     VariableDeclaration: {
       exit(path) {
         if (path.node.declarations.length > 1 && path.key !== 'init') {
-          path.replaceWithMultiple(
-            path.node.declarations.map(declaration =>
-              t.variableDeclaration(path.node.kind, [declaration])
-            )
-          );
+          if (path.parentPath.isExportNamedDeclaration()) {
+            path.parentPath.replaceWithMultiple(
+              path.node.declarations.map(declaration =>
+                t.exportNamedDeclaration(
+                  t.variableDeclaration(path.node.kind, [declaration])
+                )
+              )
+            );
+          } else {
+            path.replaceWithMultiple(
+              path.node.declarations.map(declaration =>
+                t.variableDeclaration(path.node.kind, [declaration])
+              )
+            );
+          }
           this.changes++;
         }
       },

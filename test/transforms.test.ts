@@ -135,6 +135,15 @@ describe(splitVariableDeclarations, expectJS => {
       const c = 3;
     `));
 
+  test('split exported variable declaration', () =>
+    expectJS(`
+      export const a = 1, b = 2, c = 3;
+    `).toMatchInlineSnapshot(`
+      export const a = 1;
+      export const b = 2;
+      export const c = 3;
+    `));
+
   test('dont split in for loop', () =>
     expectJS(`
       for (let i = 0, j = 1; i < 10; i++, j++) var a, b;
