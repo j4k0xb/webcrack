@@ -67,6 +67,15 @@ describe(sequence, expectJS => {
       }
     `));
 
+  test('return void', () =>
+    expectJS(`
+      return void (a(), b());
+    `).toMatchInlineSnapshot(`
+      a();
+      b();
+      return;
+    `));
+
   test('rearrange from if', () =>
     expectJS(`
       if (a(), b()) c();

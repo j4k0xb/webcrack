@@ -27,6 +27,17 @@ export default {
           );
           path.insertBefore(statements);
           this.changes++;
+        } else if (
+          t.isUnaryExpression(path.node.argument, { operator: 'void' }) &&
+          t.isSequenceExpression(path.node.argument.argument)
+        ) {
+          const expressions = path.node.argument.argument.expressions;
+          const statements = expressions.map(expr =>
+            t.expressionStatement(expr)
+          );
+          path.insertBefore(statements);
+          path.node.argument = null;
+          this.changes++;
         }
       },
     },
