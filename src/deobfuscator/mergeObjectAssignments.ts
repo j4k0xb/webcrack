@@ -59,9 +59,15 @@ export default {
             )
               return;
 
+            // { [1]: value, "foo bar": value } can be simplified to { 1: value, "foo bar": value }
+            const isComputed =
+              computed.current! &&
+              key.current!.type !== 'NumericLiteral' &&
+              key.current!.type !== 'StringLiteral';
+
             // Example: const obj = { x: 1 }; obj.foo = 'bar'; -> const obj = { x: 1, foo: 'bar' };
             object.current!.properties.push(
-              t.objectProperty(key.current!, value.current!, computed.current)
+              t.objectProperty(key.current!, value.current!, isComputed)
             );
 
             sibling.remove();

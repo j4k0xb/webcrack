@@ -778,6 +778,20 @@ describe(mergeObjectAssignments, expectJS => {
       };
     `));
 
+  test('computed properties', () =>
+    expectJS(`
+      const obj = {};
+      obj["a b c"] = 1;
+      obj[1] = 2;
+      return obj;
+    `).toMatchInlineSnapshot(`
+      const obj = {
+        "a b c": 1,
+        1: 2
+      };
+      return obj;
+    `));
+
   test('ignore circular reference', () =>
     expectJS(`
       const obj = {};
