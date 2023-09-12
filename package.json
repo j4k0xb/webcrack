@@ -1,6 +1,6 @@
 {
   "name": "webcrack",
-  "version": "2.9.1",
+  "version": "2.10.0",
   "description": "Deobfuscate, unminify and unpack bundled javascript",
   "author": "j4k0xb",
   "license": "MIT",
