@@ -826,11 +826,10 @@ describe(mergeObjectAssignments, expectJS => {
       obj[1] = 2;
       return obj;
     `).toMatchInlineSnapshot(`
-      const obj = {
+      return {
         "a b c": 1,
         1: 2
       };
-      return obj;
     `));
 
   test('ignore circular reference', () =>

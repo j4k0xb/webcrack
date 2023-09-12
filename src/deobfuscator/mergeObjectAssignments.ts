@@ -111,8 +111,6 @@ const inlineableObject: m.Matcher<t.Expression> = m.matcher(
     (t.isLiteral(node) && !t.isTemplateLiteral(node)) ||
     m.arrayExpression(m.arrayOf(inlineableObject)).match(node) ||
     m
-      .objectExpression(
-        m.arrayOf(constObjectProperty(m.anything(), inlineableObject))
-      )
+      .objectExpression(m.arrayOf(constObjectProperty(inlineableObject)))
       .match(node)
 );

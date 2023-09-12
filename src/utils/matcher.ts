@@ -19,12 +19,11 @@ export function constKey(
 }
 
 export function constObjectProperty(
-  key?: string | m.Matcher<string>,
   value?: m.Matcher<t.Expression>
 ): m.Matcher<t.ObjectProperty> {
   return m.or(
-    m.objectProperty(m.identifier(key), value, false),
-    m.objectProperty(m.stringLiteral(key), value, true)
+    m.objectProperty(m.identifier(), value, false),
+    m.objectProperty(m.or(m.stringLiteral(), m.numericLiteral()), value)
   );
 }
 
