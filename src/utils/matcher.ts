@@ -125,6 +125,19 @@ export function isReadonlyObject(
   if (!binding.constant && binding.constantViolations[0] !== binding.path)
     return false;
 
+  function isPatternAssignment(member: NodePath<t.Node>) {
+    return (
+      // [obj.property] = [1];
+      member.parentPath?.isArrayPattern() ||
+      // ([obj.property = 1] = [])
+      member.parentPath?.isAssignmentPattern() ||
+      // ({ property: obj.property } = {})
+      member.parentPath?.parentPath?.isObjectPattern() ||
+      // ({ property: obj.property = 1 } = {})
+      member.parentPath?.isAssignmentPattern()
+    );
+  }
+
   return binding.referencePaths.every(
     path =>
       // obj.property
@@ -142,10 +155,6 @@ export function isReadonlyObject(
         argument: path.parent,
         operator: 'delete',
       }) &&
-      // [obj.property] = [{}] or ({ property: obj.property } = {})
-      !path.findParent(
-        parentPath =>
-          parentPath.isArrayPattern() || parentPath.isObjectPattern()
-      )
+      !isPatternAssignment(path.parentPath!)
   );
 }
