@@ -1,0 +1,31 @@
+function hi() {
+  var _0x5e8644 = _0x5c1c;
+  var _0xa7728a = {
+      'UcfbR': function (_0x5a9ca0, ..._0x56527a) {
+          return _0x5a9ca0(..._0x56527a);
+      }
+  };
+  return m['functionExpression'](undefined, captures[_0x5e8644(0x1)](m[_0x5e8644(0x3)]), m[_0x5e8644(0x0)](_0xa7728a[_0x5e8644(0x2)](body, ...captures[_0x5e8644(0x1)](_0x56f63c => m[_0x5e8644(0x3)](m['fromCapture'](_0x56f63c))), ...arr)));
+}
+function _0x580f() {
+  var _0x3034f3 = [
+      'blockStatement',
+      'map',
+      'UcfbR',
+      'identifier'
+  ];
+  _0x580f = function () {
+      return _0x3034f3;
+  };
+  return _0x580f();
+}
+function _0x5c1c(_0x580f21, _0x5c1c8f) {
+  var _0x50ceb3 = _0x580f();
+  _0x5c1c = function (_0xc280f8, _0x2a8aa7) {
+      _0xc280f8 = _0xc280f8 - 0x0;
+      var _0x16019b = _0x50ceb3[_0xc280f8];
+      return _0x16019b;
+  };
+  return _0x5c1c(_0x580f21, _0x5c1c8f);
+}
+hi();

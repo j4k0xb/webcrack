@@ -46,7 +46,24 @@ export default {
             m.returnStatement(m.callExpression(params[0], params.slice(1))),
           ]).match(node)
         );
-      })
+      }),
+      // E.g. function (a, ...b) { return a(...b) }
+      (() => {
+        const fnName = m.capture(m.identifier());
+        const restName = m.capture(m.identifier());
+
+        return m.functionExpression(
+          undefined,
+          [fnName, m.restElement(restName)],
+          m.blockStatement([
+            m.returnStatement(
+              m.callExpression(m.fromCapture(fnName), [
+                m.spreadElement(m.fromCapture(restName)),
+              ])
+            ),
+          ])
+        );
+      })()
     );
     // E.g. "rLxJs": "6|0|4|3|1|5|2"
     const objectProperties = m.capture(

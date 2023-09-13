@@ -34,6 +34,16 @@ export function inlineCfFunction(
   fn: t.FunctionExpression,
   caller: NodePath<t.CallExpression>
 ): void {
+  if (t.isRestElement(fn.params[1])) {
+    caller.replaceWith(
+      t.callExpression(
+        caller.node.arguments[0] as t.Identifier,
+        caller.node.arguments.slice(1)
+      )
+    );
+    return;
+  }
+
   const returnedValue = (fn.body.body[0] as t.ReturnStatement).argument!;
   const clone = t.cloneNode(returnedValue, true);
 

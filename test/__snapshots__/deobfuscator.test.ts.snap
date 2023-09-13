@@ -59,6 +59,13 @@ exports[`deobfuscate obfuscator.io-control-flow-split-strings.js 1`] = `
 _0x225c6a();"
 `;
 
+exports[`deobfuscate obfuscator.io-control-flow-spread.js 1`] = `
+"function hi() {
+  return m.functionExpression(undefined, captures.map(m.identifier), m.blockStatement(body(...captures.map(_0x56f63c => m.identifier(m.fromCapture(_0x56f63c))), ...arr)));
+}
+hi();"
+`;
+
 exports[`deobfuscate obfuscator.io-control-flow-switch-return.js 1`] = `
 "function hi() {
   console.log(\\"Hello World!\\");

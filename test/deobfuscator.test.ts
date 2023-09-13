@@ -23,6 +23,7 @@ test.each([
   'obfuscator.io-control-flow-split-strings.js',
   'obfuscator.io-control-flow-keys.js',
   'obfuscator.io-control-flow-switch-return.js',
+  'obfuscator.io-control-flow-spread.js',
   'obfuscator.io-high.js',
   'simple-string-array.js',
 ])('deobfuscate %s', async filename => {
