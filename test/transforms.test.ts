@@ -117,6 +117,16 @@ describe(sequence, expectJS => {
       for (;;);
     `));
 
+  test('rearrange from for loop update', () =>
+    expectJS(`
+      for(; i < 10; a(), b(), i++);
+    `).toMatchInlineSnapshot(`
+      for (; i < 10; i++) {
+        a();
+        b();
+      }
+    `));
+
   test('rearrange variable declarator', () =>
     expectJS(`
     var t = (o = null, o);

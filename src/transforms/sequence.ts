@@ -105,6 +105,18 @@ export default {
           path.node.init = null;
           this.changes++;
         }
+        if (
+          t.isSequenceExpression(path.node.update) &&
+          path.node.body.type === 'EmptyStatement'
+        ) {
+          const expressions = path.node.update.expressions;
+          path.node.update = expressions.pop()!;
+          const statements = expressions.map(expr =>
+            t.expressionStatement(expr)
+          );
+          path.node.body = t.blockStatement(statements);
+          this.changes++;
+        }
       },
     },
     VariableDeclaration: {
