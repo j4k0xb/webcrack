@@ -1,6 +1,7 @@
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import { Assertion, describe as describeVitest, expect, test } from 'vitest';
+import { webcrack } from '../src';
 import deadCode from '../src/deobfuscator/deadCode';
 import inlineObjectProps from '../src/deobfuscator/inlineObjectProps';
 import mergeObjectAssignments from '../src/deobfuscator/mergeObjectAssignments';
@@ -42,6 +43,16 @@ function describe<Options>(
     });
   });
 }
+
+test('decode bookmarklet', async () => {
+  const code = `javascript:(function()%7Balert('hello%20world')%3B%7D)()%3B`;
+  const result = await webcrack(code);
+  expect(result.code).toMatchInlineSnapshot(`
+    "(function () {
+      alert(\\"hello world\\");
+    })();"
+  `);
+});
 
 describe(sequence, expectJS => {
   test('to statements', () =>

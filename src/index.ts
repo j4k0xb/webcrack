@@ -101,6 +101,11 @@ export async function webcrack(
     debug.enable('webcrack:*');
   }
 
+  const isBookmarklet = /^javascript:./.test(code);
+  if (isBookmarklet) {
+    code = decodeURIComponent(code.replace(/^javascript:/, ''));
+  }
+
   const ast = parse(code, {
     sourceType: 'unambiguous',
     allowReturnOutsideFunction: true,
