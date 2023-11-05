@@ -77,7 +77,8 @@ export default {
             const children = convertChildren(
               path.node.arguments.slice(2) as t.Expression[]
             );
-            const opening = t.jsxOpeningElement(name, attributes);
+            const selfClosing = children.length === 0;
+            const opening = t.jsxOpeningElement(name, attributes, selfClosing);
             const closing = t.jsxClosingElement(name);
             const element = t.jsxElement(opening, closing, children);
             path.replaceWith(element);

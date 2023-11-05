@@ -1,8 +1,8 @@
-import generate from '@babel/generator';
 import * as t from '@babel/types';
+import { generate } from './generator';
 
 export function codePreview(node: t.Node): string {
-  const { code } = generate(node, {
+  const code = generate(node, {
     minified: true,
     shouldPrintComment: () => false,
   });

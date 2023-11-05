@@ -584,27 +584,27 @@ describe(unminify, expectJS => {
 describe(jsx, expectJS => {
   test('tag name type', () =>
     expectJS('React.createElement("div", null);').toMatchInlineSnapshot(
-      '<div></div>;'
+      '<div />;'
     ));
 
   test('component type', () =>
     expectJS('React.createElement(TodoList, null);').toMatchInlineSnapshot(
-      '<TodoList></TodoList>;'
+      '<TodoList />;'
     ));
 
   test('deeply nested member expression type', () =>
     expectJS(
       'React.createElement(components.list.TodoList, null);'
     ).toMatchInlineSnapshot(
-      '<components.list.TodoList></components.list.TodoList>;'
+      '<components.list.TodoList />;'
     ));
 
   test('rename component with conflicting name', () =>
     expectJS('function a(){} React.createElement(a, null);')
       .toMatchInlineSnapshot(`
-      function _Component() {}
-      <_Component></_Component>;
-    `));
+        function _Component() {}
+        <_Component />;
+      `));
 
   test('attributes', () =>
     expectJS(
@@ -612,12 +612,12 @@ describe(jsx, expectJS => {
     ).toMatchInlineSnapshot(`
       <div data-hover="tooltip" style={{
         display: "block"
-      }}></div>;
+      }} />;
     `));
 
   test('spread attributes', () =>
     expectJS('React.createElement("div", {...props});').toMatchInlineSnapshot(
-      '<div {...props}></div>;'
+      '<div {...props} />;'
     ));
 
   test('children', () =>
@@ -628,32 +628,32 @@ describe(jsx, expectJS => {
   test('fragment', () =>
     expectJS(
       'React.createElement(React.Fragment, null, React.createElement("span", null), "test");'
-    ).toMatchInlineSnapshot('<><span></span>test</>;'));
+    ).toMatchInlineSnapshot('<><span />test</>;'));
 
   test('fragment with key', () =>
     expectJS(
       'React.createElement(React.Fragment, { key: o })'
-    ).toMatchInlineSnapshot('<React.Fragment key={o}></React.Fragment>;'));
+    ).toMatchInlineSnapshot('<React.Fragment key={o} />;'));
 });
 
 describe(jsxNew, expectJS => {
   test('tag name type', () =>
-    expectJS('jsx("div", {});').toMatchInlineSnapshot('<div></div>;'));
+    expectJS('jsx("div", {});').toMatchInlineSnapshot('<div />;'));
 
   test('component type', () =>
     expectJS('jsx(TodoList, {});').toMatchInlineSnapshot(
-      '<TodoList></TodoList>;'
+      '<TodoList />;'
     ));
 
   test('deeply nested member expression type', () =>
     expectJS('jsx(components.list.TodoList, {});').toMatchInlineSnapshot(
-      '<components.list.TodoList></components.list.TodoList>;'
+      '<components.list.TodoList />;'
     ));
 
   test('rename component with conflicting name', () =>
     expectJS('function a(){} jsx(a, {});').toMatchInlineSnapshot(`
       function _Component() {}
-      <_Component></_Component>;
+      <_Component />;
     `));
 
   test('attributes', () =>
@@ -662,12 +662,12 @@ describe(jsxNew, expectJS => {
     ).toMatchInlineSnapshot(`
       <div data-hover="tooltip" style={{
         display: "block"
-      }}></div>;
+      }} />;
     `));
 
   test('spread attributes', () =>
     expectJS('jsx("div", {...props});').toMatchInlineSnapshot(
-      '<div {...props}></div>;'
+      '<div {...props} />;'
     ));
 
   test('children', () =>
@@ -677,7 +677,7 @@ describe(jsxNew, expectJS => {
 
   test('component with key', () =>
     expectJS('jsx("div", {}, "test")').toMatchInlineSnapshot(
-      '<div key="test"></div>;'
+      '<div key="test" />;'
     ));
 
   test('array expression child', () =>
@@ -688,11 +688,11 @@ describe(jsxNew, expectJS => {
   test('fragment', () =>
     expectJS(
       'jsxs(React.Fragment, { children: [jsx("span", {}), "test"] });'
-    ).toMatchInlineSnapshot('<><span></span>test</>;'));
+    ).toMatchInlineSnapshot('<><span />test</>;'));
 
   test('fragment with key', () =>
     expectJS('jsx(React.Fragment, {}, o)').toMatchInlineSnapshot(
-      '<React.Fragment key={o}></React.Fragment>;'
+      '<React.Fragment key={o} />;'
     ));
 });
 

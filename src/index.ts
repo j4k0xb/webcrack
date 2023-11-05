@@ -1,4 +1,3 @@
-import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import * as m from '@codemod/matchers';
 import debug from 'debug';
@@ -26,6 +25,7 @@ import mangle from './transforms/mangle';
 import sequence from './transforms/sequence';
 import splitVariableDeclarations from './transforms/splitVariableDeclarations';
 import unminify from './transforms/unminify';
+import { generate } from './utils/generator';
 
 export interface WebcrackResult {
   code: string;
@@ -145,7 +145,7 @@ export async function webcrack(
 
   // Unpacking modifies the same AST and may result in imports not at top level
   // so the code has to be generated before
-  const outputCode = generate(ast, { jsescOption: { minimal: true } }).code;
+  const outputCode = generate(ast);
 
   const bundle = options.unpack
     ? unpackBundle(ast, options.mappings(m))

@@ -1,4 +1,3 @@
-import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import assert from 'assert';
@@ -7,6 +6,7 @@ import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { findStringArray } from '../src/deobfuscator/stringArray';
 import { webcrack } from '../src/index';
+import { generate } from '../src/utils/generator';
 import {
   inlineFunctionAliases,
   inlineVariableAliases,
@@ -71,7 +71,7 @@ describe('inline decoder', () => {
         path.stop();
       },
     });
-    expect(generate(ast).code).toMatchSnapshot();
+    expect(generate(ast)).toMatchSnapshot();
   });
 
   test('inline function', () => {
@@ -99,6 +99,6 @@ describe('inline decoder', () => {
       },
     });
 
-    expect(generate(ast).code).toMatchSnapshot();
+    expect(generate(ast)).toMatchSnapshot();
   });
 });

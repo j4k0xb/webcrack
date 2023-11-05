@@ -1,5 +1,5 @@
-import generate from '@babel/generator';
 import * as t from '@babel/types';
+import { generate } from '../utils/generator';
 
 export class Module {
   id: string;
@@ -22,7 +22,7 @@ export class Module {
    * @internal
    */
   regenerateCode(): string {
-    this.#code = generate(this.ast, { jsescOption: { minimal: true } }).code;
+    this.#code = generate(this.ast);
     return this.#code;
   }
 

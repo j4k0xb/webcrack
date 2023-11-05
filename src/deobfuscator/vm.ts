@@ -1,7 +1,7 @@
-import generate from '@babel/generator';
 import { NodePath } from '@babel/traverse';
 import { CallExpression } from '@babel/types';
 import debug from 'debug';
+import { generate } from '../utils/generator';
 import { ArrayRotator } from './arrayRotator';
 import { Decoder } from './decoder';
 import { StringArray } from './stringArray';
@@ -53,15 +53,10 @@ export class VMDecoder {
       compact: true,
       shouldPrintComment: () => false,
     };
-    const stringArrayCode = generate(
-      stringArray.path.node,
-      generateOptions
-    ).code;
-    const rotatorCode = rotator
-      ? generate(rotator.node, generateOptions).code
-      : '';
+    const stringArrayCode = generate(stringArray.path.node, generateOptions);
+    const rotatorCode = rotator ? generate(rotator.node, generateOptions) : '';
     const decoderCode = decoders
-      .map(decoder => generate(decoder.path.node, generateOptions).code)
+      .map(decoder => generate(decoder.path.node, generateOptions))
       .join(';\n');
 
     this.setupCode = [stringArrayCode, rotatorCode, decoderCode].join(';\n');
