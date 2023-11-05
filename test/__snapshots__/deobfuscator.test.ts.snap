@@ -48,6 +48,17 @@ exports[`deobfuscate obfuscator.io-control-flow-keys.js 1`] = `
 hi();"
 `;
 
+exports[`deobfuscate obfuscator.io-control-flow-partial-keys.js 1`] = `
+"function hi() {
+  const _0x46643e = 1;
+  const _0x4d295f = 2;
+  if (_0x46643e < _0x4d295f) {
+    console.log(\\"Hello World!\\");
+  }
+}
+hi();"
+`;
+
 exports[`deobfuscate obfuscator.io-control-flow-split-strings.js 1`] = `
 "function _0x225c6a() {
   console.log(\\"Hello World!\\");

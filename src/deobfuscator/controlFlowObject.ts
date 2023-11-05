@@ -13,7 +13,6 @@ import {
   findParent,
   isReadonlyObject,
 } from '../utils/matcher';
-import { renameFast } from '../utils/rename';
 
 /**
  * Explanation: https://excalidraw.com/#json=0vehUdrfSS635CNPEQBXl,hDOd-UO9ETfSDWT9MxVX-A
@@ -26,7 +25,7 @@ export default {
     const varId = m.capture(m.identifier());
     const propertyName = m.matcher<string>(name => /^[a-z]{5}$/i.test(name));
     const propertyKey = constKey(propertyName);
-    const property = m.or(
+    const propertyValue = m.or(
       // E.g. "6|0|4|3|1|5|2"
       m.stringLiteral(),
       // E.g. function (a, b) { return a + b }
@@ -67,20 +66,28 @@ export default {
     );
     // E.g. "rLxJs": "6|0|4|3|1|5|2"
     const objectProperties = m.capture(
-      m.arrayOf(m.objectProperty(propertyKey, property))
+      m.arrayOf(m.objectProperty(propertyKey, propertyValue))
     );
     const aliasId = m.capture(m.identifier());
-    const aliasVar = m.variableDeclarator(aliasId, m.fromCapture(varId));
+    const aliasVar = m.variableDeclaration(m.anything(), [
+      m.variableDeclarator(aliasId, m.fromCapture(varId)),
+    ]);
     // E.g. "rLxJs"
     const assignedKey = m.capture(propertyName);
     // E.g. "6|0|4|3|1|5|2"
-    const assignedValue = m.capture(property);
+    const assignedValue = m.capture(propertyValue);
     // E.g. obj.rLxJs = "6|0|4|3|1|5|2"
     const assignment = m.expressionStatement(
       m.assignmentExpression(
         '=',
         constMemberExpression(m.fromCapture(varId), assignedKey),
         assignedValue
+      )
+    );
+    const looseAssignment = m.expressionStatement(
+      m.assignmentExpression(
+        '=',
+        constMemberExpression(m.fromCapture(varId), assignedKey)
       )
     );
     // E.g. obj.rLxJs
@@ -106,8 +113,7 @@ export default {
         const binding = path.scope.getBinding(varId.current!.name);
         if (!binding) return changes;
         if (!isConstantBinding(binding)) return changes;
-        if (objectProperties.current!.length === 0)
-          transformObjectKeys(binding);
+        if (!transformObjectKeys(binding)) return changes;
         if (!isReadonlyObject(binding, memberAccess)) return changes;
 
         const props = new Map(
@@ -153,42 +159,55 @@ export default {
      * When the `Transform Object Keys` option is enabled, the obfuscator generates an empty
      * object, assigns the properties later and adds an alias variable to the object.
      * This function undoes that by converting the assignments to inline object properties.
+     *
+     * In some forked versions of the obfuscator, some properties may be in the object
+     * and others are assigned later.
      */
-    function transformObjectKeys(objBinding: Binding) {
-      const refs = objBinding.referencePaths;
+    function transformObjectKeys(objBinding: Binding): boolean {
+      const container = objBinding.path.parentPath!.container as t.Statement[];
+      const startIndex = (objBinding.path.parentPath!.key as number) + 1;
+      const properties: t.ObjectProperty[] = [];
 
-      if (refs.length < 2) return;
-      if (!aliasVar.match(refs.at(-1)?.parent)) return;
+      for (let i = startIndex; i < container.length; i++) {
+        const statement = container[i];
 
-      const assignments: NodePath[] = [];
-
-      for (let i = 0; i < refs.length - 1; i++) {
-        const expressionStatement = refs[i].parentPath?.parentPath?.parentPath;
         // Example: _0x29d709["kHAOU"] = "5|1|2" + "|4|3|" + "0|6";
-        traverse(expressionStatement!.node, mergeStrings.visitor(), undefined, {
-          changes: 0,
-        });
-        if (!assignment.match(expressionStatement?.node)) return;
+        // For performance reasons, only traverse if it is a potential match (value doesn't matter)
+        if (looseAssignment.match(statement)) {
+          traverse(statement, mergeStrings.visitor(), undefined, {
+            changes: 0,
+          });
+        }
 
-        assignments.push(expressionStatement!);
-        objectProperties.current!.push(
-          t.objectProperty(
-            t.identifier(assignedKey.current!),
-            assignedValue.current!
-          )
-        );
+        if (assignment.match(statement)) {
+          properties.push(
+            t.objectProperty(
+              t.identifier(assignedKey.current!),
+              assignedValue.current!
+            )
+          );
+        } else {
+          break;
+        }
       }
 
-      const aliasBinding = objBinding.scope.getBinding(aliasId.current!.name)!;
-      if (!isReadonlyObject(aliasBinding, memberAccess)) return;
+      // If all properties are in the object then there typically won't be an alias variable
+      const aliasAssignment = container[startIndex + properties.length];
+      if (!aliasVar.match(aliasAssignment)) return true;
 
+      // Avoid false positives
+      if (objBinding.references !== properties.length + 1) return false;
+
+      const aliasBinding = objBinding.scope.getBinding(aliasId.current!.name)!;
+      if (!isReadonlyObject(aliasBinding, memberAccess)) return false;
+
+      objectProperties.current!.push(...properties);
+      container.splice(startIndex, properties.length);
       objBinding.referencePaths = aliasBinding.referencePaths;
       objBinding.references = aliasBinding.references;
-
-      renameFast(aliasBinding, objBinding.identifier.name);
-
-      assignments.forEach(p => p.remove());
+      objBinding.identifier.name = aliasBinding.identifier.name;
       aliasBinding.path.remove();
+      return true;
     }
 
     return {

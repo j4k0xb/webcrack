@@ -22,6 +22,7 @@ test.each([
   'obfuscator.io-control-flow.js',
   'obfuscator.io-control-flow-split-strings.js',
   'obfuscator.io-control-flow-keys.js',
+  'obfuscator.io-control-flow-partial-keys.js',
   'obfuscator.io-control-flow-switch-return.js',
   'obfuscator.io-control-flow-spread.js',
   'obfuscator.io-high.js',
