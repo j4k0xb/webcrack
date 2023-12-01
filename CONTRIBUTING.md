@@ -2,44 +2,44 @@
 
 You can directly create a PR if the change is small. Otherwise, please open an issue first to discuss the change.
 
-The `package.json` version shouldn't be changed.
-
 ## Getting Started
+
+This project uses [pnpm](https://pnpm.js.org/) for package management. Please make sure you have it installed before proceeding.
 
 1. Fork and clone the repo
 2. Check out a new branch: `git checkout -b some-feature`
-3. Install dependencies: `npm install`
+3. Install dependencies: `pnpm install`
+4. Test your changes in the playground: `pnpm dev`
 
-## Debugging
+## Attach a Debugger
 
-1. Create a directory named `tmp` with `test.js` inside and paste your code
-2. Press `F5` in VSCode to build the project and launch the debugger (or run `npm run dev`)
+1. Create the file `packages/webcrack/tmp/test.js` and paste your code
+2. Press `F5` in VSCode to build the project and launch the debugger
 
 The output will be saved in `tmp/webcrack-out`.
 
 ## Tests
 
-Run the tests in watch mode with `npm test` (or use the [Vitest](https://marketplace.visualstudio.com/items?itemName=ZixuanChen.vitest-explorer) vscode extension).
+Run the tests with `pnpm test`.
+
+`.toMatchInlineSnapshot()` for new tests will automatically generate the expected output when saved, no need to write it manually.
 
 If the snapshots are outdated, make sure the changes are correct and update them:
-
 ![failed snapshot](https://user-images.githubusercontent.com/55899582/219093007-825a5056-38a0-4e8b-8512-b56e20174885.png)
 
-### Types of tests
+## Linting and Formatting
 
-- Transforms: add tests in [transforms.test.ts](test/transforms.test.ts)
-- Deobfuscator or bundle unpacker: create/modify a [sample script](test/samples)
-- Public JS API: add tests in [api.test.ts](test/api.test.ts)
+```bash
+pnpm lint:fix && pnpm format
+```
 
-The samples should be as small as possible, but still representative.
-
-## Create a new transform
+## Create a new Transform
 
 The easiest way to create a new transform is to copy an existing one and modify it.
 
 ## Performance Optimizations
 
-### Named visitor keys
+### Named Visitor Keys
 
 ```diff
 {
@@ -48,7 +48,7 @@ The easiest way to create a new transform is to copy an existing one and modify 
 }
 ```
 
-### `noScope` visitors
+### `noScope` Visitors
 
 May not work in some cases (accessing `path.scope` when the scope hasn't been crawled before).
 
@@ -59,7 +59,7 @@ May not work in some cases (accessing `path.scope` when the scope hasn't been cr
 }
 ```
 
-### Merging visitors
+### Merging Visitors
 
 To only traverse the AST once and avoid missing nodes based on the order of visitors.
 
@@ -69,7 +69,7 @@ To only traverse the AST once and avoid missing nodes based on the order of visi
 + applyTransforms(ast, [transformA, transformB]);
 ```
 
-### Renaming bindings (variables, functions, ...)
+### Renaming Bindings (variables, functions, ...)
 
 This also avoids conflicts by first renaming bindings with the name `b` to something else.
 
@@ -79,7 +79,7 @@ This also avoids conflicts by first renaming bindings with the name `b` to somet
 + renameFast(binding, 'b');
 ```
 
-### Following references instead of traversing the AST
+### Following References instead of Traversing the AST
 
 For example finding calls to a function `foo` (provided that you already have foo's NodePath):
 

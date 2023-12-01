@@ -1,0 +1,11 @@
+{
+  "name": "@webcrack/eslint-config",
+  "version": "0.0.0",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "eslint-config-prettier": "^9.0.0"
+  }
+}

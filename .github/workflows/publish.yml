@@ -7,28 +7,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Cache node modules
-        id: nodemodules-cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
+          node-version: "18.x"
+          cache: "pnpm"
 
       - name: Install dependencies
-        if: steps.nodemodules-cache.outputs.cache-hit != 'true'
-        run: npm ci
+        run: pnpm install
 
-      - name: build
-        run: npm run build
+      - name: Build
+        run: pnpm build --filter webcrack
 
-      - name: Publish package
-        run: npm publish
+      - name: Publish
+        run: pnpm publish --filter webcrack
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

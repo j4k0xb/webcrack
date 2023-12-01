@@ -1,0 +1,3 @@
+[build]
+publish = "apps/web/dist"
+command = "turbo run build --filter web"

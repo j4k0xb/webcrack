@@ -1,0 +1,10 @@
+{
+  "extends": "@webcrack/typescript-config/base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "src",
+    "test",
+  ]
+}

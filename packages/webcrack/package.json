@@ -1,0 +1,68 @@
+{
+  "name": "webcrack",
+  "version": "2.10.0",
+  "description": "Deobfuscate, unminify and unpack bundled javascript",
+  "author": "j4k0xb",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": "dist/cli.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node esbuild.config.js && tsc -p tsconfig.build.json",
+    "watch": "node esbuild.config.js --watch",
+    "start": "node dist/cli.js",
+    "tmp": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
+    "lint": "eslint src test",
+    "lint:fix": "eslint src test --fix",
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/j4k0xb/webcrack"
+  },
+  "homepage": "https://webcrack.netlify.app",
+  "keywords": [
+    "webpack",
+    "bundle",
+    "extract",
+    "reverse-engineering",
+    "ast",
+    "deobfuscation",
+    "unpack",
+    "debundle",
+    "deobfuscator",
+    "unminify",
+    "unbundle"
+  ],
+  "dependencies": {
+    "@babel/helper-validator-identifier": "^7.22.20",
+    "@babel/parser": "^7.23.5",
+    "@babel/template": "^7.22.15",
+    "@babel/traverse": "^7.23.5",
+    "@babel/types": "^7.23.5",
+    "@codemod/matchers": "^1.7.0",
+    "@webcrack/ast-utils": "workspace:*",
+    "@webcrack/deobfuscate": "workspace:*",
+    "@webcrack/unminify": "workspace:*",
+    "@webcrack/unpack": "workspace:*",
+    "babel-plugin-minify-mangle-names": "^0.5.1",
+    "commander": "^11.1.0",
+    "debug": "^4.3.4"
+  },
+  "devDependencies": {
+    "@types/babel__generator": "^7.6.7",
+    "@types/babel__helper-validator-identifier": "^7.15.2",
+    "@types/babel__template": "^7.4.4",
+    "@types/babel__traverse": "^7.20.4",
+    "@types/debug": "^4.1.12",
+    "@types/node": "^20.10.1",
+    "@webcrack/eslint-config": "workspace:*",
+    "@webcrack/typescript-config": "workspace:*",
+    "esbuild": "^0.19.8",
+    "typescript": "^5.3.2"
+  }
+}

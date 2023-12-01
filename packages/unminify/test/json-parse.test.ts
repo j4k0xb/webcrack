@@ -1,0 +1,24 @@
+import { test } from "vitest";
+import { testTransform } from ".";
+import { jsonParse } from "../src/transforms";
+
+const expectJS = testTransform(jsonParse);
+
+test("array", () =>
+  expectJS('JSON.parse("[1,2,3]")').toMatchInlineSnapshot('JSON.parse("[1,2,3]");'));
+
+test("large literal", () =>
+  expectJS('JSON.parse("1000000000000000000000")').toMatchInlineSnapshot(
+    'JSON.parse("1000000000000000000000");',
+  ));
+
+test("ignore invalid json", () =>
+  expectJS('JSON.parse("abc")').toMatchInlineSnapshot('JSON.parse("abc");'));
+
+test("ignore when JSON is declared in scope", () =>
+  expectJS('let JSON; JSON.parse("null")').toMatchInlineSnapshot(
+    `
+    let JSON;
+    JSON.parse("null");
+  `,
+  ));

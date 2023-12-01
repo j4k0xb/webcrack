@@ -1,0 +1,12 @@
+diff --git a/dist/index.js b/dist/index.js
+index 2ac6a0430a9e8d970d2e2fadf95401b368c6002f..c6f7456d1c65c2aef4f964b7eae9e15b9de78114 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -102,6 +102,7 @@ function monacoEditorPlugin(options) {
+                     esbuild.buildSync({
+                         entryPoints: [resolveMonacoPath(work.entry)],
+                         bundle: true,
++                        minify: true,
+                         outfile: workerMiddleware_1.cacheDir + workerMiddleware_1.getFilenameByEntry(work.entry),
+                     });
+                 }

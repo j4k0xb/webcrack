@@ -1,5 +1,15 @@
+.DS_Store
 node_modules
+.turbo
+*.log
 dist
-tmp
-.vscode/settings.json
+dist-ssr
+*.local
+.env
+.cache
+server/dist
+public/dist
+**/.vitepress/dist/**
+**/.vitepress/cache/**
 coverage
+.netlify
