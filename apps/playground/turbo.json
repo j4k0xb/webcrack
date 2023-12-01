@@ -5,7 +5,9 @@
   ],
   "pipeline": {
     "build": {
-      "dependsOn": []
+      "dependsOn": [
+        "topo"
+      ]
     }
   }
 }
