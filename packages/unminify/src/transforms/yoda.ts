@@ -28,7 +28,10 @@ export default {
       m.or(
         m.stringLiteral(),
         m.numericLiteral(),
-        m.unaryExpression("-", m.numericLiteral()),
+        m.unaryExpression(
+          "-",
+          m.or(m.numericLiteral(), m.identifier("Infinity")),
+        ),
         m.booleanLiteral(),
         m.nullLiteral(),
         m.identifier("undefined"),

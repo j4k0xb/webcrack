@@ -55,6 +55,9 @@ test("NaN", () => expectJS("NaN == x").toMatchInlineSnapshot("x == NaN;"));
 test("Infinity", () =>
   expectJS("Infinity == x").toMatchInlineSnapshot("x == Infinity;"));
 
+test("negative infinity", () =>
+  expectJS("-Infinity == x").toMatchInlineSnapshot("x == -Infinity;"));
+
 test("ignore other operators", () =>
   expectJS("2 + x").toMatchInlineSnapshot("2 + x;"));
 
