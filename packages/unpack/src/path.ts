@@ -1,4 +1,3 @@
-import assert from 'node:assert';
 import { posix } from 'node:path';
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -38,8 +37,6 @@ export function resolveDependencyTree(
       const newPath = path.startsWith('node_modules/')
         ? path
         : join(prefix, path);
-      assert(!newPath.includes('..'));
-      assert(!newPath.startsWith('/'));
       return [id, newPath];
     }),
   );

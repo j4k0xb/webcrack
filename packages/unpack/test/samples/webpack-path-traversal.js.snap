@@ -1,0 +1,12 @@
+WebpackBundle {
+  "entryId": "386",
+  "modules": Map {
+    "../tmp.js" => WebpackModule {
+      "ast": ,
+      "id": "../tmp.js",
+      "isEntry": false,
+      "path": "./../tmp.js.js",
+    },
+  },
+  "type": "webpack",
+}

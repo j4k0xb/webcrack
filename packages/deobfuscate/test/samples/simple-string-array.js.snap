@@ -1,0 +1,6 @@
+console.log("Hello, World!");
+
+// ignore mutable array
+const arr2 = ["log", "Hello, World!"];
+arr2[0] = "warn";
+console[arr2[0]](arr2[1]);

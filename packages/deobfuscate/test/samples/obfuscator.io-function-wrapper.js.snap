@@ -1,0 +1,10 @@
+function hi() {
+  console.log("Hello World!");
+  console.log(30);
+  console.log(undefined);
+  function notAWrapper(c, d) {
+    return "log";
+  }
+  console.log(notAWrapper(foo(), bar()));
+}
+hi();

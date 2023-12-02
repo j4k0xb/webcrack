@@ -1,17 +1,14 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`path mapping 1`] = `
 WebpackBundle {
   "entryId": "2",
   "modules": Map {
     "1" => WebpackModule {
-      "ast": const a = require("package");,
+      "ast": const a = require("./3.js");,
       "id": "1",
       "isEntry": false,
       "path": "./1.js",
     },
     "2" => WebpackModule {
-      "ast": const a = require("../1.js");
+      "ast": const a = require("./1.js");
 const _module = 1;
 module.exports.color = '#FBC02D';
 {
@@ -22,15 +19,14 @@ module.exports.color = '#FBC02D';
 exports.a = 3;,
       "id": "2",
       "isEntry": true,
-      "path": "./utils/color.js",
+      "path": "./index.js",
     },
     "3" => WebpackModule {
       "ast": module.exports = 4;,
       "id": "3",
       "isEntry": false,
-      "path": "node_modules/package",
+      "path": "./3.js",
     },
   },
   "type": "webpack",
 }
-`;

@@ -1,0 +1,8 @@
+function hi() {
+  const _0x46643e = 1;
+  const _0x4d295f = 2;
+  if (_0x46643e < _0x4d295f) {
+    console.log("Hello World!");
+  }
+}
+hi();

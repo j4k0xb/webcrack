@@ -5,32 +5,7 @@ import {
   inlineFunctionAliases,
   inlineVariableAliases,
 } from '@webcrack/ast-utils';
-import { readFile } from 'fs/promises';
-import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { webcrack } from '../../webcrack/src/index';
-
-// Test samples
-test.each([
-  'obfuscator.io.js',
-  'obfuscator.io-rotator-unary.js',
-  'obfuscator.io-multi-encoders.js',
-  'obfuscator.io-function-wrapper.js',
-  'obfuscator.io-calls-transform.js',
-  'obfuscator.io-control-flow.js',
-  'obfuscator.io-control-flow-split-strings.js',
-  'obfuscator.io-control-flow-keys.js',
-  'obfuscator.io-control-flow-partial-keys.js',
-  'obfuscator.io-control-flow-switch-return.js',
-  'obfuscator.io-control-flow-spread.js',
-  'obfuscator.io-high.js',
-  'simple-string-array.js',
-])('deobfuscate %s', async (filename) => {
-  const result = await webcrack(
-    await readFile(join(__dirname, 'samples', filename), 'utf8'),
-  );
-  expect(result.code).toMatchSnapshot();
-});
 
 describe('inline decoder', () => {
   test('inline variable', () => {

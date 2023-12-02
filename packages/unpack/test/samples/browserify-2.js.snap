@@ -1,0 +1,24 @@
+BrowserifyBundle {
+  "entryId": "2",
+  "modules": Map {
+    "1" => BrowserifyModule {
+      "ast": module.exports = 1;,
+      "dependencies": {},
+      "id": "1",
+      "isEntry": false,
+      "path": "lib.js",
+    },
+    "2" => BrowserifyModule {
+      "ast": const vscode = require('vscode');
+const lib = require('./lib');
+console.log(lib);,
+      "dependencies": {
+        "1": "./lib",
+      },
+      "id": "2",
+      "isEntry": true,
+      "path": "index.js",
+    },
+  },
+  "type": "browserify",
+}
