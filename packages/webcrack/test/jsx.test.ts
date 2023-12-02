@@ -69,3 +69,8 @@ test('fragment with children', () =>
   expectJS(
     'React.createElement(React.Fragment, null, "test", ...children);',
   ).toMatchInlineSnapshot('<>test{...children}</>;'));
+
+test('remove leading comments', () =>
+  expectJS(
+    'return /*#__PURE__*/React.createElement("h1", null, /*#__PURE__*/React.createElement("div", null));',
+  ).toMatchInlineSnapshot('return <h1><div /></h1>;'));

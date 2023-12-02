@@ -89,12 +89,14 @@ export default {
             const opening = t.jsxOpeningFragment();
             const closing = t.jsxClosingFragment();
             const fragment = t.jsxFragment(opening, closing, children);
+            path.node.leadingComments = null;
             path.replaceWith(fragment);
           } else {
             const selfClosing = children.length === 0;
             const opening = t.jsxOpeningElement(name, attributes, selfClosing);
             const closing = t.jsxClosingElement(name);
             const element = t.jsxElement(opening, closing, children);
+            path.node.leadingComments = null;
             path.replaceWith(element);
           }
           this.changes++;

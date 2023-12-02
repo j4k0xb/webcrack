@@ -59,6 +59,7 @@ export default {
             const opening = t.jsxOpeningFragment();
             const closing = t.jsxClosingFragment();
             const fragment = t.jsxFragment(opening, closing, children);
+            path.node.leadingComments = null;
             path.replaceWith(fragment);
             this.changes++;
           }
@@ -88,6 +89,7 @@ export default {
             const opening = t.jsxOpeningElement(name, attributes, selfClosing);
             const closing = t.jsxClosingElement(name);
             const element = t.jsxElement(opening, closing, children);
+            path.node.leadingComments = null;
             path.replaceWith(element);
             this.changes++;
           }

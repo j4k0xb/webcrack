@@ -64,3 +64,8 @@ test('fragment with key', () =>
   expectJS('jsx(React.Fragment, {}, o)').toMatchInlineSnapshot(
     '<React.Fragment key={o} />;',
   ));
+
+test('remove leading comments', () =>
+  expectJS(
+    'return /*#__PURE__*/_jsx("h1", {children: /*#__PURE__*/_jsx("div", {})});',
+  ).toMatchInlineSnapshot('return <h1><div /></h1>;'));
