@@ -11,6 +11,15 @@ export default {
         if (matcher.match(path.node)) {
           const evaluated = path.evaluate();
           if (evaluated.confident) {
+            // Heuristic: Simplifying a division that results in a non-integer probably doesn't increase readability
+            if (
+              path.node.type === 'BinaryExpression' &&
+              path.node.operator === '/' &&
+              !Number.isInteger(evaluated.value)
+            ) {
+              return;
+            }
+
             path.replaceWith(t.valueToNode(evaluated.value));
             path.skip();
             this.changes++;
@@ -23,7 +32,7 @@ export default {
 
 const matcher: m.Matcher<t.Expression> = m.or(
   m.binaryExpression(
-    m.or('+', '-', '*'),
+    m.or('+', '-', '*', '/'),
     m.matcher((node) => matcher.match(node)),
     m.matcher((node) => matcher.match(node)),
   ),
