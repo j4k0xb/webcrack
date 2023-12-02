@@ -40,6 +40,11 @@ test('children', () =>
     'jsx("div", { children: jsxs("span", { children: ["Hello ", name ] }) });',
   ).toMatchInlineSnapshot('<div><span>Hello {name}</span></div>;'));
 
+test('text with special chars', () =>
+  expectJS(
+    'jsx("div", { children: ".style { color: red; }" });',
+  ).toMatchInlineSnapshot('<div>{".style { color: red; }"}</div>;'));
+
 test('component with key', () =>
   expectJS('jsx("div", {}, "test")').toMatchInlineSnapshot(
     '<div key="test" />;',

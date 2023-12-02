@@ -50,6 +50,11 @@ test('spread children', () =>
     'React.createElement("div", null, ...children);',
   ).toMatchInlineSnapshot('<div>{...children}</div>;'));
 
+test('text with special chars', () =>
+  expectJS(
+    'React.createElement("div", null, ".style { color: red; }");',
+  ).toMatchInlineSnapshot('<div>{".style { color: red; }"}</div>;'));
+
 test('fragment', () =>
   expectJS(
     'React.createElement(React.Fragment, null, React.createElement("span", null), "test");',

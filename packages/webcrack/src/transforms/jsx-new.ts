@@ -192,7 +192,10 @@ function convertChild(
   if (t.isJSXElement(child)) {
     return child;
   } else if (t.isStringLiteral(child)) {
-    return t.jsxText(child.value);
+    const hasSpecialChars = /[{}<>\r\n]/.test(child.value);
+    return hasSpecialChars
+      ? t.jsxExpressionContainer(child)
+      : t.jsxText(child.value);
   } else {
     return t.jsxExpressionContainer(child);
   }
