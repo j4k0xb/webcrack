@@ -32,16 +32,20 @@ export default {
     // React.createElement(type, props, ...children)
     const elementMatcher = m.callExpression(
       constMemberExpression("React", "createElement"),
-      m.anyList<t.Expression>(type, props, m.zeroOrMore(m.anyExpression())),
+      m.anyList(
+        type,
+        props,
+        m.zeroOrMore(m.or(m.anyExpression(), m.spreadElement())),
+      ),
     );
 
     // React.createElement(React.Fragment, null, ...children)
     const fragmentMatcher = m.callExpression(
       constMemberExpression("React", "createElement"),
-      m.anyList<t.Expression>(
+      m.anyList(
         constMemberExpression("React", "Fragment"),
         m.nullLiteral(),
-        m.zeroOrMore(m.anyExpression()),
+        m.zeroOrMore(m.or(m.anyExpression(), m.spreadElement())),
       ),
     );
 
@@ -148,13 +152,15 @@ function convertAttributes(
 }
 
 function convertChildren(
-  children: t.Expression[],
-): (t.JSXText | t.JSXElement | t.JSXExpressionContainer)[] {
+  children: (t.Expression | t.SpreadElement)[],
+): (t.JSXText | t.JSXElement | t.JSXSpreadChild | t.JSXExpressionContainer)[] {
   return children.map((child) => {
     if (t.isJSXElement(child)) {
       return child;
     } else if (t.isStringLiteral(child)) {
       return t.jsxText(child.value);
+    } else if (t.isSpreadElement(child)) {
+      return t.jsxSpreadChild(child.argument);
     } else {
       return t.jsxExpressionContainer(child);
     }
