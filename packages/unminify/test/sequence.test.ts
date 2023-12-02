@@ -95,6 +95,14 @@ test('rearrange variable declarator', () =>
     var t = o;
   `));
 
+test('rearrange assignment', () =>
+  expectJS(`
+    t = (o = null, o);
+  `).toMatchInlineSnapshot(`
+    o = null;
+    t = o;
+  `));
+
 test('dont rearrange variable declarator in for loop', () =>
   expectJS(`
     for(let a = (b, c);;) {}
