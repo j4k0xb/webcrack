@@ -1,5 +1,5 @@
-import * as t from "@babel/types";
-import { Module } from "../module";
+import * as t from '@babel/types';
+import { Module } from '../module';
 
 export class BrowserifyModule extends Module {
   dependencies: Record<number, string>;

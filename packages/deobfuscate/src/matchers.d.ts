@@ -1,8 +1,8 @@
-import { Matcher } from "@codemod/matchers";
+import { Matcher } from '@codemod/matchers';
 
 type MatcherType<T> = T extends Matcher<infer U> ? U : T;
 
-declare module "@codemod/matchers" {
+declare module '@codemod/matchers' {
   // The library only implements up to 5 arguments, but we need more
   // Also have to keep the other ones because of recursive matchers (numberExpressions.ts)
 
@@ -35,7 +35,7 @@ declare module "@codemod/matchers" {
   ): Matcher<MatcherType<T[number]>>;
 }
 
-declare module "@codemod/matchers/build/matchers/predicate" {
+declare module '@codemod/matchers/build/matchers/predicate' {
   // Convenience overload for not having to cast the value when using it
   export function predicate<T>(predicate: (value: T) => boolean): Matcher<T>;
 }

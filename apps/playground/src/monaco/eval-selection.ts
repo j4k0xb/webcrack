@@ -1,30 +1,30 @@
-import generate from "@babel/generator";
-import * as t from "@babel/types";
-import * as monaco from "monaco-editor";
-import { evalCode } from "../sandbox";
+import generate from '@babel/generator';
+import * as t from '@babel/types';
+import * as monaco from 'monaco-editor';
+import { evalCode } from '../sandbox';
 
 export function registerEvalSelection(
   editor: monaco.editor.IStandaloneCodeEditor,
 ): monaco.IDisposable {
-  const codeAction = monaco.languages.registerCodeActionProvider("javascript", {
+  const codeAction = monaco.languages.registerCodeActionProvider('javascript', {
     provideCodeActions(_model, range) {
       if (range.isEmpty()) return;
       return {
         actions: [
           {
-            title: "Evaluate and replace (value)",
-            kind: "refactor",
+            title: 'Evaluate and replace (value)',
+            kind: 'refactor',
             command: {
-              id: "editor.action.evaluate-expression",
-              title: "Evaluate and replace (value)",
+              id: 'editor.action.evaluate-expression',
+              title: 'Evaluate and replace (value)',
             },
           },
           {
-            title: "Evaluate and replace (raw)",
-            kind: "refactor",
+            title: 'Evaluate and replace (raw)',
+            kind: 'refactor',
             command: {
-              id: "editor.action.evaluate-raw",
-              title: "Evaluate and replace (raw)",
+              id: 'editor.action.evaluate-raw',
+              title: 'Evaluate and replace (raw)',
             },
           },
         ],
@@ -34,28 +34,28 @@ export function registerEvalSelection(
   });
 
   const evalValuesCommand = monaco.editor.registerCommand(
-    "editor.action.evaluate-expression",
+    'editor.action.evaluate-expression',
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     evalValues,
   );
   const evalRawCommand = monaco.editor.registerCommand(
-    "editor.action.evaluate-raw",
+    'editor.action.evaluate-raw',
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     evalRaw,
   );
 
   const evalValueAction = editor.addAction({
-    id: "editor.action.evaluate-expression",
-    label: "Evaluate and replace selection (value)",
-    precondition: "editorHasSelection",
+    id: 'editor.action.evaluate-expression',
+    label: 'Evaluate and replace selection (value)',
+    precondition: 'editorHasSelection',
     keybindings: [monaco.KeyMod.Shift | monaco.KeyCode.Enter],
     run: evalValues,
   });
 
   const evalRawAction = editor.addAction({
-    id: "editor.action.evaluate-raw",
-    label: "Evaluate and replace selection (raw)",
-    precondition: "editorHasSelection",
+    id: 'editor.action.evaluate-raw',
+    label: 'Evaluate and replace selection (raw)',
+    precondition: 'editorHasSelection',
     keybindings: [
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
     ],
@@ -75,9 +75,9 @@ export function registerEvalSelection(
     const selections = editor.getSelections();
     if (!selections) return;
     await evalSelections(selections, (value) => {
-      if (typeof value !== "string") {
+      if (typeof value !== 'string') {
         console.error(value);
-        throw new Error("Evaluated value must be a string");
+        throw new Error('Evaluated value must be a string');
       }
       return value;
     });
@@ -94,7 +94,7 @@ export function registerEvalSelection(
         const value = editor.getModel()!.getValueInRange(range);
         return `eval(${JSON.stringify(value)})`;
       })
-      .join(",");
+      .join(',');
     // New lines are added so line comments don't mess up the rest of the code
     const code = `[\n${expressions}\n]`;
     const values = (await evalCode(code)) as unknown[];
@@ -105,7 +105,7 @@ export function registerEvalSelection(
     }));
 
     editor.pushUndoStop();
-    editor.executeEdits("evaluate-expression", edits);
+    editor.executeEdits('evaluate-expression', edits);
   }
 
   return {

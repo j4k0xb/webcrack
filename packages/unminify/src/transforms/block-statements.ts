@@ -1,9 +1,9 @@
-import * as t from "@babel/types";
-import { Transform } from "@webcrack/ast-utils";
+import * as t from '@babel/types';
+import { Transform } from '@webcrack/ast-utils';
 
 export default {
-  name: "block-statements",
-  tags: ["safe"],
+  name: 'block-statements',
+  tags: ['safe'],
   visitor: () => ({
     IfStatement: {
       exit(path) {

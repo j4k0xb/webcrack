@@ -1,8 +1,8 @@
-import { Transform } from "@webcrack/ast-utils";
+import { Transform } from '@webcrack/ast-utils';
 
 export default {
-  name: "raw-literals",
-  tags: ["safe"],
+  name: 'raw-literals',
+  tags: ['safe'],
   visitor: () => ({
     StringLiteral(path) {
       if (path.node.extra) {

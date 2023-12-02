@@ -1,32 +1,32 @@
-import { test } from "vitest";
-import { testTransform } from ".";
-import jsx from "../src/transforms/jsx";
+import { test } from 'vitest';
+import { testTransform } from '.';
+import jsx from '../src/transforms/jsx';
 
 const expectJS = testTransform(jsx);
 
-test("tag name type", () =>
+test('tag name type', () =>
   expectJS('React.createElement("div", null);').toMatchInlineSnapshot(
-    "<div />;",
+    '<div />;',
   ));
 
-test("component type", () =>
-  expectJS("React.createElement(TodoList, null);").toMatchInlineSnapshot(
-    "<TodoList />;",
+test('component type', () =>
+  expectJS('React.createElement(TodoList, null);').toMatchInlineSnapshot(
+    '<TodoList />;',
   ));
 
-test("deeply nested member expression type", () =>
+test('deeply nested member expression type', () =>
   expectJS(
-    "React.createElement(components.list.TodoList, null);",
-  ).toMatchInlineSnapshot("<components.list.TodoList />;"));
+    'React.createElement(components.list.TodoList, null);',
+  ).toMatchInlineSnapshot('<components.list.TodoList />;'));
 
-test("rename component with conflicting name", () =>
-  expectJS("function a(){} React.createElement(a, null);")
+test('rename component with conflicting name', () =>
+  expectJS('function a(){} React.createElement(a, null);')
     .toMatchInlineSnapshot(`
     function _Component() {}
     <_Component />;
   `));
 
-test("attributes", () =>
+test('attributes', () =>
   expectJS(
     'React.createElement("div", { "data-hover": "tooltip", style: { display: "block" } });',
   ).toMatchInlineSnapshot(`
@@ -35,32 +35,32 @@ test("attributes", () =>
   }} />;
 `));
 
-test("spread attributes", () =>
+test('spread attributes', () =>
   expectJS('React.createElement("div", {...props});').toMatchInlineSnapshot(
-    "<div {...props} />;",
+    '<div {...props} />;',
   ));
 
-test("children", () =>
+test('children', () =>
   expectJS(
     'React.createElement("div", null, React.createElement("span", null, "Hello ", name));',
-  ).toMatchInlineSnapshot("<div><span>Hello {name}</span></div>;"));
+  ).toMatchInlineSnapshot('<div><span>Hello {name}</span></div>;'));
 
-test("spread children", () =>
+test('spread children', () =>
   expectJS(
     'React.createElement("div", null, ...children);',
-  ).toMatchInlineSnapshot("<div>{...children}</div>;"));
+  ).toMatchInlineSnapshot('<div>{...children}</div>;'));
 
-test("fragment", () =>
+test('fragment', () =>
   expectJS(
     'React.createElement(React.Fragment, null, React.createElement("span", null), "test");',
-  ).toMatchInlineSnapshot("<><span />test</>;"));
+  ).toMatchInlineSnapshot('<><span />test</>;'));
 
-test("fragment with key", () =>
+test('fragment with key', () =>
   expectJS(
-    "React.createElement(React.Fragment, { key: o })",
-  ).toMatchInlineSnapshot("<React.Fragment key={o} />;"));
+    'React.createElement(React.Fragment, { key: o })',
+  ).toMatchInlineSnapshot('<React.Fragment key={o} />;'));
 
-test("fragment with children", () =>
+test('fragment with children', () =>
   expectJS(
     'React.createElement(React.Fragment, null, "test", ...children);',
-  ).toMatchInlineSnapshot("<>test{...children}</>;"));
+  ).toMatchInlineSnapshot('<>test{...children}</>;'));

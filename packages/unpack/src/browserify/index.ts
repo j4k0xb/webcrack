@@ -1,21 +1,21 @@
-import { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   Transform,
   constKey,
   getPropName,
   matchIife,
   renameParameters,
-} from "@webcrack/ast-utils";
-import { Bundle } from "../bundle";
-import { resolveDependencyTree } from "../path";
-import { BrowserifyBundle } from "./bundle";
-import { BrowserifyModule } from "./module";
+} from '@webcrack/ast-utils';
+import { Bundle } from '../bundle';
+import { resolveDependencyTree } from '../path';
+import { BrowserifyBundle } from './bundle';
+import { BrowserifyModule } from './module';
 
 export const unpackBrowserify = {
-  name: "unpack-browserify",
-  tags: ["unsafe"],
+  name: 'unpack-browserify',
+  tags: ['unsafe'],
   scope: true,
   visitor(options) {
     const modules = new Map<string, BrowserifyModule>();
@@ -34,7 +34,7 @@ export const unpackBrowserify = {
                   constKey(),
                   m.or(
                     m.numericLiteral(),
-                    m.identifier("undefined"),
+                    m.identifier('undefined'),
                     m.stringLiteral(),
                   ),
                 ),
@@ -79,7 +79,7 @@ export const unpackBrowserify = {
         const entryId = entryIdMatcher.current!.value.toString();
 
         const modulesPath = path.get(
-          files.currentKeys!.join("."),
+          files.currentKeys!.join('.'),
         ) as NodePath<t.ObjectProperty>[];
 
         const dependencyTree: Record<string, Record<string, string>> = {};
@@ -89,22 +89,22 @@ export const unpackBrowserify = {
             moduleWrapper.node.key as t.NumericLiteral
           ).value.toString();
           const fn = moduleWrapper.get(
-            "value.elements.0",
+            'value.elements.0',
           ) as NodePath<t.FunctionExpression>;
 
           const dependencies: Record<string, string> = (dependencyTree[id] =
             {});
           const dependencyProperties = (
             moduleWrapper.get(
-              "value.elements.1",
+              'value.elements.1',
             ) as NodePath<t.ObjectExpression>
           ).node.properties as t.ObjectProperty[];
 
           for (const dependency of dependencyProperties) {
             // skip external dependencies like { vscode: undefined }
             if (
-              dependency.value.type !== "NumericLiteral" &&
-              dependency.value.type !== "StringLiteral"
+              dependency.value.type !== 'NumericLiteral' &&
+              dependency.value.type !== 'StringLiteral'
             )
               continue;
 
@@ -113,7 +113,7 @@ export const unpackBrowserify = {
             dependencies[depId] = filePath;
           }
 
-          renameParameters(fn, ["require", "module", "exports"]);
+          renameParameters(fn, ['require', 'module', 'exports']);
           const file = t.file(t.program(fn.node.body.body));
           const module = new BrowserifyModule(
             id,

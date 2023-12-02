@@ -6,9 +6,9 @@ This feature does the opposite.
 
 ```jsx
 React.createElement(
-  "div",
+  'div',
   null,
-  React.createElement("span", null, "Hello ", name),
+  React.createElement('span', null, 'Hello ', name),
 );
 ```
 

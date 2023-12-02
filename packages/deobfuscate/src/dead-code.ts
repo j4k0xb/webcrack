@@ -1,25 +1,25 @@
-import { NodePath, Scope } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { Transform, renameFast } from "@webcrack/ast-utils";
+import { NodePath, Scope } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { Transform, renameFast } from '@webcrack/ast-utils';
 
 export default {
-  name: "deadCode",
-  tags: ["unsafe"],
+  name: 'deadCode',
+  tags: ['unsafe'],
   scope: true,
   visitor() {
     const stringComparison = m.binaryExpression(
-      m.or("===", "==", "!==", "!="),
+      m.or('===', '==', '!==', '!='),
       m.stringLiteral(),
       m.stringLiteral(),
     );
     const testMatcher = m.or(
       stringComparison,
-      m.unaryExpression("!", stringComparison),
+      m.unaryExpression('!', stringComparison),
     );
 
     return {
-      "IfStatement|ConditionalExpression": {
+      'IfStatement|ConditionalExpression': {
         exit(_path) {
           const path = _path as NodePath<
             t.IfStatement | t.ConditionalExpression
@@ -40,11 +40,11 @@ export default {
             }
           }
 
-          if (path.get("test").evaluateTruthy()) {
-            renameShadowedVariables(path.get("consequent").scope);
+          if (path.get('test').evaluateTruthy()) {
+            renameShadowedVariables(path.get('consequent').scope);
             replace(path, path.node.consequent);
           } else if (path.node.alternate) {
-            renameShadowedVariables(path.get("alternate").scope);
+            renameShadowedVariables(path.get('alternate').scope);
             replace(path, path.node.alternate);
           } else {
             path.remove();

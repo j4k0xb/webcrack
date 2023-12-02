@@ -1,20 +1,20 @@
-import { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   Transform,
   constKey,
   constMemberExpression,
   getPropName,
   renameParameters,
-} from "@webcrack/ast-utils";
-import { Bundle } from "../bundle";
-import { WebpackBundle } from "./bundle";
-import { WebpackModule } from "./module";
+} from '@webcrack/ast-utils';
+import { Bundle } from '../bundle';
+import { WebpackBundle } from './bundle';
+import { WebpackModule } from './module';
 
 export const unpackWebpack = {
-  name: "unpack-webpack",
-  tags: ["unsafe"],
+  name: 'unpack-webpack',
+  tags: ['unsafe'],
   scope: true,
   visitor(options) {
     const modules = new Map<string, WebpackModule>();
@@ -37,7 +37,7 @@ export const unpackWebpack = {
                 m.or(m.functionExpression(), m.arrowFunctionExpression()),
               ),
               // __webpack_public_path__ (c: "")
-              m.objectProperty(constKey("c"), m.stringLiteral()),
+              m.objectProperty(constKey('c'), m.stringLiteral()),
             ),
           ),
         ),
@@ -57,8 +57,8 @@ export const unpackWebpack = {
               m.or(
                 // E.g. __webpack_require__.s = 2
                 m.assignmentExpression(
-                  "=",
-                  constMemberExpression(m.identifier(), "s"),
+                  '=',
+                  constMemberExpression(m.identifier(), 's'),
                   entryIdMatcher,
                 ),
                 // E.g. return require(0);
@@ -86,16 +86,16 @@ export const unpackWebpack = {
             m.containerOf(
               // __webpack_require__.s = 2
               m.assignmentExpression(
-                "=",
-                constMemberExpression(m.identifier(), "s"),
+                '=',
+                constMemberExpression(m.identifier(), 's'),
                 entryIdMatcher,
               ),
             ),
             // module.exports = entryModule
             m.expressionStatement(
               m.assignmentExpression(
-                "=",
-                constMemberExpression(m.identifier(), "exports"),
+                '=',
+                constMemberExpression(m.identifier(), 'exports'),
                 m.identifier(),
               ),
             ),
@@ -107,23 +107,23 @@ export const unpackWebpack = {
     // Examples: self.webpackChunk_N_E, window.webpackJsonp, this.webpackJsonp
     const jsonpGlobal = m.capture(
       constMemberExpression(
-        m.or(m.identifier(m.or("self", "window")), m.thisExpression()),
-        m.matcher((s) => s.startsWith("webpack")),
+        m.or(m.identifier(m.or('self', 'window')), m.thisExpression()),
+        m.matcher((s) => s.startsWith('webpack')),
       ),
     );
     // (window.webpackJsonp = window.webpackJsonp || []).push([[0], {...}])
     const jsonpMatcher = m.callExpression(
       constMemberExpression(
         m.assignmentExpression(
-          "=",
+          '=',
           jsonpGlobal,
           m.logicalExpression(
-            "||",
+            '||',
             m.fromCapture(jsonpGlobal),
             m.arrayExpression([]),
           ),
         ),
-        "push",
+        'push',
       ),
       [
         m.arrayExpression(
@@ -147,32 +147,32 @@ export const unpackWebpack = {
         path.stop();
 
         const modulesPath = path.get(
-          moduleFunctionsMatcher.currentKeys!.join("."),
+          moduleFunctionsMatcher.currentKeys!.join('.'),
         ) as NodePath;
 
         const moduleWrappers = modulesPath.isArrayExpression()
-          ? (modulesPath.get("elements") as NodePath<t.Node | null>[])
-          : (modulesPath.get("properties") as NodePath[]);
+          ? (modulesPath.get('elements') as NodePath<t.Node | null>[])
+          : (modulesPath.get('properties') as NodePath[]);
 
         moduleWrappers.forEach((moduleWrapper, index) => {
           let moduleId = index.toString();
           if (t.isObjectProperty(moduleWrapper.node)) {
             moduleId = getPropName(moduleWrapper.node.key)!;
-            moduleWrapper = moduleWrapper.get("value") as NodePath;
+            moduleWrapper = moduleWrapper.get('value') as NodePath;
           }
 
           if (
             moduleWrapper.isFunction() &&
-            moduleWrapper.node.body.type === "BlockStatement"
+            moduleWrapper.node.body.type === 'BlockStatement'
           ) {
-            renameParameters(moduleWrapper, ["module", "exports", "require"]);
+            renameParameters(moduleWrapper, ['module', 'exports', 'require']);
             const file = t.file(t.program(moduleWrapper.node.body.body));
 
             // Remove /***/ comments between modules (in webpack development builds)
             const lastNode = file.program.body.at(-1);
             if (
               lastNode?.trailingComments?.length === 1 &&
-              lastNode.trailingComments[0].value === "*"
+              lastNode.trailingComments[0].value === '*'
             ) {
               lastNode.trailingComments = null;
             }
@@ -188,7 +188,7 @@ export const unpackWebpack = {
         });
 
         if (modules.size > 0) {
-          const entryId = entryIdMatcher.current?.value.toString() ?? "";
+          const entryId = entryIdMatcher.current?.value.toString() ?? '';
           options!.bundle = new WebpackBundle(entryId, modules);
         }
       },

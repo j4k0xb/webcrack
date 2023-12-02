@@ -1,8 +1,8 @@
-import { statement } from "@babel/template";
-import { Statement } from "@babel/types";
-import * as m from "@codemod/matchers";
-import { constMemberExpression } from "@webcrack/ast-utils";
-import { WebpackModule } from "./module";
+import { statement } from '@babel/template';
+import { Statement } from '@babel/types';
+import * as m from '@codemod/matchers';
+import { constMemberExpression } from '@webcrack/ast-utils';
+import { WebpackModule } from './module';
 
 const buildVar = statement`var NAME = INIT;`;
 
@@ -25,13 +25,13 @@ export function inlineVarInjections(module: WebpackModule): void {
   const body = m.capture(m.blockStatement());
   const params = m.capture(m.arrayOf(m.identifier()));
   const args = m.capture(
-    m.anyList(m.or(m.thisExpression(), m.identifier("exports")), m.oneOrMore()),
+    m.anyList(m.or(m.thisExpression(), m.identifier('exports')), m.oneOrMore()),
   );
   const matcher = m.expressionStatement(
     m.callExpression(
       constMemberExpression(
         m.functionExpression(undefined, params, body),
-        "call",
+        'call',
       ),
       args,
     ),

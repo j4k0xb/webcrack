@@ -1,14 +1,14 @@
-import * as t from "@babel/types";
-import { AsyncTransform } from "@webcrack/ast-utils";
-import { VMDecoder } from "./vm";
+import * as t from '@babel/types';
+import { AsyncTransform } from '@webcrack/ast-utils';
+import { VMDecoder } from './vm';
 
 /**
  * Replaces calls to decoder functions with the decoded string.
  * E.g. `m(199)` -> `'log'`
  */
 export default {
-  name: "inlineDecodedStrings",
-  tags: ["unsafe"],
+  name: 'inlineDecodedStrings',
+  tags: ['unsafe'],
   scope: true,
   async run(ast, state, options) {
     if (!options) return;
@@ -23,8 +23,8 @@ export default {
       const value = decodedValues[i];
 
       call.replaceWith(t.valueToNode(value));
-      if (typeof value !== "string")
-        call.addComment("leading", "webcrack:decode_error");
+      if (typeof value !== 'string')
+        call.addComment('leading', 'webcrack:decode_error');
     }
 
     state.changes += calls.length;

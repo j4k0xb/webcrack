@@ -1,17 +1,17 @@
-import { parse } from "@babel/parser";
-import traverse from "@babel/traverse";
-import { describe, expect, test } from "vitest";
-import { renameFast, renameParameters } from "../src/rename";
+import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
+import { describe, expect, test } from 'vitest';
+import { renameFast, renameParameters } from '../src/rename';
 
-describe("rename variable", () => {
-  test("conflict with existing binding", () => {
-    const ast = parse("let a = 1; let b = a;");
+describe('rename variable', () => {
+  test('conflict with existing binding', () => {
+    const ast = parse('let a = 1; let b = a;');
     traverse(ast, {
       Program(path) {
-        const binding = path.scope.getBinding("a")!;
-        renameFast(binding, "b");
+        const binding = path.scope.getBinding('a')!;
+        renameFast(binding, 'b');
 
-        expect(path.scope.bindings).keys("b", "_b");
+        expect(path.scope.bindings).keys('b', '_b');
       },
     });
     expect(ast).toMatchInlineSnapshot(`
@@ -20,7 +20,7 @@ describe("rename variable", () => {
     `);
   });
 
-  test("different types of assignments", () => {
+  test('different types of assignments', () => {
     const ast = parse(`
       var a = 1;
       var a = 2;
@@ -32,8 +32,8 @@ describe("rename variable", () => {
     `);
     traverse(ast, {
       Program(path) {
-        const binding = path.scope.getBinding("a")!;
-        renameFast(binding, "b");
+        const binding = path.scope.getBinding('a')!;
+        renameFast(binding, 'b');
       },
     });
     expect(ast).toMatchInlineSnapshot(`
@@ -50,12 +50,12 @@ describe("rename variable", () => {
   });
 });
 
-describe("rename parameters", () => {
-  test("fewer than specified", () => {
-    const ast = parse("function f(a, b, c) { a + b + c;}");
+describe('rename parameters', () => {
+  test('fewer than specified', () => {
+    const ast = parse('function f(a, b, c) { a + b + c;}');
     traverse(ast, {
       Function(path) {
-        renameParameters(path, ["x", "y"]);
+        renameParameters(path, ['x', 'y']);
       },
     });
     expect(ast).toMatchInlineSnapshot(`
@@ -65,11 +65,11 @@ describe("rename parameters", () => {
     `);
   });
 
-  test("more than specified", () => {
-    const ast = parse("function f(a, b, c) { a + b + c;}");
+  test('more than specified', () => {
+    const ast = parse('function f(a, b, c) { a + b + c;}');
     traverse(ast, {
       Function(path) {
-        renameParameters(path, ["x", "y", "z", "w"]);
+        renameParameters(path, ['x', 'y', 'z', 'w']);
       },
     });
     expect(ast).toMatchInlineSnapshot(`

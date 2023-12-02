@@ -1,18 +1,18 @@
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   Transform,
   codePreview,
   constMemberExpression,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 
 /**
  * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
  * https://new-jsx-transform.netlify.app/
  */
 export default {
-  name: "jsx-new",
-  tags: ["unsafe"],
+  name: 'jsx-new',
+  tags: ['unsafe'],
   scope: true,
   visitor: () => {
     const deepIdentifierMemberExpression = m.memberExpression(
@@ -31,11 +31,11 @@ export default {
         deepIdentifierMemberExpression, // jsx(Component.SubComponent, ...)
       ),
     );
-    const fragmentType = constMemberExpression("React", "Fragment");
+    const fragmentType = constMemberExpression('React', 'Fragment');
     const props = m.capture(m.objectExpression());
     const key = m.capture(m.anyExpression());
 
-    const jsxFunction = m.capture(m.or("jsx" as const, "jsxs" as const));
+    const jsxFunction = m.capture(m.or('jsx' as const, 'jsxs' as const));
     // jsx(type, props, key?)
     const jsxMatcher = m.callExpression(
       m.identifier(jsxFunction),
@@ -58,7 +58,7 @@ export default {
           ) {
             const binding = path.scope.getBinding(type.current.name);
             if (!binding) return;
-            name = t.jsxIdentifier(path.scope.generateUid("Component"));
+            name = t.jsxIdentifier(path.scope.generateUid('Component'));
             path.scope.rename(type.current.name, name.name);
           }
 
@@ -66,7 +66,7 @@ export default {
           if (path.node.arguments.length === 3) {
             attributes.push(
               t.jsxAttribute(
-                t.jsxIdentifier("key"),
+                t.jsxIdentifier('key'),
                 convertAttributeValue(key.current!),
               ),
             );
@@ -133,7 +133,7 @@ function convertAttributes(
 
   return object.properties.flatMap((property) => {
     if (matcher.match(property)) {
-      if (name.current === "children") return [];
+      if (name.current === 'children') return [];
 
       const jsxName = t.jsxIdentifier(name.current!);
       const jsxValue = convertAttributeValue(value.current!);
@@ -151,25 +151,25 @@ function convertAttributes(
 function convertAttributeValue(
   expression: t.Expression,
 ): t.JSXExpressionContainer | t.StringLiteral {
-  return expression.type === "StringLiteral"
+  return expression.type === 'StringLiteral'
     ? expression
     : t.jsxExpressionContainer(expression);
 }
 
 function convertChildren(
   object: t.ObjectExpression,
-  fn: "jsx" | "jsxs",
+  fn: 'jsx' | 'jsxs',
 ): (t.JSXText | t.JSXElement | t.JSXExpressionContainer)[] {
   const children = m.capture(m.anyExpression());
   const matcher = m.objectProperty(
-    m.or(m.identifier("children"), m.stringLiteral("children")),
+    m.or(m.identifier('children'), m.stringLiteral('children')),
     children,
   );
 
   const prop = object.properties.find((prop) => matcher.match(prop));
   if (!prop) return [];
 
-  if (fn === "jsxs" && t.isArrayExpression(children.current)) {
+  if (fn === 'jsxs' && t.isArrayExpression(children.current)) {
     return children.current.elements.map((child) =>
       convertChild(child as t.Expression),
     );

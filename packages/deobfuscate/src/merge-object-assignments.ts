@@ -1,7 +1,7 @@
-import { Binding } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { Transform, constObjectProperty } from "@webcrack/ast-utils";
+import { Binding } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { Transform, constObjectProperty } from '@webcrack/ast-utils';
 
 /**
  * Merges object assignments into the object expression.
@@ -16,8 +16,8 @@ import { Transform, constObjectProperty } from "@webcrack/ast-utils";
  * ```
  */
 export default {
-  name: "merge-object-assignments",
-  tags: ["safe"],
+  name: 'merge-object-assignments',
+  tags: ['safe'],
   scope: true,
   visitor: () => {
     const id = m.capture(m.identifier());
@@ -32,7 +32,7 @@ export default {
     // Example: obj.foo = 'bar';
     const assignmentMatcher = m.expressionStatement(
       m.assignmentExpression(
-        "=",
+        '=',
         m.memberExpression(m.fromCapture(id), key, computed),
         value,
       ),
@@ -62,8 +62,8 @@ export default {
             // { [1]: value, "foo bar": value } can be simplified to { 1: value, "foo bar": value }
             const isComputed =
               computed.current! &&
-              key.current!.type !== "NumericLiteral" &&
-              key.current!.type !== "StringLiteral";
+              key.current!.type !== 'NumericLiteral' &&
+              key.current!.type !== 'StringLiteral';
 
             // Example: const obj = { x: 1 }; obj.foo = 'bar'; -> const obj = { x: 1, foo: 'bar' };
             object.current!.properties.push(

@@ -1,13 +1,13 @@
-import { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   Transform,
   constKey,
   constMemberExpression,
   getPropName,
   isReadonlyObject,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 
 /**
  * Inline objects that only have string or numeric literal properties.
@@ -27,8 +27,8 @@ import {
  * ```
  */
 export default {
-  name: "inline-object-props",
-  tags: ["safe"],
+  name: 'inline-object-props',
+  tags: ['safe'],
   scope: true,
   visitor() {
     const varId = m.capture(m.identifier());

@@ -1,18 +1,18 @@
-import traverse from "@babel/traverse";
-import * as m from "@codemod/matchers";
-import { posix } from "node:path";
-import { Module } from "./module";
+import traverse from '@babel/traverse';
+import * as m from '@codemod/matchers';
+import { posix } from 'node:path';
+import { Module } from './module';
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { dirname, join, normalize } = posix;
 
 export class Bundle {
-  type: "webpack" | "browserify";
+  type: 'webpack' | 'browserify';
   entryId: string;
   modules: Map<string, Module>;
 
   constructor(
-    type: "webpack" | "browserify",
+    type: 'webpack' | 'browserify',
     entryId: string,
     modules: Map<string, Module>,
   ) {
@@ -37,7 +37,7 @@ export class Bundle {
               } else {
                 throw new Error(`Mapping ${mappingPath} is already used.`);
               }
-              const resolvedPath = mappingPath.startsWith("./")
+              const resolvedPath = mappingPath.startsWith('./')
                 ? mappingPath
                 : `node_modules/${mappingPath}`;
               module.path = resolvedPath;
@@ -65,13 +65,13 @@ export class Bundle {
       })),
     };
 
-    const { mkdir, writeFile } = await import("node:fs/promises");
+    const { mkdir, writeFile } = await import('node:fs/promises');
     await mkdir(path, { recursive: true });
 
     await writeFile(
-      join(path, "bundle.json"),
+      join(path, 'bundle.json'),
       JSON.stringify(bundleJson, null, 2),
-      "utf8",
+      'utf8',
     );
 
     await Promise.all(
@@ -81,7 +81,7 @@ export class Bundle {
           throw new Error(`detected path traversal: ${module.path}`);
         }
         await mkdir(dirname(modulePath), { recursive: true });
-        await writeFile(modulePath, module.code, "utf8");
+        await writeFile(modulePath, module.code, 'utf8');
       }),
     );
   }

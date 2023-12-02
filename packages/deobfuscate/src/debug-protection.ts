@@ -1,11 +1,11 @@
-import * as m from "@codemod/matchers";
-import { ifStatement } from "@codemod/matchers";
+import * as m from '@codemod/matchers';
+import { ifStatement } from '@codemod/matchers';
 import {
   Transform,
   constMemberExpression,
   findParent,
   iife,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 
 // https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/debug-protection/templates/debug-protection-function-interval/DebugProtectionFunctionIntervalTemplate.ts
 
@@ -16,8 +16,8 @@ import {
 // https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/debug-protection/templates/debug-protection-function/DebuggerTemplateNoEval.ts
 
 export default {
-  name: "debugProtection",
-  tags: ["safe"],
+  name: 'debugProtection',
+  tags: ['safe'],
   scope: true,
   visitor() {
     const ret = m.capture(m.identifier());
@@ -31,15 +31,15 @@ export default {
         m.or(
           m.debuggerStatement(),
           m.callExpression(
-            constMemberExpression(m.anyExpression(), "constructor"),
-            [m.stringLiteral("debugger")],
+            constMemberExpression(m.anyExpression(), 'constructor'),
+            [m.stringLiteral('debugger')],
           ),
         ),
       ),
     );
     // that.setInterval(debugProtectionFunctionName, 4000);
     const intervalCall = m.callExpression(
-      constMemberExpression(m.anyExpression(), "setInterval"),
+      constMemberExpression(m.anyExpression(), 'setInterval'),
       [
         m.identifier(m.fromCapture(debugProtectionFunctionName)),
         m.numericLiteral(),
@@ -60,7 +60,7 @@ export default {
             // debuggerProtection(++counter);
             m.expressionStatement(
               m.callExpression(m.fromCapture(debuggerProtection), [
-                m.updateExpression("++", m.fromCapture(counter), true),
+                m.updateExpression('++', m.fromCapture(counter), true),
               ]),
             ),
           ]),

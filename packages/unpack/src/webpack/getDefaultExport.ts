@@ -1,8 +1,8 @@
-import { expression } from "@babel/template";
-import traverse, { NodePath } from "@babel/traverse";
-import * as m from "@codemod/matchers";
-import { constMemberExpression } from "@webcrack/ast-utils";
-import { WebpackBundle } from "./bundle";
+import { expression } from '@babel/template';
+import traverse, { NodePath } from '@babel/traverse';
+import * as m from '@codemod/matchers';
+import { constMemberExpression } from '@webcrack/ast-utils';
+import { WebpackBundle } from './bundle';
 
 /*
  * webpack/runtime/compat get default export
@@ -45,7 +45,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
   // E.g. const m = require(1);
   const declaratorMatcher = m.variableDeclarator(
     m.identifier(),
-    m.callExpression(m.identifier("require"), [requiredModuleId]),
+    m.callExpression(m.identifier('require'), [requiredModuleId]),
   );
 
   // E.g. m
@@ -53,7 +53,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
   // E.g. getter
   const getterVarName = m.capture(m.identifier());
   // E.g. require.n(m)
-  const requireN = m.callExpression(constMemberExpression("require", "n"), [
+  const requireN = m.callExpression(constMemberExpression('require', 'n'), [
     moduleArg,
   ]);
   // E.g. const getter = require.n(m)
@@ -61,7 +61,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
 
   // E.g. require.n(m).a or require.n(m)()
   const defaultRequireMatcherAlternative = m.or(
-    constMemberExpression(requireN, "a"),
+    constMemberExpression(requireN, 'a'),
     m.callExpression(requireN, []),
   );
 
@@ -69,11 +69,11 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
 
   bundle.modules.forEach((module) => {
     traverse(module.ast, {
-      "CallExpression|MemberExpression"(path) {
+      'CallExpression|MemberExpression'(path) {
         if (defaultRequireMatcherAlternative.match(path.node)) {
           // Replace require.n(m).a or require.n(m)() with m or m.default
           const requiredModule = getRequiredModule(path);
-          if (requiredModule?.ast.program.sourceType === "module") {
+          if (requiredModule?.ast.program.sourceType === 'module') {
             path.replaceWith(
               buildDefaultAccess({ OBJECT: moduleArg.current! }),
             );
@@ -86,8 +86,8 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
         if (defaultRequireMatcher.match(path.node)) {
           // Replace require.n(m); with m or m.default
           const requiredModule = getRequiredModule(path);
-          const init = path.get("init");
-          if (requiredModule?.ast.program.sourceType === "module") {
+          const init = path.get('init');
+          if (requiredModule?.ast.program.sourceType === 'module') {
             init.replaceWith(
               buildDefaultAccess({ OBJECT: moduleArg.current! }),
             );

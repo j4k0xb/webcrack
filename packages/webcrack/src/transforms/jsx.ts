@@ -1,14 +1,14 @@
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   Transform,
   codePreview,
   constMemberExpression,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 
 export default {
-  name: "jsx",
-  tags: ["unsafe"],
+  name: 'jsx',
+  tags: ['unsafe'],
   scope: true,
   visitor: () => {
     const deepIdentifierMemberExpression = m.memberExpression(
@@ -31,7 +31,7 @@ export default {
 
     // React.createElement(type, props, ...children)
     const elementMatcher = m.callExpression(
-      constMemberExpression("React", "createElement"),
+      constMemberExpression('React', 'createElement'),
       m.anyList(
         type,
         props,
@@ -41,9 +41,9 @@ export default {
 
     // React.createElement(React.Fragment, null, ...children)
     const fragmentMatcher = m.callExpression(
-      constMemberExpression("React", "createElement"),
+      constMemberExpression('React', 'createElement'),
       m.anyList(
-        constMemberExpression("React", "Fragment"),
+        constMemberExpression('React', 'Fragment'),
         m.nullLiteral(),
         m.zeroOrMore(m.or(m.anyExpression(), m.spreadElement())),
       ),
@@ -74,7 +74,7 @@ export default {
             ) {
               const binding = path.scope.getBinding(type.current.name);
               if (!binding) return;
-              name = t.jsxIdentifier(path.scope.generateUid("Component"));
+              name = t.jsxIdentifier(path.scope.generateUid('Component'));
               path.scope.rename(type.current.name, name.name);
             }
 
@@ -137,7 +137,7 @@ function convertAttributes(
     if (matcher.match(property)) {
       const jsxName = t.jsxIdentifier(name.current!);
       const jsxValue =
-        value.current!.type === "StringLiteral"
+        value.current!.type === 'StringLiteral'
           ? value.current
           : t.jsxExpressionContainer(value.current!);
       return t.jsxAttribute(jsxName, jsxValue);

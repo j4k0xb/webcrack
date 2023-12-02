@@ -1,12 +1,12 @@
-import { ParentProps, createContext, createSignal, useContext } from "solid-js";
-import type { Options } from "webcrack";
-import { evalCode } from "../sandbox";
+import { ParentProps, createContext, createSignal, useContext } from 'solid-js';
+import type { Options } from 'webcrack';
+import { evalCode } from '../sandbox';
 import {
   DeobfuscateResult,
   WorkerRequest,
   WorkerResponse,
-} from "../webcrack.worker";
-import WebcrackWorker from "../webcrack.worker?worker";
+} from '../webcrack.worker';
+import WebcrackWorker from '../webcrack.worker?worker';
 
 let worker = new WebcrackWorker();
 
@@ -17,7 +17,7 @@ function useProviderValue(props: Props) {
   const [progress, setProgress] = createSignal(0);
 
   function cancelDeobfuscate() {
-    if (!deobfuscating()) return console.warn("Not deobfuscating...");
+    if (!deobfuscating()) return console.warn('Not deobfuscating...');
 
     setDeobfuscating(false);
     worker.terminate();
@@ -25,31 +25,31 @@ function useProviderValue(props: Props) {
   }
 
   function deobfuscate() {
-    if (deobfuscating()) return console.warn("Already deobfuscating...");
-    if (!props.code) return console.warn("No code to deobfuscate...");
+    if (deobfuscating()) return console.warn('Already deobfuscating...');
+    if (!props.code) return console.warn('No code to deobfuscate...');
 
     setProgress(0);
     setDeobfuscating(true);
     postMessage({
-      type: "deobfuscate",
+      type: 'deobfuscate',
       code: props.code,
       options: props.options,
     });
 
     worker.onmessage = ({ data }: MessageEvent<WorkerResponse>) => {
-      if (data.type === "sandbox") {
+      if (data.type === 'sandbox') {
         evalCode(data.code)
-          .then((result) => postMessage({ type: "sandbox", result }))
+          .then((result) => postMessage({ type: 'sandbox', result }))
           .catch((error) => {
             cancelDeobfuscate();
             props.onError(error);
           });
-      } else if (data.type === "progress") {
+      } else if (data.type === 'progress') {
         setProgress(data.value);
-      } else if (data.type === "result") {
+      } else if (data.type === 'result') {
         setDeobfuscating(false);
         props.onResult(data);
-      } else if (data.type === "error") {
+      } else if (data.type === 'error') {
         setDeobfuscating(false);
         props.onError(data.error);
       }

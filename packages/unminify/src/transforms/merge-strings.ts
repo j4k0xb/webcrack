@@ -1,18 +1,18 @@
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { Transform } from "@webcrack/ast-utils";
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { Transform } from '@webcrack/ast-utils';
 
 export default {
-  name: "merge-strings",
-  tags: ["safe"],
+  name: 'merge-strings',
+  tags: ['safe'],
   visitor() {
     const left = m.capture(m.stringLiteral(m.anyString()));
     const right = m.capture(m.stringLiteral(m.anyString()));
 
-    const matcher = m.binaryExpression("+", left, right);
+    const matcher = m.binaryExpression('+', left, right);
     const nestedMatcher = m.binaryExpression(
-      "+",
-      m.binaryExpression("+", m.anything(), left),
+      '+',
+      m.binaryExpression('+', m.anything(), left),
       right,
     );
 

@@ -12,21 +12,21 @@ npm install webcrack
 ## Basic Usage
 
 ```js
-import { webcrack } from "webcrack";
+import { webcrack } from 'webcrack';
 
-const result = await webcrack("const a = 1+1;");
+const result = await webcrack('const a = 1+1;');
 console.log(result.code); // 'const a = 2;'
 ```
 
 Save the deobufscated code and the unpacked bundle to the given directory:
 
 ```js
-import fs from "fs";
-import { webcrack } from "webcrack";
+import fs from 'fs';
+import { webcrack } from 'webcrack';
 
-const code = fs.readFileSync("bundle.js", "utf8");
+const code = fs.readFileSync('bundle.js', 'utf8');
 const result = await webcrack(code);
-await result.save("output-dir");
+await result.save('output-dir');
 ```
 
 ## Get Bundle Info
@@ -68,14 +68,14 @@ If a matching node in the AST of a module is found, it will be renamed to the gi
 ```js
 const result = await webcrack(code, {
   mappings: (m) => ({
-    "./utils/color.js": m.regExpLiteral("^#([0-9a-f]{3}){1,2}$"),
-    "lodash/index.js": m.memberExpression(
-      m.identifier("lodash"),
-      m.identifier("map"),
+    './utils/color.js': m.regExpLiteral('^#([0-9a-f]{3}){1,2}$'),
+    'lodash/index.js': m.memberExpression(
+      m.identifier('lodash'),
+      m.identifier('map'),
     ),
   }),
 });
-await result.save("output-dir");
+await result.save('output-dir');
 ```
 
 New folder structure:

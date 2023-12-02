@@ -1,13 +1,13 @@
-import * as t from "@babel/types";
-import { Transform } from "@webcrack/ast-utils";
+import * as t from '@babel/types';
+import { Transform } from '@webcrack/ast-utils';
 
 export default {
-  name: "split-variable-declarations",
-  tags: ["safe"],
+  name: 'split-variable-declarations',
+  tags: ['safe'],
   visitor: () => ({
     VariableDeclaration: {
       exit(path) {
-        if (path.node.declarations.length > 1 && path.key !== "init") {
+        if (path.node.declarations.length > 1 && path.key !== 'init') {
           if (path.parentPath.isExportNamedDeclaration()) {
             path.parentPath.replaceWithMultiple(
               path.node.declarations.map((declaration) =>

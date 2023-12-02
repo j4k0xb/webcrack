@@ -1,16 +1,16 @@
-import traverse, { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { Bundle } from "../bundle";
-import { relativePath } from "../path";
-import { convertESM } from "./esm";
-import { convertDefaultRequire } from "./getDefaultExport";
-import { WebpackModule } from "./module";
-import { inlineVarInjections } from "./varInjection";
+import traverse, { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { Bundle } from '../bundle';
+import { relativePath } from '../path';
+import { convertESM } from './esm';
+import { convertDefaultRequire } from './getDefaultExport';
+import { WebpackModule } from './module';
+import { inlineVarInjections } from './varInjection';
 
 export class WebpackBundle extends Bundle {
   constructor(entryId: string, modules: Map<string, WebpackModule>) {
-    super("webpack", entryId, modules);
+    super('webpack', entryId, modules);
   }
 
   /**
@@ -29,23 +29,23 @@ export class WebpackBundle extends Bundle {
   private replaceRequirePaths() {
     const requireId = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
     const requireMatcher = m.or(
-      m.callExpression(m.identifier("require"), [requireId]),
+      m.callExpression(m.identifier('require'), [requireId]),
     );
     const importId = m.capture(m.stringLiteral());
     const importMatcher = m.importDeclaration(m.anything(), importId);
 
     this.modules.forEach((module) => {
       traverse(module.ast, {
-        "CallExpression|ImportDeclaration": (path) => {
+        'CallExpression|ImportDeclaration': (path) => {
           let moduleId: string;
           let arg: NodePath;
 
           if (requireMatcher.match(path.node)) {
             moduleId = requireId.current!.value.toString();
-            [arg] = path.get("arguments") as NodePath<t.Identifier>[];
+            [arg] = path.get('arguments') as NodePath<t.Identifier>[];
           } else if (importMatcher.match(path.node)) {
             moduleId = importId.current!.value;
-            arg = path.get("source") as NodePath;
+            arg = path.get('source') as NodePath;
           } else {
             return;
           }
@@ -61,7 +61,7 @@ export class WebpackBundle extends Bundle {
           );
           // For example if its stored in another chunk
           if (!requiredModule) {
-            arg.addComment("leading", "webcrack:missing");
+            arg.addComment('leading', 'webcrack:missing');
           }
         },
         noScope: true,

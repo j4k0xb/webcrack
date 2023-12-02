@@ -3,31 +3,31 @@ import {
   applyTransform,
   applyTransformAsync,
   applyTransforms,
-} from "@webcrack/ast-utils";
-import mergeStrings from "../../unminify/src/transforms/merge-strings";
-import { findArrayRotator } from "./array-rotator";
-import controlFlowObject from "./control-flow-object";
-import controlFlowSwitch from "./control-flow-switch";
-import deadCode from "./dead-code";
-import { findDecoders } from "./decoder";
-import inlineDecodedStrings from "./inline-decoded-strings";
-import inlineDecoderWrappers from "./inline-decoder-wappers";
-import inlineObjectProps from "./inline-object-props";
-import { findStringArray } from "./string-array";
+} from '@webcrack/ast-utils';
+import mergeStrings from '../../unminify/src/transforms/merge-strings';
+import { findArrayRotator } from './array-rotator';
+import controlFlowObject from './control-flow-object';
+import controlFlowSwitch from './control-flow-switch';
+import deadCode from './dead-code';
+import { findDecoders } from './decoder';
+import inlineDecodedStrings from './inline-decoded-strings';
+import inlineDecoderWrappers from './inline-decoder-wappers';
+import inlineObjectProps from './inline-object-props';
+import { findStringArray } from './string-array';
 import {
   Sandbox,
   VMDecoder,
   createBrowserSandbox,
   createNodeSandbox,
-} from "./vm";
+} from './vm';
 
 export { createBrowserSandbox, createNodeSandbox, type Sandbox };
 
 // https://astexplorer.net/#/gist/b1018df4a8daebfcb1daf9d61fe17557/4ff9ad0e9c40b9616956f17f59a2d9888cd62a4f
 
 export default {
-  name: "deobfuscate",
-  tags: ["unsafe"],
+  name: 'deobfuscate',
+  tags: ['unsafe'],
   scope: true,
   async run(ast, state, sandbox) {
     if (!sandbox) return;

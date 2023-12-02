@@ -1,10 +1,10 @@
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { Transform } from "@webcrack/ast-utils";
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { Transform } from '@webcrack/ast-utils';
 
 export default {
-  name: "sequence",
-  tags: ["safe"],
+  name: 'sequence',
+  tags: ['safe'],
   visitor: () => ({
     ExpressionStatement: {
       exit(path) {
@@ -28,7 +28,7 @@ export default {
           path.insertBefore(statements);
           this.changes++;
         } else if (
-          t.isUnaryExpression(path.node.argument, { operator: "void" }) &&
+          t.isUnaryExpression(path.node.argument, { operator: 'void' }) &&
           t.isSequenceExpression(path.node.argument.argument)
         ) {
           const expressions = path.node.argument.argument.expressions;
@@ -107,7 +107,7 @@ export default {
         }
         if (
           t.isSequenceExpression(path.node.update) &&
-          path.node.body.type === "EmptyStatement"
+          path.node.body.type === 'EmptyStatement'
         ) {
           const expressions = path.node.update.expressions;
           path.node.update = expressions.pop()!;
@@ -131,7 +131,7 @@ export default {
           const statements = expressions.map((expr) =>
             t.expressionStatement(expr),
           );
-          if (path.parentPath.isForStatement() && path.key === "init") {
+          if (path.parentPath.isForStatement() && path.key === 'init') {
             path.parentPath.insertBefore(statements);
           } else {
             path.insertBefore(statements);

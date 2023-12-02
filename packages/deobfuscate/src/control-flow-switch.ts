@@ -1,14 +1,14 @@
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   Transform,
   constMemberExpression,
   infiniteLoop,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 
 export default {
-  name: "controlFlowSwitch",
-  tags: ["safe"],
+  name: 'controlFlowSwitch',
+  tags: ['safe'],
   visitor() {
     const sequenceName = m.capture(m.identifier());
     const sequenceString = m.capture(
@@ -35,8 +35,8 @@ export default {
           m.variableDeclarator(
             sequenceName,
             m.callExpression(
-              constMemberExpression(m.stringLiteral(sequenceString), "split"),
-              [m.stringLiteral("|")],
+              constMemberExpression(m.stringLiteral(sequenceString), 'split'),
+              [m.stringLiteral('|')],
             ),
           ),
         ]),
@@ -48,7 +48,7 @@ export default {
               // E.g. switch (sequence[iterator++]) {
               m.memberExpression(
                 m.fromCapture(sequenceName),
-                m.updateExpression("++", m.fromCapture(iterator)),
+                m.updateExpression('++', m.fromCapture(iterator)),
                 true,
               ),
               cases,
@@ -74,7 +74,7 @@ export default {
             ]),
           );
 
-          const sequence = sequenceString.current!.split("|");
+          const sequence = sequenceString.current!.split('|');
           const newStatements = sequence.flatMap((s) => caseStatements.get(s)!);
 
           path.node.body.splice(0, 3, ...newStatements);

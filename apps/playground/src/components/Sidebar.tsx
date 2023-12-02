@@ -1,8 +1,8 @@
-import { Show, createEffect, createSignal } from "solid-js";
-import { setSettings, settings } from "../App";
-import { useDeobfuscateContext } from "../context/DeobfuscateContext";
-import { useTheme } from "../hooks/useTheme";
-import FileTree from "./FileTree";
+import { Show, createEffect, createSignal } from 'solid-js';
+import { setSettings, settings } from '../App';
+import { useDeobfuscateContext } from '../context/DeobfuscateContext';
+import { useTheme } from '../hooks/useTheme';
+import FileTree from './FileTree';
 
 interface Props {
   paths: string[];
@@ -92,7 +92,7 @@ export default function Sidebar(props: Props) {
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
           checked={settings.deobfuscate}
-          onClick={(e) => setSettings("deobfuscate", e.currentTarget.checked)}
+          onClick={(e) => setSettings('deobfuscate', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100">
@@ -120,7 +120,7 @@ export default function Sidebar(props: Props) {
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
           checked={settings.unpack}
-          onClick={(e) => setSettings("unpack", e.currentTarget.checked)}
+          onClick={(e) => setSettings('unpack', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100">
@@ -150,7 +150,7 @@ export default function Sidebar(props: Props) {
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
           checked={settings.jsx}
-          onClick={(e) => setSettings("jsx", e.currentTarget.checked)}
+          onClick={(e) => setSettings('jsx', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100">
@@ -177,13 +177,13 @@ export default function Sidebar(props: Props) {
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
           checked={settings.mangle}
-          onClick={(e) => setSettings("mangle", e.currentTarget.checked)}
+          onClick={(e) => setSettings('mangle', e.currentTarget.checked)}
         />
       </label>
 
       <label class="label cursor-pointer px-4 hover:bg-base-100">
         <Show
-          when={theme() === "light"}
+          when={theme() === 'light'}
           fallback={
             <svg
               width="28"
@@ -219,8 +219,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="toggle toggle-sm hidden sm:inline"
-          checked={theme() === "dark"}
-          onClick={(e) => setTheme(e.currentTarget.checked ? "dark" : "light")}
+          checked={theme() === 'dark'}
+          onClick={(e) => setTheme(e.currentTarget.checked ? 'dark' : 'light')}
         ></input>
       </label>
 

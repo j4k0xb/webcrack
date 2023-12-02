@@ -1,4 +1,4 @@
-import { TreeNode } from "./FileTree";
+import { TreeNode } from './FileTree';
 
 interface Props extends TreeNode {
   onClick?: () => void;

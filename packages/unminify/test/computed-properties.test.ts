@@ -1,16 +1,16 @@
-import { test } from "vitest";
-import { testTransform } from ".";
-import { computedProperties } from "../src/transforms";
+import { test } from 'vitest';
+import { testTransform } from '.';
+import { computedProperties } from '../src/transforms';
 
 const expectJS = testTransform(computedProperties);
 
-test("member expression", () => {
+test('member expression', () => {
   expectJS(`
     require("foo")["default"]?.["_"];
   `).toMatchInlineSnapshot('require("foo").default?._;');
 });
 
-test("object", () => {
+test('object', () => {
   expectJS(`
     const x = { ["foo"](){}, ["bar"]: 1 };
   `).toMatchInlineSnapshot(`
@@ -21,7 +21,7 @@ test("object", () => {
   `);
 });
 
-test("class", () => {
+test('class', () => {
   expectJS(`
     class Foo {
       ["foo"](){}
@@ -35,7 +35,7 @@ test("class", () => {
   `);
 });
 
-test("ignore invalid identifier", () =>
+test('ignore invalid identifier', () =>
   expectJS(`
     console["1"]("hello");
   `).toMatchInlineSnapshot('console["1"]("hello");'));

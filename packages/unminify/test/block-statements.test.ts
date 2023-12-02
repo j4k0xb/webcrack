@@ -1,10 +1,10 @@
-import { test } from "vitest";
-import { testTransform } from ".";
-import { blockStatements } from "../src/transforms";
+import { test } from 'vitest';
+import { testTransform } from '.';
+import { blockStatements } from '../src/transforms';
 
 const expectJS = testTransform(blockStatements);
 
-test("if statement", () =>
+test('if statement', () =>
   expectJS(`
     if (a) b();
   `).toMatchInlineSnapshot(`
@@ -13,7 +13,7 @@ test("if statement", () =>
     }
   `));
 
-test("while statement", () =>
+test('while statement', () =>
   expectJS(`
     while (a) b();
   `).toMatchInlineSnapshot(`
@@ -22,7 +22,7 @@ test("while statement", () =>
     }
   `));
 
-test("for statement", () =>
+test('for statement', () =>
   expectJS(`
     for (;;) b();
   `).toMatchInlineSnapshot(`
@@ -31,7 +31,7 @@ test("for statement", () =>
     }
   `));
 
-test("for-in statement", () =>
+test('for-in statement', () =>
   expectJS(`
     for (const key in object) b();
   `).toMatchInlineSnapshot(`
@@ -40,7 +40,7 @@ test("for-in statement", () =>
     }
   `));
 
-test("for-of statement", () =>
+test('for-of statement', () =>
   expectJS(`
     for (const item of array) b();
   `).toMatchInlineSnapshot(`
@@ -49,7 +49,7 @@ test("for-of statement", () =>
     }
   `));
 
-test("arrow function", () =>
+test('arrow function', () =>
   expectJS(`
     const x = () => (a(), b());
   `).toMatchInlineSnapshot(`
@@ -58,7 +58,7 @@ test("arrow function", () =>
     };
   `));
 
-test("ignore empty statement", () =>
+test('ignore empty statement', () =>
   expectJS(`
     while (arr.pop());
   `).toMatchInlineSnapshot(`

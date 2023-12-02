@@ -4,7 +4,7 @@ layout: home
 title: Documentation
 
 hero:
-  name: "webcrack"
+  name: 'webcrack'
   logo: https://user-images.githubusercontent.com/55899582/231488871-e83fb827-1b25-4ec9-a326-b14244677e87.png
   actions:
     - theme: brand

@@ -1,14 +1,14 @@
-import { statement } from "@babel/template";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { Transform } from "@webcrack/ast-utils";
+import { statement } from '@babel/template';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { Transform } from '@webcrack/ast-utils';
 
 export default {
-  name: "logical-to-if",
-  tags: ["safe"],
+  name: 'logical-to-if',
+  tags: ['safe'],
   visitor: () => {
-    const andMatcher = m.expressionStatement(m.logicalExpression("&&"));
-    const orMatcher = m.expressionStatement(m.logicalExpression("||"));
+    const andMatcher = m.expressionStatement(m.logicalExpression('&&'));
+    const orMatcher = m.expressionStatement(m.logicalExpression('||'));
 
     const buildIf = statement`if (TEST) { BODY; }`;
     const buildIfNot = statement`if (!TEST) { BODY; }`;

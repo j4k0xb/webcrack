@@ -1,7 +1,7 @@
-import traverse, { Binding, NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { findParent } from "./matcher";
+import traverse, { Binding, NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { findParent } from './matcher';
 
 /**
  * Make sure the array is immutable and references are valid before using!
@@ -172,7 +172,7 @@ export function inlineVariableAliases(
       m.identifier(binding.identifier.name),
     ),
     m.assignmentExpression(
-      "=",
+      '=',
       m.identifier(varName),
       m.identifier(binding.identifier.name),
     ),

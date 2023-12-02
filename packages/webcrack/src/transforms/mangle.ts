@@ -1,17 +1,17 @@
-import traverse, { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import { Transform } from "@webcrack/ast-utils";
-import mangle from "babel-plugin-minify-mangle-names";
+import traverse, { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import { Transform } from '@webcrack/ast-utils';
+import mangle from 'babel-plugin-minify-mangle-names';
 
 export default {
-  name: "mangle",
-  tags: ["safe"],
+  name: 'mangle',
+  tags: ['safe'],
   scope: true,
   run(ast) {
     // path.hub is undefined for some reason, monkey-patch to avoid error...
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { getSource } = NodePath.prototype;
-    NodePath.prototype.getSource = () => "";
+    NodePath.prototype.getSource = () => '';
 
     traverse(ast, mangle({ types: t, traverse }).visitor, undefined, {
       opts: {

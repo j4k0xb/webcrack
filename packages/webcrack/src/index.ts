@@ -1,35 +1,35 @@
-import { ParseResult, parse } from "@babel/parser";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import { ParseResult, parse } from '@babel/parser';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   applyTransform,
   applyTransformAsync,
   applyTransforms,
   generate,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 import deobfuscate, {
   Sandbox,
   createBrowserSandbox,
   createNodeSandbox,
-} from "@webcrack/deobfuscate";
-import debugProtection from "@webcrack/deobfuscate/src/debug-protection";
-import mergeObjectAssignments from "@webcrack/deobfuscate/src/merge-object-assignments";
-import selfDefending from "@webcrack/deobfuscate/src/self-defending";
-import { unminify } from "@webcrack/unminify";
+} from '@webcrack/deobfuscate';
+import debugProtection from '@webcrack/deobfuscate/src/debug-protection';
+import mergeObjectAssignments from '@webcrack/deobfuscate/src/merge-object-assignments';
+import selfDefending from '@webcrack/deobfuscate/src/self-defending';
+import { unminify } from '@webcrack/unminify';
 import {
   blockStatements,
   sequence,
   splitVariableDeclarations,
-} from "@webcrack/unminify/transforms";
-import { Bundle, unpackAST } from "@webcrack/unpack";
-import debug from "debug";
-import { join, normalize } from "node:path";
-import jsx from "./transforms/jsx";
-import jsxNew from "./transforms/jsx-new";
-import mangle from "./transforms/mangle";
-import { isBrowser } from "./utils/platform";
+} from '@webcrack/unminify/transforms';
+import { Bundle, unpackAST } from '@webcrack/unpack';
+import debug from 'debug';
+import { join, normalize } from 'node:path';
+import jsx from './transforms/jsx';
+import jsxNew from './transforms/jsx-new';
+import mangle from './transforms/mangle';
+import { isBrowser } from './utils/platform';
 
-export { type Sandbox } from "@webcrack/deobfuscate";
+export { type Sandbox } from '@webcrack/deobfuscate';
 
 export interface WebcrackResult {
   code: string;
@@ -74,7 +74,7 @@ export interface Options {
    * ```
    */
   mappings?: (
-    m: typeof import("@codemod/matchers"),
+    m: typeof import('@codemod/matchers'),
   ) => Record<string, m.Matcher<unknown>>;
   /**
    * Function that executes a code expression and returns the result (typically from the obfuscator).
@@ -108,24 +108,24 @@ export async function webcrack(
   options.onProgress(0);
 
   if (isBrowser()) {
-    debug.enable("webcrack:*");
+    debug.enable('webcrack:*');
   }
 
   const isBookmarklet = /^javascript:./.test(code);
   if (isBookmarklet) {
-    code = decodeURIComponent(code.replace(/^javascript:/, ""));
+    code = decodeURIComponent(code.replace(/^javascript:/, ''));
   }
 
   let ast: ParseResult<t.File> = null!;
-  let outputCode = "";
+  let outputCode = '';
   let bundle: Bundle | undefined;
 
   const stages = [
     () => {
       return (ast = parse(code, {
-        sourceType: "unambiguous",
+        sourceType: 'unambiguous',
         allowReturnOutsideFunction: true,
-        plugins: ["jsx"],
+        plugins: ['jsx'],
       }));
     },
     () => {
@@ -169,10 +169,10 @@ export async function webcrack(
     code: outputCode,
     bundle,
     async save(path) {
-      const { mkdir, writeFile } = await import("node:fs/promises");
+      const { mkdir, writeFile } = await import('node:fs/promises');
       path = normalize(path);
       await mkdir(path, { recursive: true });
-      await writeFile(join(path, "deobfuscated.js"), outputCode, "utf8");
+      await writeFile(join(path, 'deobfuscated.js'), outputCode, 'utf8');
       await bundle?.save(path);
     },
   };

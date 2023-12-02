@@ -1,17 +1,17 @@
-import { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
+import { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
 import {
   Transform,
   inlineFunctionAliases,
   inlineVariableAliases,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 
 /**
  * Replaces all references to `var alias = decode;` with `decode`
  */
 export default {
-  name: "inlineDecoderWrappers",
-  tags: ["unsafe"],
+  name: 'inlineDecoderWrappers',
+  tags: ['unsafe'],
   scope: true,
   run(ast, state, decoder) {
     if (!decoder?.node.id) return;

@@ -1,13 +1,13 @@
-import { statement } from "@babel/template";
-import traverse, { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import { statement } from '@babel/template';
+import traverse, { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   constMemberExpression,
   findPath,
   renameFast,
-} from "@webcrack/ast-utils";
-import { WebpackModule } from "./module";
+} from '@webcrack/ast-utils';
+import { WebpackModule } from './module';
 
 const buildNamespaceImport = statement`import * as NAME from "PATH";`;
 const buildNamedExportLet = statement`export let NAME = VALUE;`;
@@ -28,7 +28,7 @@ const buildNamedExportLet = statement`export let NAME = VALUE;`;
 export function convertESM(module: WebpackModule): void {
   // E.g. require.r(exports);
   const defineEsModuleMatcher = m.expressionStatement(
-    m.callExpression(constMemberExpression("require", "r"), [m.identifier()]),
+    m.callExpression(constMemberExpression('require', 'r'), [m.identifier()]),
   );
 
   const exportsName = m.capture(m.identifier());
@@ -36,7 +36,7 @@ export function convertESM(module: WebpackModule): void {
   const returnedValue = m.capture(m.anyExpression());
   // E.g. require.d(exports, "counter", function () { return f });
   const defineExportMatcher = m.expressionStatement(
-    m.callExpression(constMemberExpression("require", "d"), [
+    m.callExpression(constMemberExpression('require', 'd'), [
       exportsName,
       m.stringLiteral(exportedName),
       m.functionExpression(
@@ -62,7 +62,7 @@ export function convertESM(module: WebpackModule): void {
   );
   // E.g. require.d(exports, { foo: () => a, bar: () => b });
   const defineExportsMatcher = m.expressionStatement(
-    m.callExpression(constMemberExpression("require", "d"), [
+    m.callExpression(constMemberExpression('require', 'd'), [
       exportsName,
       m.objectExpression(properties),
     ]),
@@ -74,7 +74,7 @@ export function convertESM(module: WebpackModule): void {
   const requireMatcher = m.variableDeclaration(undefined, [
     m.variableDeclarator(
       requireVariable,
-      m.callExpression(m.identifier("require"), [
+      m.callExpression(m.identifier('require'), [
         m.numericLiteral(requiredModuleId),
       ]),
     ),
@@ -83,9 +83,9 @@ export function convertESM(module: WebpackModule): void {
   // module = require.hmd(module);
   const hmdMatcher = m.expressionStatement(
     m.assignmentExpression(
-      "=",
-      m.identifier("module"),
-      m.callExpression(constMemberExpression("require", "hmd")),
+      '=',
+      m.identifier('module'),
+      m.callExpression(constMemberExpression('require', 'hmd')),
     ),
   );
 
@@ -95,10 +95,10 @@ export function convertESM(module: WebpackModule): void {
       if (path.parentPath?.parentPath) return path.skip();
 
       if (defineEsModuleMatcher.match(path.node)) {
-        module.ast.program.sourceType = "module";
+        module.ast.program.sourceType = 'module';
         path.remove();
       } else if (
-        module.ast.program.sourceType === "module" &&
+        module.ast.program.sourceType === 'module' &&
         requireMatcher.match(path.node)
       ) {
         path.replaceWith(
@@ -144,7 +144,7 @@ function exportVariable(
   value: t.Expression,
   exportName: string,
 ) {
-  if (value.type === "Identifier") {
+  if (value.type === 'Identifier') {
     const binding = requireDPath.scope.getBinding(value.name);
     if (!binding) return;
 
@@ -158,7 +158,7 @@ function exportVariable(
     );
     if (!declaration) return;
 
-    if (exportName === "default") {
+    if (exportName === 'default') {
       // `let f = 1;` -> `export default 1;`
       declaration.replaceWith(
         t.exportDefaultDeclaration(
@@ -172,7 +172,7 @@ function exportVariable(
       renameFast(binding, exportName);
       declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
     }
-  } else if (exportName === "default") {
+  } else if (exportName === 'default') {
     requireDPath.insertAfter(t.exportDefaultDeclaration(value));
   } else {
     requireDPath.insertAfter(

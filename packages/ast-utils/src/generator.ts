@@ -1,5 +1,5 @@
-import babelGenerate, { GeneratorOptions } from "@babel/generator";
-import * as t from "@babel/types";
+import babelGenerate, { GeneratorOptions } from '@babel/generator';
+import * as t from '@babel/types';
 
 const defaultOptions: GeneratorOptions = { jsescOption: { minimal: true } };
 
@@ -17,7 +17,7 @@ export function codePreview(node: t.Node): string {
     ...defaultOptions,
   });
   if (code.length > 100) {
-    return code.slice(0, 70) + " … " + code.slice(-30);
+    return code.slice(0, 70) + ' … ' + code.slice(-30);
   }
   return code;
 }

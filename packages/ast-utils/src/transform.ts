@@ -1,4 +1,4 @@
-import traverse, { Node, TraverseOptions, visitors } from "@babel/traverse";
+import traverse, { Node, TraverseOptions, visitors } from '@babel/traverse';
 
 export async function applyTransformAsync<TOptions>(
   ast: Node,
@@ -70,4 +70,4 @@ export interface AsyncTransform<TOptions = unknown>
   run?: (ast: Node, state: TransformState, options?: TOptions) => Promise<void>;
 }
 
-export type Tag = "safe" | "unsafe";
+export type Tag = 'safe' | 'unsafe';

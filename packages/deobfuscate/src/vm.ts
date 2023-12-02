@@ -1,9 +1,9 @@
-import { NodePath } from "@babel/traverse";
-import { CallExpression } from "@babel/types";
-import { generate } from "@webcrack/ast-utils";
-import { ArrayRotator } from "./array-rotator";
-import { Decoder } from "./decoder";
-import { StringArray } from "./string-array";
+import { NodePath } from '@babel/traverse';
+import { CallExpression } from '@babel/types';
+import { generate } from '@webcrack/ast-utils';
+import { ArrayRotator } from './array-rotator';
+import { Decoder } from './decoder';
+import { StringArray } from './string-array';
 
 export type Sandbox = (code: string) => Promise<unknown>;
 
@@ -11,13 +11,13 @@ export function createNodeSandbox(): Sandbox {
   return async (code: string) => {
     const {
       default: { Isolate },
-    } = await import("isolated-vm");
+    } = await import('isolated-vm');
     const isolate = new Isolate();
     const context = await isolate.createContext();
     const result = (await context.eval(code, {
       timeout: 10_000,
       copy: true,
-      filename: "file:///obfuscated.js",
+      filename: 'file:///obfuscated.js',
     })) as unknown;
     context.release();
     isolate.dispose();
@@ -28,7 +28,7 @@ export function createNodeSandbox(): Sandbox {
 export function createBrowserSandbox(): Sandbox {
   return () => {
     // TODO: use sandybox (not available in web workers though)
-    throw new Error("Custom Sandbox implementation required.");
+    throw new Error('Custom Sandbox implementation required.');
   };
 }
 
@@ -53,18 +53,18 @@ export class VMDecoder {
       shouldPrintComment: () => false,
     };
     const stringArrayCode = generate(stringArray.path.node, generateOptions);
-    const rotatorCode = rotator ? generate(rotator.node, generateOptions) : "";
+    const rotatorCode = rotator ? generate(rotator.node, generateOptions) : '';
     const decoderCode = decoders
       .map((decoder) => generate(decoder.path.node, generateOptions))
-      .join(";\n");
+      .join(';\n');
 
-    this.setupCode = [stringArrayCode, rotatorCode, decoderCode].join(";\n");
+    this.setupCode = [stringArrayCode, rotatorCode, decoderCode].join(';\n');
   }
 
   async decode(calls: NodePath<CallExpression>[]): Promise<unknown[]> {
     const code = `(() => {
       ${this.setupCode}
-      return [${calls.join(",")}]
+      return [${calls.join(',')}]
     })()`;
 
     const result = await this.sandbox(code);

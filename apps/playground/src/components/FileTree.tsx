@@ -1,6 +1,6 @@
-import { For, Show } from "solid-js";
-import DirectoryNode from "./DirectoryNode";
-import FileNode from "./FileNode";
+import { For, Show } from 'solid-js';
+import DirectoryNode from './DirectoryNode';
+import FileNode from './FileNode';
 
 export interface TreeNode {
   path: string;
@@ -53,7 +53,7 @@ function generateTreeNodes(paths: string[]): TreeNode[] {
       } else {
         const subtree: TreeNode = {
           name: token,
-          path: tokens.slice(0, i + 1).join("/"),
+          path: tokens.slice(0, i + 1).join('/'),
           isDirectory: i < tokens.length - 1,
           children: [],
         };
@@ -72,11 +72,11 @@ function generateTreeNodes(paths: string[]): TreeNode[] {
 function sortPathsTokens(paths: string[]): string[][] {
   const collator = new Intl.Collator(undefined, {
     numeric: true,
-    sensitivity: "base",
+    sensitivity: 'base',
   });
 
   return paths
-    .map((path) => path.replace(/^\//, "").split("/"))
+    .map((path) => path.replace(/^\//, '').split('/'))
     .sort((a, b) => {
       const maxDepth = Math.max(a.length, b.length);
       for (let depth = 0; depth < maxDepth; depth++) {

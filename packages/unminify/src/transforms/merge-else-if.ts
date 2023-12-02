@@ -1,9 +1,9 @@
-import * as m from "@codemod/matchers";
-import { Transform } from "@webcrack/ast-utils";
+import * as m from '@codemod/matchers';
+import { Transform } from '@webcrack/ast-utils';
 
 export default {
-  name: "merge-else-if",
-  tags: ["safe"],
+  name: 'merge-else-if',
+  tags: ['safe'],
   visitor() {
     const nestedIf = m.capture(m.ifStatement());
     const matcher = m.ifStatement(

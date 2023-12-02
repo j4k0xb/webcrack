@@ -1,10 +1,10 @@
 // TODO: run babel in the worker instead to avoid bundling it 2x
-import * as monaco from "monaco-editor";
-import { createEffect, onCleanup, onMount } from "solid-js";
-import { useDeobfuscateContext } from "../context/DeobfuscateContext";
-import { useTheme } from "../hooks/useTheme";
-import { registerEvalSelection } from "../monaco/eval-selection";
-import { PlaceholderContentWidget } from "../monaco/placeholder-widget";
+import * as monaco from 'monaco-editor';
+import { createEffect, onCleanup, onMount } from 'solid-js';
+import { useDeobfuscateContext } from '../context/DeobfuscateContext';
+import { useTheme } from '../hooks/useTheme';
+import { registerEvalSelection } from '../monaco/eval-selection';
+import { PlaceholderContentWidget } from '../monaco/placeholder-widget';
 
 interface Props {
   models: monaco.editor.ITextModel[];
@@ -12,11 +12,11 @@ interface Props {
   onModelChange?: (model: monaco.editor.ITextModel) => void;
 }
 
-monaco.editor.defineTheme("dark", {
-  base: "vs-dark",
+monaco.editor.defineTheme('dark', {
+  base: 'vs-dark',
   inherit: true,
   rules: [],
-  colors: { "editor.background": "#1b1b1f" },
+  colors: { 'editor.background': '#1b1b1f' },
 });
 
 export default function MonacoEditor(props: Props) {
@@ -30,9 +30,9 @@ export default function MonacoEditor(props: Props) {
 
   onMount(() => {
     const editor = monaco.editor.create(container!, {
-      language: "javascript",
+      language: 'javascript',
       automaticLayout: true,
-      wordWrap: "on",
+      wordWrap: 'on',
     });
 
     createEffect(() => {
@@ -85,13 +85,13 @@ export default function MonacoEditor(props: Props) {
     monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
 
     const placeholder = new PlaceholderContentWidget(
-      "// Paste your obfuscated or bundled code here",
+      '// Paste your obfuscated or bundled code here',
       editor,
     );
 
     const deobfuscateAction = editor.addAction({
-      id: "editor.action.deobfuscate",
-      label: "Deobfuscate",
+      id: 'editor.action.deobfuscate',
+      label: 'Deobfuscate',
       keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.Enter],
       run() {
         deobfuscate();
@@ -100,7 +100,7 @@ export default function MonacoEditor(props: Props) {
 
     const evalAction = registerEvalSelection(editor);
 
-    const commandPalette = editor.getAction("editor.action.quickCommand")!;
+    const commandPalette = editor.getAction('editor.action.quickCommand')!;
     editor.addCommand(
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyP,
       () => void commandPalette.run(),

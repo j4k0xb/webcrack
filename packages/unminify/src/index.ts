@@ -1,15 +1,15 @@
-import { parse } from "@babel/parser";
+import { parse } from '@babel/parser';
 import {
   applyTransform,
   applyTransforms,
   generate,
   Transform,
-} from "@webcrack/ast-utils";
-import * as transforms from "./transforms";
+} from '@webcrack/ast-utils';
+import * as transforms from './transforms';
 
 export const unminify = {
-  name: "unminify",
-  tags: ["safe"],
+  name: 'unminify',
+  tags: ['safe'],
   scope: true,
   run(ast, state) {
     state.changes += applyTransforms(ast, Object.values(transforms)).changes;
@@ -18,9 +18,9 @@ export const unminify = {
 
 export function unminifySource(code: string): string {
   const ast = parse(code, {
-    sourceType: "unambiguous",
+    sourceType: 'unambiguous',
     allowReturnOutsideFunction: true,
-    plugins: ["jsx"],
+    plugins: ['jsx'],
   });
 
   applyTransform(ast, unminify);

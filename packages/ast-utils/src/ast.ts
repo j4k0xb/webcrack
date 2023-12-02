@@ -1,4 +1,4 @@
-import * as t from "@babel/types";
+import * as t from '@babel/types';
 
 export function getPropName(node: t.Node): string | undefined {
   if (t.isIdentifier(node)) {

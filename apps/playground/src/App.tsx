@@ -1,12 +1,12 @@
-import * as monaco from "monaco-editor";
-import { For, Show, createMemo, createSignal, onCleanup } from "solid-js";
-import { createStore } from "solid-js/store";
-import Breadcrumbs from "./components/Breadcrumbs";
-import MonacoEditor from "./components/MonacoEditor";
-import Sidebar from "./components/Sidebar";
-import Tab from "./components/Tab";
-import { DeobfuscateContextProvider } from "./context/DeobfuscateContext";
-import { DeobfuscateResult } from "./webcrack.worker";
+import * as monaco from 'monaco-editor';
+import { For, Show, createMemo, createSignal, onCleanup } from 'solid-js';
+import { createStore } from 'solid-js/store';
+import Breadcrumbs from './components/Breadcrumbs';
+import MonacoEditor from './components/MonacoEditor';
+import Sidebar from './components/Sidebar';
+import Tab from './components/Tab';
+import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
+import { DeobfuscateResult } from './webcrack.worker';
 
 export const [settings, setSettings] = createStore({
   mangle: false,
@@ -19,9 +19,9 @@ function App() {
   const [untitledCounter, setUntitledCounter] = createSignal(1);
   const [models, setModels] = createSignal<monaco.editor.ITextModel[]>([
     monaco.editor.createModel(
-      "",
-      "javascript",
-      monaco.Uri.from({ scheme: "untitled", path: "Untitled-1" }),
+      '',
+      'javascript',
+      monaco.Uri.from({ scheme: 'untitled', path: 'Untitled-1' }),
     ),
   ]);
   const [tabs, setTabs] = createSignal<monaco.editor.ITextModel[]>(models());
@@ -30,10 +30,10 @@ function App() {
   >(tabs()[0]);
 
   const fileModels = createMemo(() =>
-    models().filter((m) => m.uri.scheme === "file"),
+    models().filter((m) => m.uri.scheme === 'file'),
   );
   const untitledModels = createMemo(() =>
-    models().filter((m) => m.uri.scheme === "untitled"),
+    models().filter((m) => m.uri.scheme === 'untitled'),
   );
   const filePaths = createMemo(() =>
     fileModels().map((model) => model.uri.fsPath),
@@ -51,7 +51,7 @@ function App() {
   }
 
   function openFile(path: string) {
-    const model = fileModels().find((m) => m.uri.fsPath === "/" + path);
+    const model = fileModels().find((m) => m.uri.fsPath === '/' + path);
     if (!model) {
       return console.warn(`No model found for path: ${path}`);
     }
@@ -64,7 +64,7 @@ function App() {
       setActiveTab(tabs()[index > 0 ? index - 1 : 1]);
     }
     setTabs(tabs().filter((t) => t !== tab));
-    if (tab.uri.scheme === "untitled") {
+    if (tab.uri.scheme === 'untitled') {
       tab.dispose();
       // FIXME: resets folder expansion state
       setModels(models().filter((m) => m !== tab));
@@ -74,10 +74,10 @@ function App() {
   function openUntitledTab() {
     setUntitledCounter(untitledCounter() + 1);
     const model = monaco.editor.createModel(
-      "",
-      "javascript",
+      '',
+      'javascript',
       monaco.Uri.from({
-        scheme: "untitled",
+        scheme: 'untitled',
         path: `Untitled-${untitledCounter()}`,
       }),
     );
@@ -95,7 +95,7 @@ function App() {
       return;
     }
 
-    if (!model || model.uri.scheme === "file") {
+    if (!model || model.uri.scheme === 'file') {
       model = openUntitledTab();
     }
 
@@ -110,14 +110,14 @@ function App() {
       ...result.files.map((file) =>
         monaco.editor.createModel(
           file.code,
-          "javascript",
+          'javascript',
           monaco.Uri.file(file.path),
         ),
       ),
       monaco.editor.createModel(
         result.code,
-        "javascript",
-        monaco.Uri.file("deobfuscated.js"),
+        'javascript',
+        monaco.Uri.file('deobfuscated.js'),
       ),
     ]);
   }
@@ -165,7 +165,7 @@ function App() {
               </svg>
             </div>
           </div>
-          <Show when={activeTab()?.uri.scheme === "file"}>
+          <Show when={activeTab()?.uri.scheme === 'file'}>
             <Breadcrumbs path={activeTab()!.uri.path} />
           </Show>
 

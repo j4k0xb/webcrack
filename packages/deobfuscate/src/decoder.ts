@@ -1,9 +1,9 @@
-import { expression } from "@babel/template";
-import { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { findParent, renameFast } from "@webcrack/ast-utils";
-import { StringArray } from "./string-array";
+import { expression } from '@babel/template';
+import { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { findParent, renameFast } from '@webcrack/ast-utils';
+import { StringArray } from './string-array';
 
 /**
  * A function that is called with >= 1 numeric/string arguments
@@ -29,7 +29,7 @@ export class Decoder {
         m.matcher((node) => argumentMatcher.match(node)),
       ),
       m.unaryExpression(
-        "-",
+        '-',
         m.matcher((node) => argumentMatcher.match(node)),
       ),
       m.numericLiteral(),

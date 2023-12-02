@@ -1,27 +1,27 @@
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
-import { Transform } from "@webcrack/ast-utils";
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { Transform } from '@webcrack/ast-utils';
 
 // https://eslint.org/docs/latest/rules/yoda and https://babeljs.io/docs/en/babel-plugin-minify-flip-comparisons
 
 const flippedOperators = {
-  "==": "==",
-  "===": "===",
-  "!=": "!=",
-  "!==": "!==",
-  ">": "<",
-  "<": ">",
-  ">=": "<=",
-  "<=": ">=",
-  "*": "*",
-  "^": "^",
-  "&": "&",
-  "|": "|",
+  '==': '==',
+  '===': '===',
+  '!=': '!=',
+  '!==': '!==',
+  '>': '<',
+  '<': '>',
+  '>=': '<=',
+  '<=': '>=',
+  '*': '*',
+  '^': '^',
+  '&': '&',
+  '|': '|',
 } as const;
 
 export default {
-  name: "yoda",
-  tags: ["safe"],
+  name: 'yoda',
+  tags: ['safe'],
   visitor: () => {
     const matcher = m.binaryExpression(
       m.or(...Object.values(flippedOperators)),
@@ -29,14 +29,14 @@ export default {
         m.stringLiteral(),
         m.numericLiteral(),
         m.unaryExpression(
-          "-",
-          m.or(m.numericLiteral(), m.identifier("Infinity")),
+          '-',
+          m.or(m.numericLiteral(), m.identifier('Infinity')),
         ),
         m.booleanLiteral(),
         m.nullLiteral(),
-        m.identifier("undefined"),
-        m.identifier("NaN"),
-        m.identifier("Infinity"),
+        m.identifier('undefined'),
+        m.identifier('NaN'),
+        m.identifier('Infinity'),
       ),
       m.matcher((node) => !t.isLiteral(node)),
     );

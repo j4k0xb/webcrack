@@ -1,17 +1,17 @@
-import { test } from "vitest";
-import { testTransform } from ".";
-import { mergeElseIf } from "../src/transforms";
+import { test } from 'vitest';
+import { testTransform } from '.';
+import { mergeElseIf } from '../src/transforms';
 
 const expectJS = testTransform(mergeElseIf);
 
-test("merge", () =>
+test('merge', () =>
   expectJS(`
     if (x) {
     } else {
       if (y) {}
-    }`).toMatchInlineSnapshot("if (x) {} else if (y) {}"));
+    }`).toMatchInlineSnapshot('if (x) {} else if (y) {}'));
 
-test("ignore when it contains other statements", () =>
+test('ignore when it contains other statements', () =>
   expectJS(`
     if (x) {
     } else {

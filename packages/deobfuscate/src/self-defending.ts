@@ -1,6 +1,6 @@
-import { NodePath } from "@babel/traverse";
-import * as t from "@babel/types";
-import * as m from "@codemod/matchers";
+import { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
+import * as m from '@codemod/matchers';
 import {
   Transform,
   constMemberExpression,
@@ -9,7 +9,7 @@ import {
   findParent,
   matchIife,
   trueMatcher,
-} from "@webcrack/ast-utils";
+} from '@webcrack/ast-utils';
 
 // SingleCallController: https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/common/templates/SingleCallControllerTemplate.ts
 
@@ -20,8 +20,8 @@ import {
 // debug protection function call: https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/debug-protection/templates/debug-protection-function-call/DebugProtectionFunctionCallTemplate.ts
 
 export default {
-  name: "selfDefending",
-  tags: ["safe"],
+  name: 'selfDefending',
+  tags: ['safe'],
   scope: true,
   visitor() {
     const callController = m.capture(m.anyString());
@@ -66,11 +66,11 @@ export default {
                                 m.callExpression(
                                   constMemberExpression(
                                     m.fromCapture(fn),
-                                    "apply",
+                                    'apply',
                                   ),
                                   [
                                     m.fromCapture(context),
-                                    m.identifier("arguments"),
+                                    m.identifier('arguments'),
                                   ],
                                 ),
                               ),
@@ -78,7 +78,7 @@ export default {
                             // fn = null;
                             m.expressionStatement(
                               m.assignmentExpression(
-                                "=",
+                                '=',
                                 m.fromCapture(fn),
                                 m.nullLiteral(),
                               ),
@@ -97,7 +97,7 @@ export default {
               // firstCall = false;
               m.expressionStatement(
                 m.assignmentExpression(
-                  "=",
+                  '=',
                   m.fromCapture(firstCall),
                   falseMatcher,
                 ),
@@ -118,9 +118,9 @@ export default {
         //       ^ path/binding
 
         binding.referencePaths
-          .filter((ref) => ref.parent.type === "CallExpression")
+          .filter((ref) => ref.parent.type === 'CallExpression')
           .forEach((ref) => {
-            if (ref.parentPath?.parent.type === "CallExpression") {
+            if (ref.parentPath?.parent.type === 'CallExpression') {
               // callControllerFunctionName(this, function () { ... })();
               // ^ ref
               ref.parentPath.parentPath?.remove();

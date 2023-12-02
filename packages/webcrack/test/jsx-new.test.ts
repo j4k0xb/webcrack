@@ -1,27 +1,27 @@
-import { test } from "vitest";
-import { testTransform } from ".";
-import jsxNew from "../src/transforms/jsx-new";
+import { test } from 'vitest';
+import { testTransform } from '.';
+import jsxNew from '../src/transforms/jsx-new';
 
 const expectJS = testTransform(jsxNew);
 
-test("tag name type", () =>
-  expectJS('jsx("div", {});').toMatchInlineSnapshot("<div />;"));
+test('tag name type', () =>
+  expectJS('jsx("div", {});').toMatchInlineSnapshot('<div />;'));
 
-test("component type", () =>
-  expectJS("jsx(TodoList, {});").toMatchInlineSnapshot("<TodoList />;"));
+test('component type', () =>
+  expectJS('jsx(TodoList, {});').toMatchInlineSnapshot('<TodoList />;'));
 
-test("deeply nested member expression type", () =>
-  expectJS("jsx(components.list.TodoList, {});").toMatchInlineSnapshot(
-    "<components.list.TodoList />;",
+test('deeply nested member expression type', () =>
+  expectJS('jsx(components.list.TodoList, {});').toMatchInlineSnapshot(
+    '<components.list.TodoList />;',
   ));
 
-test("rename component with conflicting name", () =>
-  expectJS("function a(){} jsx(a, {});").toMatchInlineSnapshot(`
+test('rename component with conflicting name', () =>
+  expectJS('function a(){} jsx(a, {});').toMatchInlineSnapshot(`
       function _Component() {}
       <_Component />;
     `));
 
-test("attributes", () =>
+test('attributes', () =>
   expectJS(
     'jsx("div", { "data-hover": "tooltip", style: { display: "block" } });',
   ).toMatchInlineSnapshot(`
@@ -30,32 +30,32 @@ test("attributes", () =>
       }} />;
     `));
 
-test("spread attributes", () =>
+test('spread attributes', () =>
   expectJS('jsx("div", {...props});').toMatchInlineSnapshot(
-    "<div {...props} />;",
+    '<div {...props} />;',
   ));
 
-test("children", () =>
+test('children', () =>
   expectJS(
     'jsx("div", { children: jsxs("span", { children: ["Hello ", name ] }) });',
-  ).toMatchInlineSnapshot("<div><span>Hello {name}</span></div>;"));
+  ).toMatchInlineSnapshot('<div><span>Hello {name}</span></div>;'));
 
-test("component with key", () =>
+test('component with key', () =>
   expectJS('jsx("div", {}, "test")').toMatchInlineSnapshot(
     '<div key="test" />;',
   ));
 
-test("array expression child", () =>
+test('array expression child', () =>
   expectJS('jsx("div", { children: [1] })').toMatchInlineSnapshot(
-    "<div>{[1]}</div>;",
+    '<div>{[1]}</div>;',
   ));
 
-test("fragment", () =>
+test('fragment', () =>
   expectJS(
     'jsxs(React.Fragment, { children: [jsx("span", {}), "test"] });',
-  ).toMatchInlineSnapshot("<><span />test</>;"));
+  ).toMatchInlineSnapshot('<><span />test</>;'));
 
-test("fragment with key", () =>
-  expectJS("jsx(React.Fragment, {}, o)").toMatchInlineSnapshot(
-    "<React.Fragment key={o} />;",
+test('fragment with key', () =>
+  expectJS('jsx(React.Fragment, {}, o)').toMatchInlineSnapshot(
+    '<React.Fragment key={o} />;',
   ));
