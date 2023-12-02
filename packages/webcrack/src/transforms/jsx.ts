@@ -138,10 +138,14 @@ function convertAttributes(
   return object.properties.map((property) => {
     if (matcher.match(property)) {
       const jsxName = t.jsxIdentifier(name.current!);
-      const jsxValue =
-        value.current!.type === 'StringLiteral'
-          ? value.current
-          : t.jsxExpressionContainer(value.current!);
+      if (value.current!.type === 'StringLiteral') {
+        const hasSpecialChars = /["\\]/.test(value.current.value);
+        const jsxValue = hasSpecialChars
+          ? t.jsxExpressionContainer(value.current)
+          : value.current;
+        return t.jsxAttribute(jsxName, jsxValue);
+      }
+      const jsxValue = t.jsxExpressionContainer(value.current!);
       return t.jsxAttribute(jsxName, jsxValue);
     } else if (t.isSpreadElement(property)) {
       return t.jsxSpreadAttribute(property.argument);

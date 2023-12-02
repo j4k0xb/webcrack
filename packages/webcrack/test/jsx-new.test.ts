@@ -69,3 +69,18 @@ test('remove leading comments', () =>
   expectJS(
     'return /*#__PURE__*/_jsx("h1", {children: /*#__PURE__*/_jsx("div", {})});',
   ).toMatchInlineSnapshot('return <h1><div /></h1>;'));
+
+test('props with escaped strings', () =>
+  expectJS(String.raw`
+    _jsx(Foo, { bar: 'abc' });
+    _jsx(Foo, { bar: 'a\\nbc' });
+    _jsx(Foo, { bar: 'ab\\tc' });
+    _jsx(Foo, { bar: 'ab"c' });
+    _jsx(Foo, { bar: "ab'c" });
+  `).toMatchInlineSnapshot(`
+    <Foo bar='abc' />;
+    <Foo bar={'a\\\\nbc'} />;
+    <Foo bar={'ab\\\\tc'} />;
+    <Foo bar={'ab"c'} />;
+    <Foo bar="ab'c" />;
+  `));

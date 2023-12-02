@@ -74,3 +74,18 @@ test('remove leading comments', () =>
   expectJS(
     'return /*#__PURE__*/React.createElement("h1", null, /*#__PURE__*/React.createElement("div", null));',
   ).toMatchInlineSnapshot('return <h1><div /></h1>;'));
+
+test('props with escaped strings', () =>
+  expectJS(String.raw`
+    React.createElement(Foo, {bar: 'abc'});
+    React.createElement(Foo, {bar: 'a\\nbc'});
+    React.createElement(Foo, {bar: 'ab\\tc'});
+    React.createElement(Foo, {bar: 'ab"c'});
+    React.createElement(Foo, {bar: "ab'c"});
+  `).toMatchInlineSnapshot(`
+    <Foo bar='abc' />;
+    <Foo bar={'a\\\\nbc'} />;
+    <Foo bar={'ab\\\\tc'} />;
+    <Foo bar={'ab"c'} />;
+    <Foo bar="ab'c" />;
+  `));

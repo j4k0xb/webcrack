@@ -162,9 +162,11 @@ function convertAttributes(
 function convertAttributeValue(
   expression: t.Expression,
 ): t.JSXExpressionContainer | t.StringLiteral {
-  return expression.type === 'StringLiteral'
-    ? expression
-    : t.jsxExpressionContainer(expression);
+  if (expression.type === 'StringLiteral') {
+    const hasSpecialChars = /["\\]/.test(expression.value);
+    return hasSpecialChars ? t.jsxExpressionContainer(expression) : expression;
+  }
+  return t.jsxExpressionContainer(expression);
 }
 
 function convertChildren(
