@@ -6,6 +6,15 @@ import {
   constMemberExpression,
 } from '@webcrack/ast-utils';
 
+const DEFAULT_PRAGMA_CANDIDATES = [
+  'jsx',
+  'jsxs',
+  '_jsx',
+  '_jsxs',
+  'jsxDEV',
+  'jsxsDEV',
+] as const;
+
 /**
  * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
  * https://new-jsx-transform.netlify.app/
@@ -35,7 +44,7 @@ export default {
     const props = m.capture(m.objectExpression());
     const key = m.capture(m.anyExpression());
 
-    const jsxFunction = m.capture(m.or('jsx' as const, 'jsxs' as const));
+    const jsxFunction = m.capture(m.or(...DEFAULT_PRAGMA_CANDIDATES));
     // jsx(type, props, key?)
     const jsxMatcher = m.callExpression(
       m.identifier(jsxFunction),
@@ -158,7 +167,7 @@ function convertAttributeValue(
 
 function convertChildren(
   object: t.ObjectExpression,
-  fn: 'jsx' | 'jsxs',
+  pragma: string,
 ): (t.JSXText | t.JSXElement | t.JSXExpressionContainer)[] {
   const children = m.capture(m.anyExpression());
   const matcher = m.objectProperty(
@@ -169,7 +178,7 @@ function convertChildren(
   const prop = object.properties.find((prop) => matcher.match(prop));
   if (!prop) return [];
 
-  if (fn === 'jsxs' && t.isArrayExpression(children.current)) {
+  if (pragma.includes('jsxs') && t.isArrayExpression(children.current)) {
     return children.current.elements.map((child) =>
       convertChild(child as t.Expression),
     );
