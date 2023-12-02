@@ -228,6 +228,19 @@ export default function Sidebar(props: Props) {
         paths={props.paths}
         onFileClick={(node) => props.onFileClick?.(node.path)}
       />
+
+      <div class="flex flex-wrap gap-4 m-4 mt-auto">
+        <a
+          href="https://github.com/j4k0xb/webcrack"
+          class="link link-primary"
+          target="_blank"
+        >
+          GitHub
+        </a>
+        <a href="/docs" class="link link-primary" target="_blank">
+          Docs
+        </a>
+      </div>
     </nav>
   );
 }
