@@ -10,6 +10,7 @@ export { default as rawLiterals } from './raw-literals';
 export { default as sequence } from './sequence';
 export { default as splitVariableDeclarations } from './split-variable-declarations';
 export { default as ternaryToIf } from './ternary-to-if';
+export { default as unaryExpressions } from './unary-expressions';
 export { default as unminifyBooleans } from './unminify-booleans';
 export { default as voidToUndefined } from './void-to-undefined';
 export { default as yoda } from './yoda';
