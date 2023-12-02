@@ -15,7 +15,10 @@ export default {
     return {
       CallExpression: {
         exit(path) {
-          if (matcher.match(path.node) && !path.scope.hasBinding("JSON")) {
+          if (
+            matcher.match(path.node) &&
+            !path.scope.hasBinding("JSON", { noGlobals: true })
+          ) {
             try {
               JSON.parse(string.current!);
               const parsed = parseExpression(string.current!);

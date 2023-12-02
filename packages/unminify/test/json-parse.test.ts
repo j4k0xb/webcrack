@@ -5,11 +5,11 @@ import { jsonParse } from "../src/transforms";
 const expectJS = testTransform(jsonParse);
 
 test("array", () =>
-  expectJS('JSON.parse("[1,2,3]")').toMatchInlineSnapshot('JSON.parse("[1,2,3]");'));
+  expectJS('JSON.parse("[1,2,3]")').toMatchInlineSnapshot("[1, 2, 3];"));
 
 test("large literal", () =>
   expectJS('JSON.parse("1000000000000000000000")').toMatchInlineSnapshot(
-    'JSON.parse("1000000000000000000000");',
+    "1000000000000000000000;",
   ));
 
 test("ignore invalid json", () =>
