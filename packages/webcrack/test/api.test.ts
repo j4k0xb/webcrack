@@ -1,23 +1,25 @@
-import { describe, expect, test } from 'vitest';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { describe, expect, test, vi } from 'vitest';
 import { webcrack } from '../src';
 
-// const obfuscatedSrc = await readFile(
-//   join(__dirname, "samples/obfuscator.io.js"),
-//   "utf8",
-// );
-// const webpackSrc = await readFile(
-//   join(__dirname, "samples/webpack.js"),
-//   "utf8",
-// );
+const obfuscatedSrc = await readFile(
+  join(__dirname, '../../deobfuscate/test/samples/obfuscator.io.js'),
+  'utf8',
+);
+const webpackSrc = await readFile(
+  join(__dirname, '../../unpack/test/samples/webpack.js'),
+  'utf8',
+);
 
 describe('options', () => {
-  test.skip('no deobfuscate', async () => {
-    // await webcrack(webpackSrc, { deobfuscate: false });
+  test('no deobfuscate', async () => {
+    await webcrack(webpackSrc, { deobfuscate: false });
   });
 
-  test.skip('no unpack', async () => {
-    // const result = await webcrack(webpackSrc, { unpack: false });
-    // expect(result.bundle).toBeUndefined();
+  test('no unpack', async () => {
+    const result = await webcrack(webpackSrc, { unpack: false });
+    expect(result.bundle).toBeUndefined();
   });
 
   test('no jsx', async () => {
@@ -27,12 +29,12 @@ describe('options', () => {
     expect(result.code).toBe('React.createElement("div", null);');
   });
 
-  test.skip('custom sandbox', async () => {
-    // const sandbox = vi.fn((code: string) =>
-    //   /* isolated-vm or something */ Promise.resolve(code),
-    // );
-    // await webcrack(obfuscatedSrc, { sandbox });
-    // expect(sandbox).toHaveBeenCalledOnce();
+  test('custom sandbox', async () => {
+    const sandbox = vi.fn((code: string) =>
+      /* isolated-vm or something */ Promise.resolve(code),
+    );
+    await webcrack(obfuscatedSrc, { sandbox });
+    expect(sandbox).toHaveBeenCalledOnce();
   });
 
   test('mangle', async () => {
