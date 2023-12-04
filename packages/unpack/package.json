@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
-    "test": "vitest"
+    "test": "vitest --pool=vmThreads"
   },
   "dependencies": {
     "@babel/helper-validator-identifier": "^7.22.20",

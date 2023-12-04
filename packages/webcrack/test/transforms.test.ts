@@ -6,7 +6,7 @@ test('decode bookmarklet', async () => {
   const result = await webcrack(code);
   expect(result.code).toMatchInlineSnapshot(`
     "(function () {
-      alert(\\"hello world\\");
+      alert("hello world");
     })();"
   `);
 });

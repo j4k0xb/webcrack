@@ -18,7 +18,7 @@
     "tmp": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
-    "test": "vitest"
+    "test": "vitest --pool=vmThreads"
   },
   "repository": {
     "type": "git",
@@ -59,7 +59,7 @@
     "@types/babel__template": "^7.4.4",
     "@types/babel__traverse": "^7.20.4",
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.10.1",
+    "@types/node": "^20.10.3",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
     "esbuild": "^0.19.8",
