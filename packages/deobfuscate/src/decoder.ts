@@ -71,7 +71,6 @@ export class Decoder {
   }
 }
 
-// TODO: can also be a function assigned to a variable
 export function findDecoders(stringArray: StringArray): Decoder[] {
   const decoders: Decoder[] = [];
 

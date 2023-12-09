@@ -13,6 +13,7 @@ import deobfuscate, {
   createNodeSandbox,
 } from '@webcrack/deobfuscate';
 import debugProtection from '@webcrack/deobfuscate/src/debug-protection';
+import varFunctions from '@webcrack/deobfuscate/src/var-functions';
 import mergeObjectAssignments from '@webcrack/deobfuscate/src/merge-object-assignments';
 import selfDefending from '@webcrack/deobfuscate/src/self-defending';
 import { unminify } from '@webcrack/unminify';
@@ -133,6 +134,7 @@ export async function webcrack(
         blockStatements,
         sequence,
         splitVariableDeclarations,
+        varFunctions,
       ]);
     },
     options.deobfuscate &&
