@@ -21,7 +21,7 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
   const arrayExpression = m.capture(
     m.arrayExpression(m.arrayOf(m.stringLiteral())),
   );
-  // getStringArray = function () { return n; };
+  // getStringArray = function () { return array; };
   const functionAssignment = m.assignmentExpression(
     '=',
     m.identifier(m.fromCapture(functionName)),
@@ -46,7 +46,7 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
         m.returnStatement(m.callExpression(functionAssignment)),
       ]),
       // var array = ["hello", "world"];
-      // getStringArray = function () { return n; });
+      // getStringArray = function () { return array; });
       // return getStringArray();
       m.blockStatement([
         variableDeclaration,
