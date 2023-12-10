@@ -2,9 +2,12 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Transform } from '@webcrack/ast-utils';
 
+// Unsafe because variables may be used before they are declared, but functions are hoisted
+// Example: `console.log(a); var a = function() {}` logs `undefined`
+// `console.log(a); function a() {}` logs the function
 export default {
   name: 'var-functions',
-  tags: ['safe'],
+  tags: ['unsafe'],
   visitor() {
     const name = m.capture(m.identifier());
     const fn = m.capture(m.functionExpression(null));

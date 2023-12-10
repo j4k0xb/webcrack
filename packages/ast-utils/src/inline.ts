@@ -74,7 +74,6 @@ export function inlineFunctionAliases(binding: Binding): { changes: number } {
   const state = { changes: 0 };
   const refs = [...binding.referencePaths];
   for (const ref of refs) {
-    // TODO: can also be a function assigned to a variable
     const fn = findParent(ref, m.functionDeclaration());
 
     // E.g. alias
