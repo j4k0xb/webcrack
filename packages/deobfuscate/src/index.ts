@@ -11,7 +11,7 @@ import controlFlowSwitch from './control-flow-switch';
 import deadCode from './dead-code';
 import { findDecoders } from './decoder';
 import inlineDecodedStrings from './inline-decoded-strings';
-import inlineDecoderWrappers from './inline-decoder-wappers';
+import inlineDecoderWrappers from './inline-decoder-wrappers';
 import inlineObjectProps from './inline-object-props';
 import { findStringArray } from './string-array';
 import {
