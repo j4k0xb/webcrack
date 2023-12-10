@@ -10,7 +10,7 @@ import {
   createFunctionMatcher,
   findParent,
   getPropName,
-  inlineCfFunction,
+  inlineFunction,
   isReadonlyObject,
 } from '@webcrack/ast-utils';
 import mergeStrings from '../../unminify/src/transforms/merge-strings';
@@ -140,7 +140,7 @@ export default {
           if (t.isStringLiteral(value)) {
             memberPath.replaceWith(value);
           } else {
-            inlineCfFunction(
+            inlineFunction(
               value,
               memberPath.parentPath as NodePath<t.CallExpression>,
             );

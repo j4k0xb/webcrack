@@ -30,8 +30,8 @@ export function inlineArrayElements(
  * ->
  * `a(1)`
  */
-export function inlineCfFunction(
-  fn: t.FunctionExpression,
+export function inlineFunction(
+  fn: t.FunctionExpression | t.FunctionDeclaration,
   caller: NodePath<t.CallExpression>,
 ): void {
   if (t.isRestElement(fn.params[1])) {
@@ -66,7 +66,7 @@ export function inlineCfFunction(
 
 /**
  * Example:
- * `function alias(a, b) { return decode(b - 938, a); alias(1071, 1077);`
+ * `function alias(a, b) { return decode(b - 938, a); } alias(1071, 1077);`
  * ->
  * `decode(1077 - 938, 1071)`
  */
@@ -118,26 +118,7 @@ export function inlineFunctionAliases(binding: Binding): { changes: number } {
         .map((ref) => ref.parentPath!) as NodePath<t.CallExpression>[];
 
       for (const callRef of callRefs) {
-        const fnClone = t.cloneNode(fn.node, true);
-
-        // Inline all arguments
-        traverse(fnClone.body, {
-          Identifier(path) {
-            const paramIndex = fnClone.params.findIndex(
-              (p) => (p as t.Identifier).name === path.node.name,
-            );
-            if (paramIndex !== -1) {
-              path.replaceWith(callRef.node.arguments[paramIndex]);
-              path.skip();
-            }
-          },
-          noScope: true,
-        });
-
-        // Replace the alias call itself with the return value
-        callRef.replaceWith(
-          (fnClone.body.body[0] as t.ReturnStatement).argument!,
-        );
+        inlineFunction(fn.node, callRef);
         state.changes++;
       }
 
