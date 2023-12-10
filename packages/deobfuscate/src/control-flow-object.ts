@@ -36,6 +36,8 @@ export default {
           m.or(
             m.binaryExpression(undefined, left, right),
             m.logicalExpression(undefined, left, right),
+            m.binaryExpression(undefined, right, left),
+            m.logicalExpression(undefined, right, left),
           ),
         ),
       ]),
