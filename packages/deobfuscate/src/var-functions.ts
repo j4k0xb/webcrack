@@ -18,7 +18,7 @@ export default {
     return {
       VariableDeclaration: {
         exit(path) {
-          if (matcher.match(path.node)) {
+          if (matcher.match(path.node) && path.key !== 'init') {
             path.replaceWith(
               t.functionDeclaration(
                 name.current,
