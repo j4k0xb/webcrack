@@ -1,9 +1,11 @@
-import { parse } from '@babel/parser';
-import { Transform, applyTransform } from '@webcrack/ast-utils';
-import { expect } from 'vitest';
+import { ParseResult, parse } from '@babel/parser';
+import { Assertion, expect } from 'vitest';
+import { Transform, applyTransform } from '../src/ast-utils';
 
-export function testTransform<Options>(transform: Transform<Options>) {
-  return (input: string, options?: Options) => {
+export function testTransform<Options>(
+  transform: Transform<Options>,
+): (input: string, options?: Options) => Assertion<ParseResult<File>> {
+  return (input, options) => {
     const ast = parse(input, {
       sourceType: 'unambiguous',
       allowReturnOutsideFunction: true,

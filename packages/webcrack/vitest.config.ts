@@ -3,8 +3,7 @@ import { defineProject } from 'vitest/config';
 
 export default defineProject({
   test: {
-    root: join(__dirname, 'test'),
-    setupFiles: 'setup.ts',
+    setupFiles: join(__dirname, 'test', 'setup.ts'),
     include: ['**/*.test.ts'],
     isolate: false,
   },

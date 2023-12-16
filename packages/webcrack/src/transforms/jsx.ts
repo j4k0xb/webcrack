@@ -1,10 +1,6 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import {
-  Transform,
-  codePreview,
-  constMemberExpression,
-} from '@webcrack/ast-utils';
+import { Transform, codePreview, constMemberExpression } from '../ast-utils';
 
 export default {
   name: 'jsx',

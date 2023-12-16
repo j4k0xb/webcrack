@@ -39,19 +39,17 @@
     "unbundle"
   ],
   "dependencies": {
+    "@babel/generator": "^7.23.5",
     "@babel/helper-validator-identifier": "^7.22.20",
     "@babel/parser": "^7.23.5",
     "@babel/template": "^7.22.15",
     "@babel/traverse": "^7.23.5",
     "@babel/types": "^7.23.5",
     "@codemod/matchers": "^1.7.0",
-    "@webcrack/ast-utils": "workspace:*",
-    "@webcrack/deobfuscate": "workspace:*",
-    "@webcrack/unminify": "workspace:*",
-    "@webcrack/unpack": "workspace:*",
     "babel-plugin-minify-mangle-names": "^0.5.1",
     "commander": "^11.1.0",
-    "debug": "^4.3.4"
+    "debug": "^4.3.4",
+    "isolated-vm": "^4.6.0"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.7",

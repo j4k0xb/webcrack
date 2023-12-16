@@ -1,36 +1,36 @@
 import { ParseResult, parse } from '@babel/parser';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import debug from 'debug';
+import { join, normalize } from 'node:path';
 import {
   applyTransform,
   applyTransformAsync,
   applyTransforms,
   generate,
-} from '@webcrack/ast-utils';
+} from './ast-utils';
 import deobfuscate, {
   Sandbox,
   createBrowserSandbox,
   createNodeSandbox,
-} from '@webcrack/deobfuscate';
-import debugProtection from '@webcrack/deobfuscate/src/debug-protection';
-import varFunctions from '@webcrack/deobfuscate/src/var-functions';
-import mergeObjectAssignments from '@webcrack/deobfuscate/src/merge-object-assignments';
-import selfDefending from '@webcrack/deobfuscate/src/self-defending';
-import { unminify } from '@webcrack/unminify';
+} from './deobfuscate';
+import debugProtection from './deobfuscate/debug-protection';
+import mergeObjectAssignments from './deobfuscate/merge-object-assignments';
+import selfDefending from './deobfuscate/self-defending';
+import varFunctions from './deobfuscate/var-functions';
+import jsx from './transforms/jsx';
+import jsxNew from './transforms/jsx-new';
+import mangle from './transforms/mangle';
+import { unminify } from './unminify';
 import {
   blockStatements,
   sequence,
   splitVariableDeclarations,
-} from '@webcrack/unminify/transforms';
-import { Bundle, unpackAST } from '@webcrack/unpack';
-import debug from 'debug';
-import { join, normalize } from 'node:path';
-import jsx from './transforms/jsx';
-import jsxNew from './transforms/jsx-new';
-import mangle from './transforms/mangle';
+} from './unminify/transforms';
+import { Bundle, unpackAST } from './unpack';
 import { isBrowser } from './utils/platform';
 
-export { type Sandbox } from '@webcrack/deobfuscate';
+export { type Sandbox } from './deobfuscate';
 
 export interface WebcrackResult {
   code: string;

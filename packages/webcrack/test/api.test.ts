@@ -4,11 +4,11 @@ import { describe, expect, test, vi } from 'vitest';
 import { webcrack } from '../src';
 
 const obfuscatedSrc = await readFile(
-  join(__dirname, '../../deobfuscate/test/samples/obfuscator.io.js'),
+  join(__dirname, '../src/deobfuscate/test/samples/obfuscator.io.js'),
   'utf8',
 );
 const webpackSrc = await readFile(
-  join(__dirname, '../../unpack/test/samples/webpack.js'),
+  join(__dirname, '../src/unpack/test/samples/webpack.js'),
   'utf8',
 );
 

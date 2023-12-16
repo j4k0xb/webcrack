@@ -1,6 +1,6 @@
 import * as t from '@babel/types';
-import { generate } from '@webcrack/ast-utils';
 import { expect } from 'vitest';
+import { generate } from '../src/ast-utils';
 
 expect.addSnapshotSerializer({
   test: (val: unknown) => t.isNode(val) && !('parentPath' in val),

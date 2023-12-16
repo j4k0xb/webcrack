@@ -1,7 +1,7 @@
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { Transform } from '@webcrack/ast-utils';
 import mangle from 'babel-plugin-minify-mangle-names';
+import { Transform } from '../ast-utils';
 
 export default {
   name: 'mangle',
