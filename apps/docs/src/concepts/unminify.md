@@ -27,7 +27,7 @@ console.log(a); // [!code ++]
 Infinity // [!code ++]
 ```
 
-### json-parse
+## json-parse
 
 ```js
 JSON.parse("[1,2,3]") // [!code --]
