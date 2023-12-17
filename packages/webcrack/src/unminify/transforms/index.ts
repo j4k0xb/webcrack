@@ -11,6 +11,7 @@ export { default as sequence } from './sequence';
 export { default as splitVariableDeclarations } from './split-variable-declarations';
 export { default as templateLiterals } from './template-literals';
 export { default as ternaryToIf } from './ternary-to-if';
+export { default as typeofUndefined } from './typeof-undefined';
 export { default as unaryExpressions } from './unary-expressions';
 export { default as unminifyBooleans } from './unminify-booleans';
 export { default as voidToUndefined } from './void-to-undefined';

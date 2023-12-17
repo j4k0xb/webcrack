@@ -178,6 +178,18 @@ if (a) { // [!code ++]
 } // [!code ++]
 ```
 
+## typeof-undefined
+
+```js
+typeof a > "u" // [!code --]
+typeof a === "undefined" // [!code ++]
+```
+
+```js
+typeof a < "u" // [!code --]
+typeof a !== "undefined" // [!code ++]
+```
+
 ## unminify-booleans
 
 ```js
