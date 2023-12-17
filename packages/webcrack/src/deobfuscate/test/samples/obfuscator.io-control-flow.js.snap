@@ -1,0 +1,9 @@
+function applyTransforms() {
+  this.modules.forEach(varInjection_1.inlineVarInjections);
+  this.modules.forEach(esm_1.convertESM);
+  (0, getDefaultExport_1.convertDefaultRequire)(this);
+  this.replaceRequireCalls();
+  var f = m.capture(m.numericLiteral());
+  var g = m.callExpression(m.identifier("require"), [f]);
+  return g;
+}

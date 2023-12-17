@@ -7,13 +7,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "runtimeExecutable": "npm",
+      "name": "Deobfuscate tmp file",
+      "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "run",
-        "dev"
+        "tmp"
       ],
-      "cwd": "${workspaceFolder}/tmp",
+      "cwd": "${workspaceFolder}/packages/webcrack",
       "outputCapture": "std",
       "skipFiles": [
         "<node_internals>/**"

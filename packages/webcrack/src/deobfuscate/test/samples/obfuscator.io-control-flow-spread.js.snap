@@ -1,0 +1,4 @@
+function hi() {
+  return m.functionExpression(undefined, captures.map(m.identifier), m.blockStatement(body(...captures.map(_0x56f63c => m.identifier(m.fromCapture(_0x56f63c))), ...arr)));
+}
+hi();

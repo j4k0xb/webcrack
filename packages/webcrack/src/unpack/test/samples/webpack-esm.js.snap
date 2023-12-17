@@ -1,0 +1,50 @@
+WebpackBundle {
+  "entryId": "0",
+  "modules": Map {
+    "0" => WebpackModule {
+      "ast": const a = require("./1.js");
+const b = require("./2.js");
+const c = require("./3.js");
+const bDefault = b.default;
+const cDefault = c;
+const dDefault = b.default;
+const eDefault = c;
+console.log(a.counter);
+console.log(bDefault.VERSION);
+console.log(cDefault.VERSION);,
+      "id": "0",
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    "1" => WebpackModule {
+      "ast": export class counter {}
+let _counter = 1;
+counter = 2;,
+      "id": "1",
+      "isEntry": false,
+      "path": "./1.js",
+    },
+    "2" => WebpackModule {
+      "ast": const x = {};
+export default 1;,
+      "id": "2",
+      "isEntry": false,
+      "path": "./2.js",
+    },
+    "3" => WebpackModule {
+      "ast": module.exports = {
+  VERSION: 1
+};,
+      "id": "3",
+      "isEntry": false,
+      "path": "./3.js",
+    },
+    "4" => WebpackModule {
+      "ast": export default class f {},
+      "id": "4",
+      "isEntry": false,
+      "path": "./4.js",
+    },
+  },
+  "type": "webpack",
+}

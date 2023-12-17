@@ -1,71 +1,25 @@
 {
-  "name": "webcrack",
-  "version": "2.10.0",
-  "description": "Deobfuscate, unminify and unpack bundled javascript",
-  "author": "j4k0xb",
-  "license": "MIT",
-  "type": "module",
-  "main": "dist/index.js",
-  "browser": "dist/browser.js",
-  "bin": "dist/cli.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "private": true,
   "scripts": {
-    "build": "node esbuild.config.js",
-    "postbuild": "tsc -p tsconfig.build.json",
-    "watch": "node esbuild.config.js --watch",
-    "start": "node dist/cli.js",
-    "dev": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
-    "lint": "eslint --ext .ts .",
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/j4k0xb/webcrack"
-  },
-  "homepage": "https://webcrack.netlify.app",
-  "keywords": [
-    "webpack",
-    "bundle",
-    "extract",
-    "reverse-engineering",
-    "ast",
-    "deobfuscation",
-    "unpack",
-    "debundle",
-    "deobfuscator",
-    "unminify",
-    "unbundle"
-  ],
-  "dependencies": {
-    "@babel/generator": "^7.22.10",
-    "@babel/helper-validator-identifier": "^7.22.5",
-    "@babel/parser": "^7.22.10",
-    "@babel/template": "^7.22.5",
-    "@babel/traverse": "^7.22.10",
-    "@babel/types": "^7.22.10",
-    "@codemod/matchers": "^1.7.0",
-    "babel-plugin-minify-mangle-names": "^0.5.1",
-    "commander": "^11.0.0",
-    "debug": "^4.3.4",
-    "isolated-vm": "^4.6.0"
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "test": "vitest --pool=vmThreads",
+    "test:coverage": "vitest --coverage",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@types/babel__generator": "^7.6.4",
-    "@types/babel__helper-validator-identifier": "^7.15.0",
-    "@types/babel__template": "^7.4.1",
-    "@types/babel__traverse": "^7.20.1",
-    "@types/debug": "^4.1.8",
-    "@types/node": "^20.5.0",
-    "@typescript-eslint/eslint-plugin": "^6.3.0",
-    "@typescript-eslint/parser": "^6.3.0",
-    "@vitest/coverage-istanbul": "^0.34.1",
-    "esbuild": "^0.19.2",
-    "eslint": "^8.47.0",
-    "typescript": "^5.1.6",
-    "vitest": "^0.34.1"
+    "@webcrack/eslint-config": "workspace:*",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "turbo": "^1.10.16",
+    "vitest": "^1.0.0"
+  },
+  "packageManager": "pnpm@8.11.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch"
+    }
   }
 }

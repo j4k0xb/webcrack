@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`inline decoder > inline function 1`] = `
+"function decoder() {}
+decoder(1);
+(() => {
+  decoder(2 - 625, 3);
+  (() => {
+    decoder(5 - -678 - 625, 4);
+  })();
+})();"
+`;
+
+exports[`inline decoder > inline variable 1`] = `
+"function decoder() {}
+decoder(1);
+() => {
+  decoder(2);
+  decoder(3);
+  () => {
+    alias(4);
+  };
+  decoder(5);
+};"
+`;

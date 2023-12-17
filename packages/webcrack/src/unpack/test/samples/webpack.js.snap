@@ -1,0 +1,32 @@
+WebpackBundle {
+  "entryId": "2",
+  "modules": Map {
+    "1" => WebpackModule {
+      "ast": const a = require("./3.js");,
+      "id": "1",
+      "isEntry": false,
+      "path": "./1.js",
+    },
+    "2" => WebpackModule {
+      "ast": const a = require("./1.js");
+const _module = 1;
+module.exports.color = '#FBC02D';
+{
+  const _module2 = 2;
+  console.log(_module2);
+  console.log(module);
+}
+exports.a = 3;,
+      "id": "2",
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    "3" => WebpackModule {
+      "ast": module.exports = 4;,
+      "id": "3",
+      "isEntry": false,
+      "path": "./3.js",
+    },
+  },
+  "type": "webpack",
+}

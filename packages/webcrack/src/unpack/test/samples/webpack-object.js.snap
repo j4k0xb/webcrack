@@ -1,0 +1,18 @@
+WebpackBundle {
+  "entryId": "386",
+  "modules": Map {
+    "386" => WebpackModule {
+      "ast": const r = require("./387.js")['default'];,
+      "id": "386",
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    "387" => WebpackModule {
+      "ast": module.exports = 'test';,
+      "id": "387",
+      "isEntry": false,
+      "path": "./387.js",
+    },
+  },
+  "type": "webpack",
+}

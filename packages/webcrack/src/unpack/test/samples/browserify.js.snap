@@ -1,0 +1,57 @@
+BrowserifyBundle {
+  "entryId": "2",
+  "modules": Map {
+    "1" => BrowserifyModule {
+      "ast": function add(a, b) {
+  return a + b;
+}
+module.exports = add;,
+      "dependencies": {},
+      "id": "1",
+      "isEntry": false,
+      "path": "add.js",
+    },
+    "2" => BrowserifyModule {
+      "ast": var sum = require('./sum');
+var numbers = [1, 2, 3];
+var result = sum(numbers);
+var outputElement = document.getElementById('output');
+outputElement.innerHTML = result;,
+      "dependencies": {
+        "4": "./sum",
+      },
+      "id": "2",
+      "isEntry": true,
+      "path": "index.js",
+    },
+    "3" => BrowserifyModule {
+      "ast": function reduce(list, iteratee, memo) {
+  list.forEach(function (item) {
+    memo = iteratee(item, memo);
+  });
+  return memo;
+}
+module.exports = reduce;,
+      "dependencies": {},
+      "id": "3",
+      "isEntry": false,
+      "path": "reduce.js",
+    },
+    "4" => BrowserifyModule {
+      "ast": var reduce = require('./reduce');
+var add = require('./add');
+function sum(list) {
+  return reduce(list, add, 0);
+}
+module.exports = sum;,
+      "dependencies": {
+        "1": "./add",
+        "3": "./reduce",
+      },
+      "id": "4",
+      "isEntry": false,
+      "path": "sum.js",
+    },
+  },
+  "type": "browserify",
+}

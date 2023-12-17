@@ -1,0 +1,26 @@
+WebpackBundle {
+  "entryId": "0",
+  "modules": Map {
+    "0" => WebpackModule {
+      "ast": import * as m from "./1.js";
+import * as n from "./2.js";
+console.log(m, n);,
+      "id": "0",
+      "isEntry": true,
+      "path": "./index.js",
+    },
+    "1" => WebpackModule {
+      "ast": module.exports = 1;,
+      "id": "1",
+      "isEntry": false,
+      "path": "./1.js",
+    },
+    "2" => WebpackModule {
+      "ast": module.exports = 2;,
+      "id": "2",
+      "isEntry": false,
+      "path": "./2.js",
+    },
+  },
+  "type": "webpack",
+}
