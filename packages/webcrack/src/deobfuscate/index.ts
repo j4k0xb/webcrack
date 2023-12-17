@@ -59,11 +59,10 @@ export default {
     decoders.forEach((decoder) => decoder.path.remove());
     state.changes += 2 + decoders.length;
 
-    state.changes += applyTransforms(ast, [
-      mergeStrings,
-      deadCode,
-      controlFlowObject,
-      controlFlowSwitch,
-    ]).changes;
+    state.changes += applyTransforms(
+      ast,
+      [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
+      true,
+    ).changes;
   },
 } satisfies AsyncTransform<Sandbox>;

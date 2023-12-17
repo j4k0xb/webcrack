@@ -1,8 +1,7 @@
 import { parse } from '@babel/parser';
-import traverse, { Visitor, visitors } from '@babel/traverse';
+import traverse, { visitors } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { TransformState } from '../ast-utils';
 import { unpackBrowserify } from './browserify';
 import { Bundle } from './bundle';
 import { unpackWebpack } from './webpack';
@@ -26,11 +25,10 @@ export function unpackAST(
   mappings: Record<string, m.Matcher<unknown>> = {},
 ): Bundle | undefined {
   const options: { bundle: Bundle | undefined } = { bundle: undefined };
-  const traverseOptions: Visitor<TransformState>[] = [
+  const visitor = visitors.merge([
     unpackWebpack.visitor(options),
     unpackBrowserify.visitor(options),
-  ];
-  const visitor = visitors.merge(traverseOptions);
+  ]);
   traverse(ast, visitor, undefined, { changes: 0 });
   // TODO: applyTransforms(ast, [unpackWebpack, unpackBrowserify]) instead
   if (options.bundle) {

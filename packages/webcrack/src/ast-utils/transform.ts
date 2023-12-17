@@ -1,4 +1,4 @@
-import traverse, { Node, TraverseOptions, visitors } from '@babel/traverse';
+import traverse, { Node, TraverseOptions, Visitor, visitors } from '@babel/traverse';
 
 export async function applyTransformAsync<TOptions>(
   ast: Node,
@@ -18,14 +18,15 @@ export function applyTransform<TOptions>(
   ast: Node,
   transform: Transform<TOptions>,
   options?: TOptions,
+  noScopeOverride?: boolean,
 ): TransformState {
   const state: TransformState = { changes: 0 };
 
   transform.run?.(ast, state, options);
 
   if (transform.visitor) {
-    const visitor = transform.visitor(options);
-    visitor.noScope = !transform.scope;
+    const visitor = transform.visitor(options) as TraverseOptions<TransformState>;
+    visitor.noScope = noScopeOverride || !transform.scope;
     traverse(ast, visitor, undefined, state);
   }
 
@@ -35,6 +36,7 @@ export function applyTransform<TOptions>(
 export function applyTransforms(
   ast: Node,
   transforms: Transform[],
+  noScopeOverride?: boolean,
 ): TransformState {
   const state: TransformState = { changes: 0 };
 
@@ -46,7 +48,7 @@ export function applyTransforms(
   if (traverseOptions.length > 0) {
     const visitor: TraverseOptions<TransformState> =
       visitors.merge(traverseOptions);
-    visitor.noScope = transforms.every((t) => !t.scope);
+    visitor.noScope = noScopeOverride || transforms.every((t) => !t.scope);
     traverse(ast, visitor, undefined, state);
   }
 
@@ -62,7 +64,7 @@ export interface Transform<TOptions = unknown> {
   tags: Tag[];
   scope?: boolean;
   run?: (ast: Node, state: TransformState, options?: TOptions) => void;
-  visitor?: (options?: TOptions) => TraverseOptions<TransformState>;
+  visitor?: (options?: TOptions) => Visitor<TransformState>;
 }
 
 export interface AsyncTransform<TOptions = unknown>

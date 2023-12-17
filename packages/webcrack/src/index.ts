@@ -153,6 +153,7 @@ export async function webcrack(
             options.deobfuscate ? [selfDefending, debugProtection] : [],
             options.jsx ? [jsx, jsxNew] : [],
           ].flat(),
+          true,
         );
       }),
     options.deobfuscate && (() => applyTransform(ast, mergeObjectAssignments)),
