@@ -12,7 +12,9 @@ export const unminify = {
   tags: ['safe'],
   scope: true,
   run(ast, state) {
-    state.changes += applyTransforms(ast, Object.values(transforms)).changes;
+    state.changes += applyTransforms(ast, Object.values(transforms), {
+      log: false,
+    }).changes;
   },
 } satisfies Transform;
 

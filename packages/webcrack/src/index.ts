@@ -130,12 +130,11 @@ export async function webcrack(
       }));
     },
     () => {
-      return applyTransforms(ast, [
-        blockStatements,
-        sequence,
-        splitVariableDeclarations,
-        varFunctions,
-      ]);
+      return applyTransforms(
+        ast,
+        [blockStatements, sequence, splitVariableDeclarations, varFunctions],
+        { name: 'prepare' },
+      );
     },
     options.deobfuscate &&
       (() => applyTransformAsync(ast, deobfuscate, options.sandbox)),
@@ -153,7 +152,7 @@ export async function webcrack(
             options.deobfuscate ? [selfDefending, debugProtection] : [],
             options.jsx ? [jsx, jsxNew] : [],
           ].flat(),
-          true,
+          { noScope: true },
         );
       }),
     options.deobfuscate && (() => applyTransform(ast, mergeObjectAssignments)),

@@ -1,5 +1,6 @@
 import { NodePath } from '@babel/traverse';
 import { CallExpression } from '@babel/types';
+import debug from 'debug';
 import { generate } from '../ast-utils';
 import { ArrayRotator } from './array-rotator';
 import { Decoder } from './decoder';
@@ -67,7 +68,12 @@ export class VMDecoder {
       return [${calls.join(',')}]
     })()`;
 
-    const result = await this.sandbox(code);
-    return result as unknown[];
+    try {
+      const result = await this.sandbox(code);
+      return result as unknown[];
+    } catch (error) {
+      debug('webcrack:deobfuscate')('vm code:', code);
+      throw error;
+    }
   }
 }

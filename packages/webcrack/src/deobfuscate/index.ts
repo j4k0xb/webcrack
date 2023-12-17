@@ -1,3 +1,4 @@
+import debug from 'debug';
 import {
   AsyncTransform,
   applyTransform,
@@ -32,12 +33,20 @@ export default {
   async run(ast, state, sandbox) {
     if (!sandbox) return;
 
+    const logger = debug('webcrack:deobfuscate');
     const stringArray = findStringArray(ast);
+    logger(
+      stringArray
+        ? `String Array: ${stringArray.length} strings`
+        : 'String Array: no'
+    );
     if (!stringArray) return;
 
     const rotator = findArrayRotator(stringArray);
+    logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
 
     const decoders = findDecoders(stringArray);
+    logger(`String Array Encodings: ${decoders.length}`);
 
     state.changes += applyTransform(ast, inlineObjectProps).changes;
 
@@ -62,7 +71,7 @@ export default {
     state.changes += applyTransforms(
       ast,
       [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
-      true,
+      { noScope: true },
     ).changes;
   },
 } satisfies AsyncTransform<Sandbox>;

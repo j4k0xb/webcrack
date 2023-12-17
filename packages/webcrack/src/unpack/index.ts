@@ -5,6 +5,7 @@ import * as m from '@codemod/matchers';
 import { unpackBrowserify } from './browserify';
 import { Bundle } from './bundle';
 import { unpackWebpack } from './webpack';
+import debug from 'debug';
 
 export { Bundle } from './bundle';
 
@@ -34,6 +35,7 @@ export function unpackAST(
   if (options.bundle) {
     options.bundle.applyMappings(mappings);
     options.bundle.applyTransforms();
+    debug('webcrack:unpack')('Bundle:', options.bundle.type);
   }
   return options.bundle;
 }
