@@ -38,7 +38,7 @@ export default {
     logger(
       stringArray
         ? `String Array: ${stringArray.length} strings`
-        : 'String Array: no'
+        : 'String Array: no',
     );
     if (!stringArray) return;
 
