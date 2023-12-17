@@ -1,4 +1,4 @@
-[![Test](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml/badge.svg)](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml)
+[![Test](https://github.com/j4k0xb/webcrack/actions/workflows/ci.yml/badge.svg)](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml)
 [![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
 [![license](https://img.shields.io/github/license/j4k0xb/webcrack)](https://github.com/j4k0xb/webcrack/blob/master/LICENSE)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/ba64bf80-7053-4ed8-a282-d3762742c0dd/deploy-status)](https://app.netlify.com/sites/webcrack/deploys)
@@ -16,7 +16,7 @@ to resemble the original source code as much as possible.
 
 Try it in the [online playground](https://webcrack.netlify.app/) or view the [documentation](https://webcrack.netlify.app/docs).
 
-- 🚀 **Performance** - 500% faster than [synchrony](https://github.com/relative/synchrony)
+- 🚀 **Performance** - Various optimizations to make it fast
 - 🛡️ **Safety** - Considers variable references and scope
 - 🔬 **Auto-detection** - Finds code patterns without needing a config
 - ✍🏻 **Readability** - Removes obfuscator/bundler artifacts
