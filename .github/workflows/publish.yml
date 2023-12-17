@@ -22,7 +22,9 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm build --filter webcrack
+        run: |
+          pnpm build --filter webcrack
+          cp README.md packages/webcrack
 
       - name: Publish
         run: pnpm publish --filter webcrack
