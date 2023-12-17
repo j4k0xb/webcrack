@@ -86,13 +86,23 @@ test('rearrange variable declarator', () =>
     var t = o;
   `));
 
-test('rearrange assignment', () =>
+test('rearrange assignment', () => {
   expectJS(`
     t = (o = null, o);
   `).toMatchInlineSnapshot(`
     o = null;
     t = o;
-  `));
+  `);
+
+  expectJS(`
+    for (;;) a = (b, c);
+  `).toMatchInlineSnapshot(`
+    for (;;) {
+      b;
+      a = c;
+    }
+  `);
+});
 
 test('dont rearrange variable declarator in for loop', () =>
   expectJS(`

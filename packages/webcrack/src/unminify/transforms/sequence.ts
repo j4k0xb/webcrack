@@ -36,10 +36,10 @@ export default {
             const statements = assignedSequence.current!.expressions.map(
               (expr) => t.expressionStatement(expr),
             );
-            path.insertBefore(statements);
             (path.get('expression.right') as NodePath<t.Node>).replaceWith(
               value,
             );
+            path.insertBefore(statements);
             this.changes++;
           }
         },
