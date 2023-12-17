@@ -91,7 +91,16 @@ function App() {
 
     if (result.files.length === 0) {
       model ||= openUntitledTab();
-      model.setValue(result.code);
+      model.pushEditOperations(
+        [],
+        [
+          {
+            range: model.getFullModelRange(),
+            text: result.code,
+          },
+        ],
+        () => null,
+      );
       return;
     }
 
@@ -101,7 +110,6 @@ function App() {
 
     model.setValue(result.code);
 
-    // Dispose previous file models
     fileModels().forEach((model) => model.dispose());
     setTabs(untitledModels());
 
