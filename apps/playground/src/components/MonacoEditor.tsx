@@ -1,4 +1,3 @@
-// TODO: run babel in the worker instead to avoid bundling it 2x
 import * as monaco from 'monaco-editor';
 import { createEffect, onCleanup, onMount } from 'solid-js';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
@@ -20,7 +19,7 @@ monaco.editor.defineTheme('dark', {
 });
 
 export default function MonacoEditor(props: Props) {
-  const { deobfuscate, deobfuscating } = useDeobfuscateContext();
+  const { deobfuscate } = useDeobfuscateContext();
   const [theme] = useTheme();
   const viewStates = new WeakMap<
     monaco.editor.ITextModel,
@@ -46,7 +45,7 @@ export default function MonacoEditor(props: Props) {
     createEffect(() => {
       // TODO: only update current model, or model where the deobfuscation started from
       //
-      editor.updateOptions({ readOnly: deobfuscating() });
+      // editor.updateOptions({ readOnly: deobfuscating() });
     });
 
     function setModel(model?: monaco.editor.ITextModel) {
