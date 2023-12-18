@@ -32,6 +32,7 @@ export default function MonacoEditor(props: Props) {
       language: 'javascript',
       automaticLayout: true,
       wordWrap: 'on',
+      tabSize: 2,
     });
 
     createEffect(() => {
