@@ -69,7 +69,7 @@ export default function Sidebar(props: Props) {
         </Show>
       </div>
 
-      <label class="label cursor-pointer px-4 hover:bg-base-100">
+      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
         <svg
           width="28"
           height="28"
@@ -86,7 +86,14 @@ export default function Sidebar(props: Props) {
           <path d="M17 17l-2 2l2 2" />
         </svg>
         <span class="label-text ml-4 mr-auto hidden sm:inline">
-          Deobfuscate
+          Deobfuscate{' '}
+          <a
+            href="/docs/concepts/deobfuscate.html"
+            target="_blank"
+            class="link p-2 hidden group-hover:inline"
+          >
+            ?
+          </a>
         </span>
         <input
           type="checkbox"
@@ -95,7 +102,44 @@ export default function Sidebar(props: Props) {
           onClick={(e) => setSettings('deobfuscate', e.currentTarget.checked)}
         />
       </label>
-      <label class="label cursor-pointer px-4 hover:bg-base-100">
+      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M5 21h14" />
+          <path d="M6 18h2" />
+          <path d="M7 18v3" />
+          <path d="M9 11l3 3l6 -6l-3 -3z" />
+          <path d="M10.5 12.5l-1.5 1.5" />
+          <path d="M17 3l3 3" />
+          <path d="M12 21a6 6 0 0 0 3.715 -10.712" />
+        </svg>
+        <span class="label-text ml-4 mr-auto hidden sm:inline">
+          Unminify{' '}
+          <a
+            href="/docs/concepts/unminify.html"
+            target="_blank"
+            class="link p-2 hidden group-hover:inline"
+          >
+            ?
+          </a>
+        </span>
+        <input
+          type="checkbox"
+          class="checkbox checkbox-sm hidden sm:inline"
+          checked={settings.unminify}
+          onClick={(e) => setSettings('unminify', e.currentTarget.checked)}
+        />
+      </label>
+      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
         <svg
           width="28"
           height="28"
@@ -114,7 +158,14 @@ export default function Sidebar(props: Props) {
           <path d="M16 5.25l-8 4.5" />
         </svg>
         <span class="label-text ml-4 mr-auto hidden sm:inline">
-          Unpack Bundle
+          Unpack Bundle{' '}
+          <a
+            href="/docs/concepts/unpack.html"
+            target="_blank"
+            class="link p-2 hidden group-hover:inline"
+          >
+            ?
+          </a>
         </span>
         <input
           type="checkbox"
@@ -123,7 +174,7 @@ export default function Sidebar(props: Props) {
           onClick={(e) => setSettings('unpack', e.currentTarget.checked)}
         />
       </label>
-      <label class="label cursor-pointer px-4 hover:bg-base-100">
+      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
         <svg
           width="28"
           height="28"
@@ -144,7 +195,14 @@ export default function Sidebar(props: Props) {
           <path d="M11.5 12.866a1 1 0 1 0 1 -1.732a1 1 0 0 0 -1 1.732z" />
         </svg>
         <span class="label-text ml-4 mr-auto hidden sm:inline">
-          Decompile JSX
+          Decompile JSX{' '}
+          <a
+            href="/docs/concepts/jsx.html"
+            target="_blank"
+            class="link p-2 hidden group-hover:inline"
+          >
+            ?
+          </a>
         </span>
         <input
           type="checkbox"

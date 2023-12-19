@@ -51,6 +51,7 @@ The default options are:
 await webcrack(code, {
   jsx: true, // Decompile react components to JSX
   unpack: true, // Extract modules from the bundle
+  unminify: true, // Unminify the code
   deobfuscate: true, // Deobfuscate the code
   mangle: false, // Mangle variable names
 });

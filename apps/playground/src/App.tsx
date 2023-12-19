@@ -9,10 +9,11 @@ import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
 import { DeobfuscateResult } from './webcrack.worker';
 
 export const [settings, setSettings] = createStore({
-  mangle: false,
   deobfuscate: true,
-  jsx: true,
+  unminify: true,
   unpack: true,
+  jsx: true,
+  mangle: false,
 });
 
 function App() {

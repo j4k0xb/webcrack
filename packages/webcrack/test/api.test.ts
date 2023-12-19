@@ -17,6 +17,11 @@ describe('options', () => {
     await webcrack(webpackSrc, { deobfuscate: false });
   });
 
+  test('no unminify', async () => {
+    const result = await webcrack('console["log"](1)', { unminify: false });
+    expect(result.code).toBe('console["log"](1);');
+  });
+
   test('no unpack', async () => {
     const result = await webcrack(webpackSrc, { unpack: false });
     expect(result.bundle).toBeUndefined();

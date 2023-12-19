@@ -59,6 +59,11 @@ export interface Options {
    */
   deobfuscate?: boolean;
   /**
+   * Unminify the code. Required for some of the deobfuscate/unpack/jsx transforms.
+   * @default true
+   */
+  unminify?: boolean;
+  /**
    * Mangle variable names.
    * @default false
    */
@@ -90,6 +95,7 @@ export interface Options {
 function mergeOptions(options: Options): asserts options is Required<Options> {
   const mergedOptions: Required<Options> = {
     jsx: true,
+    unminify: true,
     unpack: true,
     deobfuscate: true,
     mangle: false,
@@ -138,9 +144,10 @@ export async function webcrack(
     },
     options.deobfuscate &&
       (() => applyTransformAsync(ast, deobfuscate, options.sandbox)),
-    () => {
-      applyTransform(ast, unminify);
-    },
+    options.unminify &&
+      (() => {
+        applyTransform(ast, unminify);
+      }),
     options.mangle && (() => applyTransform(ast, mangle)),
     // TODO: Also merge unminify visitor (breaks selfDefending/debugProtection atm)
     (options.deobfuscate || options.jsx) &&
