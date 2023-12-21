@@ -1,13 +1,13 @@
-import { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
   Transform,
   constKey,
   constMemberExpression,
-  getPropName,
+  inlineObjectProperties,
   isReadonlyObject,
 } from '../ast-utils';
+
+// TODO: move do decoder.ts collectCalls to avoid traversing the whole AST
 
 /**
  * Inline objects that only have string or numeric literal properties.
@@ -61,33 +61,13 @@ export default {
         const binding = path.scope.getBinding(varId.current!.name);
         if (!binding || !isReadonlyObject(binding, memberAccess)) return;
 
-        const props = new Map(
-          objectProperties.current!.map((p) => [
-            getPropName(p.key),
-            p.value as t.StringLiteral | t.NumericLiteral,
-          ]),
+        inlineObjectProperties(
+          binding,
+          m.objectProperty(
+            propertyKey,
+            m.or(m.stringLiteral(), m.numericLiteral()),
+          ),
         );
-
-        if (
-          !binding.referencePaths.every((ref) => {
-            const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
-            const propName = getPropName(memberPath.node.property)!;
-            return props.has(propName);
-          })
-        )
-          return;
-
-        binding.referencePaths.forEach((ref) => {
-          const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
-          const propName = getPropName(memberPath.node.property)!;
-          const value = props.get(propName)!;
-
-          memberPath.replaceWith(value);
-          this.changes++;
-        });
-
-        path.remove();
-        this.changes++;
       },
     };
   },

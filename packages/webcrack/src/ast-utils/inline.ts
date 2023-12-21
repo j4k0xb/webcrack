@@ -1,7 +1,31 @@
 import traverse, { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import { getPropName } from '.';
 import { findParent } from './matcher';
+
+/**
+ * Replace all references of a variable with the initializer.
+ * Make sure the binding is immutable before using!
+ * Example:
+ * `const a = 1; console.log(a);` -> `console.log(1);`
+ */
+export function inlineVariable(
+  binding: Binding,
+  init?: m.Matcher<t.Expression>,
+) {
+  const varDeclarator = binding.path.node;
+  const varMatcher = m.variableDeclarator(
+    m.identifier(binding.identifier.name),
+    init,
+  );
+  if (varMatcher.match(varDeclarator)) {
+    binding.referencePaths.forEach((ref) => {
+      ref.replaceWith(varDeclarator.init!);
+    });
+    binding.path.remove();
+  }
+}
 
 /**
  * Make sure the array is immutable and references are valid before using!
@@ -20,6 +44,41 @@ export function inlineArrayElements(
     const replacement = array.elements[index]!;
     memberPath.replaceWith(replacement);
   }
+}
+
+export function inlineObjectProperties(
+  binding: Binding,
+  property = m.objectProperty(),
+): void {
+  const varDeclarator = binding.path.node;
+  const objectProperties = m.capture(m.arrayOf(property));
+  const varMatcher = m.variableDeclarator(
+    m.identifier(binding.identifier.name),
+    m.objectExpression(objectProperties),
+  );
+  if (!varMatcher.match(varDeclarator)) return;
+
+  const propertyMap = new Map(
+    objectProperties.current!.map((p) => [getPropName(p.key), p.value]),
+  );
+  if (
+    !binding.referencePaths.every((ref) => {
+      const member = ref.parent as t.MemberExpression;
+      const propName = getPropName(member.property)!;
+      return propertyMap.has(propName);
+    })
+  )
+    return;
+
+  binding.referencePaths.forEach((ref) => {
+    const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
+    const propName = getPropName(memberPath.node.property)!;
+    const value = propertyMap.get(propName)!;
+
+    memberPath.replaceWith(value);
+  });
+
+  binding.path.remove();
 }
 
 /**

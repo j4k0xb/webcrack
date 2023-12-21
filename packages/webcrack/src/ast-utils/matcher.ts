@@ -2,6 +2,12 @@ import { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
+export const anyLiteral: m.Matcher<t.Literal> = m.matcher(
+  (node) =>
+    t.isLiteral(node) &&
+    (!t.isTemplateLiteral(node) || node.expressions.length === 0),
+);
+
 export function infiniteLoop(
   body?: m.Matcher<t.Statement>,
 ): m.Matcher<t.ForStatement | t.WhileStatement> {

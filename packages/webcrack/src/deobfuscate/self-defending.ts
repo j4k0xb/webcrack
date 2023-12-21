@@ -113,7 +113,8 @@ export default {
     return {
       VariableDeclarator(path) {
         if (!matcher.match(path.node)) return;
-        const binding = path.scope.getBinding(callController.current!)!;
+        const binding = path.scope.getBinding(callController.current!);
+        if (!binding) return;
         // const callControllerFunctionName = (function() { ... })();
         //       ^ path/binding
 
