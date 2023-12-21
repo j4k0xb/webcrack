@@ -83,14 +83,26 @@ export const unpackWebpack = {
             // var installedModules = {};
             m.variableDeclaration(),
             m.zeroOrMore(),
-            m.containerOf(
+            m.or(
               // __webpack_require__.s = 2
-              m.assignmentExpression(
-                '=',
-                constMemberExpression(m.identifier(), 's'),
-                entryIdMatcher,
+              m.containerOf(
+                m.assignmentExpression(
+                  '=',
+                  constMemberExpression(m.identifier(), 's'),
+                  entryIdMatcher,
+                ),
+              ),
+              m.expressionStatement(
+                m.assignmentExpression(
+                  '=',
+                  constMemberExpression(
+                    m.identifier(),
+                    m.or('e', 'd', 'j', 'm', 'r'),
+                  ),
+                ),
               ),
             ),
+            m.zeroOrMore(),
             // module.exports = entryModule
             m.expressionStatement(
               m.assignmentExpression(
