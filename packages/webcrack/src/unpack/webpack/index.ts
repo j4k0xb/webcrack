@@ -88,7 +88,10 @@ export const unpackWebpack = {
               m.containerOf(
                 m.assignmentExpression(
                   '=',
-                  constMemberExpression(m.identifier(), 's'),
+                  m.or(
+                    constMemberExpression(m.identifier(), 's'),
+                    constMemberExpression(m.identifier(), 'j'),
+                  ),
                   entryIdMatcher,
                 ),
               ),
@@ -97,7 +100,7 @@ export const unpackWebpack = {
                   '=',
                   constMemberExpression(
                     m.identifier(),
-                    m.or('e', 'd', 'j', 'm', 'r'),
+                    m.or('e', 'd', 'm', 'r'),
                   ),
                 ),
               ),
