@@ -6,23 +6,46 @@ import { findParent } from './matcher';
 
 /**
  * Replace all references of a variable with the initializer.
- * Make sure the binding is immutable before using!
  * Example:
  * `const a = 1; console.log(a);` -> `console.log(1);`
+ *
+ * Example with `unsafeAssignments` being `true`:
+ * `let a; a = 2; console.log(a);` -> `console.log(2);`
+ *
+ * @param unsafeAssignments Also inline assignments to the variable (not guaranteed to be the final value)
  */
 export function inlineVariable(
   binding: Binding,
-  init?: m.Matcher<t.Expression>,
+  value = m.anyExpression(),
+  unsafeAssignments = false,
 ) {
   const varDeclarator = binding.path.node;
   const varMatcher = m.variableDeclarator(
     m.identifier(binding.identifier.name),
-    init,
+    value,
   );
-  if (varMatcher.match(varDeclarator)) {
+  const assignmentMatcher = m.assignmentExpression(
+    '=',
+    m.identifier(binding.identifier.name),
+    value,
+  );
+
+  if (binding.constant && varMatcher.match(varDeclarator)) {
     binding.referencePaths.forEach((ref) => {
       ref.replaceWith(varDeclarator.init!);
     });
+    binding.path.remove();
+  } else if (
+    unsafeAssignments &&
+    binding.constantViolations.length === 1 &&
+    assignmentMatcher.match(binding.constantViolations[0]?.node)
+  ) {
+    const assignment = binding
+      .constantViolations[0] as NodePath<t.AssignmentExpression>;
+    binding.referencePaths.forEach((ref) => {
+      ref.replaceWith(assignment.node.right);
+    });
+    assignment.remove();
     binding.path.remove();
   }
 }

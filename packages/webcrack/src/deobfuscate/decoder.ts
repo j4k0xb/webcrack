@@ -2,12 +2,7 @@ import { expression } from '@babel/template';
 import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import {
-  anyLiteral,
-  findParent,
-  inlineVariable,
-  renameFast,
-} from '../ast-utils';
+import { findParent, inlineVariable, renameFast } from '../ast-utils';
 import { StringArray } from './string-array';
 
 /**
@@ -78,8 +73,8 @@ export class Decoder {
         ref.parentPath!.traverse({
           ReferencedIdentifier(path) {
             const varBinding = path.scope.getBinding(path.node.name)!;
-            if (!varBinding || !varBinding.constant) return;
-            inlineVariable(varBinding, anyLiteral);
+            if (!varBinding) return;
+            inlineVariable(varBinding, literalArgument, true);
           },
         });
         if (literalCall.match(ref.parent)) {
