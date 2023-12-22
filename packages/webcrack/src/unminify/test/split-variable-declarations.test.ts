@@ -22,7 +22,20 @@ test('split exported variable declarations', () =>
     export const c = 3;
   `));
 
-test('dont split in for loop', () =>
+
+test('split in for loop', () =>
+  expectJS(`
+    for (let i = 0, j = 1;;) var a, b;
+  `).toMatchInlineSnapshot(`
+    let i = 0;
+    let j = 1;
+    for (;;) {
+      var a;
+      var b;
+    }
+  `));
+
+test('dont split in for loop with test and update', () =>
   expectJS(`
     for (let i = 0, j = 1; i < 10; i++, j++) var a, b;
   `).toMatchInlineSnapshot(`
