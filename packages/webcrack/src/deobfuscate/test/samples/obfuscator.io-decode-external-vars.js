@@ -41,8 +41,9 @@ function b(c, d) {
   }, b(c, d);
 }
 function hi() {
-  const x = 0xd6;
+  let x;
   const y = 0xd3;
+  x = 0xd6;
   console[b(x)](b(y));
   console[b(x)](b(y));
 }
