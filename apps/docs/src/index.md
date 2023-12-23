@@ -21,6 +21,9 @@ features:
   - title: Unminify
     details: Convert minified code to human readable code
     icon: 🧹
+  - title: Transpile
+    details: Convert transpiled syntax back to modern JavaScript
+    icon: 🧩
   - title: Unpack Bundles
     details: Extract modules from webpack and browserify bundles to separate files
     icon: 📦

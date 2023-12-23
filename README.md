@@ -11,7 +11,7 @@
 
 webcrack is a tool for reverse engineering javascript.
 It can deobfuscate [obfuscator.io](https://github.com/javascript-obfuscator/javascript-obfuscator), unminify,
-and unpack [webpack](https://webpack.js.org/)/[browserify](https://browserify.org/),
+transpile, and unpack [webpack](https://webpack.js.org/)/[browserify](https://browserify.org/),
 to resemble the original source code as much as possible.
 
 Try it in the [online playground](https://webcrack.netlify.app/) or view the [documentation](https://webcrack.netlify.app/docs).

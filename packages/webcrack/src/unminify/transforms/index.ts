@@ -9,7 +9,6 @@ export { default as numberExpressions } from './number-expressions';
 export { default as rawLiterals } from './raw-literals';
 export { default as sequence } from './sequence';
 export { default as splitVariableDeclarations } from './split-variable-declarations';
-export { default as templateLiterals } from './template-literals';
 export { default as ternaryToIf } from './ternary-to-if';
 export { default as typeofUndefined } from './typeof-undefined';
 export { default as unaryExpressions } from './unary-expressions';

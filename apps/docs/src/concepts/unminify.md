@@ -155,15 +155,6 @@ const b = 2; // [!code ++]
 const c = 3; // [!code ++]
 ```
 
-## template-literals
-
-<https://babeljs.io/docs/babel-plugin-transform-template-literals>
-
-```js
-"'".concat(foo, "' \"").concat(bar, "\"") // [!code --]
-`'${foo}' "${bar}"` // [!code ++]
-```
-
 ## ternary-to-if
 
 ```js

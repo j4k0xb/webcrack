@@ -166,3 +166,25 @@ export function isReadonlyObject(
       !isPatternAssignment(path.parentPath!),
   );
 }
+
+/**
+ * Checks if the binding is a temporary variable that is only assigned
+ * once and has limited references. Often created by transpilers.
+ *
+ * Example with 1 reference to `_tmp`:
+ * ```js
+ * var _tmp; x[_tmp = y] || (x[_tmp] = z);
+ * ```
+ */
+export function isTemporaryVariable(
+  binding: Binding | undefined,
+  references: number,
+): binding is Binding {
+  return (
+    binding !== undefined &&
+    binding.references === references &&
+    binding.constantViolations.length === 1 &&
+    binding.path.isVariableDeclarator() &&
+    binding.path.node.init === null
+  );
+}

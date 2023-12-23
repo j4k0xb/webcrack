@@ -38,9 +38,10 @@ export default defineConfig({
       {
         text: 'Concepts',
         items: [
-          { text: 'Deobfuscation', link: '/concepts/deobfuscate' },
-          { text: 'Unminifying', link: '/concepts/unminify' },
-          { text: 'Bundle Unpacking', link: '/concepts/unpack' },
+          { text: 'Deobfuscate', link: '/concepts/deobfuscate' },
+          { text: 'Unminify', link: '/concepts/unminify' },
+          { text: 'Transpile', link: '/concepts/transpile' },
+          { text: 'Unpack Bundle', link: '/concepts/unpack' },
           { text: 'JSX', link: '/concepts/jsx' },
         ],
       },
