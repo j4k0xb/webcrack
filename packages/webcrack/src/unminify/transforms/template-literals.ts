@@ -65,16 +65,6 @@ export default {
     );
 
     return {
-      StringLiteral(path) {
-        // Heuristic: source code most likely used a template literal if it contains multiple lines
-        if (!/\n.*?\n/.test(path.node.value)) return;
-        if (concatMatcher.match(path.parentPath.parent)) return;
-
-        const raw = escape(path.node.value);
-        const quasi = t.templateElement({ raw });
-        path.replaceWith(t.templateLiteral([quasi], []));
-        this.changes++;
-      },
       BinaryExpression: {
         exit(path) {
           if (path.node.operator !== '+') return;
