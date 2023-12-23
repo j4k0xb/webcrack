@@ -28,14 +28,12 @@ export default {
       m.identifier(),
       false,
     );
-
-    const type = m.capture(
-      m.or(
-        m.identifier(), // jsx(Component, ...)
-        m.stringLiteral(), // jsx('div', ...)
-        deepIdentifierMemberExpression, // jsx(Component.SubComponent, ...)
-      ),
+    const convertibleName = m.or(
+      m.identifier(), // jsx(Component, ...)
+      m.stringLiteral(), // jsx('div', ...)
+      deepIdentifierMemberExpression, // jsx(Component.SubComponent, ...)
     );
+    const type = m.capture(m.anyExpression());
     const fragmentType = constMemberExpression('React', 'Fragment');
     const props = m.capture(m.objectExpression());
     const key = m.capture(m.anyExpression());
@@ -52,7 +50,16 @@ export default {
         exit(path) {
           if (!jsxMatcher.match(path.node)) return;
 
-          let name = convertType(type.current!);
+          let name: t.Node;
+          if (convertibleName.match(type.current!)) {
+            name = convertType(type.current);
+          } else {
+            name = t.jsxIdentifier(path.scope.generateUid('Component'));
+            const componentVar = t.variableDeclaration('const', [
+              t.variableDeclarator(t.identifier(name.name), type.current),
+            ]);
+            path.getStatementParent()?.insertBefore(componentVar);
+          }
           const isFragment = fragmentType.match(type.current);
 
           // rename component to avoid conflict with built-in html tags
