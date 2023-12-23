@@ -135,6 +135,19 @@ export default {
           }
         },
       },
+      WhileStatement: {
+        exit(path) {
+          if (t.isSequenceExpression(path.node.test)) {
+            const expressions = path.node.test.expressions;
+            path.node.test = expressions.pop()!;
+            const statements = expressions.map((expr) =>
+              t.expressionStatement(expr),
+            );
+            path.insertBefore(statements);
+            this.changes++;
+          }
+        },
+      },
       VariableDeclaration: {
         exit(path) {
           const sequence = m.capture(m.sequenceExpression());

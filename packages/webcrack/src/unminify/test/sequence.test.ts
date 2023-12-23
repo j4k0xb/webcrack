@@ -78,6 +78,14 @@ test('rearrange from for loop update', () =>
     }
   `));
 
+test('rearrange from while', () =>
+  expectJS(`
+    while (a(), b()) c();
+  `).toMatchInlineSnapshot(`
+    a();
+    while (b()) c();
+  `));
+
 test('rearrange variable declarator', () =>
   expectJS(`
    var t = (o = null, o);

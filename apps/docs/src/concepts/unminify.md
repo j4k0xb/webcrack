@@ -135,6 +135,12 @@ for(; i < 10; i++) { // [!code ++]
 ```
 
 ```js
+while (a(), b()) {} // [!code --]
+a(); // [!code ++]
+while (b()) {} // [!code ++]
+```
+
+```js
 t = (o = null, o); // [!code --]
 o = null; // [!code ++]
 t = o; // [!code ++]
