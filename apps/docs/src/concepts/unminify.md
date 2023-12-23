@@ -34,6 +34,21 @@ JSON.parse("[1,2,3]") // [!code --]
 [1, 2, 3] // [!code ++]
 ```
 
+## logical-assignments
+
+<https://babeljs.io/docs/babel-plugin-transform-logical-assignment-operators>, TypeScript and SWC
+
+```js
+x || (x = y) // [!code --]
+x ||= y // [!code ++]
+```
+
+```js
+var _x, _y; // [!code --]
+(_x = x)[_y = y] && (_x[_y] = z); // [!code --]
+x[y] &&= z; // [!code ++]
+```
+
 ## logical-to-if
 
 ```js
