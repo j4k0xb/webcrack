@@ -72,6 +72,23 @@ export function applyTransforms(
   return state;
 }
 
+export function mergeTransforms(options: {
+  name: string;
+  tags: Tag[];
+  transforms: Transform[];
+}): Transform {
+  return {
+    name: options.name,
+    tags: options.tags,
+    run(ast, state) {
+      state.changes += applyTransforms(ast, options.transforms, {
+        name: options.name,
+        log: false,
+      }).changes;
+    },
+  };
+}
+
 export interface TransformState {
   changes: number;
 }

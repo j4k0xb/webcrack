@@ -1,31 +1,8 @@
-import { parse } from '@babel/parser';
-import {
-  applyTransform,
-  applyTransforms,
-  generate,
-  Transform,
-} from '../ast-utils';
+import { mergeTransforms } from '../ast-utils';
 import * as transforms from './transforms';
 
-export const unminify = {
+export default mergeTransforms({
   name: 'unminify',
   tags: ['safe'],
-  scope: true,
-  run(ast, state) {
-    state.changes += applyTransforms(ast, Object.values(transforms), {
-      log: false,
-    }).changes;
-  },
-} satisfies Transform;
-
-export function unminifySource(code: string): string {
-  const ast = parse(code, {
-    sourceType: 'unambiguous',
-    allowReturnOutsideFunction: true,
-    plugins: ['jsx'],
-  });
-
-  applyTransform(ast, unminify);
-
-  return generate(ast);
-}
+  transforms: Object.values(transforms),
+});

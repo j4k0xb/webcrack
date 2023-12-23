@@ -21,8 +21,8 @@ import varFunctions from './deobfuscate/var-functions';
 import jsx from './transforms/jsx';
 import jsxNew from './transforms/jsx-new';
 import mangle from './transforms/mangle';
-import { transpile } from './transpile';
-import { unminify } from './unminify';
+import transpile from './transpile';
+import unminify from './unminify';
 import {
   blockStatements,
   sequence,
