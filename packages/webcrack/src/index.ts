@@ -147,7 +147,7 @@ export async function webcrack(
       (() => applyTransformAsync(ast, deobfuscate, options.sandbox)),
     options.unminify &&
       (() => {
-        applyTransforms(ast, [unminify, transpile]);
+        applyTransforms(ast, [transpile, unminify]);
       }),
     options.mangle && (() => applyTransform(ast, mangle)),
     // TODO: Also merge unminify visitor (breaks selfDefending/debugProtection atm)
