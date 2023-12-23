@@ -21,6 +21,7 @@ import varFunctions from './deobfuscate/var-functions';
 import jsx from './transforms/jsx';
 import jsxNew from './transforms/jsx-new';
 import mangle from './transforms/mangle';
+import { transpile } from './transpile';
 import { unminify } from './unminify';
 import {
   blockStatements,
@@ -146,7 +147,7 @@ export async function webcrack(
       (() => applyTransformAsync(ast, deobfuscate, options.sandbox)),
     options.unminify &&
       (() => {
-        applyTransform(ast, unminify);
+        applyTransforms(ast, [unminify, transpile]);
       }),
     options.mangle && (() => applyTransform(ast, mangle)),
     // TODO: Also merge unminify visitor (breaks selfDefending/debugProtection atm)

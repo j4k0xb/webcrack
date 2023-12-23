@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { nullishCoalescingAssignment } from '../transforms';
+import nullishCoalescingAssignment from '../transforms/nullish-coalescing-assignment';
 
 const expectJS = testTransform(nullishCoalescingAssignment);
 

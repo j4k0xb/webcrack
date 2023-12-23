@@ -34,21 +34,6 @@ JSON.parse("[1,2,3]") // [!code --]
 [1, 2, 3] // [!code ++]
 ```
 
-## logical-assignments
-
-<https://babeljs.io/docs/babel-plugin-transform-logical-assignment-operators>, TypeScript and SWC
-
-```js
-x || (x = y) // [!code --]
-x ||= y // [!code ++]
-```
-
-```js
-var _x, _y; // [!code --]
-(_x = x)[_y = y] && (_x[_y] = z); // [!code --]
-x[y] &&= z; // [!code ++]
-```
-
 ## logical-to-if
 
 ```js
@@ -83,33 +68,6 @@ if (x) {
 "a" + "b" + "c" // [!code --]
 "abc" // [!code ++]
 ```
-
-## nullish-coalescing
-
-```js
-a !== null && a !== undefined ? a : b; // [!code --]
-a ?? b; // [!code ++]
-```
-
-```js
-var _a$b; // [!code --]
-(_a$b = a.b) !== null && _a$b !== undefined ? _a$b : c; // [!code --]
-a.b ?? c; // [!code ++]
-```
-
-## nullish-coalescing-assignment
-
-```js
-a ?? (a = b); // [!code --]
-a ??= b; // [!code ++]
-```
-
-```js
-var _a; // [!code --]
-(_a = a).b ?? (_a.b = c); // [!code --]
-a.b ??= c; // [!code ++]
-```
-
 
 ## number-expressions
 
@@ -195,15 +153,6 @@ const a = 1, b = 2, c = 3; // [!code --]
 const a = 1; // [!code ++]
 const b = 2; // [!code ++]
 const c = 3; // [!code ++]
-```
-
-## template-literals
-
-<https://babeljs.io/docs/babel-plugin-transform-template-literals>
-
-```js
-"'".concat(foo, "' \"").concat(bar, "\"") // [!code --]
-`'${foo}' "${bar}"` // [!code ++]
 ```
 
 ## ternary-to-if

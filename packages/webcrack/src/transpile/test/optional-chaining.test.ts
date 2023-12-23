@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { optionalChaining } from '../transforms';
+import optionalChaining from '../transforms/optional-chaining';
 
 const expectJS = testTransform(optionalChaining);
 
