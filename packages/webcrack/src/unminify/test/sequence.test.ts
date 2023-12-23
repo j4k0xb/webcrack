@@ -103,6 +103,16 @@ test('rearrange assignment', () => {
   `);
 
   expectJS(`
+    a ||= (b, c);
+    a &&= (b, c);
+    a ??= (b, c);
+  `).toMatchInlineSnapshot(`
+    a ||= (b, c);
+    a &&= (b, c);
+    a ??= (b, c);
+  `);
+
+  expectJS(`
     for (;;) a = (b, c);
   `).toMatchInlineSnapshot(`
     for (;;) {

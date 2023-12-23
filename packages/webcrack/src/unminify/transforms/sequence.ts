@@ -16,7 +16,22 @@ export default {
     const assignedSequence = m.capture(m.sequenceExpression());
     const assignmentMatcher = m.expressionStatement(
       m.assignmentExpression(
-        m.anything(),
+        // "||=", "&&=", and "??=" have short-circuiting behavior
+        m.or(
+          '=',
+          '+=',
+          '-=',
+          '*=',
+          '/=',
+          '%=',
+          '**=',
+          '<<=',
+          '>>=',
+          '>>>=',
+          '|=',
+          '^=',
+          '&=',
+        ),
         assignmentVariable,
         assignedSequence,
       ),
