@@ -17,7 +17,22 @@ test('expressions', () =>
     "".concat(1, f, "oo", true).concat(b, "ar", 0).concat(baz);
   `).toMatchInlineSnapshot(`
     \`\${1}\`;
-    1 + \`\${foo}\${bar}\${baz}\`;
-    1 + \`\${foo}bar\${baz}\`;
+    \`\${1}\${foo}\${bar}\${baz}\`;
+    \`\${1}\${foo}bar\${baz}\`;
     \`\${1}\${f}oo\${true}\${b}ar\${0}\${baz}\`;
+  `));
+
+test('merge concatenations', () =>
+  expectJS(`
+    \`a\${1}b\` + 'c';
+    \`a\${1}b\` + \`c\${2}d\`;
+    \`a\${1}b\` + 2;
+    'c' + \`a\${1}b\`;
+    2 + \`a\${1}b\`;
+  `).toMatchInlineSnapshot(`
+    \`a\${1}bc\`;
+    \`a\${1}bc\${2}d\`;
+    \`a\${1}b\${2}\`;
+    \`ca\${1}b\`;
+    \`\${2}a\${1}b\`;
   `));
