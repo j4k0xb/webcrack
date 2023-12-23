@@ -6,6 +6,7 @@ export { default as logicalAssignments } from './logical-assignments';
 export { default as logicalToIf } from './logical-to-if';
 export { default as mergeElseIf } from './merge-else-if';
 export { default as mergeStrings } from './merge-strings';
+export { default as nullishCoalescing } from './nullish-coalescing';
 export { default as numberExpressions } from './number-expressions';
 export { default as rawLiterals } from './raw-literals';
 export { default as sequence } from './sequence';
