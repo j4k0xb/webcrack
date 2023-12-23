@@ -22,15 +22,14 @@ export default {
     const object = m.capture(m.anyExpression());
     const property = m.capture(m.anyExpression());
     const tmpVar = m.capture(m.identifier());
+    const member = m.capture(
+      m.memberExpression(m.fromCapture(tmpVar), m.fromCapture(property)),
+    );
     // Example: var _tmp; (_tmp = x.y()).property || (_tmp.property = right);
     const memberMatcher = m.logicalExpression(
       operator,
       m.memberExpression(m.assignmentExpression('=', tmpVar, object), property),
-      m.assignmentExpression(
-        '=',
-        m.memberExpression(m.fromCapture(tmpVar), m.fromCapture(property)),
-        right,
-      ),
+      m.assignmentExpression('=', member, right),
     );
 
     // Example: var _tmp; x[_tmp = y()] || (x[_tmp] = z);
@@ -91,10 +90,11 @@ export default {
             if (!validateTmpVar(binding)) return;
 
             binding.path.remove();
+            member.current!.object = object.current!;
             path.replaceWith(
               t.assignmentExpression(
                 operator.current! + '=',
-                t.memberExpression(object.current!, property.current!),
+                member.current!,
                 right.current!,
               ),
             );

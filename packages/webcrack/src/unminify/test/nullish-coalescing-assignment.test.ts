@@ -15,6 +15,12 @@ test('member expression assignment (Babel)', () =>
     (_a = a).b ?? (_a.b = c);
   `).toMatchInlineSnapshot(`a.b ??= c;`));
 
+  test('computed member expression assignment (Babel)', () =>
+  expectJS(`
+    var _a;
+    (_a = a)[b] ?? (_a[b] = c);
+  `).toMatchInlineSnapshot(`a[b] ??= c;`));
+
 test('member expression assignment (TS)', () =>
   expectJS(`
     a.b ?? (a.b = c);

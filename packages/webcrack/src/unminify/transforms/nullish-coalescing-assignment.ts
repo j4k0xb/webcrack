@@ -12,13 +12,22 @@ export default {
     const leftId = m.capture(m.identifier());
     const property = m.capture(m.identifier());
     const right = m.capture(m.anyExpression());
+    const computed = m.capture<boolean>(m.anything());
     // Example (Babel):  var tmp; (tmp = left).b ?? (tmp.b = c);
     const memberMatcher = m.logicalExpression(
       '??',
-      m.memberExpression(m.assignmentExpression('=', tmpVar, leftId), property),
+      m.memberExpression(
+        m.assignmentExpression('=', tmpVar, leftId),
+        property,
+        computed,
+      ),
       m.assignmentExpression(
         '=',
-        m.memberExpression(m.fromCapture(tmpVar), m.fromCapture(property)),
+        m.memberExpression(
+          m.fromCapture(tmpVar),
+          m.fromCapture(property),
+          computed,
+        ),
         right,
       ),
     );
@@ -52,7 +61,11 @@ export default {
             path.replaceWith(
               t.assignmentExpression(
                 '??=',
-                t.memberExpression(leftId.current!, property.current!),
+                t.memberExpression(
+                  leftId.current!,
+                  property.current!,
+                  computed.current,
+                ),
                 right.current!,
               ),
             );

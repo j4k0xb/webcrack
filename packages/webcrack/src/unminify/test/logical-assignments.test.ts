@@ -16,6 +16,12 @@ test('member expression or-assignment (Babel/TS/SWC/esbuild)', () =>
     (_x$y = x.y()).z || (_x$y.z = b);
   `).toMatchInlineSnapshot(`x.y().z ||= b;`));
 
+test('computed member expression or-assignment (Babel/TS/SWC/esbuild)', () =>
+  expectJS(`
+    var _x$y;
+    (_x$y = x.y())[z] || (_x$y[z] = b);
+  `).toMatchInlineSnapshot(`x.y()[z] ||= b;`));
+
 test('member expression or-assignment (TS/esbuild)', () =>
   expectJS('x.y || (x.y = z)').toMatchInlineSnapshot(`x.y ||= z;`));
 
