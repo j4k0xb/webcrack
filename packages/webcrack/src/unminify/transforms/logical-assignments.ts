@@ -1,7 +1,6 @@
-import { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '../../ast-utils';
+import { Transform, isTemporaryVariable } from '../../ast-utils';
 
 export default {
   name: 'logical-assignments',
@@ -63,16 +62,6 @@ export default {
       ),
     );
 
-    function validateTmpVar(binding: Binding | undefined): binding is Binding {
-      return (
-        binding !== undefined &&
-        binding.references === 1 &&
-        binding.constantViolations.length === 1 &&
-        binding.path.isVariableDeclarator() &&
-        binding.path.node.init === null
-      );
-    }
-
     return {
       LogicalExpression: {
         exit(path) {
@@ -87,7 +76,7 @@ export default {
             this.changes++;
           } else if (memberMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!validateTmpVar(binding)) return;
+            if (!isTemporaryVariable(binding, 1)) return;
 
             binding.path.remove();
             member.current!.object = object.current!;
@@ -101,7 +90,7 @@ export default {
             this.changes++;
           } else if (computedMemberMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!validateTmpVar(binding)) return;
+            if (!isTemporaryVariable(binding, 1)) return;
 
             binding.path.remove();
             path.replaceWith(
@@ -115,7 +104,11 @@ export default {
           } else if (multiComputedMemberMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
             const binding2 = path.scope.getBinding(tmpVar2.current!.name);
-            if (!validateTmpVar(binding) || !validateTmpVar(binding2)) return;
+            if (
+              !isTemporaryVariable(binding, 1) ||
+              !isTemporaryVariable(binding2, 1)
+            )
+              return;
 
             binding.path.remove();
             binding2.path.remove();

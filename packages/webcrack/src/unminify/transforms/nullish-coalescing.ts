@@ -1,7 +1,6 @@
-import { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '../../ast-utils';
+import { Transform, isTemporaryVariable } from '../../ast-utils';
 
 export default {
   name: 'nullish-coalescing',
@@ -59,25 +58,12 @@ export default {
       right,
     );
 
-    function validateTmpVar(
-      binding: Binding | undefined,
-      references: number,
-    ): binding is Binding {
-      return (
-        binding !== undefined &&
-        binding.references === references &&
-        binding.constantViolations.length === 1 &&
-        binding.path.isVariableDeclarator() &&
-        binding.path.node.init === null
-      );
-    }
-
     return {
       ConditionalExpression: {
         exit(path) {
           if (idMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!validateTmpVar(binding, 2)) return;
+            if (!isTemporaryVariable(binding, 2)) return;
 
             binding.path.remove();
             path.replaceWith(
@@ -86,7 +72,7 @@ export default {
             this.changes++;
           } else if (idLooseMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!validateTmpVar(binding, 1)) return;
+            if (!isTemporaryVariable(binding, 1)) return;
 
             binding.path.remove();
             path.replaceWith(

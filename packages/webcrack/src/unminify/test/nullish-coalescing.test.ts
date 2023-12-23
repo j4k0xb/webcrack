@@ -4,6 +4,8 @@ import { nullishCoalescing } from '../transforms';
 
 const expectJS = testTransform(nullishCoalescing);
 
+// TODO: group by tool
+
 test('identifier (Babel)', () =>
   expectJS(`
     var _a;

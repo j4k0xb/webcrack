@@ -1,7 +1,6 @@
-import { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '../../ast-utils';
+import { Transform, isTemporaryVariable } from '../../ast-utils';
 
 export default {
   name: 'optional-chaining',
@@ -46,16 +45,6 @@ export default {
       tmpMember,
     );
 
-    function validateTmpVar(binding: Binding | undefined): binding is Binding {
-      return (
-        binding !== undefined &&
-        binding.references === 2 &&
-        binding.constantViolations.length === 1 &&
-        binding.path.isVariableDeclarator() &&
-        binding.path.node.init === null
-      );
-    }
-
     return {
       ConditionalExpression: {
         exit(path) {
@@ -72,7 +61,7 @@ export default {
             this.changes++;
           } else if (tmpMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!validateTmpVar(binding)) return;
+            if (!isTemporaryVariable(binding, 2)) return;
 
             binding.path.remove();
             tmpMember.current!.optional = true;
