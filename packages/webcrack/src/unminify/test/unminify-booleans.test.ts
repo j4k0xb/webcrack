@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { unminifyBooleans } from '../transforms';
+import unminifyBooleans from '../transforms/unminify-booleans';
 
 const expectJS = testTransform(unminifyBooleans);
 

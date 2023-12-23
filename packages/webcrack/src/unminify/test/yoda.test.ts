@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { yoda } from '../transforms';
+import yoda from '../transforms/yoda';
 
 const expectJS = testTransform(yoda);
 

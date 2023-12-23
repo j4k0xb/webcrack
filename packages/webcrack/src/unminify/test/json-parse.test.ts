@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { jsonParse } from '../transforms';
+import jsonParse from '../transforms/json-parse';
 
 const expectJS = testTransform(jsonParse);
 

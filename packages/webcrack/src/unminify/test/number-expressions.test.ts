@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { numberExpressions } from '../transforms';
+import numberExpressions from '../transforms/number-expressions';
 
 const expectJS = testTransform(numberExpressions);
 

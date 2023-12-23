@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { blockStatements } from '../transforms';
+import blockStatements from '../transforms/block-statements';
 
 const expectJS = testTransform(blockStatements);
 

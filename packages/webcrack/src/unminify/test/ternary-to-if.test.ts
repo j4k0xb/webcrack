@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { ternaryToIf } from '../transforms';
+import ternaryToIf from '../transforms/ternary-to-if';
 
 const expectJS = testTransform(ternaryToIf);
 

@@ -4,7 +4,7 @@ import * as m from '@codemod/matchers';
 import { Transform, renameFast } from '../ast-utils';
 
 export default {
-  name: 'deadCode',
+  name: 'dead-code',
   tags: ['unsafe'],
   scope: true,
   visitor() {

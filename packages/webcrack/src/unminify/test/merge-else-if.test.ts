@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { mergeElseIf } from '../transforms';
+import mergeElseIf from '../transforms/merge-else-if';
 
 const expectJS = testTransform(mergeElseIf);
 

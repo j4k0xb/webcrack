@@ -10,7 +10,7 @@ import {
  * Replaces all references to `var alias = decode;` with `decode`
  */
 export default {
-  name: 'inlineDecoderWrappers',
+  name: 'inline-decoder-wrappers',
   tags: ['unsafe'],
   scope: true,
   run(ast, state, decoder) {

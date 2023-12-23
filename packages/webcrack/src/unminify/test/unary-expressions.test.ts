@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { unaryExpressions } from '../transforms';
+import unaryExpressions from '../transforms/unary-expressions';
 
 const expectJS = testTransform(unaryExpressions);
 

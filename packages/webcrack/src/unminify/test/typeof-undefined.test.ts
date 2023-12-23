@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { typeofUndefined } from '../transforms';
+import typeofUndefined from '../transforms/typeof-undefined';
 
 const expectJS = testTransform(typeofUndefined);
 

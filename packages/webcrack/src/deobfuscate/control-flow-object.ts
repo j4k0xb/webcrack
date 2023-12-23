@@ -20,7 +20,7 @@ import mergeStrings from '../unminify/transforms/merge-strings';
  */
 
 export default {
-  name: 'controlFlowObject',
+  name: 'control-flow-object',
   tags: ['safe'],
   scope: true,
   visitor() {

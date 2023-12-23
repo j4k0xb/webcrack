@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { splitVariableDeclarations } from '../transforms';
+import splitVariableDeclarations from '../transforms/split-variable-declarations';
 
 const expectJS = testTransform(splitVariableDeclarations);
 

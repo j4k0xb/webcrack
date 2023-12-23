@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { computedProperties } from '../transforms';
+import computedProperties from '../transforms/computed-properties';
 
 const expectJS = testTransform(computedProperties);
 

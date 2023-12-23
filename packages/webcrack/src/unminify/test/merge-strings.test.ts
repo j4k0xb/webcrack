@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { mergeStrings } from '../transforms';
+import mergeStrings from '../transforms/merge-strings';
 
 const expectJS = testTransform(mergeStrings);
 

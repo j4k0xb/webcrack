@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { logicalToIf } from '../transforms';
+import logicalToIf from '../transforms/logical-to-if';
 
 const expectJS = testTransform(logicalToIf);
 

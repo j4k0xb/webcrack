@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { infinity } from '../transforms';
+import infinity from '../transforms/infinity';
 
 const expectJS = testTransform(infinity);
 

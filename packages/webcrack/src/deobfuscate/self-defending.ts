@@ -20,7 +20,7 @@ import {
 // debug protection function call: https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/debug-protection/templates/debug-protection-function-call/DebugProtectionFunctionCallTemplate.ts
 
 export default {
-  name: 'selfDefending',
+  name: 'self-defending',
   tags: ['safe'],
   scope: true,
   visitor() {

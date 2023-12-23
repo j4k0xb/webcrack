@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { sequence } from '../transforms';
+import sequence from '../transforms/sequence';
 
 const expectJS = testTransform(sequence);
 

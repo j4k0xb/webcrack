@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import { rawLiterals } from '../transforms';
+import rawLiterals from '../transforms/raw-literals';
 
 const expectJS = testTransform(rawLiterals);
 

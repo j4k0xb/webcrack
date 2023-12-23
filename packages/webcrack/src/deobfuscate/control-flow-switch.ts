@@ -3,7 +3,7 @@ import * as m from '@codemod/matchers';
 import { Transform, constMemberExpression, infiniteLoop } from '../ast-utils';
 
 export default {
-  name: 'controlFlowSwitch',
+  name: 'control-flow-switch',
   tags: ['safe'],
   visitor() {
     const sequenceName = m.capture(m.identifier());

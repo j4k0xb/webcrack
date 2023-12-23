@@ -1,8 +1,8 @@
 import { test } from 'vitest';
 import { testTransform } from '../../../test';
-import mergeObjectAssignments from '../var-functions';
+import varFunctions from '../var-functions';
 
-const expectJS = testTransform(mergeObjectAssignments);
+const expectJS = testTransform(varFunctions);
 
 test('var to function declaration', () =>
   expectJS('var a = function() {}').toMatchInlineSnapshot(`
