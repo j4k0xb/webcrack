@@ -84,6 +84,33 @@ if (x) {
 "abc" // [!code ++]
 ```
 
+## nullish-coalescing
+
+```js
+a !== null && a !== undefined ? a : b; // [!code --]
+a ?? b; // [!code ++]
+```
+
+```js
+var _a$b; // [!code --]
+(_a$b = a.b) !== null && _a$b !== undefined ? _a$b : c; // [!code --]
+a.b ?? c; // [!code ++]
+```
+
+## nullish-coalescing-assignment
+
+```js
+a ?? (a = b); // [!code --]
+a ??= b; // [!code ++]
+```
+
+```js
+var _a; // [!code --]
+(_a = a).b ?? (_a.b = c); // [!code --]
+a.b ??= c; // [!code ++]
+```
+
+
 ## number-expressions
 
 ```js
