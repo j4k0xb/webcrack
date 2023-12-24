@@ -6,6 +6,13 @@ import { constMemberExpression, findPath, renameFast } from '../../ast-utils';
 import { WebpackModule } from './module';
 
 const buildNamespaceImport = statement`import * as NAME from "PATH";`;
+const buildNamedImport = (locals: string[], imported: string[], path: string) =>
+  t.importDeclaration(
+    locals.map((local, i) =>
+      t.importSpecifier(t.identifier(local), t.identifier(imported[i])),
+    ),
+    t.stringLiteral(path),
+  );
 const buildNamedExportLet = statement`export let NAME = VALUE;`;
 
 /**
@@ -27,24 +34,35 @@ export function convertESM(module: WebpackModule): void {
     m.callExpression(constMemberExpression('require', 'r'), [m.identifier()]),
   );
 
-  const exportsName = m.capture(m.identifier());
+  const exportsObjectName = m.capture(m.identifier());
   const exportedName = m.capture(m.anyString());
-  const returnedValue = m.capture(m.anyExpression());
+  const exportedLocal = m.capture(m.anyExpression());
   // E.g. require.d(exports, "counter", function () { return f });
   const defineExportMatcher = m.expressionStatement(
     m.callExpression(constMemberExpression('require', 'd'), [
-      exportsName,
+      exportsObjectName,
       m.stringLiteral(exportedName),
       m.functionExpression(
         undefined,
         [],
-        m.blockStatement([m.returnStatement(returnedValue)]),
+        m.blockStatement([m.returnStatement(exportedLocal)]),
       ),
     ]),
   );
+  const exportAssignment = m.expressionStatement(
+    m.assignmentExpression(
+      '=',
+      m.memberExpression(
+        m.identifier('exports'),
+        m.identifier(exportedName),
+        false,
+      ),
+      exportedLocal,
+    ),
+  );
 
   const emptyObjectVarMatcher = m.variableDeclarator(
-    m.fromCapture(exportsName),
+    m.fromCapture(exportsObjectName),
     m.objectExpression([]),
   );
 
@@ -52,21 +70,28 @@ export function convertESM(module: WebpackModule): void {
     m.arrayOf(
       m.objectProperty(
         m.identifier(),
-        m.arrowFunctionExpression([], m.anyExpression()),
+        m.or(
+          m.arrowFunctionExpression([], m.anyExpression()),
+          m.functionExpression(
+            null,
+            [],
+            m.blockStatement([m.returnStatement()]),
+          ),
+        ),
       ),
     ),
   );
   // E.g. require.d(exports, { foo: () => a, bar: () => b });
   const defineExportsMatcher = m.expressionStatement(
     m.callExpression(constMemberExpression('require', 'd'), [
-      exportsName,
+      exportsObjectName,
       m.objectExpression(properties),
     ]),
   );
 
-  // E.g. const lib = require("./lib.js");
   const requireVariable = m.capture(m.identifier());
   const requiredModuleId = m.capture(m.anyNumber());
+  // E.g. const lib = require(1);
   const requireMatcher = m.variableDeclaration(undefined, [
     m.variableDeclarator(
       requireVariable,
@@ -74,6 +99,11 @@ export function convertESM(module: WebpackModule): void {
         m.numericLiteral(requiredModuleId),
       ]),
     ),
+  ]);
+
+  const zeroSequenceMatcher = m.sequenceExpression([
+    m.numericLiteral(0),
+    m.identifier(),
   ]);
 
   // module = require.hmd(module);
@@ -93,18 +123,62 @@ export function convertESM(module: WebpackModule): void {
       if (defineEsModuleMatcher.match(path.node)) {
         module.ast.program.sourceType = 'module';
         path.remove();
-      } else if (
-        module.ast.program.sourceType === 'module' &&
-        requireMatcher.match(path.node)
-      ) {
+      } else if (requireMatcher.match(path.node)) {
+        const binding = path.scope.getBinding(requireVariable.current!.name)!;
+        const references = binding.referencePaths.map((p) => p.parentPath!);
+        const validateReferences = (
+          references: NodePath[],
+        ): references is NodePath<
+          t.MemberExpression & { property: t.Identifier }
+        >[] =>
+          references.every((p) =>
+            m
+              .memberExpression(
+                m.fromCapture(requireVariable),
+                m.identifier(),
+                false,
+              )
+              .match(p.node),
+          );
+        if (!validateReferences(references)) {
+          path.replaceWith(
+            buildNamespaceImport({
+              NAME: requireVariable.current,
+              PATH: String(requiredModuleId.current),
+            }),
+          );
+          return;
+        }
+
+        const importNames = [
+          ...new Set(references.map((p) => p.node.property.name)),
+        ];
+        const localNames = importNames.map((name) => {
+          const binding = path.scope.getBinding(name);
+          const hasNameConflict = binding?.referencePaths.some(
+            (p) => p.scope.getBinding(name) !== binding,
+          );
+          return hasNameConflict ? path.scope.generateUid(name) : name;
+        });
+
         path.replaceWith(
-          buildNamespaceImport({
-            NAME: requireVariable.current,
-            PATH: String(requiredModuleId.current),
-          }),
+          buildNamedImport(
+            localNames,
+            importNames,
+            String(requiredModuleId.current),
+          ),
         );
+
+        [...references].forEach((ref) => {
+          ref.replaceWith(ref.node.property);
+          if (zeroSequenceMatcher.match(ref.parent)) {
+            ref.parentPath.replaceWith(ref);
+          }
+        });
       } else if (defineExportsMatcher.match(path.node)) {
-        const exportsBinding = path.scope.getBinding(exportsName.current!.name);
+        const exportsBinding = path.scope.getBinding(
+          exportsObjectName.current!.name,
+        );
         const emptyObject = emptyObjectVarMatcher.match(
           exportsBinding?.path.node,
         )
@@ -113,8 +187,12 @@ export function convertESM(module: WebpackModule): void {
 
         for (const property of properties.current!) {
           const exportedKey = property.key as t.Identifier;
-          const returnedValue = (property.value as t.ArrowFunctionExpression)
-            .body as t.Expression;
+          const returnedValue = t.isArrowFunctionExpression(property.value)
+            ? (property.value.body as t.Expression)
+            : ((
+                (property.value as t.FunctionExpression).body
+                  .body[0] as t.ReturnStatement
+              ).argument as t.Expression);
           if (emptyObject) {
             emptyObject.properties.push(
               t.objectProperty(exportedKey, returnedValue),
@@ -125,8 +203,15 @@ export function convertESM(module: WebpackModule): void {
         }
 
         path.remove();
+      } else if (exportAssignment.match(path.node)) {
+        path.replaceWith(
+          buildNamedExportLet({
+            NAME: t.identifier(exportedName.current!),
+            VALUE: exportedLocal.current!,
+          }),
+        );
       } else if (defineExportMatcher.match(path.node)) {
-        exportVariable(path, returnedValue.current!, exportedName.current!);
+        exportVariable(path, exportedLocal.current!, exportedName.current!);
         path.remove();
       } else if (hmdMatcher.match(path.node)) {
         path.remove();

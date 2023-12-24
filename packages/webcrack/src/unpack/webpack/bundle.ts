@@ -3,10 +3,10 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Bundle } from '../bundle';
 import { relativePath } from '../path';
+import { convertDefaultRequire } from './default-export';
 import { convertESM } from './esm';
-import { convertDefaultRequire } from './getDefaultExport';
 import { WebpackModule } from './module';
-import { inlineVarInjections } from './varInjection';
+import { inlineVarInjections } from './var-injection';
 
 export class WebpackBundle extends Bundle {
   constructor(entryId: string, modules: Map<string, WebpackModule>) {
