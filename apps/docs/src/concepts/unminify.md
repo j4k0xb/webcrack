@@ -27,6 +27,23 @@ console.log(a); // [!code ++]
 Infinity // [!code ++]
 ```
 
+## invert-boolean-logic
+
+```js
+!(a == b) // [!code --]
+a != b // [!code ++]
+```
+
+```js
+!(a || b || c) // [!code --]
+!a && !b && !c // [!code ++]
+```
+
+```js
+!(a && b && c) // [!code --]
+!a || !b || !c // [!code ++]
+```
+
 ## json-parse
 
 ```js

@@ -1,6 +1,7 @@
 export { default as blockStatements } from './block-statements';
 export { default as computedProperties } from './computed-properties';
 export { default as infinity } from './infinity';
+export { default as invertBooleanLogic } from './invert-boolean-logic';
 export { default as jsonParse } from './json-parse';
 export { default as logicalToIf } from './logical-to-if';
 export { default as mergeElseIf } from './merge-else-if';
