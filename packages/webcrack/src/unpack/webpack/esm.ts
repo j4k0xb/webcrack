@@ -154,23 +154,25 @@ export function convertESM(module: WebpackModule): void {
           ...new Set(references.map((p) => p.node.property.name)),
         ];
         const localNames = importNames.map((name) => {
-          const binding = path.scope.getBinding(name);
-          const hasNameConflict = binding?.referencePaths.some(
-            (p) => p.scope.getBinding(name) !== binding,
+          const hasNameConflict = binding.referencePaths.some((ref) =>
+            ref.scope.hasBinding(name),
           );
           return hasNameConflict ? path.scope.generateUid(name) : name;
         });
 
-        path.replaceWith(
+        const [importDeclaration] = path.replaceWith(
           buildNamedImport(
             localNames,
             importNames,
             String(requiredModuleId.current),
           ),
         );
+        importDeclaration.scope.crawl();
 
         [...references].forEach((ref) => {
-          ref.replaceWith(ref.node.property);
+          const localName =
+            localNames[importNames.indexOf(ref.node.property.name)];
+          ref.replaceWith(t.identifier(localName));
           if (zeroSequenceMatcher.match(ref.parent)) {
             ref.parentPath.replaceWith(ref);
           }
