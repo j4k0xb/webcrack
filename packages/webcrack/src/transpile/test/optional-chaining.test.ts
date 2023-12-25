@@ -23,16 +23,16 @@ test('member expression (Babel)', () =>
 test.skip('computed member expression (Babel)', () =>
   expectJS(`
     var _a;
-    (_a = a) === null || _a === void 0 ? void 0 : _a[0];
+    (_a = a) === null || _a === undefined ? undefined : _a[0];
   `).toMatchInlineSnapshot(`a?.[0];`));
 
 test.skip('call expression (Babel)', () =>
   expectJS(`
     var _a;
-    (_a = a) === null || _a === void 0 ? void 0 : _a();
+    (_a = a) === null || _a === undefined ? undefined : _a();
   `).toMatchInlineSnapshot(`a?.();`));
 
 test.skip('call expression (TS)', () =>
   expectJS(`
-    a === null || a === void 0 ? void 0 : a();
+    a === null || a === undefined ? undefined : a();
   `).toMatchInlineSnapshot(`a?.();`));

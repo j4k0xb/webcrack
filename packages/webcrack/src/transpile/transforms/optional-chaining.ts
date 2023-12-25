@@ -26,7 +26,7 @@ export default {
 
     const tmpVar = m.capture(m.identifier());
     const tmpMember = m.capture(m.memberExpression(m.fromCapture(tmpVar)));
-    // Example (Babel): var _tmp; (_tmp = object) === null || _tmp === void 0 ? void 0 : _tmp.property;
+    // Example (Babel): var _tmp; (_tmp = object) === null || _tmp === undefined ? undefined : _tmp.property;
     const tmpMatcher = m.conditionalExpression(
       m.logicalExpression(
         '||',

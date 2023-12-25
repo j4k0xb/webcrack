@@ -80,12 +80,12 @@ export function mergeTransforms(options: {
   return {
     name: options.name,
     tags: options.tags,
-    run(ast, state) {
-      state.changes += applyTransforms(ast, options.transforms, {
-        name: options.name,
-        log: false,
-      }).changes;
-    },
+    scope: options.transforms.some((t) => t.scope),
+    visitor() {
+      return visitors.merge(
+        options.transforms.flatMap((t) => t.visitor?.() ?? []),
+      );
+    }
   };
 }
 
