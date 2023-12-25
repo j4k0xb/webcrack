@@ -19,3 +19,20 @@ test('member expression (Babel)', () =>
     var _a;
     (_a = a) === null || _a === undefined ? undefined : _a.b;
   `).toMatchInlineSnapshot(`a?.b;`));
+
+test.skip('computed member expression (Babel)', () =>
+  expectJS(`
+    var _a;
+    (_a = a) === null || _a === void 0 ? void 0 : _a[0];
+  `).toMatchInlineSnapshot(`a?.[0];`));
+
+test.skip('call expression (Babel)', () =>
+  expectJS(`
+    var _a;
+    (_a = a) === null || _a === void 0 ? void 0 : _a();
+  `).toMatchInlineSnapshot(`a?.();`));
+
+test.skip('call expression (TS)', () =>
+  expectJS(`
+    a === null || a === void 0 ? void 0 : a();
+  `).toMatchInlineSnapshot(`a?.();`));
