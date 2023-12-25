@@ -9,9 +9,6 @@ describe('samples', async () => {
   const fileNames = (await readdir(SAMPLES_DIR)).filter((name) =>
     name.endsWith('.js'),
   );
-  for (let i = 0; i < 3; i++) {
-    fileNames.push(...fileNames);
-  }
 
   fileNames.forEach((fileName) => {
     test.concurrent(`unpack ${fileName}`, async ({ expect }) => {
