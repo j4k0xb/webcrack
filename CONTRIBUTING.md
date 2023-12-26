@@ -13,10 +13,15 @@ This project uses [pnpm](https://pnpm.js.org/) for package management. Please ma
 
 ## Attach a Debugger
 
-1. Create the file `packages/webcrack/tmp/test.js` and paste your code
-2. Press `F5` in VSCode to build the project and launch the debugger
+Press `F5` in VSCode to build the project and launch the debugger.
+Choose any of these launch configurations:
 
-The output will be saved in `tmp/webcrack-out`.
+- `Launch playground`: runs a dev server in the background and opens the playground in your browser.
+
+  <https://github.com/j4k0xb/webcrack/assets/55899582/8d6509c6-7ec2-43c8-8d1b-8aac5b279e45>
+- `Deobfuscate tmp file`: runs the CLI locally.
+  1. Create the file `packages/webcrack/tmp/test.js` and paste your code
+  2. The output will be saved in `tmp/webcrack-out`
 
 ## Tests
 
@@ -26,6 +31,9 @@ Run the tests with `pnpm test`.
 
 If the snapshots are outdated, make sure the changes are correct and update them:
 ![failed snapshot](https://user-images.githubusercontent.com/55899582/219093007-825a5056-38a0-4e8b-8512-b56e20174885.png)
+
+The tests can also be debugged by installing the [Vitest extension](https://marketplace.visualstudio.com/items?itemName=ZixuanChen.vitest-explorer) and right-clicking on the play icon:
+![vitest debug](https://github.com/j4k0xb/webcrack/assets/55899582/9661b202-7f85-4615-bf83-c132cfdaa9f7)
 
 ## Linting and Formatting
 

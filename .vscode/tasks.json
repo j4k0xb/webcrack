@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"group": "build",
+			"type": "npm",
+			"script": "dev",
+			"path": "apps/playground",
+			"problemMatcher": [
+				"$vite"
+			],
+			"label": "Run playground dev server",
+			"isBackground": true,
+		}
+	]
+}
