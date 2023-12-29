@@ -49,15 +49,14 @@ test.todo('member expression (esbuild)', () =>
   `),
 );
 
-test.todo('default param (Babel)', () =>
+test('default param (Babel)', () =>
   expectJS(`
-    function foo(foo, qux = (_foo$bar => (_foo$bar = foo.bar) !== null && _foo$bar !== void 0 ? _foo$bar : "qux")()) {}
-    function bar(bar, qux = bar !== null && bar !== void 0 ? bar : "qux") {}
+    function foo(foo, qux = (_foo$bar => (_foo$bar = foo.bar) !== null && _foo$bar !== undefined ? _foo$bar : "qux")()) {}
+    function bar(bar, qux = bar !== null && bar !== undefined ? bar : "qux") {}
   `).toMatchInlineSnapshot(`
     function foo(foo, qux = foo.bar ?? "qux") {}
     function bar(bar, qux = bar ?? "qux") {}
-  `),
-);
+  `));
 
 // TODO: add unminify transform or different matchers?
 test.todo('flipped', () =>

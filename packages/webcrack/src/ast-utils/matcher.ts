@@ -179,12 +179,14 @@ export function isReadonlyObject(
 export function isTemporaryVariable(
   binding: Binding | undefined,
   references: number,
+  kind: 'var' | 'param' = 'var',
 ): binding is Binding {
   return (
     binding !== undefined &&
     binding.references === references &&
     binding.constantViolations.length === 1 &&
-    binding.path.isVariableDeclarator() &&
-    binding.path.node.init === null
+    (kind === 'var'
+      ? binding.path.isVariableDeclarator() && binding.path.node.init === null
+      : binding.path.listKey === 'params' && binding.path.isIdentifier())
   );
 }

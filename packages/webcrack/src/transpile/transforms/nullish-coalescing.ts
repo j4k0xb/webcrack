@@ -58,18 +58,36 @@ export default {
       right,
     );
 
+    const iifeMatcher = m.callExpression(
+      m.arrowFunctionExpression(
+        [m.fromCapture(tmpVar)],
+        m.anyExpression(),
+        false,
+      ),
+      [],
+    );
+
     return {
       ConditionalExpression: {
         exit(path) {
           if (idMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!isTemporaryVariable(binding, 2)) return;
 
-            binding.path.remove();
-            path.replaceWith(
-              t.logicalExpression('??', left.current!, right.current!),
-            );
-            this.changes++;
+            if (
+              iifeMatcher.match(path.parentPath.parent) &&
+              isTemporaryVariable(binding, 2, 'param')
+            ) {
+              path.parentPath.parentPath!.replaceWith(
+                t.logicalExpression('??', left.current!, right.current!),
+              );
+              this.changes++;
+            } else if (isTemporaryVariable(binding, 2, 'var')) {
+              binding.path.remove();
+              path.replaceWith(
+                t.logicalExpression('??', left.current!, right.current!),
+              );
+              this.changes++;
+            }
           } else if (idLooseMatcher.match(path.node)) {
             const binding = path.scope.getBinding(tmpVar.current!.name);
             if (!isTemporaryVariable(binding, 1)) return;

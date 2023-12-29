@@ -30,6 +30,11 @@ var _a$b; // [!code --]
 a.b ?? c; // [!code ++]
 ```
 
+```js
+function foo(foo, qux = (_foo$bar => (_foo$bar = foo.bar) !== null && _foo$bar !== undefined ? _foo$bar : "qux")()) {} // [!code --]
+function foo(foo, qux = foo.bar ?? "qux") {} // [!code ++]
+```
+
 ## nullish-coalescing-assignment
 
 ```js
