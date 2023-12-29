@@ -4,7 +4,7 @@ import { Transform } from '../../ast-utils';
 
 // https://eslint.org/docs/latest/rules/yoda and https://babeljs.io/docs/en/babel-plugin-minify-flip-comparisons
 
-const flippedOperators = {
+const FLIPPED_OPERATORS = {
   '==': '==',
   '===': '===',
   '!=': '!=',
@@ -24,7 +24,7 @@ export default {
   tags: ['safe'],
   visitor: () => {
     const matcher = m.binaryExpression(
-      m.or(...Object.values(flippedOperators)),
+      m.or(...Object.values(FLIPPED_OPERATORS)),
       m.or(
         m.stringLiteral(),
         m.numericLiteral(),
@@ -43,11 +43,17 @@ export default {
 
     return {
       BinaryExpression: {
-        exit({ node }) {
-          if (matcher.match(node)) {
-            [node.left, node.right] = [node.right, node.left as t.Expression];
-            node.operator =
-              flippedOperators[node.operator as keyof typeof flippedOperators];
+        exit(path) {
+          if (matcher.match(path.node)) {
+            path.replaceWith(
+              t.binaryExpression(
+                FLIPPED_OPERATORS[
+                  path.node.operator as keyof typeof FLIPPED_OPERATORS
+                ],
+                path.node.right,
+                path.node.left as t.Expression,
+              ),
+            );
             this.changes++;
           }
         },
