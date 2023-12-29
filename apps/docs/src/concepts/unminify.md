@@ -20,6 +20,18 @@ console["log"](a); // [!code --]
 console.log(a); // [!code ++]
 ```
 
+## for-to-while
+
+```js
+for (;;) a(); // [!code --]
+while (true) a(); // [!code ++]
+```
+
+```js
+for (; a < b;) c(); // [!code --]
+while (a < b) c(); // [!code ++]
+```
+
 ## infinity
 
 ```js
