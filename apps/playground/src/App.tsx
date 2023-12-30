@@ -37,7 +37,7 @@ function App() {
     models().filter((m) => m.uri.scheme === 'untitled'),
   );
   const filePaths = createMemo(() =>
-    fileModels().map((model) => model.uri.fsPath),
+    fileModels().map((model) => model.uri.path),
   );
 
   onCleanup(() => {
@@ -52,7 +52,7 @@ function App() {
   }
 
   function openFile(path: string) {
-    const model = fileModels().find((m) => m.uri.fsPath === '/' + path);
+    const model = fileModels().find((m) => m.uri.path === '/' + path);
     if (!model) {
       return console.warn(`No model found for path: ${path}`);
     }
