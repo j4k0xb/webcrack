@@ -2,7 +2,10 @@ import { Binding, NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
-export const anyLiteral: m.Matcher<t.Literal> = m.matcher(
+/**
+ * Matches any literal except for template literals with expressions (that could have side effects)
+ */
+export const safeLiteral: m.Matcher<t.Literal> = m.matcher(
   (node) =>
     t.isLiteral(node) &&
     (!t.isTemplateLiteral(node) || node.expressions.length === 0),

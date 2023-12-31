@@ -2,31 +2,36 @@ import { statement } from '@babel/template';
 import traverse, { NodePath, Visitor, visitors } from '@babel/traverse';
 import * as t from '@babel/types';
 import mangle from 'babel-plugin-minify-mangle-names';
-import { Transform } from '../ast-utils';
+import { Transform, safeLiteral } from '../ast-utils';
 
 // See https://github.com/j4k0xb/webcrack/issues/41 and https://github.com/babel/minify/issues/1023
 const fixDefaultParamError: Visitor = {
   Function(path) {
     const { params } = path.node;
+
     for (let i = params.length - 1; i >= 0; i--) {
       const param = params[i];
-      if (
-        !t.isAssignmentPattern(param) ||
-        !t.isIdentifier(param.left) ||
-        t.isLiteral(param.right)
-      )
+      if (!t.isAssignmentPattern(param) || safeLiteral.match(param.right))
         continue;
 
-      if (
-        path.isArrowFunctionExpression() &&
-        !t.isBlockStatement(path.node.body)
-      ) {
+      if (!t.isBlockStatement(path.node.body)) {
         path.node.body = t.blockStatement([t.returnStatement(path.node.body)]);
       }
-      (path.get('body') as NodePath<t.BlockStatement>).unshiftContainer(
-        'body',
-        statement`if (${param.left} !== undefined) ${param.left} = ${param.right}`(),
-      );
+
+      const body = path.get('body') as NodePath<t.BlockStatement>;
+      if (t.isIdentifier(param.left)) {
+        body.unshiftContainer(
+          'body',
+          statement`if (${param.left} === undefined) ${param.left} = ${param.right}`(),
+        );
+      } else {
+        const tempId = path.scope.generateUidIdentifier();
+        body.unshiftContainer(
+          'body',
+          statement`var ${param.left} = ${tempId} === undefined ? ${param.right} : ${tempId}`(),
+        );
+        param.left = tempId;
+      }
       param.right = t.identifier('undefined');
     }
   },

@@ -1,7 +1,7 @@
 import { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, anyLiteral, constObjectProperty } from '../ast-utils';
+import { Transform, constObjectProperty, safeLiteral } from '../ast-utils';
 
 /**
  * Merges object assignments into the object expression.
@@ -109,7 +109,7 @@ function hasCircularReference(node: t.Node, binding: Binding) {
 const inlineableObject: m.Matcher<t.Expression> = m.matcher((node) =>
   m
     .or(
-      anyLiteral,
+      safeLiteral,
       m.arrayExpression(m.arrayOf(inlineableObject)),
       m.objectExpression(m.arrayOf(constObjectProperty(inlineableObject))),
     )
