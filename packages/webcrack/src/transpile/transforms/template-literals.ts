@@ -8,12 +8,19 @@ import { Transform, constMemberExpression } from '../../ast-utils';
 // TODO: option ignoreToPrimitiveHint (uses `+` instead of concat)
 
 function escape(str: string) {
-  return str
-    .replace(/\\/g, '\\\\')
-    .replace(/`/g, '\\`')
-    .replace(/\$/g, '\\$')
-    .replace(/\t/g, '\\t')
-    .replace(/\r/g, '\\r');
+  return (
+    str
+      .replaceAll('\\', '\\\\')
+      .replaceAll('`', '\\`')
+      .replaceAll('$', '\\$')
+      .replaceAll('\0', '\\0')
+      .replaceAll('\b', '\\b')
+      .replaceAll('\f', '\\f')
+      // .replaceAll('\n', '\\n') // not escaped because multiline strings are preferred
+      .replaceAll('\r', '\\r')
+      .replaceAll('\t', '\\t')
+      .replaceAll('\v', '\\v')
+  );
 }
 
 function push(template: t.TemplateLiteral, value: t.Expression) {

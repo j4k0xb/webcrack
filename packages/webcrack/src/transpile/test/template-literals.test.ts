@@ -4,10 +4,10 @@ import templateLiterals from '../transforms/template-literals';
 
 const expectJS = testTransform(templateLiterals);
 
-test('escape quotes', () =>
+test('escape sequences', () =>
   expectJS(
-    `"'".concat(foo, "' \\"").concat(bar, "\\"");`,
-  ).toMatchInlineSnapshot(`\`'\${foo}' "\${bar}"\`;`));
+    `"'".concat(foo, "' \\"").concat(bar, "\\"").concat("$\\0\\b\\f\\n\\r\\t\\v");`,
+  ).toMatchInlineSnapshot(`\`'\${foo}' "\${bar}"\\$\\0\\b\\f\n\\r\\t\\v\`;`));
 
 test('expressions', () =>
   expectJS(`
