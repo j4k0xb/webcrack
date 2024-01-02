@@ -27,6 +27,6 @@ jobs:
           cp README.md packages/webcrack
 
       - name: Publish
-        run: pnpm publish --filter webcrack
+        run: pnpm publish --filter webcrack --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
