@@ -1,5 +1,6 @@
-import traverse, { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import traverse from '@babel/traverse';
+import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
   inlineArrayElements,

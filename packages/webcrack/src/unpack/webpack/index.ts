@@ -1,14 +1,14 @@
-import { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import type { Transform } from '../../ast-utils';
 import {
-  Transform,
   constKey,
   constMemberExpression,
   getPropName,
   renameParameters,
 } from '../../ast-utils';
-import { Bundle } from '../bundle';
+import type { Bundle } from '../bundle';
 import { WebpackBundle } from './bundle';
 import { WebpackModule } from './module';
 

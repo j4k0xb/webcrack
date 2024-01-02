@@ -1,5 +1,5 @@
 import * as t from '@babel/types';
-import { Transform } from '../../ast-utils';
+import type { Transform } from '../../ast-utils';
 
 export default {
   name: 'block-statements',

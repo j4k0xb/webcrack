@@ -1,11 +1,12 @@
-import traverse, { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
+import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { Bundle } from '../bundle';
 import { relativePath } from '../path';
 import { convertESM } from './esm';
 import { convertDefaultRequire } from './getDefaultExport';
-import { WebpackModule } from './module';
+import type { WebpackModule } from './module';
 import { inlineVarInjections } from './varInjection';
 
 export class WebpackBundle extends Bundle {

@@ -1,6 +1,6 @@
 declare module 'babel-plugin-minify-mangle-names' {
-  import { Visitor, traverse } from '@babel/traverse';
-  import * as t from '@babel/types';
+  import type { Visitor, traverse } from '@babel/traverse';
+  import type * as t from '@babel/types';
 
   export default function mangle(babel: Babel): {
     visitor: Visitor;

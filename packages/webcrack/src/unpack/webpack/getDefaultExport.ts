@@ -1,8 +1,9 @@
 import { expression } from '@babel/template';
-import traverse, { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
+import traverse from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../ast-utils';
-import { WebpackBundle } from './bundle';
+import type { WebpackBundle } from './bundle';
 
 /*
  * webpack/runtime/compat get default export

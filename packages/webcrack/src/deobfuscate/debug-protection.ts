@@ -1,11 +1,7 @@
 import * as m from '@codemod/matchers';
 import { ifStatement } from '@codemod/matchers';
-import {
-  Transform,
-  constMemberExpression,
-  findParent,
-  iife,
-} from '../ast-utils';
+import type { Transform } from '../ast-utils';
+import { constMemberExpression, findParent, iife } from '../ast-utils';
 
 // https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/debug-protection/templates/debug-protection-function-interval/DebugProtectionFunctionIntervalTemplate.ts
 

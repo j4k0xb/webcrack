@@ -1,6 +1,7 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, constMemberExpression } from '../../ast-utils';
+import type { Transform } from '../../ast-utils';
+import { constMemberExpression } from '../../ast-utils';
 
 // https://github.com/babel/babel/pull/5791
 // https://github.com/babel/babel/blob/cce807f1eb638ee3030112dc190cbee032760888/packages/babel-plugin-transform-template-literals/src/index.ts

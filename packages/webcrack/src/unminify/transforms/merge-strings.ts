@@ -1,6 +1,6 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '../../ast-utils';
+import type { Transform } from '../../ast-utils';
 
 export default {
   name: 'merge-strings',

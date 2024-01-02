@@ -1,14 +1,14 @@
-import { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import type { Transform } from '../../ast-utils';
 import {
-  Transform,
   constKey,
   getPropName,
   matchIife,
   renameParameters,
 } from '../../ast-utils';
-import { Bundle } from '../bundle';
+import type { Bundle } from '../bundle';
 import { resolveDependencyTree } from '../path';
 import { BrowserifyBundle } from './bundle';
 import { BrowserifyModule } from './module';

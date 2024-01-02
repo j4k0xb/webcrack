@@ -1,6 +1,6 @@
 import { statement } from '@babel/template';
 import * as m from '@codemod/matchers';
-import { Transform } from '../../ast-utils';
+import type { Transform } from '../../ast-utils';
 
 export default {
   name: 'ternary-to-if',

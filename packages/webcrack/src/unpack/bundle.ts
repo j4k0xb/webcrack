@@ -1,7 +1,7 @@
 import traverse from '@babel/traverse';
-import * as m from '@codemod/matchers';
+import type * as m from '@codemod/matchers';
 import { posix } from 'node:path';
-import { Module } from './module';
+import type { Module } from './module';
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { dirname, join, normalize } = posix;

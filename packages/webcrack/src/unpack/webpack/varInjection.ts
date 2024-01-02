@@ -1,8 +1,8 @@
 import { statement } from '@babel/template';
-import { Statement } from '@babel/types';
+import type { Statement } from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../ast-utils';
-import { WebpackModule } from './module';
+import type { WebpackModule } from './module';
 
 const buildVar = statement`var NAME = INIT;`;
 

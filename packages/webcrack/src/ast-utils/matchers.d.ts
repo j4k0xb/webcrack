@@ -1,4 +1,4 @@
-import { Matcher } from '@codemod/matchers';
+import type { Matcher } from '@codemod/matchers';
 
 type MatcherType<T> = T extends Matcher<infer U> ? U : T;
 

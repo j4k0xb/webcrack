@@ -1,6 +1,7 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, codePreview, constMemberExpression } from '../ast-utils';
+import type { Transform } from '../ast-utils';
+import { codePreview, constMemberExpression } from '../ast-utils';
 
 const DEFAULT_PRAGMA_CANDIDATES = [
   'jsx',

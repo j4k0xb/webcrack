@@ -1,9 +1,9 @@
 import { parse } from '@babel/parser';
 import traverse, { visitors } from '@babel/traverse';
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
+import type * as t from '@babel/types';
+import type * as m from '@codemod/matchers';
 import { unpackBrowserify } from './browserify';
-import { Bundle } from './bundle';
+import type { Bundle } from './bundle';
 import { unpackWebpack } from './webpack';
 import debug from 'debug';
 

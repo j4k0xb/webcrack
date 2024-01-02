@@ -1,7 +1,8 @@
-import { NodePath, Scope } from '@babel/traverse';
+import type { NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, renameFast } from '../ast-utils';
+import type { Transform } from '../ast-utils';
+import { renameFast } from '../ast-utils';
 
 export default {
   name: 'dead-code',

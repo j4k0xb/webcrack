@@ -1,8 +1,8 @@
-import { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import type { Transform } from '../ast-utils';
 import {
-  Transform,
   constMemberExpression,
   emptyIife,
   falseMatcher,

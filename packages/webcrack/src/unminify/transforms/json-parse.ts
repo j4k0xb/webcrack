@@ -1,6 +1,7 @@
 import { parseExpression } from '@babel/parser';
 import * as m from '@codemod/matchers';
-import { Transform, constMemberExpression } from '../../ast-utils';
+import type { Transform } from '../../ast-utils';
+import { constMemberExpression } from '../../ast-utils';
 
 export default {
   name: 'json-parse',

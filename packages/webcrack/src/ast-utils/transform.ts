@@ -1,9 +1,5 @@
-import traverse, {
-  Node,
-  TraverseOptions,
-  Visitor,
-  visitors,
-} from '@babel/traverse';
+import type { Node, TraverseOptions, Visitor } from '@babel/traverse';
+import traverse, { visitors } from '@babel/traverse';
 import debug from 'debug';
 
 const logger = debug('webcrack:transforms');
@@ -85,7 +81,7 @@ export function mergeTransforms(options: {
       return visitors.merge(
         options.transforms.flatMap((t) => t.visitor?.() ?? []),
       );
-    }
+    },
   };
 }
 

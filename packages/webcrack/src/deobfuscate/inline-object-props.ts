@@ -1,6 +1,6 @@
 import * as m from '@codemod/matchers';
+import type { Transform } from '../ast-utils';
 import {
-  Transform,
   constKey,
   constMemberExpression,
   inlineObjectProperties,

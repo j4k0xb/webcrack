@@ -1,7 +1,8 @@
-import { Binding } from '@babel/traverse';
+import type { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform, constObjectProperty, safeLiteral } from '../ast-utils';
+import type { Transform } from '../ast-utils';
+import { constObjectProperty, safeLiteral } from '../ast-utils';
 
 /**
  * Merges object assignments into the object expression.

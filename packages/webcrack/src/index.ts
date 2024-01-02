@@ -1,5 +1,7 @@
-import { ParseResult, parse } from '@babel/parser';
-import * as t from '@babel/types';
+import type { ParseResult } from '@babel/parser';
+import { parse } from '@babel/parser';
+import type * as t from '@babel/types';
+import type Matchers from '@codemod/matchers';
 import * as m from '@codemod/matchers';
 import debug from 'debug';
 import { join, normalize } from 'node:path';
@@ -9,8 +11,8 @@ import {
   applyTransforms,
   generate,
 } from './ast-utils';
+import type { Sandbox } from './deobfuscate';
 import deobfuscate, {
-  Sandbox,
   createBrowserSandbox,
   createNodeSandbox,
 } from './deobfuscate';
@@ -28,10 +30,13 @@ import {
   sequence,
   splitVariableDeclarations,
 } from './unminify/transforms';
-import { Bundle, unpackAST } from './unpack';
+import type { Bundle } from './unpack';
+import { unpackAST } from './unpack';
 import { isBrowser } from './utils/platform';
 
 export { type Sandbox } from './deobfuscate';
+
+type Matchers = typeof m;
 
 export interface WebcrackResult {
   code: string;
@@ -80,9 +85,7 @@ export interface Options {
    * })
    * ```
    */
-  mappings?: (
-    m: typeof import('@codemod/matchers'),
-  ) => Record<string, m.Matcher<unknown>>;
+  mappings?: (m: Matchers) => Record<string, m.Matcher<unknown>>;
   /**
    * Function that executes a code expression and returns the result (typically from the obfuscator).
    */

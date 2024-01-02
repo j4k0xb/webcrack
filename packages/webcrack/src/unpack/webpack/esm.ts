@@ -1,9 +1,10 @@
 import { statement } from '@babel/template';
-import traverse, { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
+import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression, findPath, renameFast } from '../../ast-utils';
-import { WebpackModule } from './module';
+import type { WebpackModule } from './module';
 
 const buildNamespaceImport = statement`import * as NAME from "PATH";`;
 const buildNamedExportLet = statement`export let NAME = VALUE;`;

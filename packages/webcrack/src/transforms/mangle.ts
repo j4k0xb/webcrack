@@ -1,8 +1,10 @@
 import { statement } from '@babel/template';
-import traverse, { NodePath, Visitor, visitors } from '@babel/traverse';
+import type { Visitor } from '@babel/traverse';
+import traverse, { NodePath, visitors } from '@babel/traverse';
 import * as t from '@babel/types';
 import mangle from 'babel-plugin-minify-mangle-names';
-import { Transform, safeLiteral } from '../ast-utils';
+import type { Transform } from '../ast-utils';
+import { safeLiteral } from '../ast-utils';
 
 // See https://github.com/j4k0xb/webcrack/issues/41 and https://github.com/babel/minify/issues/1023
 const fixDefaultParamError: Visitor = {

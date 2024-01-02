@@ -22,7 +22,7 @@
       "import * as t from '@babel/types';",
       "import * as m from '@codemod/matchers';",
       // https://github.com/microsoft/vscode/issues/37570#issuecomment-672199343
-      "import { Transform } from '${TM_DIRECTORY/.*src(\\/[^\\/]*)(\\/[^\\/]*)?(\\/[^\\/]*)?(\\/[^\\/]*)?(\\/[^\\/]*)?(\\/[^\\/]*)?/${1:+../}${2:+../}${3:+../}${4:+../}${5:+../}${6:+../}/}ast-utils';",
+      "import type { Transform } from '${TM_DIRECTORY/.*src(\\/[^\\/]*)(\\/[^\\/]*)?(\\/[^\\/]*)?(\\/[^\\/]*)?(\\/[^\\/]*)?(\\/[^\\/]*)?/${1:+../}${2:+../}${3:+../}${4:+../}${5:+../}${6:+../}/}ast-utils';",
       "",
       "export default {",
       "  name: '${TM_FILENAME_BASE/[A-Z]/-${0:/downcase}/g}',",

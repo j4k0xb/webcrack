@@ -19,6 +19,7 @@ Choose any of these launch configurations:
 - `Launch playground`: runs a dev server in the background and opens the playground in your browser.
 
   <https://github.com/j4k0xb/webcrack/assets/55899582/8d6509c6-7ec2-43c8-8d1b-8aac5b279e45>
+
 - `Deobfuscate tmp file`: runs the CLI locally.
   1. Create the file `packages/webcrack/tmp/test.js` and paste your code
   2. The output will be saved in `tmp/webcrack-out`

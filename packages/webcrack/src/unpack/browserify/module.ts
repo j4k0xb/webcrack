@@ -1,4 +1,4 @@
-import * as t from '@babel/types';
+import type * as t from '@babel/types';
 import { Module } from '../module';
 
 export class BrowserifyModule extends Module {

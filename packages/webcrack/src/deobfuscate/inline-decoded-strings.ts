@@ -1,6 +1,6 @@
 import * as t from '@babel/types';
-import { AsyncTransform } from '../ast-utils';
-import { VMDecoder } from './vm';
+import type { AsyncTransform } from '../ast-utils';
+import type { VMDecoder } from './vm';
 
 /**
  * Replaces calls to decoder functions with the decoded string.

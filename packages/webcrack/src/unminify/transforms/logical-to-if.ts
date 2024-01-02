@@ -1,7 +1,7 @@
 import { statement } from '@babel/template';
-import * as t from '@babel/types';
+import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Transform } from '../../ast-utils';
+import type { Transform } from '../../ast-utils';
 
 export default {
   name: 'logical-to-if',
