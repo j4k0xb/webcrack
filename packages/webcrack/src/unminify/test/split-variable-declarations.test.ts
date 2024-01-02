@@ -22,24 +22,42 @@ test('split exported variable declarations', () =>
     export const c = 3;
   `));
 
-
-test('split in for loop', () =>
+test('split var in for loop initializer', () =>
   expectJS(`
-    for (let i = 0, j = 1;;) var a, b;
+    for (var i = 0, j = 1;;) {}
   `).toMatchInlineSnapshot(`
-    let i = 0;
-    let j = 1;
-    for (;;) {
-      var a;
-      var b;
-    }
+    var i = 0;
+    var j = 1;
+    for (;;) {}
   `));
 
-test('dont split in for loop with test and update', () =>
+test('ignore let in for loop initializer', () => {
   expectJS(`
-    for (let i = 0, j = 1; i < 10; i++, j++) var a, b;
+    let i;
+    for (let i = 0, j = 1;;) {}
   `).toMatchInlineSnapshot(`
-    for (let i = 0, j = 1; i < 10; i++, j++) {
+    let i;
+    for (let i = 0, j = 1;;) {}
+  `);
+
+  expectJS(`
+    for (let i = 0, j = 1;;) {
+      setTimeout(() => console.log(i));
+      if (++i > 3) break;
+    }
+  `).toMatchInlineSnapshot(`
+    for (let i = 0, j = 1;;) {
+      setTimeout(() => console.log(i));
+      if (++i > 3) break;
+    }
+  `);
+});
+
+test('ignore for loop with test or update', () =>
+  expectJS(`
+    for (var i = 0, j = 1; i < 10; i++, j++) var a, b;
+  `).toMatchInlineSnapshot(`
+    for (var i = 0, j = 1; i < 10; i++, j++) {
       var a;
       var b;
     }

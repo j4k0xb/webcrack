@@ -8,9 +8,13 @@ export default {
     VariableDeclaration: {
       exit(path) {
         if (path.node.declarations.length > 1) {
-          // E.g. for (let i = 0, j = 1;;)
+          // E.g. for (var i = 0, j = 1;;)
           if (path.key === 'init' && path.parentPath.isForStatement()) {
-            if (!path.parentPath.node.test && !path.parentPath.node.update) {
+            if (
+              !path.parentPath.node.test &&
+              !path.parentPath.node.update &&
+              path.node.kind === 'var'
+            ) {
               path.parentPath.insertBefore(
                 path.node.declarations.map((declaration) =>
                   t.variableDeclaration(path.node.kind, [declaration]),
