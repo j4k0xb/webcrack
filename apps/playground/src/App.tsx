@@ -6,7 +6,7 @@ import MonacoEditor from './components/MonacoEditor';
 import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
-import { DeobfuscateResult } from './webcrack.worker';
+import type { DeobfuscateResult } from './webcrack.worker';
 
 export const [settings, setSettings] = createStore({
   deobfuscate: true,

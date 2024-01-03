@@ -1,6 +1,6 @@
 import { For, Show } from 'solid-js';
 import FileNode from './FileNode';
-import { TreeNode } from './FileTree';
+import type { TreeNode } from './FileTree';
 
 interface Props extends TreeNode {
   onFileClick?: (node: TreeNode) => void;
