@@ -20,6 +20,20 @@ describe('rename variable', () => {
     `);
   });
 
+  test('duplicate function binding', () => {
+    const ast = parse('var a; function a() {}');
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('a')!;
+        renameFast(binding, 'b');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot(`
+      var b;
+      function b() {}
+    `);
+  });
+
   test('different types of assignments', () => {
     const ast = parse(`
       var a = 1;

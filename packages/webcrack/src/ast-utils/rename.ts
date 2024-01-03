@@ -42,6 +42,8 @@ export function renameFast(binding: Binding, newName: string): void {
         },
         noScope: true,
       });
+    } else if (ref.isFunctionDeclaration() && t.isIdentifier(ref.node.id)) {
+      ref.node.id.name = newName;
     } else {
       throw new Error(
         `Unexpected constant violation (${ref.type}): ${codePreview(ref.node)}`,
