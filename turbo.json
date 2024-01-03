@@ -9,8 +9,12 @@
         "dist/**"
       ]
     },
-    "lint": {},
-    "lint:fix": {},
+    "lint": {
+      "cache": false
+    },
+    "lint:fix": {
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true
