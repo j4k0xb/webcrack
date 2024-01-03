@@ -105,27 +105,17 @@ export default {
     );
 
     const anyMemberAccess = constMemberExpression(m.identifier(), propertyName);
+    const deadBranchTest = m.or(
+      m.callExpression(anyMemberAccess, [anyMemberAccess, anyMemberAccess]),
+      m.binaryExpression(
+        m.or('===', '!=='),
+        m.stringLiteral(),
+        m.stringLiteral(),
+      ),
+    );
     const deadBranchMatcher = m.or(
-      m.ifStatement(
-        m.or(
-          m.callExpression(anyMemberAccess, [anyMemberAccess, anyMemberAccess]),
-          m.binaryExpression(
-            m.or('===', '!=='),
-            m.stringLiteral(),
-            m.stringLiteral(),
-          ),
-        ),
-      ),
-      m.conditionalExpression(
-        m.or(
-          m.callExpression(anyMemberAccess, [anyMemberAccess, anyMemberAccess]),
-          m.binaryExpression(
-            m.or('===', '!=='),
-            m.stringLiteral(),
-            m.stringLiteral(),
-          ),
-        ),
-      ),
+      m.ifStatement(deadBranchTest),
+      m.conditionalExpression(deadBranchTest),
     );
 
     function isConstantBinding(binding: Binding) {
