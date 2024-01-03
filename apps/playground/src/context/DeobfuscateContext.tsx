@@ -1,7 +1,8 @@
-import { ParentProps, createContext, createSignal, useContext } from 'solid-js';
+import type { ParentProps} from 'solid-js';
+import { createContext, createSignal, useContext } from 'solid-js';
 import type { Options } from 'webcrack';
 import { evalCode } from '../sandbox';
-import {
+import type {
   DeobfuscateResult,
   WorkerRequest,
   WorkerResponse,

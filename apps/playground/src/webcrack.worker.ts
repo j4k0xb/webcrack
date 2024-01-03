@@ -1,4 +1,5 @@
-import { Options, Sandbox, webcrack } from 'webcrack';
+import type { Options, Sandbox} from 'webcrack';
+import { webcrack } from 'webcrack';
 
 export type WorkerRequest =
   | { type: 'deobfuscate'; code: string; options: Options }
