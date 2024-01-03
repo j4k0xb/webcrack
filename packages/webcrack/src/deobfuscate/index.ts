@@ -59,10 +59,12 @@ export default {
       await applyTransformAsync(ast, inlineDecodedStrings, { vm })
     ).changes;
 
-    stringArray.path.remove();
-    rotator?.remove();
-    decoders.forEach((decoder) => decoder.path.remove());
-    state.changes += 2 + decoders.length;
+    if (decoders.length > 0) {
+      stringArray.path.remove();
+      rotator?.remove();
+      decoders.forEach((decoder) => decoder.path.remove());
+      state.changes += 2 + decoders.length;
+    }
 
     state.changes += applyTransforms(
       ast,

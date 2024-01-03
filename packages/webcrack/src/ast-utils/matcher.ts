@@ -62,6 +62,11 @@ export function constMemberExpression(
   );
 }
 
+export const undefinedMatcher = m.or(
+  m.identifier('undefined'),
+  m.unaryExpression('void', m.numericLiteral(0)),
+);
+
 export const trueMatcher = m.or(
   m.booleanLiteral(true),
   m.unaryExpression('!', m.numericLiteral(0)),

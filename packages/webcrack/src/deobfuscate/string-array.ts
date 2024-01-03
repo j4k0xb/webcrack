@@ -6,6 +6,7 @@ import {
   inlineArrayElements,
   isReadonlyObject,
   renameFast,
+  undefinedMatcher,
 } from '../ast-utils';
 
 export interface StringArray {
@@ -20,7 +21,7 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
   const functionName = m.capture(m.anyString());
   const arrayIdentifier = m.capture(m.identifier());
   const arrayExpression = m.capture(
-    m.arrayExpression(m.arrayOf(m.stringLiteral())),
+    m.arrayExpression(m.arrayOf(m.or(m.stringLiteral(), undefinedMatcher))),
   );
   // getStringArray = function () { return array; };
   const functionAssignment = m.assignmentExpression(
