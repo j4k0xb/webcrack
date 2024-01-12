@@ -10,6 +10,7 @@ export { default as mergeStrings } from './merge-strings';
 export { default as numberExpressions } from './number-expressions';
 export { default as rawLiterals } from './raw-literals';
 export { default as sequence } from './sequence';
+export { default as splitForLoopVars } from './split-for-loop-vars';
 export { default as splitVariableDeclarations } from './split-variable-declarations';
 export { default as ternaryToIf } from './ternary-to-if';
 export { default as typeofUndefined } from './typeof-undefined';

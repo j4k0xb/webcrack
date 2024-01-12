@@ -175,6 +175,18 @@ o = null; // [!code ++]
 t = o; // [!code ++]
 ```
 
+## split-for-loops-vars
+
+Minifiers commonly inline variables into for loops. Example: [esbuild](https://esbuild.github.io/try/#dAAwLjE5LjExAC0tbWluaWZ5AHZhciBqID0gMDsKZm9yICh2YXIgaSA9IDA7IGkgPCAzOyBpKyspIHt9)
+
+To improve readability we only move the variables outside that are not used in the loop's test or update expressions.
+
+```js
+for (var j = 0, i = 0; i < 3; i++) {} // [!code --]
+var j = 0; // [!code ++]
+for (var i = 0; i < 3; i++) {} // [!code ++]
+```
+
 ## split-variable-declarations
 
 ```js
