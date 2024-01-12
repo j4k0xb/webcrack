@@ -16,7 +16,7 @@ jobs:
       - uses: pnpm/action-setup@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: "20.x"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -27,7 +27,11 @@ jobs:
           pnpm build --filter webcrack
           cp README.md packages/webcrack
 
+      # https://github.com/pnpm/pnpm/issues/3141#issuecomment-1305563972
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
       - name: Publish
         run: pnpm publish --filter webcrack --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
