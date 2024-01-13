@@ -40,7 +40,7 @@ export class ImportExportManager {
     this.ast = ast;
     this.webpackRequire = webpackRequireBinding;
     this.collectRequireCalls();
-    this.collectExportDefinitions();
+    this.transformExports();
   }
 
   addExport(scope: Scope, exportName: string, value: t.Expression) {
@@ -149,6 +149,11 @@ export class ImportExportManager {
           ),
         ]),
       );
+    } else if (exportName === 'default') {
+      const value = t.isVariableDeclaration(declaration.node)
+        ? declaration.node.declarations[0].init!
+        : (declaration.node as t.ClassDeclaration | t.FunctionDeclaration);
+      declaration.replaceWith(t.exportDefaultDeclaration(value));
     } else {
       renameFast(binding, exportName);
       declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
@@ -208,7 +213,7 @@ export class ImportExportManager {
   /**
    * Extract the export information from all `__webpack_require__.d` calls
    */
-  private collectExportDefinitions() {
+  private transformExports() {
     const exportName = m.capture(m.anyString());
     const returnValue = m.capture(m.anyExpression());
     const getter = m.or(
@@ -228,7 +233,8 @@ export class ImportExportManager {
       ]),
     );
 
-    const defaultExpressionExport = m.expressionStatement(
+    // Example (webpack v4): exports.default = 1;
+    const defaultExportAssignment = m.expressionStatement(
       m.assignmentExpression(
         '=',
         constMemberExpression('exports', 'default'),
@@ -253,9 +259,8 @@ export class ImportExportManager {
         if (singleExport.match(path.node)) {
           this.addExport(path.scope, exportName.current!, returnValue.current!);
           path.remove();
-        } else if (defaultExpressionExport.match(path.node)) {
-          // TODO: handle
-          // path.replaceWith(t.exportDefaultDeclaration(returnValue.current!));
+        } else if (defaultExportAssignment.match(path.node)) {
+          path.replaceWith(t.exportDefaultDeclaration(returnValue.current!));
         } else if (multiExport.match(path.node)) {
           for (const property of properties.current!) {
             objectProperty.match(property); // To easily get the captures per property
