@@ -1,4 +1,4 @@
-import { statement } from '@babel/template';
+import { expression, statement } from '@babel/template';
 import type { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
@@ -118,10 +118,11 @@ export class ImportExportManager {
       requireVar.binding.path.parentPath!.remove();
     });
 
-    // this should never happen:
-    // this.requireCalls.forEach(({ path, moduleId }) => {
-    //   path.replaceWith(expression`require('${moduleId}')`());
-    // });
+    // this should never happen unless for mixed esm/commonjs:
+    this.requireCalls.forEach(({ path, moduleId }) => {
+      // TODO: resolve module id to path
+      path.replaceWith(expression`require('${moduleId}')`());
+    });
   }
 
   private collectImports() {

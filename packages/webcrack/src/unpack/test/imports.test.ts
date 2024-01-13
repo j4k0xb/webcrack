@@ -96,6 +96,16 @@ describe('webpack 4', () => {
       });
     `),
   );
+
+  test('mixed import/require', () =>
+    expectJS(`
+      __webpack_require__.r(__webpack_exports__);
+      var lib = __webpack_require__("lib");
+      console.log(lib, __webpack_require__("lib2"));
+    `).toMatchInlineSnapshot(`
+      import * as lib from "lib";
+      console.log(lib, require("lib2"));
+    `));
 });
 
 describe('webpack 5', () => {
