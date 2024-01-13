@@ -1,16 +1,16 @@
 import { WebpackModule } from './module';
 
 export class WebpackChunk {
-  id: string;
+  chunkIds: string[];
   entryIds: string[];
   modules: Map<string, WebpackModule>;
 
   constructor(
-    id: string,
+    id: string[],
     entryIds: string[],
     modules: Map<string, WebpackModule>,
   ) {
-    this.id = id;
+    this.chunkIds = id;
     this.entryIds = entryIds;
     this.modules = modules;
   }

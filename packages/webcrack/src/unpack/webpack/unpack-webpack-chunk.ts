@@ -60,7 +60,6 @@ export default {
       CallExpression(path) {
         if (!matcher.match(path.node)) return;
 
-        // TODO: WebpackChunk class
         const modules = new Map<string, WebpackModule>();
 
         const containerPath = path.get(
@@ -71,11 +70,13 @@ export default {
           const isEntry = false; // FIXME: afaik after the modules there can be a function that specifies the entry point
           modules.set(id, new WebpackModule(id, func, isEntry));
         }
-        const chunks = chunkIds.current!.map(
-          (id) => new WebpackChunk(id.value.toString(), [], modules),
-        );
 
-        options.bundle = new WebpackBundle('', modules, chunks);
+        const chunk = new WebpackChunk(
+          chunkIds.current!.map((id) => id.value.toString()),
+          [],
+          modules,
+        );
+        options.bundle = new WebpackBundle('', modules, [chunk]);
       },
     };
   },

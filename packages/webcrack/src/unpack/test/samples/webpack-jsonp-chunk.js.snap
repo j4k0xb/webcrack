@@ -1,8 +1,10 @@
 WebpackBundle {
   "chunks": [
     WebpackChunk {
+      "chunkIds": [
+        "15",
+      ],
       "entryIds": [],
-      "id": "15",
       "modules": Map {
         "2wwy" => WebpackModule {
           "ast": const a = require("./E8gZ.js");
