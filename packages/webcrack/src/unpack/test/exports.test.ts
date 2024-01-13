@@ -114,6 +114,16 @@ describe('webpack 4', () => {
       export * as lib from "lib";
     `));
 
+  test('multiple re-export all as named', () =>
+    expectJS(`
+      __webpack_require__.d(__webpack_exports__, "lib", function() { return lib; });
+      __webpack_require__.d(__webpack_exports__, "lib2", function() { return lib; });
+      var lib = __webpack_require__("lib");
+    `).toMatchInlineSnapshot(`
+      export * as lib from "lib";
+      export * as lib2 from "lib";
+    `));
+
   test('re-export all as default', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, "default", function() { return lib; });

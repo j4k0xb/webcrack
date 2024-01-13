@@ -25,7 +25,7 @@ interface RequireVar {
   defaultImport?: t.ImportDefaultSpecifier;
   namespaceImport?: t.ImportNamespaceSpecifier;
   namedImports: t.ImportSpecifier[];
-  namespaceExport?: t.ExportNamespaceSpecifier;
+  namespaceExports: t.ExportNamespaceSpecifier[];
   namedExports: t.ExportSpecifier[];
 }
 
@@ -66,16 +66,18 @@ export class ImportExportManager {
         requireVar.namedExports,
         t.stringLiteral(requireVar.moduleId),
       );
+      // TODO: resolve module id to path
+      const namespaceExports = requireVar.namespaceExports.map((specifier) =>
+        t.exportNamedDeclaration(
+          undefined,
+          [specifier],
+          t.stringLiteral(requireVar.moduleId),
+        ),
+      );
       if (namedExports.specifiers.length > 0) {
         requireVar.binding.path.parentPath!.insertAfter(namedExports);
       }
-      if (requireVar.namespaceExport) {
-        // TODO: resolve module id to path
-        const namespaceExports = t.exportNamedDeclaration(
-          undefined,
-          [requireVar.namespaceExport],
-          t.stringLiteral(requireVar.moduleId),
-        );
+      if (namespaceExports.length > 0) {
         requireVar.binding.path.parentPath!.insertAfter(namespaceExports);
       }
     });
@@ -108,7 +110,8 @@ export class ImportExportManager {
         !!requireVar.namespaceImport ||
         requireVar.namedImports.length > 0;
       const hasExports =
-        !!requireVar.namespaceExport || requireVar.namedExports.length > 0;
+        requireVar.namespaceExports.length > 0 ||
+        requireVar.namedExports.length > 0;
 
       // side-effect import
       if (!requireVar.binding.referenced && !hasImports && !hasExports) {
@@ -369,8 +372,8 @@ export class ImportExportManager {
    * ```
    */
   private addExportNamespace(requireVar: RequireVar, exportName: string) {
-    requireVar.namespaceExport ??= t.exportNamespaceSpecifier(
-      t.identifier(exportName),
+    requireVar.namespaceExports.push(
+      t.exportNamespaceSpecifier(t.identifier(exportName)),
     );
   }
 
@@ -405,7 +408,7 @@ export class ImportExportManager {
             defaultImport: undefined,
             namespaceImport: undefined,
             namedImports: [],
-            namespaceExport: undefined,
+            namespaceExports: [],
             namedExports: [],
           });
         }
