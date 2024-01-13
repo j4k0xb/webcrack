@@ -37,10 +37,11 @@ export class WebpackModule extends Module {
   private removeTrailingComments(): void {
     const lastNode = this.ast.program.body.at(-1);
     if (
-      lastNode?.trailingComments?.length === 1 &&
-      lastNode.trailingComments[0].value === '*'
+      lastNode?.trailingComments &&
+      lastNode.trailingComments.length >= 1 &&
+      lastNode.trailingComments.at(-1)!.value === '*'
     ) {
-      lastNode.trailingComments = null;
+      lastNode.trailingComments.pop();
     }
   }
 
