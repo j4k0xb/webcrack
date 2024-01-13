@@ -65,6 +65,11 @@ test('export default class', () =>
     class foo {}
   `).toMatchInlineSnapshot(`export default class foo {}`));
 
+test('export default expression (webpack 4)', () =>
+  expectJS(`
+    exports.default = 1;
+  `).toMatchInlineSnapshot(`export default 1;`));
+
 test('export object destructuring', () =>
   expectJS(`
     __webpack_require__.d(__webpack_exports__, {
@@ -170,6 +175,23 @@ test('re-export default as default', () =>
 // webpack just declares all the exports individually
 // hard to detect this case
 test.todo('re-export all'); // export * from 'fs';
+
+test.todo('re-export all from commonjs (webpack 4)', () =>
+  expectJS(`
+    var fs = __webpack_require__("fs");
+    for (var importKey in fs) {
+      if (["default"].indexOf(importKey) < 0) {
+        (function (key) {
+          __webpack_require__.d(exports, key, function () {
+            return fs[key];
+          });
+        })(importKey);
+      }
+    }
+  `).toMatchInlineSnapshot(`
+    export * from "./fs";
+  `),
+);
 
 test.todo('re-export all as named', () =>
   expectJS(`

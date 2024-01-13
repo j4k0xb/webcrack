@@ -28,7 +28,9 @@ export class WebpackModule extends Module {
     applyTransform(file, varInjections);
     this.removeTrailingComments();
     this.removeDefineESM();
-    this.convertExportsToESM();
+    if (this.#sourceType === 'esm') {
+      this.convertExportsToESM();
+    }
   }
 
   /**

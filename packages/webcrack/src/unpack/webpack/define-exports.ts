@@ -48,6 +48,14 @@ export default {
       ]),
     );
 
+    const defaultExpressionExport = m.expressionStatement(
+      m.assignmentExpression(
+        '=',
+        constMemberExpression('exports', 'default'),
+        returnValue,
+      ),
+    );
+
     const objectProperty = m.objectProperty(m.identifier(exportName), getter);
     const properties = m.capture(m.arrayOf(objectProperty));
     // Example (webpack v5): __webpack_require__.d(exports, { a: () => b, c: () => d });
@@ -60,11 +68,14 @@ export default {
 
     return {
       ExpressionStatement(path) {
-        if (!path.parentPath.isProgram()) return;
+        if (!path.parentPath.isProgram()) return path.skip();
 
         if (singleExport.match(path.node)) {
           addExport(path, exportName.current!, returnValue.current!);
           path.remove();
+          this.changes++;
+        } else if (defaultExpressionExport.match(path.node)) {
+          path.replaceWith(t.exportDefaultDeclaration(returnValue.current!));
           this.changes++;
         } else if (multiExport.match(path.node)) {
           for (const property of properties.current!) {
