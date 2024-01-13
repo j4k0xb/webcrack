@@ -4,9 +4,10 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import assert from 'assert';
 import { generate, renameFast } from '../../ast-utils';
+import { dereference } from '../../ast-utils/binding';
 
-// TODO: hoist re-exports to the top of the file (but retain order relative to imports)
-// TODO: when it accesses module.exports, dont convert to esm
+// TODO: hoist imports/re-exports to the top of the file (but retain order relative to imports)
+// TODO: when it accesses module.exports, don't convert to esm
 // TODO: sort named imports alphabetically
 // FIXME: remove unused require vars (when they were used for imports/exports)
 
@@ -105,9 +106,10 @@ export class ImportExportManager {
         requireVar.defaultImport ||
         requireVar.namespaceImport ||
         requireVar.namedImports.length > 0;
+      const hasExports = requireVar.exports.length > 0;
 
       // side-effect import
-      if (!requireVar.binding.referenced && !hasImports) {
+      if (!requireVar.binding.referenced && !hasImports && !hasExports) {
         requireVar.binding.path.parentPath!.insertAfter(
           t.importDeclaration([], t.stringLiteral(requireVar.moduleId)),
         );
@@ -116,7 +118,7 @@ export class ImportExportManager {
       requireVar.binding.path.parentPath!.remove();
     });
 
-    // TODO: hoist imports to the top of the file
+    // this should never happen:
     // this.requireCalls.forEach(({ path, moduleId }) => {
     //   path.replaceWith(expression`require('${moduleId}')`());
     // });
@@ -176,20 +178,15 @@ export class ImportExportManager {
         }
       });
     });
-
-    // this should never happen:
-    // this.requireCalls.forEach(({ path, moduleId }) => {
-    //   path.replaceWith(expression`require('${moduleId}')`());
-    // });
   }
 
   addExport(scope: Scope, exportName: string, value: t.Expression) {
     this.exports.add(exportName);
 
-    const objectName = m.capture(m.anyString());
+    const objectId = m.capture(m.identifier());
     const propertyName = m.capture(m.anyString());
     const memberExpressionMatcher = m.memberExpression(
-      m.identifier(objectName),
+      objectId,
       m.identifier(propertyName),
     );
 
@@ -200,18 +197,20 @@ export class ImportExportManager {
 
       if (requireVar) {
         this.addExportNamespace(requireVar, exportName);
+        dereference(requireVar.binding, value);
       } else if (exportName === 'default' && binding.references === 1) {
         this.addExportDefault(binding);
       } else {
         this.addExportDeclaration(binding, exportName);
       }
     } else if (memberExpressionMatcher.match(value)) {
-      const binding = scope.getBinding(objectName.current!);
+      const binding = scope.getBinding(objectId.current!.name);
       if (!binding) return;
       const requireVar = this.findRequireVar(binding.path.node);
       if (!requireVar) return;
 
       this.addExportFrom(requireVar, propertyName.current!, exportName);
+      dereference(requireVar.binding, objectId.current!);
     } else {
       t.addComment(
         this.ast.program,

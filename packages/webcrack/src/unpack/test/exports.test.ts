@@ -57,11 +57,11 @@ describe('webpack 4', () => {
     expectJS(`
       __webpack_require__.d(__webpack_exports__, "readFile", function() { return lib.readFile; });
       var lib = __webpack_require__("lib");
-      lib.writeFile();
+      console.log(lib);
     `).toMatchInlineSnapshot(`
       import * as lib from "lib";
       export { readFile } from "lib";
-      lib.writeFile();
+      console.log(lib);
     `));
 
   test('re-export named as named', () =>

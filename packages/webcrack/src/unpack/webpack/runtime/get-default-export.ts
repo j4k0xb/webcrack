@@ -3,6 +3,7 @@ import * as m from '@codemod/matchers';
 import assert from 'assert';
 import type { Transform } from '../../../ast-utils';
 import { constMemberExpression } from '../../../ast-utils';
+import { dereference } from '../../../ast-utils/binding';
 import type { ImportExportManager } from '../import-export-manager';
 
 // var a = __webpack_require__(11); var i = __webpack_require__.n(a); let p = i.a;
@@ -20,10 +21,10 @@ export default {
   run(ast, manager) {
     assert(manager);
 
-    const moduleVar = m.capture(m.anyString());
+    const moduleVarId = m.capture(m.identifier());
     const getDefaultExportMatcher = m.callExpression(
       constMemberExpression('__webpack_require__', 'n'),
-      [m.identifier(moduleVar)],
+      [moduleVarId],
     );
     const tmpVarName = m.capture(m.anyString());
     const getDefaultExportVarMatcher = m.variableDeclarator(
@@ -37,16 +38,14 @@ export default {
       if (!getDefaultExportMatcher.match(callPath?.node)) return;
 
       // Example: `__webpack_require__.n(moduleVar).a`
-      const moduleBinding = reference.scope.getBinding(moduleVar.current!);
+      const moduleBinding = reference.scope.getBinding(
+        moduleVarId.current!.name,
+      );
       if (!moduleBinding) return;
       const requireVar = manager.findRequireVar(moduleBinding.path.node);
       if (!requireVar) return;
 
-      requireVar.binding.referencePaths =
-        requireVar.binding.referencePaths.filter(
-          (ref) => ref.parent !== callPath.node,
-        );
-      requireVar.binding.dereference();
+      dereference(requireVar.binding, moduleVarId.current!);
 
       const importName = manager.addDefaultImport(requireVar);
 
