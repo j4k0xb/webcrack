@@ -62,15 +62,7 @@ export class ImportExportManager {
   }
 
   insertImportsAndExports() {
-    // const property = m.capture(m.anyString());
-    // const memberExpressionMatcher = m.memberExpression(
-    //   m.identifier(),
-    //   m.identifier(property),
-    // );
-    // const zeroSequenceMatcher = m.sequenceExpression([
-    //   m.numericLiteral(0),
-    //   m.memberExpression(m.identifier(), m.identifier(property)),
-    // ]);
+    this.collectImports();
 
     this.requireVars.forEach((requireVar) => {
       // TODO: resolve module id to path
@@ -94,11 +86,11 @@ export class ImportExportManager {
       requireVar.binding.path.parentPath!.insertAfter(namespaceExports);
 
       // FIXME: collect this information earlier
-      if (requireVar.binding.references > 1) {
-        requireVar.binding.path.parentPath!.insertAfter(
-          statement`import * as ${requireVar.binding.identifier} from '${requireVar.moduleId}'`(),
-        );
-      }
+      // if (requireVar.binding.references > 1) {
+      //   requireVar.binding.path.parentPath!.insertAfter(
+      //     statement`import * as ${requireVar.binding.identifier} from '${requireVar.moduleId}'`(),
+      //   );
+      // }
 
       const namedImports = t.importDeclaration(
         [
@@ -120,7 +112,16 @@ export class ImportExportManager {
       }
       requireVar.binding.path.parentPath!.insertAfter(namespaceImports);
 
-      requireVar.binding.path.remove();
+      // requireVar.binding.path.remove();
+    });
+
+    this.requireVars.forEach((requireVar) => {
+      if (requireVar.binding.references === 0) {
+        // side-effect import
+        requireVar.binding.path.parentPath!.replaceWith(
+          t.importDeclaration([], t.stringLiteral(requireVar.moduleId)),
+        );
+      }
     });
 
     // TODO: hoist imports to the top of the file
@@ -180,7 +181,9 @@ export class ImportExportManager {
         binding.referencePaths.forEach((reference) => {
           reference.replaceWith(t.identifier(binding.identifier.name));
         });
-        this.addImportNamespace(requireVar);
+        if (binding.references > 0) {
+          this.addImportNamespace(requireVar);
+        }
       }
     });
 
