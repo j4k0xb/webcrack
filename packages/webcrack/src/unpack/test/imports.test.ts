@@ -29,8 +29,7 @@ describe('webpack 4', () => {
   test('inlined default import of commonjs module', () =>
     expectJS(`
       var lib = __webpack_require__(1);
-      var _tmp = __webpack_require__.n(lib).a;
-      console.log(_tmp);
+      console.log(__webpack_require__.n(lib).a);
     `).toMatchInlineSnapshot(`
       import _lib_default from "1";
       console.log(_lib_default);

@@ -37,33 +37,32 @@ export default {
       if (!getDefaultExportMatcher.match(callPath?.node)) return;
 
       // Example: `__webpack_require__.n(moduleVar).a`
-      const isInlined = !getDefaultExportVarMatcher.match(callPath.parent);
-      if (isInlined) {
-        const moduleBinding = reference.scope.getBinding(moduleVar.current!);
-        if (!moduleBinding) return;
-        const requireVar = manager.findRequireVar(moduleBinding.path.node);
-        if (!requireVar) return;
-
-        requireVar.binding.dereference();
-        const importName = manager.addDefaultImport(requireVar);
-        callPath.parentPath?.replaceWith(t.identifier(importName));
-        this.changes++;
-        return;
-      }
-
-      const tmpVarBinding = reference.scope.getBinding(tmpVarName.current!);
       const moduleBinding = reference.scope.getBinding(moduleVar.current!);
-      if (!moduleBinding || !tmpVarBinding) return;
+      if (!moduleBinding) return;
       const requireVar = manager.findRequireVar(moduleBinding.path.node);
       if (!requireVar) return;
 
-      const importName = manager.addDefaultImport(requireVar);
-      // `_tmp.a` or `_tmp()` -> `importName`
-      tmpVarBinding.referencePaths.forEach((refPath) => {
-        refPath.parentPath?.replaceWith(t.identifier(importName));
-      });
-      tmpVarBinding.path.remove();
+      requireVar.binding.referencePaths =
+        requireVar.binding.referencePaths.filter(
+          (ref) => ref.parent !== callPath.node,
+        );
       requireVar.binding.dereference();
+
+      const importName = manager.addDefaultImport(requireVar);
+
+      const isInlined = !getDefaultExportVarMatcher.match(callPath.parent);
+      if (isInlined) {
+        callPath.parentPath?.replaceWith(t.identifier(importName));
+      } else {
+        const tmpVarBinding = reference.scope.getBinding(tmpVarName.current!);
+        if (!tmpVarBinding) return;
+
+        // `_tmp.a` or `_tmp()` -> `importName`
+        tmpVarBinding.referencePaths.forEach((refPath) => {
+          refPath.parentPath?.replaceWith(t.identifier(importName));
+        });
+        tmpVarBinding.path.remove();
+      }
       this.changes++;
     });
   },
