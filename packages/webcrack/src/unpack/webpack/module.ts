@@ -28,6 +28,8 @@ export class WebpackModule extends Module {
     applyTransform(file, varInjections);
     this.removeTrailingComments();
     this.removeDefineESM();
+    // FIXME: some bundles don't define __esModule but still declare esm exports
+    // https://github.com/0xdevalias/chatgpt-source-watch/blob/main/orig/_next/static/chunks/167-121de668c4456907.js
     if (this.#sourceType === 'esm') {
       this.convertExportsToESM();
     }
