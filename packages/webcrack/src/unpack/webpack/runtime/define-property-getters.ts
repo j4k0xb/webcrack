@@ -37,7 +37,7 @@ export default {
     const defaultExportAssignment = m.expressionStatement(
       m.assignmentExpression(
         '=',
-        constMemberExpression('exports', 'default'),
+        constMemberExpression('__webpack_exports__', 'default'),
         returnValue,
       ),
     );

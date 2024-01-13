@@ -24,6 +24,7 @@ export function webpackRequireFunctionMatcher() {
     m.functionDeclaration(
       m.identifier(), // __webpack_require__
       [m.identifier()], // moduleId
+      // TODO(perf): use m.anyList for statements
       m.containerOf(
         m.callExpression(
           m.or(

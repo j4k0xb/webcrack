@@ -30,7 +30,11 @@ export class WebpackModule extends Module {
     const file = t.file(t.program(ast.node.body.body));
     super(id, file, isEntry);
 
-    renameParameters(ast, ['module', 'exports', '__webpack_require__']);
+    renameParameters(ast, [
+      '__webpack_module__',
+      '__webpack_exports__',
+      '__webpack_require__',
+    ]);
     applyTransform(file, varInjections);
     this.removeTrailingComments();
 

@@ -5,7 +5,13 @@ import { Assertion, expect } from 'vitest';
 import { Transform, applyTransform } from '../../ast-utils';
 
 /**
- * Test a transform with the input being wrapped in `(function(module, exports, __webpack_require__) { ... })`
+ * Test a transform with the input being wrapped with
+ * ```js
+ * (function(__webpack_module__, __webpack_exports__, __webpack_require__) {
+ *  // input
+ * });
+ * ```
+ *
  * @param transform the transform to apply
  * @param cb specify the options that will be passed to the transform
  */
@@ -15,7 +21,7 @@ export function testWebpackModuleTransform<Options>(
 ): (input: string) => Assertion<ParseResult<File>> {
   return (input) => {
     const moduleCode = `
-      (function(module, exports, __webpack_require__) {
+      (function(__webpack_module__, __webpack_exports__, __webpack_require__) {
         ${input}
       });
     `;

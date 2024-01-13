@@ -17,7 +17,7 @@ test('replace __webpack_require__.g with global', () =>
 
 test('a', () => {
   const ast = parse(`
-    (function(module, exports, __webpack_require__) {
+    (function(__webpack_module__, __webpack_exports__, __webpack_require__) {
       __webpack_require__.g.setTimeout(() => {});
     });
   `);
@@ -27,7 +27,7 @@ test('a', () => {
       const binding = path.scope.bindings.__webpack_require__;
       applyTransform(path.node, global, binding);
       expect(path.node).toMatchInlineSnapshot(`
-        function (module, exports, __webpack_require__) {
+        function (__webpack_module__, __webpack_exports__, __webpack_require__) {
           global.setTimeout(() => {});
         }
       `);
