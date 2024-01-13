@@ -6,6 +6,7 @@ import { generate, renameFast } from '../../ast-utils';
 
 // TODO: hoist re-exports to the top of the file (but retain order relative to imports)
 // TODO: when it accesses module.exports, dont convert to esm
+// TODO: side-effect import
 // FIXME: remove unused require vars (when they were used for imports/exports)
 // also store import/export metadata in the require var for easier management
 

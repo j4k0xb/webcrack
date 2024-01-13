@@ -60,6 +60,7 @@ export default {
       ]),
     );
 
+    // TODO: use `var namespace = { get foo() { return foo; } };` instead of `Object.defineProperty`
     /**
      * Used only for concatenated modules where we can't convert to ESM exports, so it still works at runtime.
      */
