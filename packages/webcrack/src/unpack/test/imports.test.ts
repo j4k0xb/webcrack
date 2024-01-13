@@ -107,6 +107,18 @@ describe('webpack 4', () => {
     `),
   );
 
+  test('indirect calls', () =>
+    expectJS(`
+      __webpack_require__.r(__webpack_exports__);
+      const lib = __webpack_require__("lib");
+      console.log(Object(lib.foo)("bar"));
+      console.log(Object(lib.default)("bar"));
+    `).toMatchInlineSnapshot(`
+      import _lib_default, { foo } from "lib";
+      console.log(foo("bar"));
+      console.log(_lib_default("bar"));
+    `));
+
   test('sort import specifiers alphabetically', () =>
     expectJS(`
       __webpack_require__.r(__webpack_exports__);

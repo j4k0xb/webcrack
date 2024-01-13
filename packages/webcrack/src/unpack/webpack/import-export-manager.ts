@@ -165,7 +165,7 @@ export class ImportExportManager {
           // lib.default -> _lib_default
           if (importedName === 'default') {
             const localName = this.addDefaultImport(requireVar);
-            reference.parentPath!.replaceWith(t.identifier(localName));
+            replaceImportReference(reference, localName);
             return;
           }
 
@@ -181,21 +181,23 @@ export class ImportExportManager {
             this.addNamedImport(requireVar, localName, importedName);
           }
 
-          if (
-            indirectCall.match(reference.parentPath?.parentPath?.parent) &&
-            reference.parentPath.parentPath?.key === 'callee'
-          ) {
-            reference.parentPath.parentPath.replaceWith(
-              t.identifier(localName),
-            );
-          } else {
-            reference.parentPath!.replaceWith(t.identifier(localName));
-          }
+          replaceImportReference(reference, localName);
         } else {
           this.addNamespaceImport(requireVar);
         }
       });
     });
+
+    function replaceImportReference(path: NodePath<t.Node>, localName: string) {
+      if (
+        indirectCall.match(path.parentPath?.parentPath?.parent) &&
+        path.parentPath.parentPath?.key === 'callee'
+      ) {
+        path.parentPath.parentPath.replaceWith(t.identifier(localName));
+      } else {
+        path.parentPath!.replaceWith(t.identifier(localName));
+      }
+    }
   }
 
   addExport(scope: Scope, exportName: string, value: t.Expression) {
