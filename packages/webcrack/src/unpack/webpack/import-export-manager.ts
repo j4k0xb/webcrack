@@ -71,12 +71,13 @@ export class ImportExportManager {
 
     this.requireVars.forEach((requireVar) => {
       const importedLocalNames = new Set<string>();
-      if (
-        requireVar.binding.referencePaths.every((ref) =>
-          memberExpressionMatcher.match(ref.parent),
-        )
-      ) {
+      const hasOnlyNamedImports = requireVar.binding.referencePaths.every(
+        (ref) => memberExpressionMatcher.match(ref.parent),
+      );
+
+      if (hasOnlyNamedImports) {
         requireVar.binding.referencePaths.forEach((reference) => {
+          memberExpressionMatcher.match(reference.parent); // to populate property.current
           const importedName = property.current!;
           const hasNameConflict = requireVar.binding.referencePaths.some(
             (ref) => ref.scope.hasBinding(importedName),
@@ -87,6 +88,7 @@ export class ImportExportManager {
 
           if (!importedLocalNames.has(localName)) {
             importedLocalNames.add(localName);
+
             this.addNamedImport(requireVar, localName, importedName);
           }
 
