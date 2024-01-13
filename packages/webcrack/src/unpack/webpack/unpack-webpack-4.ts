@@ -46,6 +46,7 @@ export default {
     return {
       CallExpression(path) {
         if (!matcher.match(path.node)) return;
+        path.stop();
 
         const webpackRequireBinding = path
           .get('callee')
