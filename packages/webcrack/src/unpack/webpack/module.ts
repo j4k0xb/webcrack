@@ -6,15 +6,15 @@ import {
   constMemberExpression,
   renameParameters,
 } from '../../ast-utils';
-import { Import, Module } from '../module';
+import { Module } from '../module';
 import { FunctionPath } from './common-matchers';
 import defineExport from './define-exports';
+import { ImportExportManager } from './import-export-manager';
 import varInjections from './var-injections';
 
 export class WebpackModule extends Module {
   #webpackRequireBinding: Binding | undefined;
-  // TODO: expose to public API
-  #imports: Import[] = [];
+  #importExportManager: ImportExportManager;
   // TODO: expose to public API
   #sourceType: 'commonjs' | 'esm' = 'commonjs';
 
@@ -24,15 +24,21 @@ export class WebpackModule extends Module {
     super(id, file, isEntry);
 
     renameParameters(ast, ['module', 'exports', '__webpack_require__']);
-    this.#webpackRequireBinding = ast.scope.getBinding('__webpack_require__');
     applyTransform(file, varInjections);
     this.removeTrailingComments();
-    this.removeDefineESM();
-    // FIXME: some bundles don't define __esModule but still declare esm exports
-    // https://github.com/0xdevalias/chatgpt-source-watch/blob/main/orig/_next/static/chunks/167-121de668c4456907.js
-    if (this.#sourceType === 'esm') {
-      this.convertExportsToESM();
-    }
+
+    this.#webpackRequireBinding = ast.scope.getBinding('__webpack_require__');
+    this.#importExportManager = new ImportExportManager(
+      file,
+      this.#webpackRequireBinding,
+    );
+
+    // this.removeDefineESM();
+    // // FIXME: some bundles don't define __esModule but still declare esm exports
+    // // https://github.com/0xdevalias/chatgpt-source-watch/blob/main/orig/_next/static/chunks/167-121de668c4456907.js
+    // if (this.#sourceType === 'esm') {
+    //   this.convertExportsToESM();
+    // }
   }
 
   /**
@@ -85,6 +91,7 @@ export class WebpackModule extends Module {
   }
 
   /**
+   * // TODO: refactor to use ImportExportManager
    * ```diff
    * - __webpack_require__(id)
    * + require("./relative/path.js")
@@ -95,6 +102,7 @@ export class WebpackModule extends Module {
     onResolve: (id: string) => { path: string; external?: boolean },
   ): void {
     if (!this.#webpackRequireBinding) return;
+    return;
 
     const idArg = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
     const requireCall = m.callExpression(m.identifier('__webpack_require__'), [
@@ -112,11 +120,11 @@ export class WebpackModule extends Module {
           idArg.addComment('leading', 'webcrack:missing');
         }
 
-        this.#imports.push({
-          id,
-          path: result.path,
-          nodePath: path.parentPath as NodePath<t.CallExpression>,
-        });
+        // this.#imports.push({
+        //   id,
+        //   path: result.path,
+        //   nodePath: path.parentPath as NodePath<t.CallExpression>,
+        // });
       });
     });
   }
