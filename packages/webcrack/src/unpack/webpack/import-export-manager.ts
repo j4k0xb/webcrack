@@ -1,23 +1,22 @@
 import traverse, { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { constMemberExpression, findPath, renameFast } from '../../ast-utils';
+import { constMemberExpression, renameFast } from '../../ast-utils';
 
 /**
  * Example: `__webpack_require__(id)`
  */
 interface RequireCall {
-  moduleId: string;
   path: NodePath<t.CallExpression>;
+  moduleId: string;
 }
 
 /**
  * Example: `var foo = __webpack_require__(id);`
  */
 interface RequireVar {
-  name: string;
-  moduleId: string;
   binding: Binding;
+  moduleId: string;
 }
 
 export class ImportExportManager {
@@ -230,7 +229,6 @@ export class ImportExportManager {
           const binding = path.scope.getBinding(varName.current!)!;
           this.requireVars.push({
             moduleId: idArg.node.value.toString(),
-            name: varName.current!,
             binding,
           });
         }
