@@ -1,8 +1,11 @@
 import { test } from 'vitest';
-import { testTransform } from '../../../test';
+import { testWebpackModuleTransform } from '.';
 import hasOwnProperty from '../webpack/runtime/has-own-property';
 
-const expectJS = testTransform(hasOwnProperty);
+const expectJS = testWebpackModuleTransform(
+  hasOwnProperty,
+  ({ scope }) => scope.bindings.__webpack_require__,
+);
 
 test('replace hasOwnProperty', () =>
   expectJS(`__webpack_require__.o(obj, prop);`).toMatchInlineSnapshot(`

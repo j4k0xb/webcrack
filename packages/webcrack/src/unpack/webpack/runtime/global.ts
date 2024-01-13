@@ -1,3 +1,4 @@
+import { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import { Transform, constMemberExpression } from '../../../ast-utils';
 
@@ -9,14 +10,12 @@ import { Transform, constMemberExpression } from '../../../ast-utils';
 export default {
   name: 'global',
   tags: ['safe'],
-  visitor() {
+  run(ast, binding) {
     const matcher = constMemberExpression('__webpack_require__', 'g');
-    return {
-      Expression(path) {
-        if (!matcher.match(path.node)) return;
-        path.replaceWith(t.identifier('global'));
-        this.changes++;
-      },
-    };
+    binding?.referencePaths.forEach((path) => {
+      if (!matcher.match(path.parent)) return;
+      path.parentPath!.replaceWith(t.identifier('global'));
+      this.changes++;
+    });
   },
-} satisfies Transform;
+} satisfies Transform<Binding>;

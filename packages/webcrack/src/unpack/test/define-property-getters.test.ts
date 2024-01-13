@@ -1,27 +1,13 @@
-import { parse } from '@babel/parser';
-import traverse from '@babel/traverse';
-import { describe, expect, test } from 'vitest';
-import { applyTransform } from '../../ast-utils';
+import { describe, test } from 'vitest';
+import { testWebpackModuleTransform } from '.';
 import { ImportExportManager } from '../webpack/import-export-manager';
 import definePropertyGetters from '../webpack/runtime/define-property-getters';
 
-const expectJS = (input: string) => {
-  const ast = parse('var __webpack_require__; ' + input, {
-    sourceType: 'unambiguous',
-    allowReturnOutsideFunction: true,
-  });
-  traverse(ast, {
-    Program(path) {
-      const webpackRequireBinding = path.scope.getBinding(
-        '__webpack_require__',
-      );
-      const manager = new ImportExportManager(ast, webpackRequireBinding);
-      applyTransform(ast, definePropertyGetters, manager);
-      webpackRequireBinding!.path.remove();
-    },
-  });
-  return expect(ast);
-};
+const expectJS = testWebpackModuleTransform(
+  definePropertyGetters,
+  ({ scope }, ast) =>
+    new ImportExportManager(ast, scope.bindings.__webpack_require__),
+);
 
 describe('webpack 4', () => {
   test('export default expression;', () =>

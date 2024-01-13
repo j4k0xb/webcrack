@@ -1,4 +1,5 @@
 import { expression } from '@babel/template';
+import { Binding } from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import { Transform, constMemberExpression } from '../../../ast-utils';
 
@@ -10,7 +11,7 @@ import { Transform, constMemberExpression } from '../../../ast-utils';
 export default {
   name: 'has-own-property',
   tags: ['safe'],
-  visitor() {
+  run(ast, binding) {
     const object = m.capture(m.anyExpression());
     const property = m.capture(m.anyExpression());
     const matcher = m.callExpression(
@@ -18,14 +19,12 @@ export default {
       [object, property],
     );
 
-    return {
-      CallExpression(path) {
-        if (!matcher.match(path.node)) return;
-        path.replaceWith(
-          expression`Object.hasOwn(${object.current}, ${property.current})`(),
-        );
-        this.changes++;
-      },
-    };
+    binding?.referencePaths.forEach((path) => {
+      if (!matcher.match(path.parentPath?.parent)) return;
+      path.parentPath.parentPath!.replaceWith(
+        expression`Object.hasOwn(${object.current}, ${property.current})`(),
+      );
+      this.changes++;
+    });
   },
-} satisfies Transform;
+} satisfies Transform<Binding>;
