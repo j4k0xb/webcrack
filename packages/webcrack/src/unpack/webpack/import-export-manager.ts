@@ -66,24 +66,27 @@ export class ImportExportManager {
     );
     const zeroSequenceMatcher = m.sequenceExpression([
       m.numericLiteral(0),
-      m.memberExpression(m.identifier(), m.identifier()),
+      m.memberExpression(m.identifier(), m.identifier(property)),
     ]);
 
     this.requireVars.forEach((requireVar) => {
+      const { binding } = requireVar;
       const importedLocalNames = new Set<string>();
-      const hasOnlyNamedImports = requireVar.binding.referencePaths.every(
-        (ref) => memberExpressionMatcher.match(ref.parent),
-      );
+      const hasOnlyNamedImports =
+        binding.references > 0 &&
+        binding.referencePaths.every((ref) =>
+          memberExpressionMatcher.match(ref.parent),
+        );
 
       if (hasOnlyNamedImports) {
-        requireVar.binding.referencePaths.forEach((reference) => {
+        binding.referencePaths.forEach((reference) => {
           memberExpressionMatcher.match(reference.parent); // to populate property.current
           const importedName = property.current!;
-          const hasNameConflict = requireVar.binding.referencePaths.some(
-            (ref) => ref.scope.hasBinding(importedName),
+          const hasNameConflict = binding.referencePaths.some((ref) =>
+            ref.scope.hasBinding(importedName),
           );
           const localName = hasNameConflict
-            ? requireVar.binding.path.scope.generateUid(importedName)
+            ? binding.path.scope.generateUid(importedName)
             : importedName;
 
           if (!importedLocalNames.has(localName)) {
@@ -101,12 +104,10 @@ export class ImportExportManager {
           }
           if (!memberExpressionMatcher.match(reference.parent)) return;
         });
-        requireVar.binding.path.remove();
+        binding.path.remove();
       } else {
-        requireVar.binding.referencePaths.forEach((reference) => {
-          reference.replaceWith(
-            t.identifier(requireVar.binding.identifier.name),
-          );
+        binding.referencePaths.forEach((reference) => {
+          reference.replaceWith(t.identifier(binding.identifier.name));
         });
         this.addImportAll(requireVar);
       }
