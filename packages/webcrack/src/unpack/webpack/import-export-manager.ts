@@ -1,4 +1,4 @@
-import { statement } from '@babel/template';
+import { expression, statement } from '@babel/template';
 import { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
@@ -46,11 +46,72 @@ export class ImportExportManager {
    * Used for merging multiple re-exports of a module
    */
   private reExportCache = new Map<string, t.ExportNamedDeclaration>();
+  /**
+   * Used for merging multiple imports of a module
+   */
+  private importCache = new Map<string, t.ImportDeclaration>();
 
   constructor(ast: t.File, webpackRequireBinding: Binding | undefined) {
     this.ast = ast;
     this.webpackRequire = webpackRequireBinding;
     this.collectRequireCalls();
+  }
+
+  transformImports() {
+    const property = m.capture(m.anyString());
+    const memberExpressionMatcher = m.memberExpression(
+      m.identifier(),
+      m.identifier(property),
+    );
+    const zeroSequenceMatcher = m.sequenceExpression([
+      m.numericLiteral(0),
+      m.memberExpression(m.identifier(), m.identifier()),
+    ]);
+
+    this.requireVars.forEach((requireVar) => {
+      const importedLocalNames = new Set<string>();
+      if (
+        requireVar.binding.referencePaths.every((ref) =>
+          memberExpressionMatcher.match(ref.parent),
+        )
+      ) {
+        requireVar.binding.referencePaths.forEach((reference) => {
+          const importedName = property.current!;
+          const hasNameConflict = requireVar.binding.referencePaths.some(
+            (ref) => ref.scope.hasBinding(importedName),
+          );
+          const localName = hasNameConflict
+            ? requireVar.binding.path.scope.generateUid(importedName)
+            : importedName;
+
+          if (!importedLocalNames.has(localName)) {
+            importedLocalNames.add(localName);
+            this.addNamedImport(requireVar, localName, importedName);
+          }
+
+          if (zeroSequenceMatcher.match(reference.parentPath?.parent)) {
+            reference.parentPath.parentPath!.replaceWith(
+              t.identifier(localName),
+            );
+          } else {
+            reference.parentPath!.replaceWith(t.identifier(localName));
+          }
+          if (!memberExpressionMatcher.match(reference.parent)) return;
+        });
+        requireVar.binding.path.remove();
+      } else {
+        requireVar.binding.referencePaths.forEach((reference) => {
+          reference.replaceWith(
+            t.identifier(requireVar.binding.identifier.name),
+          );
+        });
+        this.addImportAll(requireVar);
+      }
+    });
+
+    this.requireCalls.forEach(({ path, moduleId }) => {
+      path.replaceWith(expression`require('${moduleId}')`());
+    });
   }
 
   transformExport(scope: Scope, exportName: string, value: t.Expression) {
@@ -98,6 +159,32 @@ export class ImportExportManager {
         true,
       );
     }
+  }
+
+  private addNamedImport(
+    requireVar: RequireVar,
+    localName: string,
+    importedName: string,
+  ) {
+    const existingImport = this.importCache.get(requireVar.moduleId);
+    if (existingImport) {
+      existingImport.specifiers.push(
+        t.importSpecifier(t.identifier(localName), t.identifier(importedName)),
+      );
+    } else {
+      // TODO: resolve to file path
+      const importDeclaration =
+        statement`import { ${importedName} as ${localName} } from '${requireVar.moduleId}'`() as t.ImportDeclaration;
+      requireVar.binding.path.parentPath!.insertAfter(importDeclaration);
+      this.importCache.set(requireVar.moduleId, importDeclaration);
+    }
+  }
+
+  private addImportAll(requireVar: RequireVar) {
+    // TODO: resolve to file path
+    requireVar.binding.path.parentPath!.replaceWith(
+      statement`import * as ${requireVar.binding.identifier} from '${requireVar.moduleId}'`(),
+    );
   }
 
   /**

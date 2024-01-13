@@ -45,6 +45,7 @@ export class WebpackModule extends Module {
     applyTransform(file, moduleDecorator, this.#webpackRequireBinding);
     applyTransform(file, namespaceObject);
     applyTransform(file, definePropertyGetters, this.#importExportManager);
+    this.#importExportManager.transformImports();
 
     // this.removeDefineESM();
     // // FIXME: some bundles don't define __esModule but still declare esm exports
