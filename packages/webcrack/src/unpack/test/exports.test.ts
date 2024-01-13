@@ -126,12 +126,11 @@ describe('webpack 4', () => {
       export * as lib from "lib";
     `));
 
-  test.todo('re-export all as default', () =>
+  test('re-export all as default', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, "default", function() { return lib; });
       var lib = __webpack_require__("lib");
-    `).toMatchInlineSnapshot(`export * as default from "lib";`),
-  );
+    `).toMatchInlineSnapshot(`export * as default from "lib";`));
 
   test('namespace object', () =>
     expectJS(`
