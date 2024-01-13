@@ -311,6 +311,7 @@ export class ImportExportManager {
       m.functionDeclaration(),
       m.exportNamedDeclaration(),
     );
+    // FIXME: most likely an inlined variable declaration
     if (!matcher.match(statementPath.node)) return;
 
     const isDeclarationExport =
