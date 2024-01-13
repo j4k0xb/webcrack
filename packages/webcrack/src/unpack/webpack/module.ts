@@ -9,7 +9,14 @@ import {
 import { Module } from '../module';
 import { FunctionPath } from './common-matchers';
 import { ImportExportManager } from './import-export-manager';
-import defineExport from './runtime/define-property-getters';
+import {
+  default as defineExport,
+  default as definePropertyGetters,
+} from './runtime/define-property-getters';
+import global from './runtime/global';
+import hasOwnProperty from './runtime/has-own-property';
+import moduleDecorator from './runtime/module-decorator';
+import namespaceObject from './runtime/namespace-object';
 import varInjections from './var-injections';
 
 export class WebpackModule extends Module {
@@ -32,6 +39,12 @@ export class WebpackModule extends Module {
       file,
       this.#webpackRequireBinding,
     );
+
+    applyTransform(file, global, this.#webpackRequireBinding);
+    applyTransform(file, hasOwnProperty, this.#webpackRequireBinding);
+    applyTransform(file, moduleDecorator, this.#webpackRequireBinding);
+    applyTransform(file, namespaceObject);
+    applyTransform(file, definePropertyGetters, this.#importExportManager);
 
     // this.removeDefineESM();
     // // FIXME: some bundles don't define __esModule but still declare esm exports
@@ -98,34 +111,29 @@ export class WebpackModule extends Module {
    * ```
    * @internal
    */
-  replaceRequireCalls(
-    onResolve: (id: string) => { path: string; external?: boolean },
-  ): void {
-    if (!this.#webpackRequireBinding) return;
-    return;
-
-    const idArg = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
-    const requireCall = m.callExpression(m.identifier('__webpack_require__'), [
-      idArg,
-    ]);
-
-    this.#webpackRequireBinding.referencePaths.forEach((path) => {
-      m.matchPath(requireCall, { idArg }, path.parentPath!, ({ idArg }) => {
-        const id = idArg.node.value.toString();
-        const result = onResolve(id);
-
-        (path.node as t.Identifier).name = 'require';
-        idArg.replaceWith(t.stringLiteral(result.path));
-        if (result.external) {
-          idArg.addComment('leading', 'webcrack:missing');
-        }
-
-        // this.#imports.push({
-        //   id,
-        //   path: result.path,
-        //   nodePath: path.parentPath as NodePath<t.CallExpression>,
-        // });
-      });
-    });
+  replaceRequireCalls() // onResolve: (id: string) => { path: string; external?: boolean },
+  : void {
+    // if (!this.#webpackRequireBinding) return;
+    // return;
+    // const idArg = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
+    // const requireCall = m.callExpression(m.identifier('__webpack_require__'), [
+    //   idArg,
+    // ]);
+    // this.#webpackRequireBinding.referencePaths.forEach((path) => {
+    //   m.matchPath(requireCall, { idArg }, path.parentPath!, ({ idArg }) => {
+    //     const id = idArg.node.value.toString();
+    //     const result = onResolve(id);
+    //     (path.node as t.Identifier).name = 'require';
+    //     idArg.replaceWith(t.stringLiteral(result.path));
+    //     if (result.external) {
+    //       idArg.addComment('leading', 'webcrack:missing');
+    //     }
+    //     // this.#imports.push({
+    //     //   id,
+    //     //   path: result.path,
+    //     //   nodePath: path.parentPath as NodePath<t.CallExpression>,
+    //     // });
+    //   });
+    // });
   }
 }

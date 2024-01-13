@@ -74,7 +74,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
         if (defaultRequireMatcherAlternative.match(path.node)) {
           // Replace require.n(m).a or require.n(m)() with m or m.default
           const requiredModule = getRequiredModule(path.scope);
-          if (requiredModule?.ast.program.sourceType === 'module') {
+          if (requiredModule?.ast.program.sourceType === 'esm') {
             path.replaceWith(
               buildDefaultAccess({ OBJECT: moduleArg.current! }),
             );
@@ -88,7 +88,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
           // Replace require.n(m); with m or m.default
           const requiredModule = getRequiredModule(path.scope);
           const init = path.get('init');
-          if (requiredModule?.ast.program.sourceType === 'module') {
+          if (requiredModule?.ast.program.sourceType === 'esm') {
             init.replaceWith(
               buildDefaultAccess({ OBJECT: moduleArg.current! }),
             );

@@ -2,8 +2,7 @@ import { statement } from '@babel/template';
 import { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { applyTransform, generate, renameFast } from '../../ast-utils';
-import definePropertyGetters from './runtime/define-property-getters';
+import { generate, renameFast } from '../../ast-utils';
 
 /**
  * Example: `__webpack_require__(id)`
@@ -50,7 +49,6 @@ export class ImportExportManager {
     this.ast = ast;
     this.webpackRequire = webpackRequireBinding;
     this.collectRequireCalls();
-    applyTransform(ast, definePropertyGetters, this);
   }
 
   transformExport(scope: Scope, exportName: string, value: t.Expression) {
