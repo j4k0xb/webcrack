@@ -33,16 +33,18 @@ export class ImportExportManager {
    */
   exports = new Set<string>();
 
-  private ast: t.File;
-  private webpackRequire: Binding | undefined;
   /**
    * All `var foo = __webpack_require__(id);` variable declarations
    */
-  private requireVars: RequireVar[] = [];
+  requireVars: RequireVar[] = [];
   /**
    * All `__webpack_require__(id)` calls
    */
-  private requireCalls: RequireCall[] = [];
+  requireCalls: RequireCall[] = [];
+
+  webpackRequire: Binding | undefined;
+
+  private ast: t.File;
   /**
    * Used for merging multiple re-exports of a module
    */
@@ -128,13 +130,10 @@ export class ImportExportManager {
       m.identifier(propertyName),
     );
 
-    const findRequireVar = (binding: Binding) =>
-      this.requireVars.find((v) => v.binding.path.node === binding.path.node);
-
     if (t.isIdentifier(value)) {
       const binding = scope.getBinding(value.name);
       if (!binding) return;
-      const requireVar = findRequireVar(binding);
+      const requireVar = this.findRequireVar(binding.path.node);
 
       if (requireVar) {
         this.addExportAll(binding, requireVar.moduleId, exportName);
@@ -146,7 +145,7 @@ export class ImportExportManager {
     } else if (memberExpressionMatcher.match(value)) {
       const binding = scope.getBinding(objectName.current!);
       if (!binding) return;
-      const requireVar = findRequireVar(binding);
+      const requireVar = this.findRequireVar(binding.path.node);
       if (!requireVar) return;
 
       this.addExportFrom(
@@ -163,6 +162,43 @@ export class ImportExportManager {
         true,
       );
     }
+  }
+
+  /**
+   * Find the `var <name> = __webpack_require__(<id>);` statement that belongs to a binding node
+   */
+  findRequireVar(node: t.Node) {
+    return this.requireVars.find((v) => v.binding.path.node === node);
+  }
+
+  /**
+   * @returns local name of the default import
+   */
+  addDefaultImport(requireVar: RequireVar) {
+    const { moduleId } = requireVar;
+    const existingImport = this.importCache.get(moduleId);
+    const localName = requireVar.binding.scope.generateUid();
+
+    if (existingImport) {
+      const existingDefaultImport = existingImport.specifiers.find(
+        (specifier) => t.isImportDefaultSpecifier(specifier),
+      );
+      if (existingDefaultImport) return existingDefaultImport.local.name;
+
+      existingImport.specifiers.push(
+        t.importDefaultSpecifier(t.identifier(localName)),
+      );
+    } else {
+      // TODO: resolve to file path
+      const importDeclaration =
+        statement`import ${localName} from '${moduleId}'`() as t.ImportDeclaration;
+      // TODO: find better place to insert
+      this.ast.program.body.unshift(importDeclaration);
+      // FIXME: register binding
+      this.importCache.set(moduleId, importDeclaration);
+    }
+
+    return localName;
   }
 
   private addNamedImport(

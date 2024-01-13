@@ -18,6 +18,7 @@ import hasOwnProperty from './runtime/has-own-property';
 import moduleDecorator from './runtime/module-decorator';
 import namespaceObject from './runtime/namespace-object';
 import varInjections from './var-injections';
+import getDefaultExport from './runtime/get-default-export';
 
 export class WebpackModule extends Module {
   #webpackRequireBinding: Binding | undefined;
@@ -48,6 +49,7 @@ export class WebpackModule extends Module {
     applyTransform(file, hasOwnProperty, this.#webpackRequireBinding);
     applyTransform(file, moduleDecorator, this.#webpackRequireBinding);
     applyTransform(file, namespaceObject);
+    applyTransform(file, getDefaultExport, this.#importExportManager);
     applyTransform(file, definePropertyGetters, this.#importExportManager);
     this.#importExportManager.transformImports();
 
