@@ -2,13 +2,13 @@ import { statement } from '@babel/template';
 import type { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
+import assert from 'assert';
 import { generate, renameFast } from '../../ast-utils';
 
 // TODO: hoist re-exports to the top of the file (but retain order relative to imports)
 // TODO: when it accesses module.exports, dont convert to esm
-// TODO: side-effect import
+// TODO: sort named imports alphabetically
 // FIXME: remove unused require vars (when they were used for imports/exports)
-// also store import/export metadata in the require var for easier management
 
 /**
  * Example: `__webpack_require__(id)`
@@ -124,17 +124,17 @@ export class ImportExportManager {
 
   private collectImports() {
     const property = m.capture(m.anyString());
-    const memberExpressionMatcher = m.memberExpression(
+    const memberExpression = m.memberExpression(
       m.identifier(),
       m.identifier(property),
       false,
     );
-    const indirectCallMatcher = m.callExpression(
+    const indirectCall = m.callExpression(
       m.or(
         // webpack 4: Object(lib.foo)("bar")
-        m.callExpression(m.identifier('Object'), [memberExpressionMatcher]),
+        m.callExpression(m.identifier('Object'), [memberExpression]),
         // webpack 5: (0, lib.foo)("bar")
-        m.sequenceExpression([m.numericLiteral(0), memberExpressionMatcher]),
+        m.sequenceExpression([m.numericLiteral(0), memberExpression]),
       ),
     );
 
@@ -143,11 +143,14 @@ export class ImportExportManager {
       const importedLocalNames = new Set<string>();
 
       binding.referencePaths.forEach((reference) => {
-        if (memberExpressionMatcher.match(reference.parent)) {
+        if (memberExpression.match(reference.parent)) {
           const importedName = property.current!;
+          // lib.default -> _lib_default
           if (importedName === 'default') {
             const localName = this.addDefaultImport(requireVar);
             reference.parentPath!.replaceWith(t.identifier(localName));
+            return;
+          } else if (importedLocalNames.has(importedName)) {
             return;
           }
 
@@ -158,17 +161,15 @@ export class ImportExportManager {
             ? binding.path.scope.generateUid(importedName)
             : importedName;
 
-          if (!importedLocalNames.has(localName)) {
-            importedLocalNames.add(localName);
+          importedLocalNames.add(localName);
+          this.addNamedImport(requireVar, localName, importedName);
 
-            this.addNamedImport(requireVar, localName, importedName);
-            if (indirectCallMatcher.match(reference.parentPath?.parentPath?.parent)) {
-              reference.parentPath.parentPath.replaceWith(
-                t.identifier(localName),
-              );
-            } else {
-              reference.parentPath!.replaceWith(t.identifier(localName));
-            }
+          if (indirectCall.match(reference.parentPath?.parentPath?.parent)) {
+            reference.parentPath.parentPath.replaceWith(
+              t.identifier(localName),
+            );
+          } else {
+            reference.parentPath!.replaceWith(t.identifier(localName));
           }
         } else {
           this.addNamespaceImport(requireVar);
@@ -296,8 +297,10 @@ export class ImportExportManager {
       m.functionDeclaration(),
       m.exportNamedDeclaration(),
     );
-    // FIXME: most likely an inlined variable declaration
-    if (!matcher.match(statementPath.node)) return;
+    assert(
+      matcher.match(statementPath.node),
+      `unexpected export statement: ${statementPath.type}`,
+    );
 
     const isDeclarationExport =
       exportName !== 'default' &&

@@ -21,9 +21,9 @@ describe('webpack 4', () => {
       console.log(_tmp.a);
       console.log(_tmp());
     `).toMatchInlineSnapshot(`
-      import _default from "1";
-      console.log(_default);
-      console.log(_default);
+      import _lib_default from "1";
+      console.log(_lib_default);
+      console.log(_lib_default);
     `));
 
   test('inlined default import of commonjs module', () =>
