@@ -1,26 +1,18 @@
-import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import assert from 'assert';
-import { Transform, constMemberExpression } from '../../ast-utils';
-import { ImportExportManager } from './import-export-manager';
+import { Transform, constMemberExpression } from '../../../ast-utils';
+import { ImportExportManager } from '../import-export-manager';
+import { statement } from '@babel/template';
 
 // TODO: hoist re-exports to the top of the file (but retain order relative to imports)
-// TODO: merge re-exports
 
 /**
- * webpack/runtime/define property getters
- * ```js
- * 	__webpack_require__.d = (exports, definition) => {
- * 		for (var key in definition) {
- * 			if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
- * 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
- * 			}
- * 		}
- * 	};
- * ```
+ * `webpack/runtime/define property getters`
+ *
+ * Used to declare ESM exports.
  */
 export default {
-  name: 'define-exports',
+  name: 'define-property-getters',
   tags: ['unsafe'],
   scope: true,
   visitor(manager) {
@@ -45,7 +37,8 @@ export default {
       ]),
     );
 
-    const defaultExpressionExport = m.expressionStatement(
+    // Example (webpack v4): exports.default = 1;
+    const defaultExportAssignment = m.expressionStatement(
       m.assignmentExpression(
         '=',
         constMemberExpression('exports', 'default'),
@@ -64,23 +57,29 @@ export default {
     );
 
     return {
-      ExpressionStatement(path) {
+      ExpressionStatement: (path) => {
         if (!path.parentPath.isProgram()) return path.skip();
 
         if (singleExport.match(path.node)) {
-          // manager.addExport(path, exportName.current!, returnValue.current!);
+          manager.transformExport(
+            path.scope,
+            exportName.current!,
+            returnValue.current!,
+          );
           path.remove();
-          this.changes++;
-        } else if (defaultExpressionExport.match(path.node)) {
-          path.replaceWith(t.exportDefaultDeclaration(returnValue.current!));
-          this.changes++;
+        } else if (defaultExportAssignment.match(path.node)) {
+          manager.exports.add('default');
+          path.replaceWith(statement`export default ${returnValue.current}`());
         } else if (multiExport.match(path.node)) {
           for (const property of properties.current!) {
             objectProperty.match(property); // To easily get the captures per property
-            // manager.addExport(path, exportName.current!, returnValue.current!);
+            manager.transformExport(
+              path.scope,
+              exportName.current!,
+              returnValue.current!,
+            );
           }
           path.remove();
-          this.changes++;
         }
       },
     };

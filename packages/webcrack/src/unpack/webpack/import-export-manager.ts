@@ -1,8 +1,9 @@
 import { statement } from '@babel/template';
-import traverse, { Binding, NodePath, Scope } from '@babel/traverse';
+import { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { generate, renameFast } from '../../ast-utils';
+import { applyTransform, generate, renameFast } from '../../ast-utils';
+import definePropertyGetters from './runtime/define-property-getters';
 
 /**
  * Example: `__webpack_require__(id)`
@@ -49,14 +50,10 @@ export class ImportExportManager {
     this.ast = ast;
     this.webpackRequire = webpackRequireBinding;
     this.collectRequireCalls();
-    this.transformExports();
+    applyTransform(ast, definePropertyGetters, this);
   }
 
-  private transformExport(
-    scope: Scope,
-    exportName: string,
-    value: t.Expression,
-  ) {
+  transformExport(scope: Scope, exportName: string, value: t.Expression) {
     this.exports.add(exportName);
 
     const objectName = m.capture(m.anyString());
@@ -244,77 +241,6 @@ export class ImportExportManager {
           });
         }
       });
-    });
-  }
-
-  /**
-   * Extract the export information from all `__webpack_require__.d` calls
-   */
-  private transformExports() {
-    const exportName = m.capture(m.anyString());
-    const returnValue = m.capture(m.anyExpression());
-    const getter = m.or(
-      m.functionExpression(
-        undefined,
-        [],
-        m.blockStatement([m.returnStatement(returnValue)]),
-      ),
-      m.arrowFunctionExpression([], returnValue),
-    );
-    // Example (webpack v4): __webpack_require__.d(exports, 'counter', function () { return local });
-    const singleExport = m.expressionStatement(
-      m.callExpression(constMemberExpression('__webpack_require__', 'd'), [
-        m.identifier(),
-        m.stringLiteral(exportName),
-        getter,
-      ]),
-    );
-
-    // Example (webpack v4): exports.default = 1;
-    const defaultExportAssignment = m.expressionStatement(
-      m.assignmentExpression(
-        '=',
-        constMemberExpression('exports', 'default'),
-        returnValue,
-      ),
-    );
-
-    const objectProperty = m.objectProperty(m.identifier(exportName), getter);
-    const properties = m.capture(m.arrayOf(objectProperty));
-    // Example (webpack v5): __webpack_require__.d(exports, { a: () => b, c: () => d });
-    const multiExport = m.expressionStatement(
-      m.callExpression(constMemberExpression('__webpack_require__', 'd'), [
-        m.identifier(),
-        m.objectExpression(properties),
-      ]),
-    );
-
-    traverse(this.ast, {
-      ExpressionStatement: (path) => {
-        if (!path.parentPath.isProgram()) return path.skip();
-
-        if (singleExport.match(path.node)) {
-          this.transformExport(
-            path.scope,
-            exportName.current!,
-            returnValue.current!,
-          );
-          path.remove();
-        } else if (defaultExportAssignment.match(path.node)) {
-          this.exports.add('default');
-          path.replaceWith(statement`export default ${returnValue.current}`());
-        } else if (multiExport.match(path.node)) {
-          for (const property of properties.current!) {
-            objectProperty.match(property); // To easily get the captures per property
-            this.transformExport(
-              path.scope,
-              exportName.current!,
-              returnValue.current!,
-            );
-          }
-          path.remove();
-        }
-      },
     });
   }
 }

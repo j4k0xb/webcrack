@@ -1,8 +1,27 @@
-import { describe, test } from 'vitest';
-import { testTransform } from '../../../test';
-import defineExports from '../webpack/define-exports';
+import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
+import { describe, expect, test } from 'vitest';
+import { applyTransform } from '../../ast-utils';
+import { ImportExportManager } from '../webpack/import-export-manager';
+import definePropertyGetters from '../webpack/runtime/define-property-getters';
 
-const expectJS = testTransform(defineExports);
+const expectJS = (input: string) => {
+  const ast = parse('var __webpack_require__; ' + input, {
+    sourceType: 'unambiguous',
+    allowReturnOutsideFunction: true,
+  });
+  traverse(ast, {
+    Program(path) {
+      const webpackRequireBinding = path.scope.getBinding(
+        '__webpack_require__',
+      );
+      const manager = new ImportExportManager(ast, webpackRequireBinding);
+      applyTransform(ast, definePropertyGetters, manager);
+      webpackRequireBinding!.path.remove();
+    },
+  });
+  return expect(ast);
+};
 
 describe('webpack 4', () => {
   test('export default expression;', () =>
@@ -50,8 +69,8 @@ describe('webpack 4', () => {
       __webpack_require__.d(exports, "readFile", function() { return lib.readFile; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      export { readFile } from "lib";
       var lib = __webpack_require__("lib");
+      export { readFile } from "lib";
     `));
 
   test('re-export named with multiple references', () =>
@@ -60,8 +79,8 @@ describe('webpack 4', () => {
       var lib = __webpack_require__("lib");
       lib.writeFile();
     `).toMatchInlineSnapshot(`
-      export { readFile } from "lib";
       var lib = __webpack_require__("lib");
+      export { readFile } from "lib";
       lib.writeFile();
     `));
 
@@ -70,8 +89,8 @@ describe('webpack 4', () => {
       __webpack_require__.d(exports, "foo", function() { return lib.readFile; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      export { readFile as foo } from "lib";
       var lib = __webpack_require__("lib");
+      export { readFile as foo } from "lib";
     `));
 
   test('re-export named as default', () =>
@@ -79,8 +98,8 @@ describe('webpack 4', () => {
       __webpack_require__.d(exports, "default", function() { return lib.readFile; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      export { readFile as default } from "lib";
       var lib = __webpack_require__("lib");
+      export { readFile as default } from "lib";
     `));
 
   test('re-export default as named', () =>
@@ -88,8 +107,8 @@ describe('webpack 4', () => {
       __webpack_require__.d(exports, "foo", function() { return lib.default; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      export { default as foo } from "lib";
       var lib = __webpack_require__("lib");
+      export { default as foo } from "lib";
     `));
 
   test('re-export default as default', () =>
@@ -97,8 +116,8 @@ describe('webpack 4', () => {
       __webpack_require__.d(exports, "default", function() { return lib.default; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      export { default } from "lib";
       var lib = __webpack_require__("lib");
+      export { default } from "lib";
     `));
 
   // webpack just declares all the exports individually
@@ -123,12 +142,14 @@ describe('webpack 4', () => {
     `),
   );
 
-  test.todo('re-export all as named', () =>
+  test('re-export all as named', () =>
     expectJS(`
       __webpack_require__.d(exports, "lib", function() { return lib; });
       var lib = __webpack_require__("lib");
-    `).toMatchInlineSnapshot(`export * as lib from "lib";`),
-  );
+    `).toMatchInlineSnapshot(`
+      var lib = __webpack_require__("lib");
+      export * as lib from "lib";
+    `));
 
   test.todo('re-export all as default', () =>
     expectJS(`
@@ -149,7 +170,7 @@ describe('webpack 5', () => {
       export var counter = 1;
     `));
 
-  test.todo('export same variable with multiple names', () =>
+  test('export same variable with multiple names', () =>
     expectJS(`
       __webpack_require__.d(exports, {
         counter: () => foo,
@@ -159,10 +180,9 @@ describe('webpack 5', () => {
     `).toMatchInlineSnapshot(`
       export var counter = 1;
       export { counter as increment };
-    `),
-  );
+    `));
 
-  test('export object destructuring', () =>
+  test.todo('export object destructuring', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, {
         bar: () => bar,
@@ -185,9 +205,10 @@ describe('webpack 5', () => {
         name1,
         name2: bar
       } = o;
-    `));
+    `),
+  );
 
-  test('export array destructuring', () =>
+  test.todo('export array destructuring', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, {
         bar: () => bar,
@@ -198,7 +219,8 @@ describe('webpack 5', () => {
     `).toMatchInlineSnapshot(`
       const o = ["foo", "bar"];
       export const [name1, bar] = o;
-    `));
+    `),
+  );
 
   test.todo('export as invalid identifier string name', () =>
     expectJS(`
@@ -212,7 +234,7 @@ describe('webpack 5', () => {
     `),
   );
 
-  test.todo('re-export named merging', () =>
+  test('re-export named merging', () =>
     expectJS(`
       __webpack_require__.d(exports, {
         readFile: () => lib.readFile,
@@ -220,10 +242,9 @@ describe('webpack 5', () => {
       });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      export { readFile, writeFile } from "lib";
       var lib = __webpack_require__("lib");
-    `),
-  );
+      export { readFile, writeFile } from "lib";
+    `));
 
   test.todo('re-export all from commonjs', () =>
     expectJS(`

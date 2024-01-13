@@ -1,4 +1,4 @@
-import { Binding, NodePath } from '@babel/traverse';
+import { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
@@ -8,8 +8,8 @@ import {
 } from '../../ast-utils';
 import { Module } from '../module';
 import { FunctionPath } from './common-matchers';
-import defineExport from './define-exports';
 import { ImportExportManager } from './import-export-manager';
+import defineExport from './runtime/define-property-getters';
 import varInjections from './var-injections';
 
 export class WebpackModule extends Module {
