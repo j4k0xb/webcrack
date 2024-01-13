@@ -2,7 +2,7 @@ import { statement } from '@babel/template';
 import traverse, { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { constMemberExpression, renameFast } from '../../ast-utils';
+import { generate, renameFast } from '../../ast-utils';
 
 /**
  * Example: `__webpack_require__(id)`
@@ -87,7 +87,12 @@ export class ImportExportManager {
         exportName,
       );
     } else {
-      throw new Error(`Unexpected export: ${value.type}`);
+      t.addComment(
+        this.ast.program,
+        'inner',
+        `webcrack:unexpected-export: ${exportName} = ${generate(value)}`,
+        true,
+      );
     }
   }
 
