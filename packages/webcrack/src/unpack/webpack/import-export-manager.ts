@@ -143,8 +143,12 @@ export class ImportExportManager {
     );
     if (!declaration) return;
 
-    if (declaration.type === 'ExportNamedDeclaration') {
-      const namedExport = t.exportNamedDeclaration(null, [
+    if (
+      declaration.type === 'ExportNamedDeclaration' ||
+      (exportName === 'default' && binding.references > 1)
+    ) {
+      // Example: export { foo as bar };
+      const namedExport = t.exportNamedDeclaration(undefined, [
         t.exportSpecifier(
           t.identifier(binding.identifier.name),
           t.identifier(exportName),
@@ -153,6 +157,7 @@ export class ImportExportManager {
       this.exports.push(namedExport);
       declaration.insertAfter(namedExport);
     } else if (exportName === 'default') {
+      // Example: export default 1;
       const value = t.isVariableDeclaration(declaration.node)
         ? declaration.node.declarations[0].init!
         : (declaration.node as t.ClassDeclaration | t.FunctionDeclaration);
@@ -160,6 +165,7 @@ export class ImportExportManager {
       this.exports.push(defaultExport);
       declaration.replaceWith(defaultExport);
     } else {
+      // Example: export var counter = 1;
       renameFast(binding, exportName);
       const namedExport = t.exportNamedDeclaration(declaration.node);
       this.exports.push(namedExport);
