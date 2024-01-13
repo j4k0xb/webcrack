@@ -119,7 +119,7 @@ function App() {
       ...result.files.map((file) =>
         monaco.editor.createModel(
           file.code,
-          'javascript',
+          file.path.endsWith('.json') ? 'json' : 'javascript',
           monaco.Uri.file(file.path),
         ),
       ),

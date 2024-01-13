@@ -1,0 +1,44 @@
+WebpackBundle {
+  "chunks": [
+    WebpackChunk {
+      "chunkIds": [],
+      "entryIds": [],
+      "modules": Map {
+        "0" => WebpackModule {
+          "ast": import * as json from "1";
+console.log(json);,
+          "id": "0",
+          "isEntry": false,
+          "path": "0.js",
+        },
+        "1" => WebpackModule {
+          "ast": module.exports = {
+  foo: "bar"
+};,
+          "id": "1",
+          "isEntry": false,
+          "path": "1.json",
+        },
+      },
+    },
+  ],
+  "entryId": "",
+  "modules": Map {
+    "0" => WebpackModule {
+      "ast": import * as json from "1";
+console.log(json);,
+      "id": "0",
+      "isEntry": false,
+      "path": "0.js",
+    },
+    "1" => WebpackModule {
+      "ast": module.exports = {
+  foo: "bar"
+};,
+      "id": "1",
+      "isEntry": false,
+      "path": "1.json",
+    },
+  },
+  "type": "webpack",
+}

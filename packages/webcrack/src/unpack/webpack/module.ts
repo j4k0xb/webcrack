@@ -5,6 +5,7 @@ import { constMemberExpression } from '../../ast-utils/matcher';
 import { Module } from '../module';
 import type { FunctionPath } from './common-matchers';
 import { ImportExportManager } from './import-export-manager';
+import { transformJsonModule } from './json-module';
 import { default as definePropertyGetters } from './runtime/define-property-getters';
 import getDefaultExport from './runtime/get-default-export';
 import global from './runtime/global';
@@ -16,7 +17,8 @@ import varInjections from './var-injections';
 export class WebpackModule extends Module {
   #importExportManager: ImportExportManager;
   // TODO: expose to public API
-  #sourceType: 'commonjs' | 'esm' = 'commonjs';
+  #sourceType: 'commonjs' | 'esm' | 'json' = 'commonjs';
+  #json: unknown;
 
   constructor(id: string, ast: FunctionPath, isEntry: boolean) {
     // TODO: refactor
@@ -54,12 +56,18 @@ export class WebpackModule extends Module {
     if (moduleBinding) renameFast(moduleBinding, 'module');
     if (exportsBinding) renameFast(exportsBinding, 'exports');
 
-    // this.removeDefineESM();
-    // // FIXME: some bundles don't define __esModule but still declare esm exports
-    // // https://github.com/0xdevalias/chatgpt-source-watch/blob/main/orig/_next/static/chunks/167-121de668c4456907.js
-    // if (this.#sourceType === 'esm') {
-    //   this.convertExportsToESM();
-    // }
+    const json = transformJsonModule(this.ast);
+    if (json) {
+      this.#sourceType = 'json';
+      this.#json = json;
+      this.path = this.path.replace(/\.js$/, '.json');
+    }
+  }
+
+  override get code() {
+    return this.#sourceType === 'json'
+      ? JSON.stringify(this.#json, null, 2)
+      : super.code;
   }
 
   /**
