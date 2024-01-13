@@ -24,27 +24,32 @@ export function webpackRequireFunctionMatcher() {
     m.functionDeclaration(
       m.identifier(), // __webpack_require__
       [m.identifier()], // moduleId
-      // TODO(perf): use m.anyList for statements
-      m.containerOf(
-        m.callExpression(
-          m.or(
-            // Example (webpack 5): __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-            m.memberExpression(
-              m.fromCapture(containerId),
-              m.identifier(),
-              true,
-            ),
-            // Example (webpack 4): __webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-            // Example (webpack 0.11.x): __webpack_modules__[moduleId].call(null, module, module.exports, __webpack_require__);
-            constMemberExpression(
-              m.memberExpression(
-                m.fromCapture(containerId),
-                m.identifier(),
-                true,
+      m.blockStatement(
+        m.anyList(
+          m.zeroOrMore(),
+          m.expressionStatement(
+            m.callExpression(
+              m.or(
+                // Example (webpack 0.11.x): __webpack_modules__[moduleId].call(null, module, module.exports, __webpack_require__);
+                // Example (webpack 4): __webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+                constMemberExpression(
+                  m.memberExpression(
+                    m.fromCapture(containerId),
+                    m.identifier(),
+                    true,
+                  ),
+                  'call',
+                ),
+                // Example (webpack 5): __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+                m.memberExpression(
+                  m.fromCapture(containerId),
+                  m.identifier(),
+                  true,
+                ),
               ),
-              'call',
             ),
           ),
+          m.zeroOrMore(),
         ),
       ),
     ),
