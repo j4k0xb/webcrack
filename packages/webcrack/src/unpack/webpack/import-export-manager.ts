@@ -67,7 +67,7 @@ export class ImportExportManager {
       const requireVar = findRequireVar(binding);
 
       if (requireVar) {
-        this.addExportAll(binding, requireVar.moduleId);
+        this.addExportAll(binding, requireVar.moduleId, exportName);
       } else if (exportName === 'default' && binding.references === 1) {
         this.addExportDefault(binding);
       } else {
@@ -199,9 +199,13 @@ export class ImportExportManager {
    * export * as foo from 'lib';
    * ```
    */
-  private addExportAll(binding: Binding, moduleId: string) {
+  private addExportAll(binding: Binding, moduleId: string, exportName: string) {
     // TODO: resolve to file path
-    const exportAll = t.exportAllDeclaration(t.stringLiteral(moduleId));
+    const exportAll = t.exportNamedDeclaration(
+      undefined,
+      [t.exportNamespaceSpecifier(t.identifier(exportName))],
+      t.stringLiteral(moduleId),
+    );
     binding.path.parentPath?.insertAfter(exportAll);
   }
 
