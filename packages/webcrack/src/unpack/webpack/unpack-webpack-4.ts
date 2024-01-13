@@ -25,6 +25,7 @@ import { WebpackModule } from './module';
 export default {
   name: 'unpack-webpack-4',
   tags: ['unsafe'],
+  scope: true,
   visitor(options = { bundle: undefined }) {
     const { webpackRequire, containerId } = webpackRequireFunctionMatcher();
     const container = modulesContainerMatcher();

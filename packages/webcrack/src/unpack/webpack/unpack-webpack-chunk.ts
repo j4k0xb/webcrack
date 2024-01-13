@@ -18,6 +18,7 @@ import { WebpackModule } from './module';
 export default {
   name: 'unpack-webpack-chunk',
   tags: ['unsafe'],
+  scope: true,
   visitor(options = { bundle: undefined }) {
     const container = modulesContainerMatcher();
 

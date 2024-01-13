@@ -167,21 +167,24 @@ export class ImportExportManager {
             const localName = this.addDefaultImport(requireVar);
             reference.parentPath!.replaceWith(t.identifier(localName));
             return;
-          } else if (importedLocalNames.has(importedName)) {
-            return;
           }
 
-          const hasNameConflict = binding.referencePaths.some((ref) =>
-            ref.scope.hasBinding(importedName),
-          );
-          const localName = hasNameConflict
-            ? binding.path.scope.generateUid(importedName)
-            : importedName;
+          let localName = importedName;
+          if (!importedLocalNames.has(importedName)) {
+            const hasNameConflict = binding.referencePaths.some((ref) =>
+              ref.scope.hasBinding(importedName),
+            );
+            localName = hasNameConflict
+              ? binding.path.scope.generateUid(importedName)
+              : importedName;
+            importedLocalNames.add(localName);
+            this.addNamedImport(requireVar, localName, importedName);
+          }
 
-          importedLocalNames.add(localName);
-          this.addNamedImport(requireVar, localName, importedName);
-
-          if (indirectCall.match(reference.parentPath?.parentPath?.parent)) {
+          if (
+            indirectCall.match(reference.parentPath?.parentPath?.parent) &&
+            reference.parentPath.parentPath?.key === 'callee'
+          ) {
             reference.parentPath.parentPath.replaceWith(
               t.identifier(localName),
             );

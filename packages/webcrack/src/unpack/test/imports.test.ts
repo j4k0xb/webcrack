@@ -45,6 +45,16 @@ describe('webpack 4', () => {
       console.log(foo);
     `));
 
+  test('multiple named imports', () =>
+    expectJS(`
+      __webpack_require__.r(__webpack_exports__);
+      const lib = __webpack_require__("lib");
+      console.log(lib.foo, lib.foo, lib.bar);
+    `).toMatchInlineSnapshot(`
+      import { bar, foo } from "lib";
+      console.log(foo, foo, bar);
+    `));
+
   test('named import with indirect call', () =>
     expectJS(`
       __webpack_require__.r(__webpack_exports__);
