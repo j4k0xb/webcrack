@@ -154,23 +154,15 @@ export async function webcrack(
       }),
     options.mangle && (() => applyTransform(ast, mangle)),
     // TODO: Also merge unminify visitor (breaks selfDefending/debugProtection atm)
-    (options.deobfuscate || options.jsx) &&
-      (() => {
-        return applyTransforms(
-          ast,
-          [
-            // Have to run this after unminify to properly detect it
-            options.deobfuscate ? [selfDefending, debugProtection] : [],
-            options.jsx ? [jsx, jsxNew] : [],
-          ].flat(),
-          { noScope: true },
-        );
-      }),
+    options.deobfuscate &&
+      (() =>
+        applyTransforms(ast, [selfDefending, debugProtection], {
+          noScope: true,
+        })),
     options.deobfuscate && (() => applyTransform(ast, mergeObjectAssignments)),
-    () => (outputCode = generate(ast)),
-    // Unpacking modifies the same AST and may result in imports not at top level
-    // so the code has to be generated before
     options.unpack && (() => (bundle = unpackAST(ast, options.mappings(m)))),
+    options.jsx && (() => applyTransforms(ast, [jsx, jsxNew])),
+    () => (outputCode = generate(ast)),
   ].filter(Boolean) as (() => unknown)[];
 
   for (let i = 0; i < stages.length; i++) {
