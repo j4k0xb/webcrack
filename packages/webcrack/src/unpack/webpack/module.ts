@@ -4,6 +4,7 @@ import * as m from '@codemod/matchers';
 import {
   applyTransform,
   constMemberExpression,
+  renameFast,
   renameParameters,
 } from '../../ast-utils';
 import { Module } from '../module';
@@ -21,7 +22,9 @@ import namespaceObject from './runtime/namespace-object';
 import varInjections from './var-injections';
 
 export class WebpackModule extends Module {
+  #moduleBinding: Binding | undefined;
   #webpackRequireBinding: Binding | undefined;
+  #exportsBinding: Binding | undefined;
   #importExportManager: ImportExportManager;
   // TODO: expose to public API
   #sourceType: 'commonjs' | 'esm' = 'commonjs';
@@ -31,20 +34,24 @@ export class WebpackModule extends Module {
     const file = t.file(t.program(ast.node.body.body));
     super(id, file, isEntry);
 
+    this.removeTrailingComments();
+    // The params are temporarily renamed to these special names to avoid
+    // mixing them up with the global module/exports/require from Node.js
     renameParameters(ast, [
       '__webpack_module__',
       '__webpack_exports__',
       '__webpack_require__',
     ]);
-    applyTransform(file, varInjections);
-    this.removeTrailingComments();
-
+    this.#moduleBinding = ast.scope.getBinding('__webpack_module__');
     this.#webpackRequireBinding = ast.scope.getBinding('__webpack_require__');
+    this.#exportsBinding = ast.scope.getBinding('__webpack_exports__');
+
+    applyTransform(file, varInjections);
+
     this.#importExportManager = new ImportExportManager(
       file,
       this.#webpackRequireBinding,
     );
-
     applyTransform(file, global, this.#webpackRequireBinding);
     applyTransform(file, hasOwnProperty, this.#webpackRequireBinding);
     applyTransform(file, moduleDecorator, this.#webpackRequireBinding);
@@ -52,6 +59,10 @@ export class WebpackModule extends Module {
     applyTransform(file, getDefaultExport, this.#importExportManager);
     applyTransform(file, definePropertyGetters, this.#importExportManager);
     this.#importExportManager.insertImportsAndExports();
+
+    // For CommonJS
+    if (this.#moduleBinding) renameFast(this.#moduleBinding, 'module');
+    if (this.#exportsBinding) renameFast(this.#exportsBinding, 'exports');
 
     // this.removeDefineESM();
     // // FIXME: some bundles don't define __esModule but still declare esm exports
