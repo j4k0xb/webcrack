@@ -5,6 +5,7 @@ import * as m from '@codemod/matchers';
 import { generate, renameFast } from '../../ast-utils';
 
 // TODO: hoist re-exports to the top of the file (but retain order relative to imports)
+// TODO: when it accesses module.exports, dont convert to esm
 
 /**
  * Example: `__webpack_require__(id)`
@@ -168,6 +169,7 @@ export class ImportExportManager {
   ) {
     const existingImport = this.importCache.get(requireVar.moduleId);
     if (existingImport) {
+      // FIXME: this can import the same name multiple times
       existingImport.specifiers.push(
         t.importSpecifier(t.identifier(localName), t.identifier(importedName)),
       );
@@ -176,6 +178,7 @@ export class ImportExportManager {
       const importDeclaration =
         statement`import { ${importedName} as ${localName} } from '${requireVar.moduleId}'`() as t.ImportDeclaration;
       requireVar.binding.path.parentPath!.insertAfter(importDeclaration);
+      // FIXME: register binding to avoid duplicate names
       this.importCache.set(requireVar.moduleId, importDeclaration);
     }
   }
