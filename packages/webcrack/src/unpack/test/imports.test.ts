@@ -10,8 +10,8 @@ describe('webpack 4', () => {
       const lib = __webpack_require__("lib");
       console.log(lib.default);
     `).toMatchInlineSnapshot(`
-      import lib from "lib";
-      console.log(lib);
+      import _lib_default from "lib";
+      console.log(_lib_default);
     `));
 
   test('default import of commonjs module', () =>
@@ -64,6 +64,17 @@ describe('webpack 4', () => {
     `).toMatchInlineSnapshot(`
       import * as lib from "lib";
       console.log(lib);
+    `));
+
+  test('combined namespace and default import', () =>
+    expectJS(`
+      __webpack_require__.r(__webpack_exports__);
+      const lib = __webpack_require__("lib");
+      console.log(lib, lib.default);
+    `).toMatchInlineSnapshot(`
+      import * as lib from "lib";
+      import _lib_default from "lib";
+      console.log(lib, _lib_default);
     `));
 
   // TODO: maybe theres no var or it got inlined somewhere

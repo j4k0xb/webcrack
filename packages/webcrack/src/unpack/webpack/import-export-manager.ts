@@ -1,4 +1,4 @@
-import { expression, statement } from '@babel/template';
+import { statement } from '@babel/template';
 import type { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
@@ -24,11 +24,9 @@ interface RequireCall {
 interface RequireVar {
   binding: Binding;
   moduleId: string;
-  imports: (
-    | t.ImportSpecifier
-    | t.ImportNamespaceSpecifier
-    | t.ImportDefaultSpecifier
-  )[];
+  defaultImport?: t.ImportDefaultSpecifier;
+  namespaceImport?: t.ImportNamespaceSpecifier;
+  namedImports: t.ImportSpecifier[];
   exports: (t.ExportSpecifier | t.ExportNamespaceSpecifier)[];
 }
 
@@ -62,8 +60,6 @@ export class ImportExportManager {
   }
 
   insertImportsAndExports() {
-    this.collectImports();
-
     this.requireVars.forEach((requireVar) => {
       // TODO: resolve module id to path
       const namedExports = t.exportNamedDeclaration(
@@ -92,42 +88,42 @@ export class ImportExportManager {
       //   );
       // }
 
+      // requireVar.binding.path.remove();
+    });
+
+    this.collectImports();
+
+    this.requireVars.forEach((requireVar) => {
       const namedImports = t.importDeclaration(
-        [
-          ...requireVar.imports.filter((node) =>
-            t.isImportDefaultSpecifier(node),
-          ),
-          ...requireVar.imports.filter((node) => t.isImportSpecifier(node)),
-        ],
+        [requireVar.defaultImport ?? [], requireVar.namedImports].flat(),
         t.stringLiteral(requireVar.moduleId),
       );
-      const namespaceImports = requireVar.imports
-        .filter((node) => t.isImportNamespaceSpecifier(node))
-        .map((node) =>
-          t.importDeclaration([node], t.stringLiteral(requireVar.moduleId)),
-        );
 
       if (namedImports.specifiers.length > 0) {
         requireVar.binding.path.parentPath!.insertAfter(namedImports);
       }
-      requireVar.binding.path.parentPath!.insertAfter(namespaceImports);
+      if (requireVar.namespaceImport) {
+        const namespaceImport = t.importDeclaration(
+          [requireVar.namespaceImport],
+          t.stringLiteral(requireVar.moduleId),
+        );
+        requireVar.binding.path.parentPath!.insertAfter(namespaceImport);
+      }
 
-      // requireVar.binding.path.remove();
-    });
-
-    this.requireVars.forEach((requireVar) => {
-      if (requireVar.binding.references === 0) {
+      if (!requireVar.binding.referenced) {
         // side-effect import
-        requireVar.binding.path.parentPath!.replaceWith(
+        requireVar.binding.path.parentPath!.insertAfter(
           t.importDeclaration([], t.stringLiteral(requireVar.moduleId)),
         );
       }
+
+      requireVar.binding.path.parentPath!.remove();
     });
 
     // TODO: hoist imports to the top of the file
-    this.requireCalls.forEach(({ path, moduleId }) => {
-      path.replaceWith(expression`require('${moduleId}')`());
-    });
+    // this.requireCalls.forEach(({ path, moduleId }) => {
+    //   path.replaceWith(expression`require('${moduleId}')`());
+    // });
   }
 
   private collectImports() {
@@ -135,6 +131,7 @@ export class ImportExportManager {
     const memberExpressionMatcher = m.memberExpression(
       m.identifier(),
       m.identifier(property),
+      false,
     );
     const zeroSequenceMatcher = m.sequenceExpression([
       m.numericLiteral(0),
@@ -144,16 +141,16 @@ export class ImportExportManager {
     this.requireVars.forEach((requireVar) => {
       const { binding } = requireVar;
       const importedLocalNames = new Set<string>();
-      const hasOnlyNamedImports =
-        binding.references > 0 &&
-        binding.referencePaths.every((ref) =>
-          memberExpressionMatcher.match(ref.parent),
-        );
 
-      if (hasOnlyNamedImports) {
-        binding.referencePaths.forEach((reference) => {
-          memberExpressionMatcher.match(reference.parent); // to populate property.current
+      binding.referencePaths.forEach((reference) => {
+        if (memberExpressionMatcher.match(reference.parent)) {
           const importedName = property.current!;
+          if (importedName === 'default') {
+            const localName = this.addDefaultImport(requireVar);
+            reference.parentPath!.replaceWith(t.identifier(localName));
+            return;
+          }
+
           const hasNameConflict = binding.referencePaths.some((ref) =>
             ref.scope.hasBinding(importedName),
           );
@@ -165,31 +162,32 @@ export class ImportExportManager {
             importedLocalNames.add(localName);
 
             this.addNamedImport(requireVar, localName, importedName);
+            if (zeroSequenceMatcher.match(reference.parentPath?.parent)) {
+              reference.parentPath.parentPath!.replaceWith(
+                t.identifier(localName),
+              );
+            } else {
+              reference.parentPath!.replaceWith(t.identifier(localName));
+            }
           }
-
-          if (zeroSequenceMatcher.match(reference.parentPath?.parent)) {
-            reference.parentPath.parentPath!.replaceWith(
-              t.identifier(localName),
-            );
-          } else {
-            reference.parentPath!.replaceWith(t.identifier(localName));
-          }
-          if (!memberExpressionMatcher.match(reference.parent)) return;
-        });
-        binding.path.remove();
-      } else {
-        binding.referencePaths.forEach((reference) => {
-          reference.replaceWith(t.identifier(binding.identifier.name));
-        });
-        if (binding.references > 0) {
-          this.addImportNamespace(requireVar);
+        } else {
+          this.addNamespaceImport(requireVar);
         }
-      }
+      });
+
+      // if (zeroSequenceMatcher.match(reference.parentPath?.parent)) {
+      //   reference.parentPath.parentPath!.replaceWith(
+      //     t.identifier(localName),
+      //   );
+      // } else {
+      //   reference.parentPath!.replaceWith(t.identifier(localName));
+      // }
+      // if (!memberExpressionMatcher.match(reference.parent)) return;
     });
 
-    this.requireCalls.forEach(({ path, moduleId }) => {
-      path.replaceWith(expression`require('${moduleId}')`());
-    });
+    // this.requireCalls.forEach(({ path, moduleId }) => {
+    //   path.replaceWith(expression`require('${moduleId}')`());
+    // });
   }
 
   addExport(scope: Scope, exportName: string, value: t.Expression) {
@@ -242,18 +240,12 @@ export class ImportExportManager {
    * @returns local name of the default import
    */
   addDefaultImport(requireVar: RequireVar) {
-    const existingDefaultImport = requireVar.imports.find((node) =>
-      t.isImportDefaultSpecifier(node),
+    requireVar.defaultImport ??= t.importDefaultSpecifier(
+      requireVar.binding.scope.generateUidIdentifier(
+        `${requireVar.binding.identifier.name}_default`,
+      ),
     );
-    if (existingDefaultImport) {
-      return existingDefaultImport.local.name;
-    } else {
-      const localName = requireVar.binding.scope.generateUid('default');
-      requireVar.imports.push(
-        t.importDefaultSpecifier(t.identifier(localName)),
-      );
-      return localName;
-    }
+    return requireVar.defaultImport.local.name;
   }
 
   private addNamedImport(
@@ -261,16 +253,14 @@ export class ImportExportManager {
     localName: string,
     importedName: string,
   ) {
-    requireVar.imports.push(
+    requireVar.namedImports.push(
       t.importSpecifier(t.identifier(localName), t.identifier(importedName)),
     );
   }
 
-  private addImportNamespace(requireVar: RequireVar) {
-    requireVar.imports.push(
-      t.importNamespaceSpecifier(
-        t.identifier(requireVar.binding.identifier.name),
-      ),
+  private addNamespaceImport(requireVar: RequireVar) {
+    requireVar.namespaceImport ??= t.importNamespaceSpecifier(
+      t.identifier(requireVar.binding.identifier.name),
     );
   }
 
@@ -401,7 +391,9 @@ export class ImportExportManager {
           this.requireVars.push({
             moduleId,
             binding,
-            imports: [],
+            defaultImport: undefined,
+            namespaceImport: undefined,
+            namedImports: [],
             exports: [],
           });
         }
