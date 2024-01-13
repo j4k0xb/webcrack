@@ -25,7 +25,8 @@ interface RequireVar {
   defaultImport?: t.ImportDefaultSpecifier;
   namespaceImport?: t.ImportNamespaceSpecifier;
   namedImports: t.ImportSpecifier[];
-  exports: (t.ExportSpecifier | t.ExportNamespaceSpecifier)[];
+  namespaceExport?: t.ExportNamespaceSpecifier;
+  namedExports: t.ExportSpecifier[];
 }
 
 export class ImportExportManager {
@@ -62,22 +63,21 @@ export class ImportExportManager {
       // TODO: resolve module id to path
       const namedExports = t.exportNamedDeclaration(
         undefined,
-        requireVar.exports.filter((node) => t.isExportSpecifier(node)),
+        requireVar.namedExports,
         t.stringLiteral(requireVar.moduleId),
       );
-      const namespaceExports = requireVar.exports
-        .filter((node) => t.isExportNamespaceSpecifier(node))
-        .map((node) =>
-          t.exportNamedDeclaration(
-            undefined,
-            [node],
-            t.stringLiteral(requireVar.moduleId),
-          ),
-        );
       if (namedExports.specifiers.length > 0) {
         requireVar.binding.path.parentPath!.insertAfter(namedExports);
       }
-      requireVar.binding.path.parentPath!.insertAfter(namespaceExports);
+      if (requireVar.namespaceExport) {
+        // TODO: resolve module id to path
+        const namespaceExports = t.exportNamedDeclaration(
+          undefined,
+          [requireVar.namespaceExport],
+          t.stringLiteral(requireVar.moduleId),
+        );
+        requireVar.binding.path.parentPath!.insertAfter(namespaceExports);
+      }
     });
 
     this.collectImports();
@@ -85,6 +85,7 @@ export class ImportExportManager {
     this.requireVars.forEach((requireVar) => {
       this.sortImportSpecifiers(requireVar.namedImports);
 
+      // TODO: resolve module id to path
       const namedImports = t.importDeclaration(
         [requireVar.defaultImport ?? [], requireVar.namedImports].flat(),
         t.stringLiteral(requireVar.moduleId),
@@ -94,6 +95,7 @@ export class ImportExportManager {
         requireVar.binding.path.parentPath!.insertAfter(namedImports);
       }
       if (requireVar.namespaceImport) {
+        // TODO: resolve module id to path
         const namespaceImport = t.importDeclaration(
           [requireVar.namespaceImport],
           t.stringLiteral(requireVar.moduleId),
@@ -102,13 +104,15 @@ export class ImportExportManager {
       }
 
       const hasImports =
-        requireVar.defaultImport ||
-        requireVar.namespaceImport ||
+        !!requireVar.defaultImport ||
+        !!requireVar.namespaceImport ||
         requireVar.namedImports.length > 0;
-      const hasExports = requireVar.exports.length > 0;
+      const hasExports =
+        !!requireVar.namespaceExport || requireVar.namedExports.length > 0;
 
       // side-effect import
       if (!requireVar.binding.referenced && !hasImports && !hasExports) {
+        // TODO: resolve module id to path
         requireVar.binding.path.parentPath!.insertAfter(
           t.importDeclaration([], t.stringLiteral(requireVar.moduleId)),
         );
@@ -280,7 +284,7 @@ export class ImportExportManager {
     localName: string,
     exportName: string,
   ) {
-    requireVar.exports.push(
+    requireVar.namedExports.push(
       t.exportSpecifier(t.identifier(localName), t.identifier(exportName)),
     );
   }
@@ -360,8 +364,8 @@ export class ImportExportManager {
    * ```
    */
   private addExportNamespace(requireVar: RequireVar, exportName: string) {
-    requireVar.exports.push(
-      t.exportNamespaceSpecifier(t.identifier(exportName)),
+    requireVar.namespaceExport ??= t.exportNamespaceSpecifier(
+      t.identifier(exportName),
     );
   }
 
@@ -396,7 +400,8 @@ export class ImportExportManager {
             defaultImport: undefined,
             namespaceImport: undefined,
             namedImports: [],
-            exports: [],
+            namespaceExport: undefined,
+            namedExports: [],
           });
         }
       });
