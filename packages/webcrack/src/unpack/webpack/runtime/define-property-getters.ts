@@ -1,15 +1,11 @@
+import { statement } from '@babel/template';
 import * as m from '@codemod/matchers';
 import assert from 'assert';
 import { Transform, constMemberExpression } from '../../../ast-utils';
 import { ImportExportManager } from '../import-export-manager';
-import { statement } from '@babel/template';
-
-// TODO: hoist re-exports to the top of the file (but retain order relative to imports)
 
 /**
- * `webpack/runtime/define property getters`
- *
- * Used to declare ESM exports.
+ * `__webpack_require__.d` defines getters on the exports object. Used in ESM.
  */
 export default {
   name: 'define-property-getters',

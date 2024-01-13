@@ -4,6 +4,8 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { generate, renameFast } from '../../ast-utils';
 
+// TODO: hoist re-exports to the top of the file (but retain order relative to imports)
+
 /**
  * Example: `__webpack_require__(id)`
  */

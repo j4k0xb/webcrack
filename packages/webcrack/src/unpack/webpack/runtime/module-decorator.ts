@@ -1,14 +1,13 @@
 import * as m from '@codemod/matchers';
 import { Transform, constMemberExpression } from '../../../ast-utils';
 
+// TODO(webpack 4): `module = __webpack_require__('webpack/buildin/harmony-module.js');`
+// or `module = __webpack_require__('webpack/buildin/module.js');`
+
 /**
- * `webpack/runtime/harmony module decorator` and `webpack/runtime/node module decorator`
+ * `__webpack_require__.hmd` and `__webpack_require__.nmd`
  *
  * The CommonJsPlugin injects this when a module accesses the global 'module' variable.
- *
- * - // TODO(webpack 4): `module = __webpack_require__('webpack/buildin/harmony-module.js');`
- * or `module = __webpack_require__('webpack/buildin/module.js');`
- * - webpack 5: `module = __webpack_require__.hmd(module);` or `module = __webpack_require__.nmd(module);`
  */
 export default {
   name: 'module-decorator',

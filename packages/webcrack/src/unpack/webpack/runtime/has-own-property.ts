@@ -4,7 +4,7 @@ import * as m from '@codemod/matchers';
 import { Transform, constMemberExpression } from '../../../ast-utils';
 
 /**
- * `webpack/runtime/hasOwnProperty shorthand`
+ * `__webpack_require__.o` checks if an object has a property.
  *
  * Used mostly in other runtime helpers but sometimes it also appears in user code.
  */

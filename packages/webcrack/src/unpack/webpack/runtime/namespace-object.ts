@@ -2,8 +2,6 @@ import * as m from '@codemod/matchers';
 import { Transform, constMemberExpression } from '../../../ast-utils';
 
 /**
- * `webpack/runtime/make namespace object`
- *
  * `__webpack_require__.r(__webpack_exports__);` defines `__esModule` on exports.
  */
 export default {
