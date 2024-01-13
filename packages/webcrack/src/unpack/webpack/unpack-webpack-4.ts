@@ -3,13 +3,14 @@ import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Bundle } from '..';
 import type { Transform } from '../../ast-utils';
-import { constMemberExpression, renameFast } from '../../ast-utils';
+import { renameFast } from '../../ast-utils';
 import { WebpackBundle } from './bundle';
 import {
   findAssignedEntryId,
   findRequiredEntryId,
   getModuleFunctions,
   modulesContainerMatcher,
+  webpackRequireFunctionMatcher,
 } from './common-matchers';
 import { WebpackModule } from './module';
 
@@ -25,34 +26,7 @@ export default {
   name: 'unpack-webpack-4',
   tags: ['unsafe'],
   visitor(options = { bundle: undefined }) {
-    // Example: __webpack_modules__
-    const containerId = m.capture(m.identifier());
-    const webpackRequire = m.capture(
-      m.functionDeclaration(
-        m.identifier(), // __webpack_require__
-        [m.identifier()], // moduleId
-        m.blockStatement(
-          m.anyList(
-            m.zeroOrMore(),
-            // Example (webpack 0.11.x): __webpack_modules__[moduleId].call(null, module, module.exports, __webpack_require__);
-            // Example (webpack 4): __webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-            m.expressionStatement(
-              m.callExpression(
-                constMemberExpression(
-                  m.memberExpression(
-                    m.fromCapture(containerId),
-                    m.identifier(),
-                    true,
-                  ),
-                  'call',
-                ),
-              ),
-            ),
-            m.zeroOrMore(),
-          ),
-        ),
-      ),
-    );
+    const { webpackRequire, containerId } = webpackRequireFunctionMatcher();
     const container = modulesContainerMatcher();
 
     const matcher = m.callExpression(

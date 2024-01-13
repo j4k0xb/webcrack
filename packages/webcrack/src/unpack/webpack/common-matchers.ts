@@ -13,9 +13,55 @@ export type FunctionPath = NodePath<
 >;
 
 /**
+ * @returns
+ * - `webpackRequire`: A Matcher for `function __webpack_require__(moduleId) { ... }`
+ * - `containerId`: A matcher for e.g. `__webpack_modules__` that has to be captured before `webpackRequire` is matched
+ */
+export function webpackRequireFunctionMatcher() {
+  // Example: __webpack_modules__
+  const containerId = m.capture(m.identifier());
+  const webpackRequire = m.capture(
+    m.functionDeclaration(
+      m.identifier(), // __webpack_require__
+      [m.identifier()], // moduleId
+      m.blockStatement(
+        m.anyList(
+          m.zeroOrMore(),
+          m.expressionStatement(
+            m.callExpression(
+              m.or(
+                // Example (webpack 0.11.x): __webpack_modules__[moduleId].call(null, module, module.exports, __webpack_require__);
+                // Example (webpack 4): __webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+                constMemberExpression(
+                  m.memberExpression(
+                    m.fromCapture(containerId),
+                    m.identifier(),
+                    true,
+                  ),
+                  'call',
+                ),
+                // Example (webpack 5): __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+                m.memberExpression(
+                  m.fromCapture(containerId),
+                  m.identifier(),
+                  true,
+                ),
+              ),
+            ),
+          ),
+          m.zeroOrMore(),
+        ),
+      ),
+    ),
+  );
+
+  return { webpackRequire, containerId };
+}
+
+/**
  * Matches
- * - `[,,function (module, exports, require) {...}, ...]` where the indexes are the module ids
- * - or `{0: function (module, exports, require) {...}, ...}` where the keys are the module ids
+ * - `[,,function (module, exports, require) {...}, ...]` where the index is the module ID
+ * - or `{0: function (module, exports, require) {...}, ...}` where the key is the module ID
  */
 export function modulesContainerMatcher(): m.CapturedMatcher<
   t.ArrayExpression | t.ObjectExpression

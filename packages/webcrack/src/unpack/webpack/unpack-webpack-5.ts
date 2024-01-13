@@ -9,6 +9,7 @@ import {
   findAssignedEntryId,
   getModuleFunctions,
   modulesContainerMatcher,
+  webpackRequireFunctionMatcher,
 } from './common-matchers';
 import { WebpackModule } from './module';
 
@@ -28,30 +29,7 @@ export default {
   tags: ['unsafe'],
   scope: true,
   visitor(options = { bundle: undefined }) {
-    // Example: __webpack_modules__
-    const modulesId = m.capture(m.identifier());
-    const webpackRequire = m.capture(
-      m.functionDeclaration(
-        m.identifier(), // __webpack_require__
-        [m.identifier()], // moduleId
-        m.blockStatement(
-          m.anyList(
-            m.zeroOrMore(),
-            // Example: __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-            m.expressionStatement(
-              m.callExpression(
-                m.memberExpression(
-                  m.fromCapture(modulesId),
-                  m.identifier(),
-                  true,
-                ),
-              ),
-            ),
-            m.zeroOrMore(),
-          ),
-        ),
-      ),
-    );
+    const { webpackRequire, containerId } = webpackRequireFunctionMatcher();
     const container = modulesContainerMatcher();
 
     const matcher = m.blockStatement(
@@ -59,7 +37,7 @@ export default {
         m.zeroOrMore(),
         // Example: var __webpack_modules__ = { ... };
         m.variableDeclaration(undefined, [
-          m.variableDeclarator(modulesId, container),
+          m.variableDeclarator(containerId, container),
         ]),
         m.zeroOrMore(),
         webpackRequire,

@@ -17,7 +17,7 @@
       loaded: false,
       exports: {}
     };
-    __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+    __webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
     module.loaded = true;
     return module.exports;
   }
