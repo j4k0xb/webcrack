@@ -43,6 +43,7 @@ export default {
         const requireVar = manager.findRequireVar(moduleBinding.path.node);
         if (!requireVar) return;
 
+        requireVar.binding.dereference();
         const importName = manager.addDefaultImport(requireVar);
         callPath.parentPath?.replaceWith(t.identifier(importName));
         this.changes++;
@@ -56,11 +57,12 @@ export default {
       if (!requireVar) return;
 
       const importName = manager.addDefaultImport(requireVar);
-      // `_tmp.a` -> `importName` or `_tmp()` -> `importName()`
+      // `_tmp.a` or `_tmp()` -> `importName`
       tmpVarBinding.referencePaths.forEach((refPath) => {
         refPath.parentPath?.replaceWith(t.identifier(importName));
       });
       tmpVarBinding.path.remove();
+      requireVar.binding.dereference();
       this.changes++;
     });
   },

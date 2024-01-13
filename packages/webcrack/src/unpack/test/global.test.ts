@@ -5,10 +5,7 @@ import { testWebpackModuleTransform } from '.';
 import { applyTransform } from '../../ast-utils';
 import global from '../webpack/runtime/global';
 
-const expectJS = testWebpackModuleTransform(
-  global,
-  ({ scope }) => scope.bindings.__webpack_require__,
-);
+const expectJS = testWebpackModuleTransform();
 
 test('replace __webpack_require__.g with global', () =>
   expectJS(`

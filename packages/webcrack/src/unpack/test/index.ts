@@ -1,24 +1,20 @@
 import { ParseResult, parse } from '@babel/parser';
-import traverse, { NodePath } from '@babel/traverse';
+import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import { Assertion, expect } from 'vitest';
-import { Transform, applyTransform } from '../../ast-utils';
+import { WebpackModule } from '../webpack/module';
 
 /**
- * Test a transform with the input being wrapped with
+ * Test all transforms with the input being wrapped with
  * ```js
  * (function(__webpack_module__, __webpack_exports__, __webpack_require__) {
  *  // input
  * });
  * ```
- *
- * @param transform the transform to apply
- * @param cb specify the options that will be passed to the transform
  */
-export function testWebpackModuleTransform<Options>(
-  transform: Transform<Options>,
-  cb?: (wrapperPath: NodePath<t.FunctionExpression>, ast: t.File) => Options,
-): (input: string) => Assertion<ParseResult<File>> {
+export function testWebpackModuleTransform(): (
+  input: string,
+) => Assertion<ParseResult<File>> {
   return (input) => {
     const moduleCode = `
       (function(__webpack_module__, __webpack_exports__, __webpack_require__) {
@@ -29,15 +25,14 @@ export function testWebpackModuleTransform<Options>(
       sourceType: 'unambiguous',
       allowReturnOutsideFunction: true,
     });
-    let innerAST: t.File;
+    let file: t.File;
     traverse(ast, {
       FunctionExpression(path) {
         path.stop();
-        innerAST = t.file(t.program(path.node.body.body));
-        const options = cb?.(path, innerAST);
-        applyTransform(innerAST, transform, options);
+        file = t.file(t.program(path.node.body.body));
+        new WebpackModule('test', path, true);
       },
     });
-    return expect(innerAST!);
+    return expect(file!);
   };
 }

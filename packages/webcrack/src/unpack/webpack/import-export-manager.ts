@@ -6,6 +6,8 @@ import { generate, renameFast } from '../../ast-utils';
 
 // TODO: hoist re-exports to the top of the file (but retain order relative to imports)
 // TODO: when it accesses module.exports, dont convert to esm
+// FIXME: remove unused require vars (when they were used for imports/exports)
+// also store import/export metadata in the require var for easier management
 
 /**
  * Example: `__webpack_require__(id)`
@@ -21,6 +23,12 @@ interface RequireCall {
 interface RequireVar {
   binding: Binding;
   moduleId: string;
+  imports: (
+    | t.ImportSpecifier
+    | t.ImportNamespaceSpecifier
+    | t.ImportDefaultSpecifier
+  )[];
+  exports: (t.ExportSpecifier | t.ExportNamespaceSpecifier)[];
 }
 
 export class ImportExportManager {
@@ -45,14 +53,6 @@ export class ImportExportManager {
   webpackRequire: Binding | undefined;
 
   private ast: t.File;
-  /**
-   * Used for merging multiple re-exports of a module
-   */
-  private reExportCache = new Map<string, t.ExportNamedDeclaration>();
-  /**
-   * Used for merging multiple imports of a module
-   */
-  private importCache = new Map<string, t.ImportDeclaration>();
 
   constructor(ast: t.File, webpackRequireBinding: Binding | undefined) {
     this.ast = ast;
@@ -60,7 +60,75 @@ export class ImportExportManager {
     this.collectRequireCalls();
   }
 
-  transformImports() {
+  insertImportsAndExports() {
+    // const property = m.capture(m.anyString());
+    // const memberExpressionMatcher = m.memberExpression(
+    //   m.identifier(),
+    //   m.identifier(property),
+    // );
+    // const zeroSequenceMatcher = m.sequenceExpression([
+    //   m.numericLiteral(0),
+    //   m.memberExpression(m.identifier(), m.identifier(property)),
+    // ]);
+
+    this.requireVars.forEach((requireVar) => {
+      // TODO: resolve module id to path
+      const namedExports = t.exportNamedDeclaration(
+        undefined,
+        requireVar.exports.filter((node) => t.isExportSpecifier(node)),
+        t.stringLiteral(requireVar.moduleId),
+      );
+      const namespaceExports = requireVar.exports
+        .filter((node) => t.isExportNamespaceSpecifier(node))
+        .map((node) =>
+          t.exportNamedDeclaration(
+            undefined,
+            [node],
+            t.stringLiteral(requireVar.moduleId),
+          ),
+        );
+      if (namedExports.specifiers.length > 0) {
+        requireVar.binding.path.parentPath!.insertAfter(namedExports);
+      }
+      requireVar.binding.path.parentPath!.insertAfter(namespaceExports);
+
+      // FIXME: collect this information earlier
+      if (requireVar.binding.references > 1) {
+        requireVar.binding.path.parentPath!.insertAfter(
+          statement`import * as ${requireVar.binding.identifier} from '${requireVar.moduleId}'`(),
+        );
+      }
+
+      const namedImports = t.importDeclaration(
+        [
+          ...requireVar.imports.filter((node) =>
+            t.isImportDefaultSpecifier(node),
+          ),
+          ...requireVar.imports.filter((node) => t.isImportSpecifier(node)),
+        ],
+        t.stringLiteral(requireVar.moduleId),
+      );
+      const namespaceImports = requireVar.imports
+        .filter((node) => t.isImportNamespaceSpecifier(node))
+        .map((node) =>
+          t.importDeclaration([node], t.stringLiteral(requireVar.moduleId)),
+        );
+
+      if (namedImports.specifiers.length > 0) {
+        requireVar.binding.path.parentPath!.insertAfter(namedImports);
+      }
+      requireVar.binding.path.parentPath!.insertAfter(namespaceImports);
+
+      requireVar.binding.path.remove();
+    });
+
+    // TODO: hoist imports to the top of the file
+    this.requireCalls.forEach(({ path, moduleId }) => {
+      path.replaceWith(expression`require('${moduleId}')`());
+    });
+  }
+
+  private collectImports() {
     const property = m.capture(m.anyString());
     const memberExpressionMatcher = m.memberExpression(
       m.identifier(),
@@ -111,7 +179,7 @@ export class ImportExportManager {
         binding.referencePaths.forEach((reference) => {
           reference.replaceWith(t.identifier(binding.identifier.name));
         });
-        this.addImportAll(requireVar);
+        this.addImportNamespace(requireVar);
       }
     });
 
@@ -120,7 +188,7 @@ export class ImportExportManager {
     });
   }
 
-  transformExport(scope: Scope, exportName: string, value: t.Expression) {
+  addExport(scope: Scope, exportName: string, value: t.Expression) {
     this.exports.add(exportName);
 
     const objectName = m.capture(m.anyString());
@@ -136,7 +204,7 @@ export class ImportExportManager {
       const requireVar = this.findRequireVar(binding.path.node);
 
       if (requireVar) {
-        this.addExportAll(binding, requireVar.moduleId, exportName);
+        this.addExportNamespace(requireVar, exportName);
       } else if (exportName === 'default' && binding.references === 1) {
         this.addExportDefault(binding);
       } else {
@@ -148,12 +216,7 @@ export class ImportExportManager {
       const requireVar = this.findRequireVar(binding.path.node);
       if (!requireVar) return;
 
-      this.addExportFrom(
-        requireVar.binding,
-        requireVar.moduleId,
-        propertyName.current!,
-        exportName,
-      );
+      this.addExportFrom(requireVar, propertyName.current!, exportName);
     } else {
       t.addComment(
         this.ast.program,
@@ -175,30 +238,18 @@ export class ImportExportManager {
    * @returns local name of the default import
    */
   addDefaultImport(requireVar: RequireVar) {
-    const { moduleId } = requireVar;
-    const existingImport = this.importCache.get(moduleId);
-    const localName = requireVar.binding.scope.generateUid();
-
-    if (existingImport) {
-      const existingDefaultImport = existingImport.specifiers.find(
-        (specifier) => t.isImportDefaultSpecifier(specifier),
-      );
-      if (existingDefaultImport) return existingDefaultImport.local.name;
-
-      existingImport.specifiers.push(
+    const existingDefaultImport = requireVar.imports.find((node) =>
+      t.isImportDefaultSpecifier(node),
+    );
+    if (existingDefaultImport) {
+      return existingDefaultImport.local.name;
+    } else {
+      const localName = requireVar.binding.scope.generateUid('default');
+      requireVar.imports.push(
         t.importDefaultSpecifier(t.identifier(localName)),
       );
-    } else {
-      // TODO: resolve to file path
-      const importDeclaration =
-        statement`import ${localName} from '${moduleId}'`() as t.ImportDeclaration;
-      // TODO: find better place to insert
-      this.ast.program.body.unshift(importDeclaration);
-      // FIXME: register binding
-      this.importCache.set(moduleId, importDeclaration);
+      return localName;
     }
-
-    return localName;
   }
 
   private addNamedImport(
@@ -206,26 +257,16 @@ export class ImportExportManager {
     localName: string,
     importedName: string,
   ) {
-    const existingImport = this.importCache.get(requireVar.moduleId);
-    if (existingImport) {
-      // FIXME: this can import the same name multiple times
-      existingImport.specifiers.push(
-        t.importSpecifier(t.identifier(localName), t.identifier(importedName)),
-      );
-    } else {
-      // TODO: resolve to file path
-      const importDeclaration =
-        statement`import { ${importedName} as ${localName} } from '${requireVar.moduleId}'`() as t.ImportDeclaration;
-      requireVar.binding.path.parentPath!.insertAfter(importDeclaration);
-      // FIXME: register binding to avoid duplicate names
-      this.importCache.set(requireVar.moduleId, importDeclaration);
-    }
+    requireVar.imports.push(
+      t.importSpecifier(t.identifier(localName), t.identifier(importedName)),
+    );
   }
 
-  private addImportAll(requireVar: RequireVar) {
-    // TODO: resolve to file path
-    requireVar.binding.path.parentPath!.replaceWith(
-      statement`import * as ${requireVar.binding.identifier} from '${requireVar.moduleId}'`(),
+  private addImportNamespace(requireVar: RequireVar) {
+    requireVar.imports.push(
+      t.importNamespaceSpecifier(
+        t.identifier(requireVar.binding.identifier.name),
+      ),
     );
   }
 
@@ -241,24 +282,13 @@ export class ImportExportManager {
    * ```
    */
   private addExportFrom(
-    binding: Binding,
-    moduleId: string,
+    requireVar: RequireVar,
     localName: string,
     exportName: string,
   ) {
-    const existingExport = this.reExportCache.get(moduleId);
-    if (existingExport) {
-      existingExport.specifiers.push(
-        t.exportSpecifier(t.identifier(localName), t.identifier(exportName)),
-      );
-    } else {
-      // TODO: resolve to file path
-      const exportDeclaration =
-        statement`export { ${localName} as ${exportName} } from '${moduleId}'`() as t.ExportNamedDeclaration;
-      const [path] = binding.path.parentPath!.insertAfter(exportDeclaration);
-      binding.reference(path.get('specifiers.0.local') as NodePath);
-      this.reExportCache.set(moduleId, exportDeclaration);
-    }
+    requireVar.exports.push(
+      t.exportSpecifier(t.identifier(localName), t.identifier(exportName)),
+    );
   }
 
   /**
@@ -332,10 +362,9 @@ export class ImportExportManager {
    * export * as foo from 'lib';
    * ```
    */
-  private addExportAll(binding: Binding, moduleId: string, exportName: string) {
-    // TODO: resolve to file path
-    binding.path.parentPath!.insertAfter(
-      statement`export * as ${exportName} from '${moduleId}'`(),
+  private addExportNamespace(requireVar: RequireVar, exportName: string) {
+    requireVar.exports.push(
+      t.exportNamespaceSpecifier(t.identifier(exportName)),
     );
   }
 
@@ -367,6 +396,8 @@ export class ImportExportManager {
           this.requireVars.push({
             moduleId,
             binding,
+            imports: [],
+            exports: [],
           });
         }
       });

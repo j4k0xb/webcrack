@@ -86,7 +86,7 @@ export default {
 
         if (singleExport.match(path.node)) {
           if (namespaceObject.current === '__webpack_exports__') {
-            manager.transformExport(
+            manager.addExport(
               path.scope,
               exportName.current!,
               returnValue.current!,
@@ -102,7 +102,7 @@ export default {
           for (const property of properties.current!) {
             objectProperty.match(property); // To easily get the captures per property
             if (namespaceObject.current === '__webpack_exports__') {
-              manager.transformExport(
+              manager.addExport(
                 path.scope,
                 exportName.current!,
                 returnValue.current!,

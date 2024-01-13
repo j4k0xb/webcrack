@@ -1,13 +1,7 @@
 import { test } from 'vitest';
 import { testWebpackModuleTransform } from '.';
-import { ImportExportManager } from '../webpack/import-export-manager';
-import getDefaultExport from '../webpack/runtime/get-default-export';
 
-const expectJS = testWebpackModuleTransform(
-  getDefaultExport,
-  ({ scope }, ast) =>
-    new ImportExportManager(ast, scope.bindings.__webpack_require__),
-);
+const expectJS = testWebpackModuleTransform();
 
 test('replace default import', () =>
   expectJS(`
@@ -16,10 +10,9 @@ test('replace default import', () =>
     console.log(_tmp.a);
     console.log(_tmp());
   `).toMatchInlineSnapshot(`
-    import _temp from "1";
-    var module = __webpack_require__(1);
-    console.log(_temp);
-    console.log(_temp);
+    import _default from "1";
+    console.log(_default);
+    console.log(_default);
   `));
 
 test('replace inlined default import', () =>
@@ -28,8 +21,7 @@ test('replace inlined default import', () =>
     console.log(__webpack_require__.n(module).a);
     console.log(__webpack_require__.n(module)());
   `).toMatchInlineSnapshot(`
-    import _temp from "1";
-    var module = __webpack_require__(1);
-    console.log(_temp);
-    console.log(_temp);
+    import _default from "1";
+    console.log(_default);
+    console.log(_default);
   `));

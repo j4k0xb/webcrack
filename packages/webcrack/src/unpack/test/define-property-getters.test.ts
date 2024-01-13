@@ -1,13 +1,7 @@
 import { describe, test } from 'vitest';
 import { testWebpackModuleTransform } from '.';
-import { ImportExportManager } from '../webpack/import-export-manager';
-import definePropertyGetters from '../webpack/runtime/define-property-getters';
 
-const expectJS = testWebpackModuleTransform(
-  definePropertyGetters,
-  ({ scope }, ast) =>
-    new ImportExportManager(ast, scope.bindings.__webpack_require__),
-);
+const expectJS = testWebpackModuleTransform();
 
 describe('webpack 4', () => {
   test('export default expression;', () =>
@@ -55,7 +49,6 @@ describe('webpack 4', () => {
       __webpack_require__.d(__webpack_exports__, "readFile", function() { return lib.readFile; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
       export { readFile } from "lib";
     `));
 
@@ -65,7 +58,7 @@ describe('webpack 4', () => {
       var lib = __webpack_require__("lib");
       lib.writeFile();
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
+      import * as lib from "lib";
       export { readFile } from "lib";
       lib.writeFile();
     `));
@@ -75,7 +68,6 @@ describe('webpack 4', () => {
       __webpack_require__.d(__webpack_exports__, "foo", function() { return lib.readFile; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
       export { readFile as foo } from "lib";
     `));
 
@@ -84,7 +76,6 @@ describe('webpack 4', () => {
       __webpack_require__.d(__webpack_exports__, "default", function() { return lib.readFile; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
       export { readFile as default } from "lib";
     `));
 
@@ -93,7 +84,6 @@ describe('webpack 4', () => {
       __webpack_require__.d(__webpack_exports__, "foo", function() { return lib.default; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
       export { default as foo } from "lib";
     `));
 
@@ -102,7 +92,6 @@ describe('webpack 4', () => {
       __webpack_require__.d(__webpack_exports__, "default", function() { return lib.default; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
       export { default } from "lib";
     `));
 
@@ -133,7 +122,6 @@ describe('webpack 4', () => {
       __webpack_require__.d(__webpack_exports__, "lib", function() { return lib; });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
       export * as lib from "lib";
     `));
 
@@ -243,7 +231,7 @@ describe('webpack 5', () => {
       });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      var lib = __webpack_require__("lib");
+      import * as lib from "lib";
       export { readFile, writeFile } from "lib";
     `));
 
