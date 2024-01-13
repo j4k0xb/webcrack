@@ -34,7 +34,7 @@
         Console: () => bar,
       });
       function bar() {}
-    }
+    },
   };
   var installedModules = {};
   function __webpack_require__(moduleId) {
@@ -47,17 +47,12 @@
       loaded: false,
       exports: {},
     });
-    modules[moduleId].call(
-      module.exports,
-      module,
-      module.exports,
-      __webpack_require__
-    );
+    modules[moduleId](module, module.exports, __webpack_require__);
     module.loaded = true;
     return module.exports;
   }
   __webpack_require__.c = installedModules;
-  __webpack_require__.n = module => {
+  __webpack_require__.n = (module) => {
     var getter =
       module && module.__esModule ? () => module.default : () => module;
     __webpack_require__.d(getter, {
@@ -80,7 +75,7 @@
   };
   __webpack_require__.o = (object, property) =>
     Object.prototype.hasOwnProperty.call(object, property);
-  __webpack_require__.r = exports => {
+  __webpack_require__.r = (exports) => {
     if (typeof Symbol != 'undefined' && Symbol.toStringTag) {
       Object.defineProperty(exports, Symbol.toStringTag, {
         value: 'Module',

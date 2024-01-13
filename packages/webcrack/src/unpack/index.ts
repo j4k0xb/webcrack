@@ -1,4 +1,3 @@
-import { parse } from '@babel/parser';
 import traverse, { visitors } from '@babel/traverse';
 import type * as t from '@babel/types';
 import type * as m from '@codemod/matchers';
@@ -10,18 +9,6 @@ import unpackWebpack5 from './webpack/unpack-webpack-5';
 import unpackWebpackChunk from './webpack/unpack-webpack-chunk';
 
 export { Bundle } from './bundle';
-
-export function unpack(
-  code: string,
-  mappings: Record<string, m.Matcher<unknown>> = {},
-): Bundle | undefined {
-  const ast = parse(code, {
-    sourceType: 'unambiguous',
-    allowReturnOutsideFunction: true,
-    plugins: ['jsx'],
-  });
-  return unpackAST(ast, mappings);
-}
 
 export function unpackAST(
   ast: t.Node,

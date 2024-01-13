@@ -8,7 +8,7 @@ const obfuscatedSrc = await readFile(
   'utf8',
 );
 const webpackSrc = await readFile(
-  join(__dirname, '../src/unpack/test/samples/webpack.js'),
+  join(__dirname, '../src/unpack/test/samples/webpack-4.js'),
   'utf8',
 );
 
