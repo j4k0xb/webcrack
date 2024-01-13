@@ -4,16 +4,16 @@ import { testWebpackModuleTransform } from '.';
 const expectJS = testWebpackModuleTransform();
 
 describe('webpack 4', () => {
-  test('export default expression;', () =>
-    expectJS(`
-      __webpack_exports__.default = 1;
-    `).toMatchInlineSnapshot(`export default 1;`));
-
   test('export named', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, "counter", function() { return foo; });
       var foo = 1;
     `).toMatchInlineSnapshot(`export var counter = 1;`));
+
+  test('export default expression;', () =>
+    expectJS(`
+      __webpack_exports__.default = 1;
+    `).toMatchInlineSnapshot(`export default 1;`));
 
   test.todo('export inlined variable', () =>
     expectJS(`
@@ -22,7 +22,8 @@ describe('webpack 4', () => {
     `).toMatchInlineSnapshot(`
       export var foo = 1;
       for (var i = 0; i < 10; i++) {}
-    `));
+    `),
+  );
 
   test('export default variable', () =>
     expectJS(`
@@ -30,6 +31,7 @@ describe('webpack 4', () => {
       var foo = 1;
     `).toMatchInlineSnapshot(`export default 1;`));
 
+  // TODO: or `export default foo;` ?
   test('export default variable with multiple references', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, "default", function() { return foo; });
@@ -180,6 +182,39 @@ describe('webpack 5', () => {
       export { counter as increment };
     `));
 
+  test('export default expression;', () =>
+    expectJS(`
+      __webpack_require__.d(__webpack_exports__, {
+        default: () => foo
+      });
+      var foo = 1;
+    `).toMatchInlineSnapshot(`
+      export default 1;
+    `));
+
+  test('export default variable', () =>
+    expectJS(`
+      __webpack_require__.d(__webpack_exports__, {
+        default: () => foo
+      });
+      var foo = 1;
+    `).toMatchInlineSnapshot(`
+      export default 1;
+    `));
+
+  test('export default variable with multiple references', () =>
+    expectJS(`
+      __webpack_require__.d(__webpack_exports__, {
+        default: () => foo
+      });
+      var foo = 1;
+      console.log(foo);
+    `).toMatchInlineSnapshot(`
+      var foo = 1;
+      export { foo as default };
+      console.log(foo);
+    `));
+
   test.todo('export object destructuring', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, {
@@ -240,13 +275,12 @@ describe('webpack 5', () => {
       });
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
-      import * as lib from "lib";
       export { readFile, writeFile } from "lib";
     `));
 
   test.todo('re-export all from commonjs', () =>
     expectJS(`
-      var lib = require("lib");
+      var lib = __webpack_require__("lib");
       var libDef = __webpack_require__.n(lib);
       var reExportObject = {};
       for (const importKey in lib) {
