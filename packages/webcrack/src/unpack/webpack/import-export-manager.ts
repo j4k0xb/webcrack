@@ -21,7 +21,7 @@ interface RequireVar {
 }
 
 export class ImportExportManager {
-  exports: t.ExportDeclaration[] = [];
+  exports = new Set<string>();
 
   private ast: t.File;
   private webpackRequire: Binding | undefined;
@@ -45,7 +45,13 @@ export class ImportExportManager {
     this.transformExports();
   }
 
-  addExport(scope: Scope, exportName: string, value: t.Expression) {
+  private transformExport(
+    scope: Scope,
+    exportName: string,
+    value: t.Expression,
+  ) {
+    this.exports.add(exportName);
+
     const objectName = m.capture(m.anyString());
     const propertyName = m.capture(m.anyString());
     const memberExpressionMatcher = m.memberExpression(
@@ -114,7 +120,6 @@ export class ImportExportManager {
         [specifier],
         t.stringLiteral(moduleId),
       );
-      this.exports.push(exportDeclaration);
       binding.path.parentPath?.insertAfter(exportDeclaration);
       this.reExportCache.set(moduleId, exportDeclaration);
     }
@@ -154,7 +159,6 @@ export class ImportExportManager {
           t.identifier(exportName),
         ),
       ]);
-      this.exports.push(namedExport);
       declaration.insertAfter(namedExport);
     } else if (exportName === 'default') {
       // Example: export default 1;
@@ -162,13 +166,11 @@ export class ImportExportManager {
         ? declaration.node.declarations[0].init!
         : (declaration.node as t.ClassDeclaration | t.FunctionDeclaration);
       const defaultExport = t.exportDefaultDeclaration(value);
-      this.exports.push(defaultExport);
       declaration.replaceWith(defaultExport);
     } else {
       // Example: export var counter = 1;
       renameFast(binding, exportName);
       const namedExport = t.exportNamedDeclaration(declaration.node);
-      this.exports.push(namedExport);
       declaration.replaceWith(namedExport);
     }
   }
@@ -187,7 +189,6 @@ export class ImportExportManager {
   private addExportAll(binding: Binding, moduleId: string) {
     // TODO: resolve to file path
     const exportAll = t.exportAllDeclaration(t.stringLiteral(moduleId));
-    this.exports.push(exportAll);
     binding.path.parentPath?.insertAfter(exportAll);
   }
 
@@ -270,14 +271,19 @@ export class ImportExportManager {
         if (!path.parentPath.isProgram()) return path.skip();
 
         if (singleExport.match(path.node)) {
-          this.addExport(path.scope, exportName.current!, returnValue.current!);
+          this.transformExport(
+            path.scope,
+            exportName.current!,
+            returnValue.current!,
+          );
           path.remove();
         } else if (defaultExportAssignment.match(path.node)) {
+          this.exports.add('default');
           path.replaceWith(t.exportDefaultDeclaration(returnValue.current!));
         } else if (multiExport.match(path.node)) {
           for (const property of properties.current!) {
             objectProperty.match(property); // To easily get the captures per property
-            this.addExport(
+            this.transformExport(
               path.scope,
               exportName.current!,
               returnValue.current!,
