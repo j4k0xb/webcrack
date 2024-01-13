@@ -135,12 +135,24 @@ export class ImportExportManager {
         m.variableDeclaration(),
         m.classDeclaration(),
         m.functionDeclaration(),
+        m.exportNamedDeclaration(),
       ),
     );
     if (!declaration) return;
-    // FIXME: check if its already exported and add `export { a as b }` instead.
-    renameFast(binding, exportName);
-    declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
+
+    if (declaration.type === 'ExportNamedDeclaration') {
+      declaration.insertAfter(
+        t.exportNamedDeclaration(null, [
+          t.exportSpecifier(
+            t.identifier(binding.identifier.name),
+            t.identifier(exportName),
+          ),
+        ]),
+      );
+    } else {
+      renameFast(binding, exportName);
+      declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
+    }
   }
 
   /**
