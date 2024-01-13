@@ -1,4 +1,4 @@
-import { Binding } from '@babel/traverse';
+import type { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
@@ -7,7 +7,7 @@ import {
   renameParameters,
 } from '../../ast-utils';
 import { Module } from '../module';
-import { FunctionPath } from './common-matchers';
+import type { FunctionPath } from './common-matchers';
 import { ImportExportManager } from './import-export-manager';
 import {
   default as defineExport,

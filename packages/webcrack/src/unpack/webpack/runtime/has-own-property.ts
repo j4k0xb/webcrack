@@ -1,7 +1,8 @@
 import { expression } from '@babel/template';
-import { Binding } from '@babel/traverse';
+import type { Binding } from '@babel/traverse';
 import * as m from '@codemod/matchers';
-import { Transform, constMemberExpression } from '../../../ast-utils';
+import type { Transform } from '../../../ast-utils';
+import { constMemberExpression } from '../../../ast-utils';
 
 /**
  * `__webpack_require__.o` checks if an object has a property.

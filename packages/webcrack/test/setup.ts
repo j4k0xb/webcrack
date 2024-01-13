@@ -1,4 +1,4 @@
-import { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { expect } from 'vitest';
 import { generate } from '../src/ast-utils';

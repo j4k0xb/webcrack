@@ -1,7 +1,9 @@
-import { ParseResult, parse } from '@babel/parser';
+import type { ParseResult } from '@babel/parser';
+import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import * as t from '@babel/types';
-import { Assertion, expect } from 'vitest';
+import type { Assertion } from 'vitest';
+import { expect } from 'vitest';
 import { WebpackModule } from '../webpack/module';
 
 /**

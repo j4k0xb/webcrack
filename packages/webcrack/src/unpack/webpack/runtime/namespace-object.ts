@@ -1,6 +1,7 @@
 import { statement } from '@babel/template';
 import * as m from '@codemod/matchers';
-import { Transform, constMemberExpression } from '../../../ast-utils';
+import type { Transform } from '../../../ast-utils';
+import { constMemberExpression } from '../../../ast-utils';
 
 /**
  * `__webpack_require__.r(__webpack_exports__);` defines `__esModule` on exports.

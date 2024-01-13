@@ -1,5 +1,5 @@
 import { expression, statement } from '@babel/template';
-import { Binding, NodePath, Scope } from '@babel/traverse';
+import type { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { generate, renameFast } from '../../ast-utils';

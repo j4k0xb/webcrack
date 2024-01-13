@@ -1,4 +1,4 @@
-import type { Options, Sandbox} from 'webcrack';
+import type { Options, Sandbox } from 'webcrack';
 import { webcrack } from 'webcrack';
 
 export type WorkerRequest =

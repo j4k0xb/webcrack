@@ -1,4 +1,4 @@
-import { WebpackModule } from './module';
+import type { WebpackModule } from './module';
 
 export class WebpackChunk {
   chunkIds: string[];

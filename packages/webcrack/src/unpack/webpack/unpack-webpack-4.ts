@@ -1,8 +1,9 @@
-import { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import type { NodePath } from '@babel/traverse';
+import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { Bundle } from '..';
-import { Transform, renameFast } from '../../ast-utils';
+import type { Bundle } from '..';
+import type { Transform } from '../../ast-utils';
+import { renameFast } from '../../ast-utils';
 import { WebpackBundle } from './bundle';
 import {
   findAssignedEntryId,

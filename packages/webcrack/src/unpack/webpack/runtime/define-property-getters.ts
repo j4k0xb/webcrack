@@ -1,9 +1,10 @@
 import { statement } from '@babel/template';
-import { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import assert from 'assert';
-import { Transform, constMemberExpression } from '../../../ast-utils';
-import { ImportExportManager } from '../import-export-manager';
+import type { Transform } from '../../../ast-utils';
+import { constMemberExpression } from '../../../ast-utils';
+import type { ImportExportManager } from '../import-export-manager';
 
 /**
  * `__webpack_require__.d` defines getters on the exports object. Used in ESM.

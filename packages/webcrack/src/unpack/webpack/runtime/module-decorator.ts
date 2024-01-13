@@ -1,5 +1,6 @@
 import * as m from '@codemod/matchers';
-import { Transform, constMemberExpression } from '../../../ast-utils';
+import type { Transform } from '../../../ast-utils';
+import { constMemberExpression } from '../../../ast-utils';
 
 // TODO(webpack 4): `module = __webpack_require__('webpack/buildin/harmony-module.js');`
 // or `module = __webpack_require__('webpack/buildin/module.js');`

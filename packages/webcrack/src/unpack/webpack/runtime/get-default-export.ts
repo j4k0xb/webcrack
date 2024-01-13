@@ -1,8 +1,9 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import assert from 'assert';
-import { Transform, constMemberExpression } from '../../../ast-utils';
-import { ImportExportManager } from '../import-export-manager';
+import type { Transform } from '../../../ast-utils';
+import { constMemberExpression } from '../../../ast-utils';
+import type { ImportExportManager } from '../import-export-manager';
 
 // var a = __webpack_require__(11); var i = __webpack_require__.n(a); let p = i.a;
 // var c = __webpack_require__(11); let h = __webpack_require__.n(c).a;
