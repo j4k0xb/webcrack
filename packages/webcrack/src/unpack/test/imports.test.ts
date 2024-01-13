@@ -6,7 +6,6 @@ const expectJS = testWebpackModuleTransform();
 describe('webpack 4', () => {
   test('default import', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(lib.default);
     `).toMatchInlineSnapshot(`
@@ -37,7 +36,6 @@ describe('webpack 4', () => {
 
   test('named import', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(lib.foo);
     `).toMatchInlineSnapshot(`
@@ -47,7 +45,6 @@ describe('webpack 4', () => {
 
   test('multiple named imports', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(lib.foo, lib.foo, lib.bar);
     `).toMatchInlineSnapshot(`
@@ -57,7 +54,6 @@ describe('webpack 4', () => {
 
   test('named import with indirect call', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(Object(lib.foo)("bar"));
     `).toMatchInlineSnapshot(`
@@ -67,7 +63,6 @@ describe('webpack 4', () => {
 
   test('namespace import', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(lib);
     `).toMatchInlineSnapshot(`
@@ -77,7 +72,6 @@ describe('webpack 4', () => {
 
   test('combined namespace and default import', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(lib, lib.default);
     `).toMatchInlineSnapshot(`
@@ -89,7 +83,6 @@ describe('webpack 4', () => {
   // TODO: maybe theres no var or it got inlined somewhere
   test('side effect import', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`
       import "lib";
@@ -109,7 +102,6 @@ describe('webpack 4', () => {
 
   test('indirect calls', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(Object(lib.foo)("bar"));
       console.log(Object(lib.default)("bar"));
@@ -121,7 +113,6 @@ describe('webpack 4', () => {
 
   test('sort import specifiers alphabetically', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(lib.xyz, lib.abc);
     `).toMatchInlineSnapshot(`
@@ -132,7 +123,6 @@ describe('webpack 4', () => {
   test.todo('hoist imports', () =>
     expectJS(`
       var _tmp;
-      __webpack_require__.r(__webpack_exports__);
       var lib = __webpack_require__("lib");
       var lib2 = __webpack_require__("lib2");
       console.log(lib, lib2);
@@ -144,9 +134,9 @@ describe('webpack 4', () => {
     `),
   );
 
+  // TODO: also create an import for the 2nd require call?
   test('mixed import/require', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       var lib = __webpack_require__("lib");
       console.log(lib, __webpack_require__("lib2"));
     `).toMatchInlineSnapshot(`
@@ -158,7 +148,6 @@ describe('webpack 4', () => {
 describe('webpack 5', () => {
   test('named import with indirect call', () =>
     expectJS(`
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log((0, lib.foo)("bar"));
     `).toMatchInlineSnapshot(`
@@ -169,7 +158,6 @@ describe('webpack 5', () => {
   test.todo('namespace import of commonjs module', () =>
     expectJS(`
       var _cache;
-      __webpack_require__.r(__webpack_exports__);
       const lib = __webpack_require__("lib");
       console.log(_cache ||= __webpack_require__.t(lib, 2));
     `).toMatchInlineSnapshot(`

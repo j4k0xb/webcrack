@@ -132,18 +132,18 @@ describe('webpack 4', () => {
 
   test('namespace object', () =>
     expectJS(`
-        var lib_namespaceObject = {};
-        __webpack_require__.d(lib_namespaceObject, "foo", function() { return foo; });
-        function foo() {}
-      `).toMatchInlineSnapshot(`
-        var lib_namespaceObject = {};
-        //webcrack:concatenated-module-export
-        Object.defineProperty(lib_namespaceObject, "foo", {
-          enumerable: true,
-          get: () => foo
-        });
-        function foo() {}
-      `));
+      var lib_namespaceObject = {};
+      __webpack_require__.d(lib_namespaceObject, "foo", function() { return foo; });
+      function foo() {}
+    `).toMatchInlineSnapshot(`
+      var lib_namespaceObject = {};
+      //webcrack:concatenated-module-export
+      Object.defineProperty(lib_namespaceObject, "foo", {
+        enumerable: true,
+        get: () => foo
+      });
+      function foo() {}
+    `));
 });
 
 describe('webpack 5', () => {
