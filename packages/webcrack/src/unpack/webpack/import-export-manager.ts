@@ -80,15 +80,6 @@ export class ImportExportManager {
         requireVar.binding.path.parentPath!.insertAfter(namedExports);
       }
       requireVar.binding.path.parentPath!.insertAfter(namespaceExports);
-
-      // FIXME: collect this information earlier
-      // if (requireVar.binding.references > 1) {
-      //   requireVar.binding.path.parentPath!.insertAfter(
-      //     statement`import * as ${requireVar.binding.identifier} from '${requireVar.moduleId}'`(),
-      //   );
-      // }
-
-      // requireVar.binding.path.remove();
     });
 
     this.collectImports();
@@ -110,8 +101,13 @@ export class ImportExportManager {
         requireVar.binding.path.parentPath!.insertAfter(namespaceImport);
       }
 
-      if (!requireVar.binding.referenced) {
-        // side-effect import
+      const hasImports =
+        requireVar.defaultImport ||
+        requireVar.namespaceImport ||
+        requireVar.namedImports.length > 0;
+
+      // side-effect import
+      if (!requireVar.binding.referenced && !hasImports) {
         requireVar.binding.path.parentPath!.insertAfter(
           t.importDeclaration([], t.stringLiteral(requireVar.moduleId)),
         );
@@ -133,10 +129,14 @@ export class ImportExportManager {
       m.identifier(property),
       false,
     );
-    const zeroSequenceMatcher = m.sequenceExpression([
-      m.numericLiteral(0),
-      m.memberExpression(m.identifier(), m.identifier(property)),
-    ]);
+    const indirectCallMatcher = m.callExpression(
+      m.or(
+        // webpack 4: Object(lib.foo)("bar")
+        m.callExpression(m.identifier('Object'), [memberExpressionMatcher]),
+        // webpack 5: (0, lib.foo)("bar")
+        m.sequenceExpression([m.numericLiteral(0), memberExpressionMatcher]),
+      ),
+    );
 
     this.requireVars.forEach((requireVar) => {
       const { binding } = requireVar;
@@ -162,8 +162,8 @@ export class ImportExportManager {
             importedLocalNames.add(localName);
 
             this.addNamedImport(requireVar, localName, importedName);
-            if (zeroSequenceMatcher.match(reference.parentPath?.parent)) {
-              reference.parentPath.parentPath!.replaceWith(
+            if (indirectCallMatcher.match(reference.parentPath?.parentPath?.parent)) {
+              reference.parentPath.parentPath.replaceWith(
                 t.identifier(localName),
               );
             } else {
@@ -174,17 +174,9 @@ export class ImportExportManager {
           this.addNamespaceImport(requireVar);
         }
       });
-
-      // if (zeroSequenceMatcher.match(reference.parentPath?.parent)) {
-      //   reference.parentPath.parentPath!.replaceWith(
-      //     t.identifier(localName),
-      //   );
-      // } else {
-      //   reference.parentPath!.replaceWith(t.identifier(localName));
-      // }
-      // if (!memberExpressionMatcher.match(reference.parent)) return;
     });
 
+    // this should never happen:
     // this.requireCalls.forEach(({ path, moduleId }) => {
     //   path.replaceWith(expression`require('${moduleId}')`());
     // });

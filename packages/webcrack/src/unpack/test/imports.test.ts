@@ -32,8 +32,8 @@ describe('webpack 4', () => {
       var _tmp = __webpack_require__.n(lib).a;
       console.log(_tmp);
     `).toMatchInlineSnapshot(`
-      import _default from "1";
-      console.log(_default);
+      import _lib_default from "1";
+      console.log(_lib_default);
     `));
 
   test('named import', () =>
