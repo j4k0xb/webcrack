@@ -1,19 +1,9 @@
-import type { Binding } from '@babel/traverse';
 import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import {
-  applyTransform,
-  constMemberExpression,
-  renameFast,
-  renameParameters,
-} from '../../ast-utils';
+import { applyTransform, renameFast, renameParameters } from '../../ast-utils';
 import { Module } from '../module';
 import type { FunctionPath } from './common-matchers';
 import { ImportExportManager } from './import-export-manager';
-import {
-  default as defineExport,
-  default as definePropertyGetters,
-} from './runtime/define-property-getters';
+import { default as definePropertyGetters } from './runtime/define-property-getters';
 import getDefaultExport from './runtime/get-default-export';
 import global from './runtime/global';
 import hasOwnProperty from './runtime/has-own-property';
@@ -22,9 +12,6 @@ import namespaceObject from './runtime/namespace-object';
 import varInjections from './var-injections';
 
 export class WebpackModule extends Module {
-  #moduleBinding: Binding | undefined;
-  #webpackRequireBinding: Binding | undefined;
-  #exportsBinding: Binding | undefined;
   #importExportManager: ImportExportManager;
   // TODO: expose to public API
   #sourceType: 'commonjs' | 'esm' = 'commonjs';
@@ -42,27 +29,27 @@ export class WebpackModule extends Module {
       '__webpack_exports__',
       '__webpack_require__',
     ]);
-    this.#moduleBinding = ast.scope.getBinding('__webpack_module__');
-    this.#webpackRequireBinding = ast.scope.getBinding('__webpack_require__');
-    this.#exportsBinding = ast.scope.getBinding('__webpack_exports__');
+    const moduleBinding = ast.scope.getBinding('__webpack_module__');
+    const webpackRequireBinding = ast.scope.getBinding('__webpack_require__');
+    const exportsBinding = ast.scope.getBinding('__webpack_exports__');
 
     applyTransform(file, varInjections);
 
     this.#importExportManager = new ImportExportManager(
       file,
-      this.#webpackRequireBinding,
+      webpackRequireBinding,
     );
-    applyTransform(file, global, this.#webpackRequireBinding);
-    applyTransform(file, hasOwnProperty, this.#webpackRequireBinding);
-    applyTransform(file, moduleDecorator, this.#webpackRequireBinding);
+    applyTransform(file, global, webpackRequireBinding);
+    applyTransform(file, hasOwnProperty, webpackRequireBinding);
+    applyTransform(file, moduleDecorator, webpackRequireBinding);
     applyTransform(file, namespaceObject);
     applyTransform(file, getDefaultExport, this.#importExportManager);
     applyTransform(file, definePropertyGetters, this.#importExportManager);
     this.#importExportManager.insertImportsAndExports();
 
     // For CommonJS
-    if (this.#moduleBinding) renameFast(this.#moduleBinding, 'module');
-    if (this.#exportsBinding) renameFast(this.#exportsBinding, 'exports');
+    if (moduleBinding) renameFast(moduleBinding, 'module');
+    if (exportsBinding) renameFast(exportsBinding, 'exports');
 
     // this.removeDefineESM();
     // // FIXME: some bundles don't define __esModule but still declare esm exports
@@ -84,74 +71,5 @@ export class WebpackModule extends Module {
     ) {
       lastNode.trailingComments.pop();
     }
-  }
-
-  /**
-   * Removes
-   * - `__webpack_require__.r(exports);` (webpack/runtime/make namespace object)
-   * - `Object.defineProperty(exports, "__esModule", { value: true });`
-   */
-  private removeDefineESM(): void {
-    const matcher = m.expressionStatement(
-      m.or(
-        m.callExpression(constMemberExpression('__webpack_require__', 'r'), [
-          m.identifier(),
-        ]),
-        m.callExpression(constMemberExpression('Object', 'defineProperty'), [
-          m.identifier(),
-          m.stringLiteral('__esModule'),
-          m.objectExpression([
-            m.objectProperty(m.identifier('value'), m.booleanLiteral(true)),
-          ]),
-        ]),
-      ),
-    );
-
-    for (let i = 0; i < this.ast.program.body.length; i++) {
-      const node = this.ast.program.body[i];
-      if (matcher.match(node)) {
-        this.#sourceType = 'esm';
-        this.ast.program.body.splice(i, 1);
-        i--;
-      }
-    }
-  }
-
-  private convertExportsToESM(): void {
-    applyTransform(this.ast, defineExport);
-  }
-
-  /**
-   * // TODO: refactor to use ImportExportManager
-   * ```diff
-   * - __webpack_require__(id)
-   * + require("./relative/path.js")
-   * ```
-   * @internal
-   */
-  replaceRequireCalls() // onResolve: (id: string) => { path: string; external?: boolean },
-  : void {
-    // if (!this.#webpackRequireBinding) return;
-    // return;
-    // const idArg = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
-    // const requireCall = m.callExpression(m.identifier('__webpack_require__'), [
-    //   idArg,
-    // ]);
-    // this.#webpackRequireBinding.referencePaths.forEach((path) => {
-    //   m.matchPath(requireCall, { idArg }, path.parentPath!, ({ idArg }) => {
-    //     const id = idArg.node.value.toString();
-    //     const result = onResolve(id);
-    //     (path.node as t.Identifier).name = 'require';
-    //     idArg.replaceWith(t.stringLiteral(result.path));
-    //     if (result.external) {
-    //       idArg.addComment('leading', 'webcrack:missing');
-    //     }
-    //     // this.#imports.push({
-    //     //   id,
-    //     //   path: result.path,
-    //     //   nodePath: path.parentPath as NodePath<t.CallExpression>,
-    //     // });
-    //   });
-    // });
   }
 }
