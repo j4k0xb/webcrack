@@ -1,3 +1,4 @@
+import { statement } from '@babel/template';
 import traverse, { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
@@ -108,20 +109,16 @@ export class ImportExportManager {
     exportName: string,
   ) {
     const existingExport = this.reExportCache.get(moduleId);
-    const specifier = t.exportSpecifier(
-      t.identifier(localName),
-      t.identifier(exportName),
-    );
     if (existingExport) {
-      existingExport.specifiers.push(specifier);
+      existingExport.specifiers.push(
+        t.exportSpecifier(t.identifier(localName), t.identifier(exportName)),
+      );
     } else {
       // TODO: resolve to file path
-      const exportDeclaration = t.exportNamedDeclaration(
-        undefined,
-        [specifier],
-        t.stringLiteral(moduleId),
-      );
-      binding.path.parentPath?.insertAfter(exportDeclaration);
+      const exportDeclaration =
+        statement`export { ${localName} as ${exportName} } from '${moduleId}'`() as t.ExportNamedDeclaration;
+      const [path] = binding.path.parentPath!.insertAfter(exportDeclaration);
+      binding.reference(path.get('specifiers.0.local') as NodePath);
       this.reExportCache.set(moduleId, exportDeclaration);
     }
   }
@@ -138,32 +135,29 @@ export class ImportExportManager {
    * ```
    */
   private addExportDeclaration(binding: Binding, exportName: string) {
-    const statement = binding.path.getStatementParent()!;
+    const statementPath = binding.path.getStatementParent()!;
     const matcher = m.or(
       m.variableDeclaration(),
       m.classDeclaration(),
       m.functionDeclaration(),
       m.exportNamedDeclaration(),
     );
-    if (!matcher.match(statement.node)) return;
+    if (!matcher.match(statementPath.node)) return;
 
     const isDeclarationExport =
-      exportName !== 'default' && statement.type !== 'ExportNamedDeclaration';
+      exportName !== 'default' &&
+      statementPath.type !== 'ExportNamedDeclaration';
 
     if (isDeclarationExport) {
       // Example: export var counter = 1;
       renameFast(binding, exportName);
-      const namedExport = t.exportNamedDeclaration(statement.node);
-      statement.replaceWith(namedExport);
+      statementPath.replaceWith(t.exportNamedDeclaration(statementPath.node));
     } else {
       // Example: export { foo as bar };
-      const namedExport = t.exportNamedDeclaration(undefined, [
-        t.exportSpecifier(
-          t.identifier(binding.identifier.name),
-          t.identifier(exportName),
-        ),
-      ]);
-      statement.insertAfter(namedExport);
+      const [path] = statementPath.insertAfter(
+        statement`export { ${binding.identifier.name} as ${exportName} }`(),
+      );
+      binding.reference(path.get('specifiers.0.local') as NodePath);
     }
   }
 
@@ -180,12 +174,13 @@ export class ImportExportManager {
    */
   private addExportDefault(binding: Binding) {
     const node = binding.path.node;
-    const declaration =
+    const value =
       node.type === 'VariableDeclarator'
         ? node.init!
         : (node as t.ClassDeclaration | t.FunctionDeclaration);
-    const defaultExport = t.exportDefaultDeclaration(declaration);
-    binding.path.getStatementParent()!.replaceWith(defaultExport);
+    binding.path
+      .getStatementParent()!
+      .replaceWith(statement`export default ${value}`());
   }
 
   /**
@@ -201,12 +196,9 @@ export class ImportExportManager {
    */
   private addExportAll(binding: Binding, moduleId: string, exportName: string) {
     // TODO: resolve to file path
-    const exportAll = t.exportNamedDeclaration(
-      undefined,
-      [t.exportNamespaceSpecifier(t.identifier(exportName))],
-      t.stringLiteral(moduleId),
+    binding.path.parentPath!.insertAfter(
+      statement`export * as ${exportName} from '${moduleId}'`(),
     );
-    binding.path.parentPath?.insertAfter(exportAll);
   }
 
   /**
@@ -295,7 +287,7 @@ export class ImportExportManager {
           path.remove();
         } else if (defaultExportAssignment.match(path.node)) {
           this.exports.add('default');
-          path.replaceWith(t.exportDefaultDeclaration(returnValue.current!));
+          path.replaceWith(statement`export default ${returnValue.current}`());
         } else if (multiExport.match(path.node)) {
           for (const property of properties.current!) {
             objectProperty.match(property); // To easily get the captures per property
