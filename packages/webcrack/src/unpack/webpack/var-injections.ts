@@ -32,7 +32,9 @@ export default {
 
     return {
       ExpressionStatement(path) {
-        if (!path.parentPath.isProgram() || !matcher.match(path.node)) return;
+        if (!path.parentPath.isProgram()) path.skip();
+        if (!matcher.match(path.node)) return;
+        if (params.current!.length !== args.current!.length - 1) return;
 
         const variables = params.current!.map((param, i) =>
           t.variableDeclaration('var', [

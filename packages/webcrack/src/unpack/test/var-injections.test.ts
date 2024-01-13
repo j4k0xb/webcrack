@@ -14,3 +14,14 @@ test('replace', () =>
     var n = __webpack_require__(2);
     console.log(m, n);
   `));
+
+test('ignore different number of params and args', () =>
+  expectJS(`
+    (function (m, n) {
+      console.log(m, n);
+    }.call(this, foo));
+  `).toMatchInlineSnapshot(`
+    (function (m, n) {
+      console.log(m, n);
+    }).call(this, foo);
+  `));
