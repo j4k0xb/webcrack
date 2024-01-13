@@ -97,6 +97,31 @@ describe('webpack 4', () => {
     `),
   );
 
+  test('sort import specifiers alphabetically', () =>
+    expectJS(`
+      __webpack_require__.r(__webpack_exports__);
+      const lib = __webpack_require__("lib");
+      console.log(lib.xyz, lib.abc);
+    `).toMatchInlineSnapshot(`
+      import { abc, xyz } from "lib";
+      console.log(xyz, abc);
+    `));
+
+  test.todo('hoist imports', () =>
+    expectJS(`
+      var _tmp;
+      __webpack_require__.r(__webpack_exports__);
+      var lib = __webpack_require__("lib");
+      var lib2 = __webpack_require__("lib2");
+      console.log(lib, lib2);
+    `).toMatchInlineSnapshot(`
+      import * as lib from "lib";
+      import * as lib2 from "lib2";
+      var _tmp;
+      console.log(lib, lib2);
+    `),
+  );
+
   test('mixed import/require', () =>
     expectJS(`
       __webpack_require__.r(__webpack_exports__);

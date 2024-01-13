@@ -6,10 +6,7 @@ import assert from 'assert';
 import { generate, renameFast } from '../../ast-utils';
 import { dereference } from '../../ast-utils/binding';
 
-// TODO: hoist imports/re-exports to the top of the file (but retain order relative to imports)
 // TODO: when it accesses module.exports, don't convert to esm
-// TODO: sort named imports alphabetically
-// FIXME: remove unused require vars (when they were used for imports/exports)
 
 /**
  * Example: `__webpack_require__(id)`
@@ -86,6 +83,8 @@ export class ImportExportManager {
     this.collectImports();
 
     this.requireVars.forEach((requireVar) => {
+      this.sortImportSpecifiers(requireVar.namedImports);
+
       const namedImports = t.importDeclaration(
         [requireVar.defaultImport ?? [], requireVar.namedImports].flat(),
         t.stringLiteral(requireVar.moduleId),
@@ -123,6 +122,14 @@ export class ImportExportManager {
       // TODO: resolve module id to path
       path.replaceWith(expression`require('${moduleId}')`());
     });
+  }
+
+  private sortImportSpecifiers(specifiers: t.ImportSpecifier[]) {
+    specifiers.sort((a, b) =>
+      (a.imported as t.Identifier).name.localeCompare(
+        (b.imported as t.Identifier).name,
+      ),
+    );
   }
 
   private collectImports() {
