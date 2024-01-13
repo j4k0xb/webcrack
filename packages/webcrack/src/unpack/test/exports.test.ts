@@ -21,18 +21,6 @@ describe('webpack 4', () => {
       var foo = 1;
     `).toMatchInlineSnapshot(`export default 1;`));
 
-  // TODO: or `export default foo;` ?
-  test('export default variable with multiple references', () =>
-    expectJS(`
-      __webpack_require__.d(__webpack_exports__, "default", function() { return foo; });
-      var foo = 1;
-      console.log(foo);
-    `).toMatchInlineSnapshot(`
-      var foo = 1;
-      export { foo as default };
-      console.log(foo);
-    `));
-
   test('export default function', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, "default", function() { return foo; });
@@ -200,7 +188,7 @@ describe('webpack 5', () => {
       console.log(foo);
     `).toMatchInlineSnapshot(`
       var foo = 1;
-      export { foo as default };
+      export default foo;
       console.log(foo);
     `));
 

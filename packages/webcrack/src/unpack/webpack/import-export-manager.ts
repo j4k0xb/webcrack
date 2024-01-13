@@ -208,11 +208,13 @@ export class ImportExportManager {
       const requireVar = this.findRequireVar(binding.path.node);
 
       if (requireVar) {
-        this.addExportNamespace(requireVar, exportName);
         dereference(requireVar.binding, value);
-      } else if (exportName === 'default' && binding.references === 1) {
-        this.addExportDefault(binding);
+        this.addExportNamespace(requireVar, exportName);
+      } else if (exportName === 'default') {
+        dereference(binding, value);
+        this.addExportDefault(binding, binding.referenced ? value : undefined);
       } else {
+        dereference(binding, value);
         this.addExportDeclaration(binding, exportName);
       }
     } else if (memberExpressionMatcher.match(value)) {
@@ -221,8 +223,8 @@ export class ImportExportManager {
       const requireVar = this.findRequireVar(binding.path.node);
       if (!requireVar) return;
 
-      this.addExportFrom(requireVar, propertyName.current!, exportName);
       dereference(requireVar.binding, objectId.current!);
+      this.addExportFrom(requireVar, propertyName.current!, exportName);
     } else {
       t.addComment(
         this.ast.program,
@@ -341,15 +343,18 @@ export class ImportExportManager {
    * export default 1;
    * ```
    */
-  private addExportDefault(binding: Binding) {
-    const node = binding.path.node;
-    const value =
-      node.type === 'VariableDeclarator'
-        ? node.init!
-        : (node as t.ClassDeclaration | t.FunctionDeclaration);
-    binding.path
-      .getStatementParent()!
-      .replaceWith(statement`export default ${value}`());
+  private addExportDefault(binding: Binding, value?: t.Node) {
+    const statementParent = binding.path.getStatementParent()!;
+    if (value) {
+      statementParent.insertAfter(statement`export default ${value}`());
+    } else {
+      const node = binding.path.node;
+      value =
+        node.type === 'VariableDeclarator'
+          ? node.init!
+          : (node as t.ClassDeclaration | t.FunctionDeclaration);
+      statementParent.replaceWith(statement`export default ${value}`());
+    }
   }
 
   /**
