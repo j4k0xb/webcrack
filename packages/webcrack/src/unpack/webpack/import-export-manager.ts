@@ -21,6 +21,13 @@ interface RequireVar {
 }
 
 export class ImportExportManager {
+  /**
+   * All module ids that are imported
+   */
+  imports = new Set<string>();
+  /**
+   * Names of all exports
+   */
   exports = new Set<string>();
 
   private ast: t.File;
@@ -222,14 +229,17 @@ export class ImportExportManager {
 
     this.webpackRequire?.referencePaths.forEach((path) => {
       m.matchPath(requireCall, { idArg }, path.parentPath!, ({ idArg }) => {
+        const moduleId = idArg.node.value.toString();
+        this.imports.add(moduleId);
         this.requireCalls.push({
-          moduleId: idArg.node.value.toString(),
+          moduleId,
           path: path.parentPath as NodePath<t.CallExpression>,
         });
+
         if (requireVar.match(path.parentPath!.parentPath?.parent)) {
           const binding = path.scope.getBinding(varName.current!)!;
           this.requireVars.push({
-            moduleId: idArg.node.value.toString(),
+            moduleId,
             binding,
           });
         }
