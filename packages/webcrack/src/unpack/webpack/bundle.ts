@@ -1,14 +1,17 @@
 import { Bundle } from '../bundle';
 import { relativePath } from '../path';
+import { WebpackChunk } from './chunk';
 import { convertESM } from './esm';
 import { convertDefaultRequire } from './getDefaultExport';
 import type { WebpackModule } from './module';
 
 export class WebpackBundle extends Bundle {
   declare modules: Map<string, WebpackModule>;
+  chunks: WebpackChunk[];
 
-  constructor(entryId: string, modules: Map<string, WebpackModule>) {
+  constructor(entryId: string, modules: Map<string, WebpackModule>, chunks: WebpackChunk[] = []) {
     super('webpack', entryId, modules);
+    this.chunks = chunks;
   }
 
   /**

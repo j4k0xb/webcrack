@@ -4,6 +4,7 @@ import * as m from '@codemod/matchers';
 import { Bundle } from '..';
 import { Transform, constMemberExpression } from '../../ast-utils';
 import { WebpackBundle } from './bundle';
+import { WebpackChunk } from './chunk';
 import { getModuleFunctions, modulesContainerMatcher } from './common-matchers';
 import { WebpackModule } from './module';
 
@@ -27,6 +28,9 @@ export default {
       ),
     );
 
+    const chunkIds = m.capture(
+      m.arrayOf(m.or(m.numericLiteral(), m.stringLiteral())),
+    );
     const matcher = m.callExpression(
       constMemberExpression(
         m.assignmentExpression(
@@ -43,10 +47,7 @@ export default {
       [
         m.arrayExpression(
           m.anyList(
-            // chunkIds
-            m.arrayExpression(
-              m.arrayOf(m.or(m.numericLiteral(), m.stringLiteral())),
-            ),
+            m.arrayExpression(chunkIds),
             container,
             // optional entry point like [["57iH",19,24,25]] or a function
             m.zeroOrMore(),
@@ -70,8 +71,11 @@ export default {
           const isEntry = false; // FIXME: afaik after the modules there can be a function that specifies the entry point
           modules.set(id, new WebpackModule(id, func, isEntry));
         }
+        const chunks = chunkIds.current!.map(
+          (id) => new WebpackChunk(id.value.toString(), [], modules),
+        );
 
-        options.bundle = new WebpackBundle('', modules);
+        options.bundle = new WebpackBundle('', modules, chunks);
       },
     };
   },

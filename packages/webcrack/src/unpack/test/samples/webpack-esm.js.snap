@@ -1,4 +1,5 @@
 WebpackBundle {
+  "chunks": [],
   "entryId": "0",
   "modules": Map {
     "0" => WebpackModule {

@@ -1,0 +1,26 @@
+WebpackBundle {
+  "chunks": [
+    WebpackChunk {
+      "entryIds": [],
+      "id": "1",
+      "modules": Map {
+        "0" => WebpackModule {
+          "ast": ,
+          "id": "0",
+          "isEntry": false,
+          "path": "./0.js",
+        },
+      },
+    },
+  ],
+  "entryId": "",
+  "modules": Map {
+    "0" => WebpackModule {
+      "ast": ,
+      "id": "0",
+      "isEntry": false,
+      "path": "./0.js",
+    },
+  },
+  "type": "webpack",
+}
