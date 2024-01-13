@@ -10,14 +10,14 @@ export default {
   name: 'inline-decoder-wrappers',
   tags: ['unsafe'],
   scope: true,
-  run(ast, state, decoder) {
+  run(ast, decoder) {
     if (!decoder?.node.id) return;
 
     const decoderName = decoder.node.id.name;
     const decoderBinding = decoder.parentPath.scope.getBinding(decoderName);
     if (decoderBinding) {
-      state.changes += inlineVariableAliases(decoderBinding).changes;
-      state.changes += inlineFunctionAliases(decoderBinding).changes;
+      this.changes += inlineVariableAliases(decoderBinding).changes;
+      this.changes += inlineFunctionAliases(decoderBinding).changes;
     }
   },
 } satisfies Transform<NodePath<t.FunctionDeclaration>>;
