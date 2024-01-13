@@ -69,6 +69,8 @@ export class ImportExportManager {
 
       if (requireVar) {
         this.addExportAll(binding, requireVar.moduleId);
+      } else if (exportName === 'default' && binding.references === 1) {
+        this.addExportDefault(binding);
       } else {
         this.addExportDeclaration(binding, exportName);
       }
@@ -137,21 +139,24 @@ export class ImportExportManager {
    * ```
    */
   private addExportDeclaration(binding: Binding, exportName: string) {
-    const declaration = findPath(
-      binding.path,
-      m.or(
-        m.variableDeclaration(),
-        m.classDeclaration(),
-        m.functionDeclaration(),
-        m.exportNamedDeclaration(),
-      ),
+    const statement = binding.path.getStatementParent()!;
+    const matcher = m.or(
+      m.variableDeclaration(),
+      m.classDeclaration(),
+      m.functionDeclaration(),
+      m.exportNamedDeclaration(),
     );
-    if (!declaration) return;
+    if (!matcher.match(statement.node)) return;
 
-    if (
-      declaration.type === 'ExportNamedDeclaration' ||
-      (exportName === 'default' && binding.references > 1)
-    ) {
+    const isDeclarationExport =
+      exportName !== 'default' && statement.type !== 'ExportNamedDeclaration';
+
+    if (isDeclarationExport) {
+      // Example: export var counter = 1;
+      renameFast(binding, exportName);
+      const namedExport = t.exportNamedDeclaration(statement.node);
+      statement.replaceWith(namedExport);
+    } else {
       // Example: export { foo as bar };
       const namedExport = t.exportNamedDeclaration(undefined, [
         t.exportSpecifier(
@@ -159,20 +164,29 @@ export class ImportExportManager {
           t.identifier(exportName),
         ),
       ]);
-      declaration.insertAfter(namedExport);
-    } else if (exportName === 'default') {
-      // Example: export default 1;
-      const value = t.isVariableDeclaration(declaration.node)
-        ? declaration.node.declarations[0].init!
-        : (declaration.node as t.ClassDeclaration | t.FunctionDeclaration);
-      const defaultExport = t.exportDefaultDeclaration(value);
-      declaration.replaceWith(defaultExport);
-    } else {
-      // Example: export var counter = 1;
-      renameFast(binding, exportName);
-      const namedExport = t.exportNamedDeclaration(declaration.node);
-      declaration.replaceWith(namedExport);
+      statement.insertAfter(namedExport);
     }
+  }
+
+  /**
+   * Example:
+   * ```js
+   * __webpack_require__.d(exports, { default: () => foo });
+   * var foo = 1;
+   * ```
+   * to
+   * ```js
+   * export default 1;
+   * ```
+   */
+  private addExportDefault(binding: Binding) {
+    const node = binding.path.node;
+    const declaration =
+      node.type === 'VariableDeclarator'
+        ? node.init!
+        : (node as t.ClassDeclaration | t.FunctionDeclaration);
+    const defaultExport = t.exportDefaultDeclaration(declaration);
+    binding.path.getStatementParent()!.replaceWith(defaultExport);
   }
 
   /**
