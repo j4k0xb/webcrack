@@ -21,6 +21,8 @@ interface RequireVar {
 }
 
 export class ImportExportManager {
+  exports: t.ExportDeclaration[] = [];
+
   private ast: t.File;
   private webpackRequire: Binding | undefined;
   /**
@@ -60,9 +62,9 @@ export class ImportExportManager {
       const requireVar = findRequireVar(binding);
 
       if (requireVar) {
-        this.reExportAll(binding, requireVar.moduleId);
+        this.addExportAll(binding, requireVar.moduleId);
       } else {
-        this.exportLocalVar(binding, exportName);
+        this.addExportDeclaration(binding, exportName);
       }
     } else if (memberExpressionMatcher.match(value)) {
       const binding = scope.getBinding(objectName.current!);
@@ -70,7 +72,7 @@ export class ImportExportManager {
       const requireVar = findRequireVar(binding);
       if (!requireVar) return;
 
-      this.reExportNamed(
+      this.addExportFrom(
         requireVar.binding,
         requireVar.moduleId,
         propertyName.current!,
@@ -92,7 +94,7 @@ export class ImportExportManager {
    * export { bar as foo } from 'lib';
    * ```
    */
-  private reExportNamed(
+  private addExportFrom(
     binding: Binding,
     moduleId: string,
     localName: string,
@@ -112,6 +114,7 @@ export class ImportExportManager {
         [specifier],
         t.stringLiteral(moduleId),
       );
+      this.exports.push(exportDeclaration);
       binding.path.parentPath?.insertAfter(exportDeclaration);
       this.reExportCache.set(moduleId, exportDeclaration);
     }
@@ -128,7 +131,7 @@ export class ImportExportManager {
    * export var counter = 1;
    * ```
    */
-  private exportLocalVar(binding: Binding, exportName: string) {
+  private addExportDeclaration(binding: Binding, exportName: string) {
     const declaration = findPath(
       binding.path,
       m.or(
@@ -141,22 +144,26 @@ export class ImportExportManager {
     if (!declaration) return;
 
     if (declaration.type === 'ExportNamedDeclaration') {
-      declaration.insertAfter(
-        t.exportNamedDeclaration(null, [
-          t.exportSpecifier(
-            t.identifier(binding.identifier.name),
-            t.identifier(exportName),
-          ),
-        ]),
-      );
+      const namedExport = t.exportNamedDeclaration(null, [
+        t.exportSpecifier(
+          t.identifier(binding.identifier.name),
+          t.identifier(exportName),
+        ),
+      ]);
+      this.exports.push(namedExport);
+      declaration.insertAfter(namedExport);
     } else if (exportName === 'default') {
       const value = t.isVariableDeclaration(declaration.node)
         ? declaration.node.declarations[0].init!
         : (declaration.node as t.ClassDeclaration | t.FunctionDeclaration);
-      declaration.replaceWith(t.exportDefaultDeclaration(value));
+      const defaultExport = t.exportDefaultDeclaration(value);
+      this.exports.push(defaultExport);
+      declaration.replaceWith(defaultExport);
     } else {
       renameFast(binding, exportName);
-      declaration.replaceWith(t.exportNamedDeclaration(declaration.node));
+      const namedExport = t.exportNamedDeclaration(declaration.node);
+      this.exports.push(namedExport);
+      declaration.replaceWith(namedExport);
     }
   }
 
@@ -171,11 +178,11 @@ export class ImportExportManager {
    * export * as foo from 'lib';
    * ```
    */
-  private reExportAll(binding: Binding, moduleId: string) {
+  private addExportAll(binding: Binding, moduleId: string) {
     // TODO: resolve to file path
-    binding.path.parentPath?.insertAfter(
-      t.exportAllDeclaration(t.stringLiteral(moduleId)),
-    );
+    const exportAll = t.exportAllDeclaration(t.stringLiteral(moduleId));
+    this.exports.push(exportAll);
+    binding.path.parentPath?.insertAfter(exportAll);
   }
 
   /**
