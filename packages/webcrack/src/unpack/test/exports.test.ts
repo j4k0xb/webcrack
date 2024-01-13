@@ -306,3 +306,8 @@ describe('webpack 5', () => {
         function bar() {}
       `));
 });
+
+test('remove __esModule property', () =>
+  expectJS(`
+    Object.defineProperty(exports, "__esModule", { value: true });
+  `).toMatchInlineSnapshot(``));
