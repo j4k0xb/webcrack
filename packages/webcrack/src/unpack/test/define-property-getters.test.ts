@@ -143,6 +143,21 @@ describe('webpack 4', () => {
       var lib = __webpack_require__("lib");
     `).toMatchInlineSnapshot(`export * as default from "lib";`),
   );
+
+  test('namespace object', () =>
+    expectJS(`
+        var lib_namespaceObject = {};
+        __webpack_require__.d(lib_namespaceObject, "foo", function() { return foo; });
+        function foo() {}
+      `).toMatchInlineSnapshot(`
+        var lib_namespaceObject = {};
+        //webcrack:concatenated-module-export
+        Object.defineProperty(lib_namespaceObject, "foo", {
+          enumerable: true,
+          get: () => foo
+        });
+        function foo() {}
+      `));
 });
 
 describe('webpack 5', () => {
@@ -247,4 +262,29 @@ describe('webpack 5', () => {
       export * from "./lib";
     `),
   );
+
+  test('namespace object', () =>
+    expectJS(`
+      var lib_namespaceObject = {};
+      __webpack_require__.d(lib_namespaceObject, {
+        foo: () => foo,
+        bar: () => bar,
+      });
+      function foo() {}
+      function bar() {}
+    `).toMatchInlineSnapshot(`
+        var lib_namespaceObject = {};
+        //webcrack:concatenated-module-export
+        Object.defineProperty(lib_namespaceObject, "bar", {
+          enumerable: true,
+          get: () => bar
+        });
+        //webcrack:concatenated-module-export
+        Object.defineProperty(lib_namespaceObject, "foo", {
+          enumerable: true,
+          get: () => foo
+        });
+        function foo() {}
+        function bar() {}
+      `));
 });

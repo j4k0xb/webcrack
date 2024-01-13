@@ -21,6 +21,12 @@ test('remove the __esModule property from a namespace object', () => {
     __webpack_require__.r(lib_namespaceObject);
   `,
     result,
-  ).toMatchInlineSnapshot(``);
+  ).toMatchInlineSnapshot(`
+    //webcrack:concatenated-module-namespace-object
+    var lib_namespaceObject = {};
+    Object.defineProperty(lib_namespaceObject, "__esModule", {
+      value: true
+    });
+  `);
   expect(result.isESM).toBe(true);
 });
