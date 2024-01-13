@@ -1,5 +1,5 @@
 import { expression } from '@babel/template';
-import type { NodePath } from '@babel/traverse';
+import type { Scope } from '@babel/traverse';
 import traverse from '@babel/traverse';
 import * as m from '@codemod/matchers';
 import { constMemberExpression } from '../../ast-utils';
@@ -33,9 +33,9 @@ import type { WebpackBundle } from './bundle';
  * ```
  */
 export function convertDefaultRequire(bundle: WebpackBundle): void {
-  function getRequiredModule(path: NodePath) {
+  function getRequiredModule(scope: Scope) {
     // The variable that's passed to require.n
-    const binding = path.scope.getBinding(moduleArg.current!.name);
+    const binding = scope.getBinding(moduleArg.current!.name);
     const declarator = binding?.path.node;
     if (declaratorMatcher.match(declarator)) {
       return bundle.modules.get(requiredModuleId.current!.value.toString());
@@ -73,7 +73,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
       'CallExpression|MemberExpression'(path) {
         if (defaultRequireMatcherAlternative.match(path.node)) {
           // Replace require.n(m).a or require.n(m)() with m or m.default
-          const requiredModule = getRequiredModule(path);
+          const requiredModule = getRequiredModule(path.scope);
           if (requiredModule?.ast.program.sourceType === 'module') {
             path.replaceWith(
               buildDefaultAccess({ OBJECT: moduleArg.current! }),
@@ -86,7 +86,7 @@ export function convertDefaultRequire(bundle: WebpackBundle): void {
       VariableDeclarator(path) {
         if (defaultRequireMatcher.match(path.node)) {
           // Replace require.n(m); with m or m.default
-          const requiredModule = getRequiredModule(path);
+          const requiredModule = getRequiredModule(path.scope);
           const init = path.get('init');
           if (requiredModule?.ast.program.sourceType === 'module') {
             init.replaceWith(

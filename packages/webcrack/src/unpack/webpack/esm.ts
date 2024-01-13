@@ -67,12 +67,12 @@ export function convertESM(module: WebpackModule): void {
 
   // E.g. const lib = require("./lib.js");
   const requireVariable = m.capture(m.identifier());
-  const requiredModuleId = m.capture(m.anyNumber());
+  const requiredModulePath = m.capture(m.anyString());
   const requireMatcher = m.variableDeclaration(undefined, [
     m.variableDeclarator(
       requireVariable,
       m.callExpression(m.identifier('require'), [
-        m.numericLiteral(requiredModuleId),
+        m.stringLiteral(requiredModulePath),
       ]),
     ),
   ]);
@@ -92,16 +92,16 @@ export function convertESM(module: WebpackModule): void {
       if (path.parentPath?.parentPath) return path.skip();
 
       if (defineEsModuleMatcher.match(path.node)) {
-        module.ast.program.sourceType = 'module';
+        module.ast.program.sourceType = 'esm';
         path.remove();
       } else if (
-        module.ast.program.sourceType === 'module' &&
+        module.ast.program.sourceType === 'esm' &&
         requireMatcher.match(path.node)
       ) {
         path.replaceWith(
           buildNamespaceImport({
             NAME: requireVariable.current,
-            PATH: String(requiredModuleId.current),
+            PATH: String(requiredModulePath.current),
           }),
         );
       } else if (defineExportsMatcher.match(path.node)) {

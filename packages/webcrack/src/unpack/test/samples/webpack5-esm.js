@@ -1,36 +1,36 @@
 (() => {
   var modules = {
-    2: (module, exports, require) => {
+    2: (module, exports, __webpack_require__) => {
       'use strict';
-      const lib = require(3);
+      const lib = __webpack_require__(3);
       console.log(lib);
     },
-    3: (module, exports) => {
+    3: (module, exports, __webpack_require__) => {
       'use strict';
-      require.r(exports);
+      __webpack_require__.r(exports);
 
-      const a = require(4);
+      const a = __webpack_require__(4);
       const obj = {
         version: '2.0.0',
       };
-      require.d(exports, {
+      __webpack_require__.d(exports, {
         default: () => a.foo,
         version: () => obj.version,
       });
     },
-    4: (module, exports) => {
+    4: (module, exports, __webpack_require__) => {
       'use strict';
-      require.r(exports);
+      __webpack_require__.r(exports);
 
       const b = 2;
-      require.d(exports, {
+      __webpack_require__.d(exports, {
         foo: () => b,
         obj: () => x,
       });
 
       var x = {};
-      require.r(x);
-      require.d(x, {
+      __webpack_require__.r(x);
+      __webpack_require__.d(x, {
         Console: () => bar,
       });
       function bar() {}

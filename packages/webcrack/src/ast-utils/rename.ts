@@ -5,6 +5,8 @@ import * as m from '@codemod/matchers';
 import { codePreview } from './generator';
 
 export function renameFast(binding: Binding, newName: string): void {
+  if (binding.identifier.name === newName) return;
+
   binding.referencePaths.forEach((ref) => {
     if (!ref.isIdentifier()) {
       throw new Error(

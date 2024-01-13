@@ -1,5 +1,16 @@
+import type { NodePath } from '@babel/traverse';
 import type * as t from '@babel/types';
 import { generate } from '../ast-utils';
+
+export interface Import {
+  path: string;
+  id: string;
+  /**
+   * E.g. `require('./foo.js')` or `import './foo.js'`
+   * @internal
+   */
+  nodePath: NodePath<t.CallExpression | t.ImportDeclaration>;
+}
 
 export class Module {
   id: string;

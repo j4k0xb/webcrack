@@ -21,6 +21,7 @@ export class Bundle {
     this.modules = modules;
   }
 
+  // TODO: remove/deprecate (use module onResolve instead)
   applyMappings(mappings: Record<string, m.Matcher<unknown>>): void {
     const mappingPaths = Object.keys(mappings);
     if (mappingPaths.length === 0) return;
