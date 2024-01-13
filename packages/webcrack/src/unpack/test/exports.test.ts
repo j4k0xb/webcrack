@@ -15,16 +15,6 @@ describe('webpack 4', () => {
       __webpack_exports__.default = 1;
     `).toMatchInlineSnapshot(`export default 1;`));
 
-  test.todo('export inlined variable', () =>
-    expectJS(`
-      __webpack_require__.d(__webpack_exports__, "counter", function() { return foo; });
-      for (var foo = 1, i = 0; i < 10; i++) {}
-    `).toMatchInlineSnapshot(`
-      export var foo = 1;
-      for (var i = 0; i < 10; i++) {}
-    `),
-  );
-
   test('export default variable', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, "default", function() { return foo; });
