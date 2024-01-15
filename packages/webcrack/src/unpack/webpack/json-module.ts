@@ -18,7 +18,7 @@ export function transformJsonModule(ast: t.File): unknown {
     ),
   );
   const jsonObject = m.objectExpression(
-    m.arrayOf(m.objectProperty(constKey(), jsonValue)),
+    m.arrayOf(m.objectProperty(constKey(), jsonValue, false)),
   );
   const jsonArray = m.arrayExpression(m.arrayOf(jsonValue));
   const matcher = m.expressionStatement(

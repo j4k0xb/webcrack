@@ -32,7 +32,8 @@ export function testWebpackModuleTransform(): (
       FunctionExpression(path) {
         path.stop();
         file = t.file(t.program(path.node.body.body));
-        new WebpackModule('test', path, true);
+        const module = new WebpackModule('test', path, true);
+        module.applyTransforms((moduleId) => moduleId);
       },
     });
     return expect(file!);

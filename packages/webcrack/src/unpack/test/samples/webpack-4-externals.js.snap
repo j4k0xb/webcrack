@@ -1,0 +1,52 @@
+WebpackBundle {
+  "chunks": [
+    WebpackChunk {
+      "chunkIds": [],
+      "entryIds": [],
+      "modules": Map {
+        "0" => WebpackModule {
+          "ast": import * as path from "path";
+console.log(path);,
+          "externalModule": undefined,
+          "id": "0",
+          "imports": Set {
+            "1",
+          },
+          "isEntry": false,
+          "path": "0.js",
+        },
+        "1" => WebpackModule {
+          "ast": module.exports = require("path");,
+          "externalModule": "path",
+          "id": "1",
+          "imports": Set {},
+          "isEntry": false,
+          "path": "1.js",
+        },
+      },
+    },
+  ],
+  "entryId": "",
+  "modules": Map {
+    "0" => WebpackModule {
+      "ast": import * as path from "path";
+console.log(path);,
+      "externalModule": undefined,
+      "id": "0",
+      "imports": Set {
+        "1",
+      },
+      "isEntry": false,
+      "path": "0.js",
+    },
+    "1" => WebpackModule {
+      "ast": module.exports = require("path");,
+      "externalModule": "path",
+      "id": "1",
+      "imports": Set {},
+      "isEntry": false,
+      "path": "1.js",
+    },
+  },
+  "type": "webpack",
+}

@@ -1,4 +1,4 @@
-import { expression, statement } from '@babel/template';
+import { statement } from '@babel/template';
 import type { Binding, NodePath, Scope } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
@@ -7,6 +7,7 @@ import { generate, renameFast } from '../../ast-utils';
 import { dereference } from '../../ast-utils/binding';
 
 // TODO: when it accesses module.exports, don't convert to esm
+// FIXME: import name collisions: https://github.com/0xdevalias/chatgpt-source-watch/blob/main/orig/_next/static/chunks/167-121de668c4456907.js module 870
 
 /**
  * Example: `__webpack_require__(id)`
@@ -58,20 +59,18 @@ export class ImportExportManager {
     this.collectRequireCalls();
   }
 
-  insertImportsAndExports() {
+  insertImportsAndExports(resolve: (moduleId: string) => string): void {
     this.requireVars.forEach((requireVar) => {
-      // TODO: resolve module id to path
       const namedExports = t.exportNamedDeclaration(
         undefined,
         requireVar.namedExports,
-        t.stringLiteral(requireVar.moduleId),
+        t.stringLiteral(resolve(requireVar.moduleId)),
       );
-      // TODO: resolve module id to path
       const namespaceExports = requireVar.namespaceExports.map((specifier) =>
         t.exportNamedDeclaration(
           undefined,
           [specifier],
-          t.stringLiteral(requireVar.moduleId),
+          t.stringLiteral(resolve(requireVar.moduleId)),
         ),
       );
       if (namedExports.specifiers.length > 0) {
@@ -87,10 +86,9 @@ export class ImportExportManager {
     this.requireVars.forEach((requireVar) => {
       this.sortImportSpecifiers(requireVar.namedImports);
 
-      // TODO: resolve module id to path
       const namedImports = t.importDeclaration(
         [requireVar.defaultImport ?? [], requireVar.namedImports].flat(),
-        t.stringLiteral(requireVar.moduleId),
+        t.stringLiteral(resolve(requireVar.moduleId)),
       );
 
       if (namedImports.specifiers.length > 0) {
@@ -100,7 +98,7 @@ export class ImportExportManager {
         // TODO: resolve module id to path
         const namespaceImport = t.importDeclaration(
           [requireVar.namespaceImport],
-          t.stringLiteral(requireVar.moduleId),
+          t.stringLiteral(resolve(requireVar.moduleId)),
         );
         requireVar.binding.path.parentPath!.insertAfter(namespaceImport);
       }
@@ -115,9 +113,11 @@ export class ImportExportManager {
 
       // side-effect import
       if (!requireVar.binding.referenced && !hasImports && !hasExports) {
-        // TODO: resolve module id to path
         requireVar.binding.path.parentPath!.insertAfter(
-          t.importDeclaration([], t.stringLiteral(requireVar.moduleId)),
+          t.importDeclaration(
+            [],
+            t.stringLiteral(resolve(requireVar.moduleId)),
+          ),
         );
       }
 
@@ -126,8 +126,11 @@ export class ImportExportManager {
 
     // this should never happen unless for mixed esm/commonjs:
     this.requireCalls.forEach(({ path, moduleId }) => {
-      // TODO: resolve module id to path
-      path.replaceWith(expression`require('${moduleId}')`());
+      path.replaceWith(
+        t.callExpression(t.identifier('require'), [
+          t.stringLiteral(resolve(moduleId)),
+        ]),
+      );
     });
   }
 

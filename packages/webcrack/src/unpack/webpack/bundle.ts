@@ -1,4 +1,5 @@
 import { Bundle } from '../bundle';
+import { relativePath } from '../path';
 import type { WebpackChunk } from './chunk';
 import type { WebpackModule } from './module';
 
@@ -13,21 +14,20 @@ export class WebpackBundle extends Bundle {
   ) {
     super('webpack', entryId, modules);
     this.chunks = chunks;
+
+    this.modules.forEach((module) => {
+      module.applyTransforms((moduleId) => this.resolvePath(module, moduleId));
+    });
   }
 
-  /**
-   * Undoes some of the transformations that Webpack injected into the modules.
-   */
-  applyTransforms(): void {
-    // this.modules.forEach((module) => {
-    // module.replaceRequireCalls((id) => {
-    //   const requiredModule = this.modules.get(id);
-    //   return requiredModule
-    //     ? { path: relativePath(module.path, requiredModule.path) }
-    //     : { path: id, external: true };
-    // });
-    // convertESM(module);
-    // });
-    // convertDefaultRequire(this);
+  private resolvePath(module: WebpackModule, moduleId: string): string {
+    const importedModule = this.modules.get(moduleId);
+    // probably external or in an unknown chunk, keep as is
+    if (!importedModule) return moduleId;
+
+    // inline external modules instead of requiring them
+    if (importedModule.externalModule) return importedModule.externalModule;
+
+    return relativePath(module.path, importedModule.path);
   }
 }
