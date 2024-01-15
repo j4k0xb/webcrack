@@ -8,6 +8,7 @@ import * as template from "./4.js";
 document.write(template({
   hello: "World!"
 }));,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "0",
       "imports": Set {
@@ -25,6 +26,7 @@ if (false) {
   module.hot.accept();
   module.hot.dispose(dispose);
 },
+      "exports": Set {},
       "externalModule": undefined,
       "id": "1",
       "imports": Set {
@@ -53,6 +55,7 @@ module.exports = function (cssCode) {
     head.removeChild(styleElement);
   };
 };,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "2",
       "imports": Set {},
@@ -61,6 +64,7 @@ module.exports = function (cssCode) {
     },
     "3" => WebpackModule {
       "ast": module.exports = "body {\n\tbackground: #333;\n\tcolor: #EEE;\n}";,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "3",
       "imports": Set {},
@@ -81,6 +85,7 @@ module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
   }
   return buf.join("");
 };,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "4",
       "imports": Set {
@@ -253,6 +258,7 @@ exports.rethrow = function rethrow(err, filename, lineno) {
   err.message = (filename || "Jade") + ":" + lineno + "\n" + context + "\n\n" + err.message;
   throw err;
 };,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "5",
       "imports": Set {
@@ -269,6 +275,7 @@ exports.setFile = function (filename, content) {
 exports.readFileSync = function (filename) {
   return files[filename] || "";
 };,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "6",
       "imports": Set {},

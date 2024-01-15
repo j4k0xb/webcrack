@@ -7,6 +7,7 @@ WebpackBundle {
         "0" => WebpackModule {
           "ast": import * as json from "./1.json";
 console.log(json);,
+          "exports": Set {},
           "externalModule": undefined,
           "id": "0",
           "imports": Set {
@@ -19,6 +20,7 @@ console.log(json);,
           "ast": module.exports = {
   foo: "bar"
 };,
+          "exports": Set {},
           "externalModule": undefined,
           "id": "1",
           "imports": Set {},
@@ -33,6 +35,7 @@ console.log(json);,
     "0" => WebpackModule {
       "ast": import * as json from "./1.json";
 console.log(json);,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "0",
       "imports": Set {
@@ -45,6 +48,7 @@ console.log(json);,
       "ast": module.exports = {
   foo: "bar"
 };,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "1",
       "imports": Set {},

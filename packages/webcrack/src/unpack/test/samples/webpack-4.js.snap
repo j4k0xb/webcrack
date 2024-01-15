@@ -4,6 +4,7 @@ WebpackBundle {
   "modules": Map {
     "1" => WebpackModule {
       "ast": import "./3.js";,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "1",
       "imports": Set {
@@ -22,6 +23,7 @@ module.exports.color = "#FBC02D";
   console.log(module);
 }
 exports.a = 3;,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "2",
       "imports": Set {
@@ -32,6 +34,7 @@ exports.a = 3;,
     },
     "3" => WebpackModule {
       "ast": module.exports = 4;,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "3",
       "imports": Set {},

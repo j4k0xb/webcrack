@@ -25,7 +25,6 @@ export function unpackAST(
   // TODO: applyTransforms(ast, [unpackWebpack, unpackBrowserify]) instead
   if (options.bundle) {
     options.bundle.applyMappings(mappings);
-    options.bundle.applyTransforms();
     debug('webcrack:unpack')('Bundle:', options.bundle.type);
   }
   return options.bundle;

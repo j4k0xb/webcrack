@@ -11,6 +11,7 @@ WebpackBundle {
 function f() {
   return <p />;
 },
+          "exports": Set {},
           "externalModule": undefined,
           "id": "0",
           "imports": Set {
@@ -29,6 +30,7 @@ function f() {
 function f() {
   return <p />;
 },
+      "exports": Set {},
       "externalModule": undefined,
       "id": "0",
       "imports": Set {

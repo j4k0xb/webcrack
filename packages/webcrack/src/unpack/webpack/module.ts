@@ -19,7 +19,11 @@ export class WebpackModule extends Module {
   /**
    * Module ids that are imported by this module.
    */
-  imports: Set<string>;
+  dependencies: Set<string>;
+  /**
+   * Names of all exports
+   */
+  exports: Set<string>;
 
   #manager: ImportExportManager;
   #moduleBinding: Binding | undefined;
@@ -48,12 +52,17 @@ export class WebpackModule extends Module {
       '__webpack_require__',
     ]);
     this.#moduleBinding = ast.scope.getOwnBinding('__webpack_module__');
-    this.#webpackRequireBinding = ast.scope.getOwnBinding('__webpack_require__');
+    this.#webpackRequireBinding = ast.scope.getOwnBinding(
+      '__webpack_require__',
+    );
     this.#exportsBinding = ast.scope.getOwnBinding('__webpack_exports__');
 
     const manager = new ImportExportManager(file, this.#webpackRequireBinding);
     this.#manager = manager;
-    this.imports = new Set(manager.requireCalls.map((call) => call.moduleId));
+    this.dependencies = new Set(
+      manager.requireCalls.map((call) => call.moduleId),
+    );
+    this.exports = manager.exports;
 
     this.externalModule = this.detectExternalModule();
     const json = transformJsonModule(this.ast);

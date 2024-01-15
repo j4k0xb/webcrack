@@ -4,6 +4,7 @@ WebpackBundle {
   "modules": Map {
     "../tmp.js" => WebpackModule {
       "ast": ,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "../tmp.js",
       "imports": Set {},

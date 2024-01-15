@@ -8,6 +8,7 @@ WebpackBundle {
       "modules": Map {
         "0" => WebpackModule {
           "ast": ,
+          "exports": Set {},
           "externalModule": undefined,
           "id": "0",
           "imports": Set {},
@@ -21,6 +22,7 @@ WebpackBundle {
   "modules": Map {
     "0" => WebpackModule {
       "ast": ,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "0",
       "imports": Set {},

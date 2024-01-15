@@ -5,6 +5,7 @@ WebpackBundle {
     "2" => WebpackModule {
       "ast": import * as lib from "./3.js";
 console.log(lib);,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "2",
       "imports": Set {
@@ -18,6 +19,10 @@ console.log(lib);,
 const obj = {
   version: "2.0.0"
 };,
+      "exports": Set {
+        "default",
+        "version",
+      },
       "externalModule": undefined,
       "id": "3",
       "imports": Set {
@@ -36,6 +41,10 @@ Object.defineProperty(obj, "Console", {
   get: () => bar
 });
 function bar() {},
+      "exports": Set {
+        "foo",
+        "obj",
+      },
       "externalModule": undefined,
       "id": "4",
       "imports": Set {},

@@ -4,6 +4,7 @@ WebpackBundle {
   "modules": Map {
     "97418" => WebpackModule {
       "ast": module.exports = "foo";,
+      "exports": Set {},
       "externalModule": undefined,
       "id": "97418",
       "imports": Set {},

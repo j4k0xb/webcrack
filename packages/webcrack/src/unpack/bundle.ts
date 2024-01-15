@@ -86,6 +86,4 @@ export class Bundle {
       }),
     );
   }
-
-  applyTransforms(): void {}
 }
