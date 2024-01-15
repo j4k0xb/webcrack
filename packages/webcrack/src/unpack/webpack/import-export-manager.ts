@@ -95,7 +95,6 @@ export class ImportExportManager {
         requireVar.binding.path.parentPath!.insertAfter(namedImports);
       }
       if (requireVar.namespaceImport) {
-        // TODO: resolve module id to path
         const namespaceImport = t.importDeclaration(
           [requireVar.namespaceImport],
           t.stringLiteral(resolve(requireVar.moduleId)),

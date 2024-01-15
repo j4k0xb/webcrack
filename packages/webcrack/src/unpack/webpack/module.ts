@@ -29,7 +29,7 @@ export class WebpackModule extends Module {
   #json: unknown;
   /**
    * The module name of a re-exported dependency.
-   * https://webpack.js.org/configuration/externals.
+   * https://webpack.js.org/configuration/externals
    * @internal
    */
   externalModule?: string;

@@ -25,7 +25,7 @@ export class WebpackBundle extends Bundle {
     // probably external or in an unknown chunk, keep as is
     if (!importedModule) return moduleId;
 
-    // inline external modules instead of requiring them
+    // use external path instead of the module that re-exports it
     if (importedModule.externalModule) return importedModule.externalModule;
 
     return relativePath(module.path, importedModule.path);
