@@ -3,10 +3,12 @@ WebpackBundle {
   "entryId": "",
   "modules": Map {
     "97418" => WebpackModule {
-      "ast": module.exports = 'foo';,
+      "ast": module.exports = "foo";,
+      "externalModule": undefined,
       "id": "97418",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./97418.js",
+      "path": "97418.js",
     },
   },
   "type": "webpack",

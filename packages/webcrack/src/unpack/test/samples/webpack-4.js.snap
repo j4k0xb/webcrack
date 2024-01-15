@@ -3,30 +3,40 @@ WebpackBundle {
   "entryId": "2",
   "modules": Map {
     "1" => WebpackModule {
-      "ast": const a = require("./3.js");,
+      "ast": import "./3.js";,
+      "externalModule": undefined,
       "id": "1",
+      "imports": Set {
+        "3",
+      },
       "isEntry": false,
-      "path": "./1.js",
+      "path": "1.js",
     },
     "2" => WebpackModule {
-      "ast": const a = require("./1.js");
+      "ast": import "./1.js";
 const _module = 1;
-module.exports.color = '#FBC02D';
+module.exports.color = "#FBC02D";
 {
   const _module2 = 2;
   console.log(_module2);
   console.log(module);
 }
 exports.a = 3;,
+      "externalModule": undefined,
       "id": "2",
+      "imports": Set {
+        "1",
+      },
       "isEntry": true,
-      "path": "./index.js",
+      "path": "index.js",
     },
     "3" => WebpackModule {
       "ast": module.exports = 4;,
+      "externalModule": undefined,
       "id": "3",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./3.js",
+      "path": "3.js",
     },
   },
   "type": "webpack",

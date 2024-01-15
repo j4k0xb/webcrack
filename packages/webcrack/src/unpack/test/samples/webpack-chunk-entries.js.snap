@@ -8,9 +8,11 @@ WebpackBundle {
       "modules": Map {
         "0" => WebpackModule {
           "ast": ,
+          "externalModule": undefined,
           "id": "0",
+          "imports": Set {},
           "isEntry": false,
-          "path": "./0.js",
+          "path": "0.js",
         },
       },
     },
@@ -19,9 +21,11 @@ WebpackBundle {
   "modules": Map {
     "0" => WebpackModule {
       "ast": ,
+      "externalModule": undefined,
       "id": "0",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./0.js",
+      "path": "0.js",
     },
   },
   "type": "webpack",

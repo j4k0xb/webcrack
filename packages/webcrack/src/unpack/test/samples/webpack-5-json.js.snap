@@ -5,9 +5,13 @@ WebpackBundle {
       "entryIds": [],
       "modules": Map {
         "0" => WebpackModule {
-          "ast": import * as json from "1";
+          "ast": import * as json from "./1.json";
 console.log(json);,
+          "externalModule": undefined,
           "id": "0",
+          "imports": Set {
+            "1",
+          },
           "isEntry": false,
           "path": "0.js",
         },
@@ -15,7 +19,9 @@ console.log(json);,
           "ast": module.exports = {
   foo: "bar"
 };,
+          "externalModule": undefined,
           "id": "1",
+          "imports": Set {},
           "isEntry": false,
           "path": "1.json",
         },
@@ -25,9 +31,13 @@ console.log(json);,
   "entryId": "",
   "modules": Map {
     "0" => WebpackModule {
-      "ast": import * as json from "1";
+      "ast": import * as json from "./1.json";
 console.log(json);,
+      "externalModule": undefined,
       "id": "0",
+      "imports": Set {
+        "1",
+      },
       "isEntry": false,
       "path": "0.js",
     },
@@ -35,7 +45,9 @@ console.log(json);,
       "ast": module.exports = {
   foo: "bar"
 };,
+      "externalModule": undefined,
       "id": "1",
+      "imports": Set {},
       "isEntry": false,
       "path": "1.json",
     },

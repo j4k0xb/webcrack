@@ -4,26 +4,35 @@ WebpackBundle {
   "modules": Map {
     "0" => WebpackModule {
       "ast": require("./1.js");
-var template = require("./4.js");
+import * as template from "./4.js";
 document.write(template({
-  hello: 'World!'
+  hello: "World!"
 }));,
+      "externalModule": undefined,
       "id": "0",
+      "imports": Set {
+        "1",
+        "4",
+      },
       "isEntry": true,
-      "path": "./index.js",
+      "path": "index.js",
     },
     "1" => WebpackModule {
       "ast": // style-loader: Adds some css to the DOM by adding a <style> tag
-var dispose = require("./2.js")
-// The css code:
+var dispose = require("./2.js") // The css code:
 (require("./3.js"));
 if (false) {
   module.hot.accept();
   module.hot.dispose(dispose);
 },
+      "externalModule": undefined,
       "id": "1",
+      "imports": Set {
+        "2",
+        "3",
+      },
       "isEntry": false,
-      "path": "./1.js",
+      "path": "1.js",
     },
     "2" => WebpackModule {
       "ast": /*
@@ -44,33 +53,41 @@ module.exports = function (cssCode) {
     head.removeChild(styleElement);
   };
 };,
+      "externalModule": undefined,
       "id": "2",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./2.js",
+      "path": "2.js",
     },
     "3" => WebpackModule {
       "ast": module.exports = "body {\n\tbackground: #333;\n\tcolor: #EEE;\n}";,
+      "externalModule": undefined,
       "id": "3",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./3.js",
+      "path": "3.js",
     },
     "4" => WebpackModule {
-      "ast": var jade = require("./5.js");
+      "ast": import { attrs as _attrs, escape as _escape, merge as _merge, rethrow as _rethrow } from "./5.js";
 module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
-  attrs = attrs || jade.attrs;
-  escape = escape || jade.escape;
-  rethrow = rethrow || jade.rethrow;
-  merge = merge || jade.merge;
+  attrs = attrs || _attrs;
+  escape = escape || _escape;
+  rethrow = rethrow || _rethrow;
+  merge = merge || _merge;
   var buf = [];
   with (locals || {}) {
     var interp;
-    buf.push('<h1>Hello ' + escape((interp = hello) == null ? '' : interp) + '</h1>');
+    buf.push("<h1>Hello " + escape((interp = hello) == null ? "" : interp) + "</h1>");
   }
   return buf.join("");
 };,
+      "externalModule": undefined,
       "id": "4",
+      "imports": Set {
+        "5",
+      },
       "isEntry": false,
-      "path": "./4.js",
+      "path": "4.js",
     },
     "5" => WebpackModule {
       "ast": /*!
@@ -85,7 +102,7 @@ module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
 
 if (!Array.isArray) {
   Array.isArray = function (arr) {
-    return '[object Array]' == Object.prototype.toString.call(arr);
+    return Object.prototype.toString.call(arr) == "[object Array]";
   };
 }
 
@@ -118,19 +135,23 @@ if (!Object.keys) {
  */
 
 exports.merge = function merge(a, b) {
-  var ac = a['class'];
-  var bc = b['class'];
+  var ac = a.class;
+  var bc = b.class;
   if (ac || bc) {
     ac = ac || [];
     bc = bc || [];
-    if (!Array.isArray(ac)) ac = [ac];
-    if (!Array.isArray(bc)) bc = [bc];
+    if (!Array.isArray(ac)) {
+      ac = [ac];
+    }
+    if (!Array.isArray(bc)) {
+      bc = [bc];
+    }
     ac = ac.filter(nulls);
     bc = bc.filter(nulls);
-    a['class'] = ac.concat(bc).join(' ');
+    a.class = ac.concat(bc).join(" ");
   }
   for (var key in b) {
-    if (key != 'class') {
+    if (key != "class") {
       a[key] = b[key];
     }
   }
@@ -159,32 +180,36 @@ function nulls(val) {
  */
 
 exports.attrs = function attrs(obj, escaped) {
-  var buf = [],
-    terse = obj.terse;
+  var buf = [];
+  var terse = obj.terse;
   delete obj.terse;
-  var keys = Object.keys(obj),
-    len = keys.length;
+  var keys = Object.keys(obj);
+  var len = keys.length;
   if (len) {
-    buf.push('');
+    buf.push("");
     for (var i = 0; i < len; ++i) {
-      var key = keys[i],
-        val = obj[key];
-      if ('boolean' == typeof val || null == val) {
+      var key = keys[i];
+      var val = obj[key];
+      if (typeof val == "boolean" || val == null) {
         if (val) {
-          terse ? buf.push(key) : buf.push(key + '="' + key + '"');
+          if (terse) {
+            buf.push(key);
+          } else {
+            buf.push(key + "=\"" + key + "\"");
+          }
         }
-      } else if (0 == key.indexOf('data') && 'string' != typeof val) {
+      } else if (key.indexOf("data") == 0 && typeof val != "string") {
         buf.push(key + "='" + JSON.stringify(val) + "'");
-      } else if ('class' == key && Array.isArray(val)) {
-        buf.push(key + '="' + exports.escape(val.join(' ')) + '"');
+      } else if (key == "class" && Array.isArray(val)) {
+        buf.push(key + "=\"" + exports.escape(val.join(" ")) + "\"");
       } else if (escaped && escaped[key]) {
-        buf.push(key + '="' + exports.escape(val) + '"');
+        buf.push(key + "=\"" + exports.escape(val) + "\"");
       } else {
-        buf.push(key + '="' + val + '"');
+        buf.push(key + "=\"" + val + "\"");
       }
     }
   }
-  return buf.join(' ');
+  return buf.join(" ");
 };
 
 /**
@@ -196,7 +221,7 @@ exports.attrs = function attrs(obj, escaped) {
  */
 
 exports.escape = function escape(html) {
-  return String(html).replace(/&(?!(\w+|\#\d+);)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return String(html).replace(/&(?!(\w+|\#\d+);)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 };
 
 /**
@@ -210,27 +235,31 @@ exports.escape = function escape(html) {
  */
 
 exports.rethrow = function rethrow(err, filename, lineno) {
-  if (!filename) throw err;
-  var context = 3,
-    str = require("./6.js").readFileSync(filename, 'utf8'),
-    lines = str.split('\n'),
-    start = Math.max(lineno - context, 0),
-    end = Math.min(lines.length, lineno + context);
-
-  // Error context
+  if (!filename) {
+    throw err;
+  }
+  var context = 3;
+  var str = require("./6.js").readFileSync(filename, "utf8");
+  var lines = str.split("\n");
+  var start = Math.max(lineno - context, 0);
+  var end = Math.min(lines.length, lineno + context); // Error context
   var context = lines.slice(start, end).map(function (line, i) {
     var curr = i + start + 1;
-    return (curr == lineno ? '  > ' : '    ') + curr + '| ' + line;
-  }).join('\n');
+    return (curr == lineno ? "  > " : "    ") + curr + "| " + line;
+  }).join("\n");
 
   // Alter exception message
   err.path = filename;
-  err.message = (filename || 'Jade') + ':' + lineno + '\n' + context + '\n\n' + err.message;
+  err.message = (filename || "Jade") + ":" + lineno + "\n" + context + "\n\n" + err.message;
   throw err;
 };,
+      "externalModule": undefined,
       "id": "5",
+      "imports": Set {
+        "6",
+      },
       "isEntry": false,
-      "path": "./5.js",
+      "path": "5.js",
     },
     "6" => WebpackModule {
       "ast": var files = {};
@@ -240,9 +269,11 @@ exports.setFile = function (filename, content) {
 exports.readFileSync = function (filename) {
   return files[filename] || "";
 };,
+      "externalModule": undefined,
       "id": "6",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./6.js",
+      "path": "6.js",
     },
   },
   "type": "webpack",

@@ -27,7 +27,7 @@ test.skip('path mapping', async () => {
   expect(bundle).toMatchSnapshot();
 });
 
-test.skip('prevent path traversal', async () => {
+test('prevent path traversal', async () => {
   const code = await readFile(
     join(SAMPLES_DIR, 'webpack-path-traversal.js'),
     'utf8',

@@ -5,7 +5,7 @@ import { webcrack } from '../..';
 
 const SAMPLES_DIR = join(__dirname, 'samples');
 
-describe.skip('samples', async () => {
+describe('samples', async () => {
   const fileNames = (await readdir(SAMPLES_DIR)).filter((name) =>
     name.endsWith('.js'),
   );

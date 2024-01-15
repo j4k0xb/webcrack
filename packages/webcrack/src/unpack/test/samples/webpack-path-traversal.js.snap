@@ -4,9 +4,11 @@ WebpackBundle {
   "modules": Map {
     "../tmp.js" => WebpackModule {
       "ast": ,
+      "externalModule": undefined,
       "id": "../tmp.js",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./../tmp.js.js",
+      "path": "../tmp.js",
     },
   },
   "type": "webpack",

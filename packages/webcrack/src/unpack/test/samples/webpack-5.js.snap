@@ -3,32 +3,44 @@ WebpackBundle {
   "entryId": "2",
   "modules": Map {
     "2" => WebpackModule {
-      "ast": const lib = require("./3.js");
+      "ast": import * as lib from "./3.js";
 console.log(lib);,
+      "externalModule": undefined,
       "id": "2",
+      "imports": Set {
+        "3",
+      },
       "isEntry": true,
-      "path": "./index.js",
+      "path": "index.js",
     },
     "3" => WebpackModule {
-      "ast": import * as a from "./4.js";
+      "ast": export { foo as default } from "./4.js";
 const obj = {
-  version: '2.0.0'
-};
-export let version = obj.version;
-export default a.foo;,
+  version: "2.0.0"
+};,
+      "externalModule": undefined,
       "id": "3",
+      "imports": Set {
+        "4",
+      },
       "isEntry": false,
-      "path": "./3.js",
+      "path": "3.js",
     },
     "4" => WebpackModule {
       "ast": export const foo = 2;
-export var obj = {
-  Console: bar
-};
+//webcrack:concatenated-module-namespace-object
+export var obj = {};
+//webcrack:concatenated-module-export
+Object.defineProperty(obj, "Console", {
+  enumerable: true,
+  get: () => bar
+});
 function bar() {},
+      "externalModule": undefined,
       "id": "4",
+      "imports": Set {},
       "isEntry": false,
-      "path": "./4.js",
+      "path": "4.js",
     },
   },
   "type": "webpack",

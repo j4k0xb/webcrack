@@ -47,9 +47,9 @@ export class WebpackModule extends Module {
       '__webpack_exports__',
       '__webpack_require__',
     ]);
-    this.#moduleBinding = ast.scope.getBinding('__webpack_module__');
-    this.#webpackRequireBinding = ast.scope.getBinding('__webpack_require__');
-    this.#exportsBinding = ast.scope.getBinding('__webpack_exports__');
+    this.#moduleBinding = ast.scope.getOwnBinding('__webpack_module__');
+    this.#webpackRequireBinding = ast.scope.getOwnBinding('__webpack_require__');
+    this.#exportsBinding = ast.scope.getOwnBinding('__webpack_exports__');
 
     const manager = new ImportExportManager(file, this.#webpackRequireBinding);
     this.#manager = manager;
