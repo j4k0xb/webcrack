@@ -24,7 +24,7 @@ export function transformJsonModule(ast: t.File): unknown {
   const matcher = m.expressionStatement(
     m.assignmentExpression(
       '=',
-      constMemberExpression('module', 'exports'),
+      constMemberExpression('__webpack_module__', 'exports'),
       m.or(jsonObject, jsonArray),
     ),
   );
