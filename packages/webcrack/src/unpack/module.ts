@@ -1,6 +1,9 @@
 import type * as t from '@babel/types';
-import { normalize } from 'node:path';
+import { posix } from 'node:path';
 import { generate } from '../ast-utils';
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { normalize } = posix;
 
 export class Module {
   id: string;
