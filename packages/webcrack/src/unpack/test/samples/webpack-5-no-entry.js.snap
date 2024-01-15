@@ -4,10 +4,10 @@ WebpackBundle {
   "modules": Map {
     "97418" => WebpackModule {
       "ast": module.exports = "foo";,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": undefined,
       "id": "97418",
-      "imports": Set {},
       "isEntry": false,
       "path": "97418.js",
     },

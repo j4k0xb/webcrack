@@ -11,12 +11,12 @@ WebpackBundle {
 function f() {
   return <p />;
 },
+          "dependencies": Set {
+            "35250",
+          },
           "exports": Set {},
           "externalModule": undefined,
           "id": "0",
-          "imports": Set {
-            "35250",
-          },
           "isEntry": false,
           "path": "0.js",
         },
@@ -30,12 +30,12 @@ function f() {
 function f() {
   return <p />;
 },
+      "dependencies": Set {
+        "35250",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "0",
-      "imports": Set {
-        "35250",
-      },
       "isEntry": false,
       "path": "0.js",
     },

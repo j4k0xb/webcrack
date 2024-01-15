@@ -5,12 +5,12 @@ WebpackBundle {
     "2" => WebpackModule {
       "ast": import * as lib from "./3.js";
 console.log(lib);,
+      "dependencies": Set {
+        "3",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "2",
-      "imports": Set {
-        "3",
-      },
       "isEntry": true,
       "path": "index.js",
     },
@@ -19,15 +19,15 @@ console.log(lib);,
 const obj = {
   version: "2.0.0"
 };,
+      "dependencies": Set {
+        "4",
+      },
       "exports": Set {
         "default",
         "version",
       },
       "externalModule": undefined,
       "id": "3",
-      "imports": Set {
-        "4",
-      },
       "isEntry": false,
       "path": "3.js",
     },
@@ -41,13 +41,13 @@ Object.defineProperty(obj, "Console", {
   get: () => bar
 });
 function bar() {},
+      "dependencies": Set {},
       "exports": Set {
         "foo",
         "obj",
       },
       "externalModule": undefined,
       "id": "4",
-      "imports": Set {},
       "isEntry": false,
       "path": "4.js",
     },

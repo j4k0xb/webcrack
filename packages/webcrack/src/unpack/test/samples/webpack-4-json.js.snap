@@ -7,12 +7,12 @@ WebpackBundle {
         "0" => WebpackModule {
           "ast": import * as json from "./1.json";
 console.log(json);,
+          "dependencies": Set {
+            "1",
+          },
           "exports": Set {},
           "externalModule": undefined,
           "id": "0",
-          "imports": Set {
-            "1",
-          },
           "isEntry": false,
           "path": "0.js",
         },
@@ -20,10 +20,10 @@ console.log(json);,
           "ast": module.exports = {
   foo: "bar"
 };,
+          "dependencies": Set {},
           "exports": Set {},
           "externalModule": undefined,
           "id": "1",
-          "imports": Set {},
           "isEntry": false,
           "path": "1.json",
         },
@@ -35,12 +35,12 @@ console.log(json);,
     "0" => WebpackModule {
       "ast": import * as json from "./1.json";
 console.log(json);,
+      "dependencies": Set {
+        "1",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "0",
-      "imports": Set {
-        "1",
-      },
       "isEntry": false,
       "path": "0.js",
     },
@@ -48,10 +48,10 @@ console.log(json);,
       "ast": module.exports = {
   foo: "bar"
 };,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": undefined,
       "id": "1",
-      "imports": Set {},
       "isEntry": false,
       "path": "1.json",
     },

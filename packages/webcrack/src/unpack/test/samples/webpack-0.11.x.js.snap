@@ -8,13 +8,13 @@ import * as template from "./4.js";
 document.write(template({
   hello: "World!"
 }));,
-      "exports": Set {},
-      "externalModule": undefined,
-      "id": "0",
-      "imports": Set {
+      "dependencies": Set {
         "1",
         "4",
       },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "0",
       "isEntry": true,
       "path": "index.js",
     },
@@ -26,13 +26,13 @@ if (false) {
   module.hot.accept();
   module.hot.dispose(dispose);
 },
-      "exports": Set {},
-      "externalModule": undefined,
-      "id": "1",
-      "imports": Set {
+      "dependencies": Set {
         "2",
         "3",
       },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "1",
       "isEntry": false,
       "path": "1.js",
     },
@@ -55,19 +55,19 @@ module.exports = function (cssCode) {
     head.removeChild(styleElement);
   };
 };,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": undefined,
       "id": "2",
-      "imports": Set {},
       "isEntry": false,
       "path": "2.js",
     },
     "3" => WebpackModule {
       "ast": module.exports = "body {\n\tbackground: #333;\n\tcolor: #EEE;\n}";,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": undefined,
       "id": "3",
-      "imports": Set {},
       "isEntry": false,
       "path": "3.js",
     },
@@ -85,12 +85,12 @@ module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
   }
   return buf.join("");
 };,
+      "dependencies": Set {
+        "5",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "4",
-      "imports": Set {
-        "5",
-      },
       "isEntry": false,
       "path": "4.js",
     },
@@ -258,12 +258,12 @@ exports.rethrow = function rethrow(err, filename, lineno) {
   err.message = (filename || "Jade") + ":" + lineno + "\n" + context + "\n\n" + err.message;
   throw err;
 };,
+      "dependencies": Set {
+        "6",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "5",
-      "imports": Set {
-        "6",
-      },
       "isEntry": false,
       "path": "5.js",
     },
@@ -275,10 +275,10 @@ exports.setFile = function (filename, content) {
 exports.readFileSync = function (filename) {
   return files[filename] || "";
 };,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": undefined,
       "id": "6",
-      "imports": Set {},
       "isEntry": false,
       "path": "6.js",
     },

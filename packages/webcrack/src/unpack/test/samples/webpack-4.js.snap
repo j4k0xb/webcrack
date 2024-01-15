@@ -4,12 +4,12 @@ WebpackBundle {
   "modules": Map {
     "1" => WebpackModule {
       "ast": import "./3.js";,
+      "dependencies": Set {
+        "3",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "1",
-      "imports": Set {
-        "3",
-      },
       "isEntry": false,
       "path": "1.js",
     },
@@ -23,21 +23,21 @@ module.exports.color = "#FBC02D";
   console.log(module);
 }
 exports.a = 3;,
+      "dependencies": Set {
+        "1",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "2",
-      "imports": Set {
-        "1",
-      },
       "isEntry": true,
       "path": "index.js",
     },
     "3" => WebpackModule {
       "ast": module.exports = 4;,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": undefined,
       "id": "3",
-      "imports": Set {},
       "isEntry": false,
       "path": "3.js",
     },

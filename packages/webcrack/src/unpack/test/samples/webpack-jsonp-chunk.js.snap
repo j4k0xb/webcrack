@@ -9,22 +9,22 @@ WebpackBundle {
         "2wwy" => WebpackModule {
           "ast": import "./E8gZ.js";
 import "w6GO";,
-          "exports": Set {},
-          "externalModule": undefined,
-          "id": "2wwy",
-          "imports": Set {
+          "dependencies": Set {
             "E8gZ",
             "w6GO",
           },
+          "exports": Set {},
+          "externalModule": undefined,
+          "id": "2wwy",
           "isEntry": false,
           "path": "2wwy.js",
         },
         "E8gZ" => WebpackModule {
           "ast": module.exports = 4;,
+          "dependencies": Set {},
           "exports": Set {},
           "externalModule": undefined,
           "id": "E8gZ",
-          "imports": Set {},
           "isEntry": false,
           "path": "E8gZ.js",
         },
@@ -36,22 +36,22 @@ import "w6GO";,
     "2wwy" => WebpackModule {
       "ast": import "./E8gZ.js";
 import "w6GO";,
-      "exports": Set {},
-      "externalModule": undefined,
-      "id": "2wwy",
-      "imports": Set {
+      "dependencies": Set {
         "E8gZ",
         "w6GO",
       },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "2wwy",
       "isEntry": false,
       "path": "2wwy.js",
     },
     "E8gZ" => WebpackModule {
       "ast": module.exports = 4;,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": undefined,
       "id": "E8gZ",
-      "imports": Set {},
       "isEntry": false,
       "path": "E8gZ.js",
     },

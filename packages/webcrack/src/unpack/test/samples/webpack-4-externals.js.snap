@@ -7,21 +7,21 @@ WebpackBundle {
         "0" => WebpackModule {
           "ast": import * as path from "path";
 console.log(path);,
+          "dependencies": Set {
+            "1",
+          },
           "exports": Set {},
           "externalModule": undefined,
           "id": "0",
-          "imports": Set {
-            "1",
-          },
           "isEntry": false,
           "path": "0.js",
         },
         "1" => WebpackModule {
           "ast": module.exports = require("path");,
+          "dependencies": Set {},
           "exports": Set {},
           "externalModule": "path",
           "id": "1",
-          "imports": Set {},
           "isEntry": false,
           "path": "1.js",
         },
@@ -33,21 +33,21 @@ console.log(path);,
     "0" => WebpackModule {
       "ast": import * as path from "path";
 console.log(path);,
+      "dependencies": Set {
+        "1",
+      },
       "exports": Set {},
       "externalModule": undefined,
       "id": "0",
-      "imports": Set {
-        "1",
-      },
       "isEntry": false,
       "path": "0.js",
     },
     "1" => WebpackModule {
       "ast": module.exports = require("path");,
+      "dependencies": Set {},
       "exports": Set {},
       "externalModule": "path",
       "id": "1",
-      "imports": Set {},
       "isEntry": false,
       "path": "1.js",
     },
