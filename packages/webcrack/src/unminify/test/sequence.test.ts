@@ -96,10 +96,21 @@ test('rearrange variable declarator', () =>
 
 test('rearrange assignment', () => {
   expectJS(`
-    t = (o = null, o);
+    a = (b = null, c);
   `).toMatchInlineSnapshot(`
-    o = null;
-    t = o;
+    b = null;
+    a = c;
+  `);
+
+  expectJS(`
+    console.log(a = (b = null, c));
+  `).toMatchInlineSnapshot(`console.log((b = null, a = c));`);
+
+  expectJS(`
+    while (a = (b = null, c));
+  `).toMatchInlineSnapshot(`
+    b = null;
+    while (a = c);
   `);
 
   expectJS(`

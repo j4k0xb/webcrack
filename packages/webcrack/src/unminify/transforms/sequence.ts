@@ -1,4 +1,3 @@
-import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../../ast-utils';
@@ -14,30 +13,41 @@ export default {
       m.memberExpression(m.identifier(), m.identifier()),
     );
     const assignedSequence = m.capture(m.sequenceExpression());
-    const assignmentMatcher = m.expressionStatement(
-      m.assignmentExpression(
-        // "||=", "&&=", and "??=" have short-circuiting behavior
-        m.or(
-          '=',
-          '+=',
-          '-=',
-          '*=',
-          '/=',
-          '%=',
-          '**=',
-          '<<=',
-          '>>=',
-          '>>>=',
-          '|=',
-          '^=',
-          '&=',
-        ),
-        assignmentVariable,
-        assignedSequence,
+    const assignmentMatcher = m.assignmentExpression(
+      // "||=", "&&=", and "??=" have short-circuiting behavior
+      m.or(
+        '=',
+        '+=',
+        '-=',
+        '*=',
+        '/=',
+        '%=',
+        '**=',
+        '<<=',
+        '>>=',
+        '>>>=',
+        '|=',
+        '^=',
+        '&=',
       ),
+      assignmentVariable,
+      assignedSequence,
     );
 
     return {
+      AssignmentExpression: {
+        exit(path) {
+          if (assignmentMatcher.match(path.node)) {
+            const value = assignedSequence.current!.expressions.pop()!;
+            path.get('right').replaceWith(value);
+            const newNodes = path.parentPath.isExpressionStatement()
+              ? assignedSequence.current!.expressions.map(t.expressionStatement)
+              : assignedSequence.current!.expressions;
+            path.insertBefore(newNodes);
+            this.changes++;
+          }
+        },
+      },
       ExpressionStatement: {
         exit(path) {
           if (t.isSequenceExpression(path.node.expression)) {
@@ -45,16 +55,6 @@ export default {
               t.expressionStatement(expr),
             );
             path.replaceWithMultiple(statements);
-            this.changes++;
-          } else if (assignmentMatcher.match(path.node)) {
-            const value = assignedSequence.current!.expressions.pop()!;
-            const statements = assignedSequence.current!.expressions.map(
-              (expr) => t.expressionStatement(expr),
-            );
-            (path.get('expression.right') as NodePath<t.Node>).replaceWith(
-              value,
-            );
-            path.insertBefore(statements);
             this.changes++;
           }
         },

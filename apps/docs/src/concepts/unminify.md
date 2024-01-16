@@ -170,9 +170,15 @@ while (b()) {} // [!code ++]
 ```
 
 ```js
-t = (o = null, o); // [!code --]
-o = null; // [!code ++]
-t = o; // [!code ++]
+a = (b = null, c); // [!code --]
+b = null; // [!code ++]
+a = c; // [!code ++]
+```
+
+```js
+while (a = (b = null, c)) {} // [!code --]
+b = null; // [!code ++]
+while (a = c) {} // [!code ++]
 ```
 
 ## split-for-loops-vars
