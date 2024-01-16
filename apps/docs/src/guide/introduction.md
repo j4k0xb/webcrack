@@ -14,9 +14,9 @@ to resemble the original source code as much as possible.
 
 ## Planned Features
 
+- Smarter variable renaming, possibly with LLMs like GPT-3.5
 - Support older obfuscator.io versions
-- Unpack `rollup`, `parcel`, `swc`, etc.
 - Unpack multi-chunk bundles
 - Download zip of all unpacked modules in the playground
-- Convert [@babel/preset-env](https://babeljs.io/docs/babel-preset-env) helpers to modern syntax
-- Decompile typescript enums
+- Decompile [@babel/preset-env](https://babeljs.io/docs/babel-preset-env) helpers
+- Decompile TypeScript helpers, modules and enums
