@@ -86,13 +86,21 @@ test('rearrange from while', () =>
     while (b()) c();
   `));
 
-test('rearrange variable declarator', () =>
+test('rearrange variable declarator', () => {
   expectJS(`
-   var t = (o = null, o);
+    var a = (b(), c());
   `).toMatchInlineSnapshot(`
-    o = null;
-    var t = o;
-  `));
+    b();
+    var a = c();
+  `);
+
+  expectJS(`
+    for(let a = (b(), c());;) {}
+  `).toMatchInlineSnapshot(`
+    b();
+    for (let a = c();;) {}
+  `);
+});
 
 test('rearrange assignment', () => {
   expectJS(`
@@ -132,11 +140,3 @@ test('rearrange assignment', () => {
     }
   `);
 });
-
-test('dont rearrange variable declarator in for loop', () =>
-  expectJS(`
-    for(let a = (b, c);;) {}
-  `).toMatchInlineSnapshot(`
-    b;
-    for (let a = c;;) {}
-  `));
