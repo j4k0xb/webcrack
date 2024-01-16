@@ -2,6 +2,19 @@
 
 Convert transpiled syntax back to modern JavaScript.
 
+## default-parameters
+
+<https://babeljs.io/docs/babel-plugin-transform-parameters>
+
+```js
+function f() { // [!code --]
+  var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1; // [!code --]
+  var y = arguments.length > 1 ? arguments[1] : undefined; // [!code --]
+} // [!code --]
+
+function f(x = 1, y) {} // [!code ++]
+```
+
 ## logical-assignments
 
 <https://babeljs.io/docs/babel-plugin-transform-logical-assignment-operators>, TypeScript and SWC
