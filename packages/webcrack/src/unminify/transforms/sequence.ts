@@ -1,6 +1,6 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import type { Transform } from '../../ast-utils';
+import { safeLiteral, type Transform } from '../../ast-utils';
 
 export default {
   name: 'sequence',
@@ -10,7 +10,7 @@ export default {
     // `obj.foo.bar = (x(), y());` would trigger the getter for `obj.foo` before `x()` is evaluated.
     const assignmentVariable = m.or(
       m.identifier(),
-      m.memberExpression(m.identifier(), m.identifier()),
+      m.memberExpression(m.identifier(), m.or(m.identifier(), safeLiteral)),
     );
     const assignedSequence = m.capture(m.sequenceExpression());
     const assignmentMatcher = m.assignmentExpression(

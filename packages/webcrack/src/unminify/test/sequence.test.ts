@@ -95,7 +95,7 @@ test('rearrange variable declarator', () => {
   `);
 
   expectJS(`
-    for(let a = (b(), c());;) {}
+    for (let a = (b(), c());;) {}
   `).toMatchInlineSnapshot(`
     b();
     for (let a = c();;) {}
@@ -104,39 +104,59 @@ test('rearrange variable declarator', () => {
 
 test('rearrange assignment', () => {
   expectJS(`
-    a = (b = null, c);
+    a = (b(), c());
   `).toMatchInlineSnapshot(`
-    b = null;
-    a = c;
+    b();
+    a = c();
   `);
 
   expectJS(`
-    console.log(a = (b = null, c));
-  `).toMatchInlineSnapshot(`console.log((b = null, a = c));`);
-
-  expectJS(`
-    while (a = (b = null, c));
+    a.x = (b(), c());
   `).toMatchInlineSnapshot(`
-    b = null;
-    while (a = c);
+    b();
+    a.x = c();
   `);
 
   expectJS(`
-    a ||= (b, c);
-    a &&= (b, c);
-    a ??= (b, c);
+    a[1] = (b(), c());
   `).toMatchInlineSnapshot(`
-    a ||= (b, c);
-    a &&= (b, c);
-    a ??= (b, c);
+    b();
+    a[1] = c();
   `);
 
   expectJS(`
-    for (;;) a = (b, c);
+    a[x()] = (b(), c());
+  `).toMatchInlineSnapshot(`a[x()] = (b(), c());`);
+
+  expectJS(`
+    console.log(a = (b(), c()));
+  `).toMatchInlineSnapshot(`
+    console.log((b(), a = c()));
+  `);
+
+  expectJS(`
+    while (a = (b(), c()));
+  `).toMatchInlineSnapshot(`
+    b();
+    while (a = c());
+  `);
+
+  expectJS(`
+    a ||= (b(), c());
+    a &&= (b(), c());
+    a ??= (b(), c());
+  `).toMatchInlineSnapshot(`
+    a ||= (b(), c());
+    a &&= (b(), c());
+    a ??= (b(), c());
+  `);
+
+  expectJS(`
+    for (;;) a = (b(), c());
   `).toMatchInlineSnapshot(`
     for (;;) {
-      b;
-      a = c;
+      b();
+      a = c();
     }
   `);
 });
