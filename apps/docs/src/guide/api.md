@@ -91,3 +91,65 @@ New folder structure:
 ```
 
 See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers#readme) for more information about matchers.
+
+## Plugins
+
+There are 5 stages you can hook into to manipulate the AST, which run in this order:
+
+- parse
+- prepare
+- deobfuscate
+- unminify
+- unpack
+
+See the [babel plugin handbook](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/en/plugin-handbook.md#writing-your-first-babel-plugin) for more information about writing plugins.
+This API is pretty similar, but there are some differences:
+
+- The required `runAfter` property specifies the stage
+- Only `visitor`, `pre` and `post` are supported
+- [parse](https://babeljs.io/docs/babel-parser),
+  [types](https://babeljs.io/docs/babel-types),
+  [traverse](https://babeljs.io/docs/babel-traverse),
+  [template](https://babeljs.io/docs/babel-template) and
+  [matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers) are passed to the plugin function
+
+### Example
+
+```js
+import { webcrack } from 'webcrack';
+
+function myPlugin({ types: t, matchers: m }) {
+  return {
+    runAfter: 'parse', // change it to 'unminify' and see what happens
+    pre(state) {
+      this.cache = new Set();
+    },
+    visitor: {
+      StringLiteral(path) {
+        this.cache.add(path.node.value);
+      },
+    },
+    post(state) {
+      console.log(this.cache); // Set(2) {'a', 'b'}
+    },
+  };
+}
+
+const result = await webcrack('"a" + "b"', { plugins: [myPlugin] });
+```
+
+### Using Babel plugins
+
+It should be compatible with most Babel plugins as long as they only access the limited API specified above.
+They have to be wrapped to set the `runAfter` property.
+
+```js
+import removeConsole from 'babel-plugin-transform-remove-console';
+
+function removeConsoleWrapper(babel) {
+  return {
+    runAfter: 'deobfuscate',
+    ...removeConsole(babel),
+  };
+}
+```
