@@ -11,26 +11,26 @@
     "lint:fix": "eslint src --fix"
   },
   "devDependencies": {
-    "@types/babel__generator": "^7.6.7",
-    "@types/node": "^20.10.3",
+    "@types/babel__generator": "^7.6.8",
+    "@types/node": "^20.11.5",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
-    "autoprefixer": "^10.4.16",
-    "daisyui": "^4.4.19",
-    "postcss": "^8.4.32",
-    "tailwindcss": "^3.3.5",
-    "typescript": "^5.3.2",
-    "vite": "^4.5.1",
+    "autoprefixer": "^10.4.17",
+    "daisyui": "^4.6.0",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
     "vite-plugin-monaco-editor": "^1.1.0",
-    "vite-plugin-node-polyfills": "^0.17.0",
-    "vite-plugin-solid": "^2.7.2"
+    "vite-plugin-node-polyfills": "^0.19.0",
+    "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
-    "@babel/generator": "^7.23.5",
-    "@babel/types": "^7.23.5",
-    "monaco-editor": "^0.44.0",
+    "@babel/generator": "^7.23.6",
+    "@babel/types": "^7.23.6",
+    "monaco-editor": "^0.45.0",
     "sandybox": "^1.1.2",
-    "solid-js": "^1.8.7",
+    "solid-js": "^1.8.11",
     "webcrack": "workspace:*"
   }
 }
