@@ -3,7 +3,7 @@ import { posix } from 'node:path';
 import { generate } from '../ast-utils';
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
-const { normalize } = posix;
+const { normalize, extname } = posix;
 
 export class Module {
   id: string;
@@ -19,11 +19,12 @@ export class Module {
     this.id = id;
     this.ast = ast;
     this.isEntry = isEntry;
-    this.path = this.normalizePath(isEntry ? 'index' : id);
+    this.path =
+      extname(id) === '' && isEntry ? 'index.js' : this.normalizePath(id);
   }
 
   private normalizePath(path: string): string {
-    return normalize(path.endsWith('.js') ? path : `${path}.js`);
+    return normalize(extname(path) === '' ? `${path}.js` : path);
   }
 
   /**

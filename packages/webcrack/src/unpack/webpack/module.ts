@@ -65,6 +65,11 @@ export class WebpackModule extends Module {
     this.exports = manager.exports;
 
     this.externalModule = this.detectExternalModule();
+
+    // In webpack development builds the id specifies the file path
+    // so we should avoid converting a .js file with `module.exports = {}` to json
+    if (this.id.endsWith('.js')) return;
+
     const json = transformJsonModule(this.ast);
     if (json) {
       this.#sourceType = 'json';
