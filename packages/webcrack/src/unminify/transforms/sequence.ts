@@ -39,11 +39,11 @@ export default {
         exit(path) {
           if (!assignmentMatcher.match(path.node)) return;
 
-          const value = assignedSequence.current!.expressions.pop()!;
-          path.get('right').replaceWith(value);
+          const { expressions } = assignedSequence.current!;
+          path.node.right = expressions.pop()!;
           const newNodes = path.parentPath.isExpressionStatement()
-            ? assignedSequence.current!.expressions.map(t.expressionStatement)
-            : assignedSequence.current!.expressions;
+            ? expressions.map(t.expressionStatement)
+            : expressions;
           path.insertBefore(newNodes);
           this.changes++;
         },
@@ -122,8 +122,8 @@ export default {
             const statements = path.node.init.expressions.map(
               t.expressionStatement,
             );
-            path.insertBefore(statements);
             path.node.init = null;
+            path.insertBefore(statements);
             this.changes++;
           }
           if (
