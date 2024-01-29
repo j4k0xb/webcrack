@@ -59,17 +59,10 @@ export default {
   name: 'template-literals',
   tags: ['unsafe'],
   visitor() {
-    const concatMatcher: m.Matcher<t.CallExpression> = m.or(
-      m.callExpression(
-        constMemberExpression(
-          m.or(
-            m.stringLiteral(),
-            m.matcher((node) => concatMatcher.match(node)),
-          ),
-          'concat',
-        ),
-        m.arrayOf(m.anyExpression()),
-      ),
+    const string = m.capture(m.or(m.stringLiteral(), m.templateLiteral()));
+    const concatMatcher = m.callExpression(
+      constMemberExpression(string, 'concat'),
+      m.arrayOf(m.anyExpression()),
     );
 
     return {
@@ -93,22 +86,17 @@ export default {
       },
       CallExpression: {
         exit(path) {
-          if (
-            concatMatcher.match(path.node) &&
-            !concatMatcher.match(path.parentPath.parent)
-          ) {
+          if (concatMatcher.match(path.node)) {
             const template = t.templateLiteral(
               [t.templateElement({ raw: '' })],
               [],
             );
-            let current: t.Expression = path.node;
-            while (current.type === 'CallExpression') {
-              for (const arg of current.arguments.reverse()) {
-                unshift(template, arg as t.Expression);
-              }
-              current = (current.callee as t.MemberExpression).object;
+            push(template, string.current!);
+
+            for (const arg of path.node.arguments) {
+              push(template, arg as t.Expression);
             }
-            unshift(template, current);
+
             path.replaceWith(template);
             this.changes++;
           }
