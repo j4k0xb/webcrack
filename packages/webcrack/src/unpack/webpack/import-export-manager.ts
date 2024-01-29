@@ -357,6 +357,10 @@ export class ImportExportManager {
     const statementParent = binding.path.getStatementParent()!;
     if (value) {
       statementParent.insertAfter(statement`export default ${value}`());
+    } else if (statementParent.isExportDeclaration()) {
+      statementParent.insertAfter(
+        statement`export default ${binding.identifier.name}`(),
+      );
     } else {
       const node = binding.path.node;
       value =

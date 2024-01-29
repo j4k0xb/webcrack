@@ -202,6 +202,18 @@ describe('webpack 5', () => {
       console.log(foo);
     `));
 
+  test('export variable as default and named', () =>
+    expectJS(`
+      __webpack_require__.d(__webpack_exports__, {
+        foo: () => foo,
+        default: () => foo
+      });
+      var foo = 1;
+    `).toMatchInlineSnapshot(`
+      export var foo = 1;
+      export default foo;
+    `));
+
   test.todo('export object destructuring', () =>
     expectJS(`
       __webpack_require__.d(__webpack_exports__, {
