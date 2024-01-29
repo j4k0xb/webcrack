@@ -135,7 +135,11 @@ export default {
         [...binding.referencePaths].reverse().forEach((ref) => {
           const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
           const propName = getPropName(memberPath.node.property)!;
-          const value = props.get(propName)!;
+          const value = props.get(propName);
+          if (!value) {
+            ref.addComment('leading', 'webcrack:control_flow_missing_prop');
+            return;
+          }
 
           if (t.isStringLiteral(value)) {
             memberPath.replaceWith(value);
