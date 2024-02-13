@@ -7,9 +7,10 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": "dist/cli.js",
+  "bin": "src/cli-wrapper.js",
   "files": [
-    "dist"
+    "dist",
+    "src/cli-wrapper.js"
   ],
   "scripts": {
     "build": "node esbuild.config.js && tsc -p tsconfig.build.json",
