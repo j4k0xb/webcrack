@@ -246,6 +246,8 @@ export function inlineVariableAliases(
       const varScope = ref.scope;
       const varBinding = varScope.getBinding(varName.current!);
       if (!varBinding) continue;
+      // Avoid infinite loop from `alias = alias;` (caused by dead code injection?)
+      if (ref.isIdentifier({ name: varBinding.identifier.name })) continue;
 
       // Check all further aliases (`var alias2 = alias;`)
       state.changes += inlineVariableAliases(varBinding, targetName).changes;
