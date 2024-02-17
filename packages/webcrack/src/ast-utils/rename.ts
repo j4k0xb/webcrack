@@ -56,6 +56,21 @@ export function renameFast(binding: Binding, newName: string): void {
   binding.identifier.name = newName;
 }
 
+/**
+ * Tries to rename the binding to the new name.
+ * If that name is invalid or conflicts with another binding, it will use a similar name instead.
+ */
+export function renameCarefully(binding: Binding, newName: string): void {
+  const hasConflicts = () =>
+    binding.referencePaths.some((referencePath) =>
+      referencePath.scope.hasBinding(newName),
+    );
+  if (!t.isValidIdentifier(newName) || hasConflicts()) {
+    newName = binding.scope.generateUid(newName);
+  }
+  binding.scope.rename(binding.identifier.name, newName);
+}
+
 export function renameParameters(
   path: NodePath<t.Function>,
   newNames: string[],
