@@ -24,30 +24,32 @@ test('rename object destructuring', () =>
 test('rename object destructuring with conflict', () =>
   expectJS(`
     const gql = 1;
+    const {
+      gql: t,
+      dispatchers: o,
+      listener: i
+    } = n;
 
     function foo({
       gql: t,
       dispatchers: o,
       listener: i
-    }, {
-      gql: a,
-      dispatchers: b,
-      listener: c
     }) {
-      o.delete(t, i, a, b, c);
+      o.delete(t, i);
     }
   `).toMatchInlineSnapshot(`
     const gql = 1;
-    function foo({
+    const {
       gql: _gql,
       dispatchers,
       listener
-    }, {
+    } = n;
+    function foo({
       gql: _gql2,
       dispatchers: _dispatchers,
       listener: _listener
     }) {
-      dispatchers.delete(_gql, listener, _gql2, _dispatchers, _listener);
+      _dispatchers.delete(_gql2, _listener);
     }
   `));
 

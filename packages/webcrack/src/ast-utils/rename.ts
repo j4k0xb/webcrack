@@ -5,6 +5,8 @@ import * as m from '@codemod/matchers';
 import { codePreview } from './generator';
 
 export function renameFast(binding: Binding, newName: string): void {
+  if (binding.scope.hasBinding(newName)) binding.scope.rename(newName);
+
   binding.referencePaths.forEach((ref) => {
     if (!ref.isIdentifier()) {
       throw new Error(
@@ -62,9 +64,10 @@ export function renameFast(binding: Binding, newName: string): void {
  */
 export function renameCarefully(binding: Binding, newName: string): void {
   const hasConflicts = () =>
-    binding.referencePaths.some((referencePath) =>
-      referencePath.scope.hasBinding(newName),
-    );
+    binding.scope.hasBinding(newName) ||
+    binding.referencePaths.some((ref) => ref.scope.hasBinding(newName)) ||
+    binding.constantViolations.some((ref) => ref.scope.hasBinding(newName));
+
   if (!t.isValidIdentifier(newName) || hasConflicts()) {
     newName = binding.scope.generateUid(newName);
   }
