@@ -18,10 +18,12 @@ export default {
         exit(path) {
           for (const property of path.node.properties) {
             if (!matcher.match(property)) continue;
-            const binding = path.scope.getBinding(alias.current!);
-            if (!binding) continue;
+            if (key.current !== alias.current) {
+              const binding = path.scope.getBinding(alias.current!);
+              if (!binding) continue;
 
-            renameCarefully(binding, key.current!);
+              renameCarefully(binding, key.current!);
+            }
             property.shorthand = true;
           }
         },

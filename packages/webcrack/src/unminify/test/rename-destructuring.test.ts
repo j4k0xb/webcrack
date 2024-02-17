@@ -21,6 +21,19 @@ test('rename object destructuring', () =>
     dispatchers.delete(gql, listener);
   `));
 
+test('ignore same key and alias', () =>
+  expectJS(`
+    const {
+      gql,
+      dispatchers: dispatchers,
+    } = n;
+  `).toMatchInlineSnapshot(`
+        const {
+          gql,
+          dispatchers
+        } = n;
+      `));
+
 test('rename object destructuring with conflict', () =>
   expectJS(`
     const gql = 1;
