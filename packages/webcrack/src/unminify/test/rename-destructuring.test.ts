@@ -66,6 +66,19 @@ test('rename object destructuring with conflict', () =>
     }
   `));
 
+test('rename object destructuring with global variable conflict', () =>
+  expectJS(`
+    const {
+      Object: t,
+    } = n;
+    Object.keys(t);
+  `).toMatchInlineSnapshot(`
+  const {
+    Object: _Object
+  } = n;
+  Object.keys(_Object);
+`));
+
 test('rename object destructuring with reserved identifier', () =>
   expectJS(`
     const { delete: t } = n;
