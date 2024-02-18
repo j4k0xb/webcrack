@@ -23,6 +23,7 @@ export default {
               if (!binding) continue;
 
               renameCarefully(binding, key.current!);
+              this.changes++;
             }
             property.shorthand = true;
           }

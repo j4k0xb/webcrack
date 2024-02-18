@@ -71,7 +71,7 @@ export function renameCarefully(binding: Binding, newName: string): void {
   if (!t.isValidIdentifier(newName) || hasConflicts()) {
     newName = binding.scope.generateUid(newName);
   }
-  binding.scope.rename(binding.identifier.name, newName);
+  renameFast(binding, newName);
 }
 
 export function renameParameters(
