@@ -76,6 +76,23 @@ describe('rename variable', () => {
       for (b in []);
     `);
   });
+
+  test.todo('unsupported node types', () => {
+    const ast = parse(
+      `
+        export var A = 1;
+        <A />;
+      `,
+      { sourceType: 'module', plugins: ['jsx'] },
+    );
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('A')!;
+        renameFast(binding, 'B');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot();
+  });
 });
 
 describe('rename parameters', () => {

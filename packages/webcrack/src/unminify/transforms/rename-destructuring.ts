@@ -1,5 +1,5 @@
 import * as m from '@codemod/matchers';
-import { renameCarefully, type Transform } from '../../ast-utils';
+import { generateUid, renameFast, type Transform } from '../../ast-utils';
 
 export default {
   name: 'rename-destructuring',
@@ -18,14 +18,18 @@ export default {
         exit(path) {
           for (const property of path.node.properties) {
             if (!matcher.match(property)) continue;
-            if (key.current !== alias.current) {
+
+            if (key.current === alias.current) {
+              property.shorthand = true;
+            } else {
               const binding = path.scope.getBinding(alias.current!);
               if (!binding) continue;
 
-              renameCarefully(binding, key.current!);
+              const newName = generateUid(binding, key.current!);
+              renameFast(binding, newName);
+              property.shorthand = key.current === newName;
               this.changes++;
             }
-            property.shorthand = true;
           }
         },
       },
