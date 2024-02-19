@@ -1,3 +1,4 @@
+import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { generateUid, renameFast, type Transform } from '../../ast-utils';
 
@@ -30,6 +31,21 @@ export default {
               property.shorthand = key.current === newName;
               this.changes++;
             }
+          }
+        },
+      },
+      ImportSpecifier: {
+        exit(path) {
+          if (
+            t.isIdentifier(path.node.imported) &&
+            path.node.imported.name !== path.node.local.name
+          ) {
+            const binding = path.scope.getBinding(path.node.local.name);
+            if (!binding) return;
+
+            const newName = generateUid(binding, path.node.imported.name);
+            renameFast(binding, newName);
+            this.changes++;
           }
         },
       },

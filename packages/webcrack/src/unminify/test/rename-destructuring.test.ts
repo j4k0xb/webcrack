@@ -28,11 +28,11 @@ test('ignore same key and alias', () =>
       dispatchers: dispatchers,
     } = n;
   `).toMatchInlineSnapshot(`
-        const {
-          gql,
-          dispatchers
-        } = n;
-      `));
+    const {
+      gql,
+      dispatchers
+    } = n;
+  `));
 
 test('rename object destructuring with conflict', () =>
   expectJS(`
@@ -73,19 +73,28 @@ test('rename object destructuring with global variable conflict', () =>
     } = n;
     Object.keys(t);
   `).toMatchInlineSnapshot(`
-  const {
-    Object: _Object
-  } = n;
-  Object.keys(_Object);
-`));
+    const {
+      Object: _Object
+    } = n;
+    Object.keys(_Object);
+  `));
 
 test('rename object destructuring with reserved identifier', () =>
   expectJS(`
     const { delete: t } = n;
     t();
   `).toMatchInlineSnapshot(`
-  const {
-    delete: _delete
-  } = n;
-  _delete();
-`));
+    const {
+      delete: _delete
+    } = n;
+    _delete();
+  `));
+
+test('rename import', () =>
+  expectJS(`
+    import { render as a } from "preact";
+    a();
+  `).toMatchInlineSnapshot(`
+    import { render } from "preact";
+    render();
+  `));
