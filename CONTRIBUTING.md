@@ -33,7 +33,7 @@ Run the tests with `pnpm test`.
 If the snapshots are outdated, make sure the changes are correct and update them:
 ![failed snapshot](https://user-images.githubusercontent.com/55899582/219093007-825a5056-38a0-4e8b-8512-b56e20174885.png)
 
-The tests can also be debugged by installing the [Vitest extension](https://marketplace.visualstudio.com/items?itemName=ZixuanChen.vitest-explorer) and right-clicking on the play icon:
+The tests can also be debugged by installing the [Vitest extension](https://marketplace.visualstudio.com/items?itemName=vitest.explorer) and right-clicking on the play icon:
 ![vitest debug](https://github.com/j4k0xb/webcrack/assets/55899582/9661b202-7f85-4615-bf83-c132cfdaa9f7)
 
 ## Linting and Formatting
