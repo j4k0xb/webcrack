@@ -1,4 +1,4 @@
-import type { NodePath, Scope } from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../ast-utils';
@@ -28,25 +28,10 @@ export default {
 
           if (!testMatcher.match(path.node.test)) return;
 
-          const { scope } = path;
-          // If statements can contain variables that shadow variables in the parent scope.
-          // Since the block scope is merged with the parent scope, we need to rename those
-          // variables to avoid duplicate declarations.
-          function renameShadowedVariables(localScope: Scope) {
-            if (localScope === scope) return;
-            for (const name in localScope.bindings) {
-              if (scope.hasBinding(name)) {
-                renameFast(localScope.bindings[name], scope.generateUid(name));
-              }
-            }
-          }
-
           if (path.get('test').evaluateTruthy()) {
-            renameShadowedVariables(path.get('consequent').scope);
-            replace(path, path.node.consequent);
+            replace(path, path.get('consequent'));
           } else if (path.node.alternate) {
-            renameShadowedVariables(path.get('alternate').scope);
-            replace(path, path.node.alternate);
+            replace(path, path.get('alternate') as NodePath);
           } else {
             path.remove();
           }
@@ -58,10 +43,22 @@ export default {
   },
 } satisfies Transform;
 
-function replace(path: NodePath, node: t.Node) {
-  if (t.isBlockStatement(node)) {
-    path.replaceWithMultiple(node.body);
+function replace(path: NodePath<t.Conditional>, replacement: NodePath) {
+  if (t.isBlockStatement(replacement.node)) {
+    // If statements can contain variables that shadow variables in the parent scope.
+    // Since the block scope is merged with the parent scope, we need to rename those
+    // variables to avoid duplicate declarations.
+    const childBindings = replacement.scope.bindings;
+    for (const name in childBindings) {
+      const binding = childBindings[name];
+      if (path.scope.hasOwnBinding(name)) {
+        renameFast(binding, path.scope.generateUid(name));
+      }
+      binding.scope = path.scope;
+      path.scope.bindings[binding.identifier.name] = binding;
+    }
+    path.replaceWithMultiple(replacement.node.body);
   } else {
-    path.replaceWith(node);
+    path.replaceWith(replacement);
   }
 }
