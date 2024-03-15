@@ -89,12 +89,18 @@ test('rearrange from for loop update', () =>
     }
   `));
 
-test('rearrange from while', () =>
+test('dont rearrange from while', () =>
   expectJS(`
     while (a(), b()) c();
   `).toMatchInlineSnapshot(`
-    a();
-    while (b()) c();
+    while (a(), b()) c();
+  `));
+
+test('dont rearrange from do-while', () =>
+  expectJS(`
+    do {} while (a(), b());
+  `).toMatchInlineSnapshot(`
+    do {} while ((a(), b()));
   `));
 
 test('rearrange variable declarator', () => {
@@ -148,8 +154,7 @@ test('rearrange assignment', () => {
   expectJS(`
     while (a = (b(), c()));
   `).toMatchInlineSnapshot(`
-    b();
-    while (a = c());
+    while (b(), a = c());
   `);
 
   expectJS(`

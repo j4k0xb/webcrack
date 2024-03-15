@@ -175,12 +175,6 @@ b = null; // [!code ++]
 a = c; // [!code ++]
 ```
 
-```js
-while (a = (b = null, c)) {} // [!code --]
-b = null; // [!code ++]
-while (a = c) {} // [!code ++]
-```
-
 ## split-for-loops-vars
 
 Minifiers commonly inline variables into for loops. Example: [esbuild](https://esbuild.github.io/try/#dAAwLjE5LjExAC0tbWluaWZ5AHZhciBqID0gMDsKZm9yICh2YXIgaSA9IDA7IGkgPCAzOyBpKyspIHt9)

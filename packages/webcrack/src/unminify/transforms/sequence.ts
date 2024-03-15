@@ -138,17 +138,6 @@ export default {
           }
         },
       },
-      WhileStatement: {
-        exit(path) {
-          if (!t.isSequenceExpression(path.node.test)) return;
-
-          const { expressions } = path.node.test;
-          path.node.test = expressions.pop()!;
-          const statements = expressions.map(t.expressionStatement);
-          path.insertBefore(statements);
-          this.changes++;
-        },
-      },
       VariableDeclaration: {
         exit(path) {
           const sequence = m.capture(m.sequenceExpression());
