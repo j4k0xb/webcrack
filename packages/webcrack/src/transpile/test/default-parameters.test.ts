@@ -20,10 +20,19 @@ describe('Babel', () => {
       function f() {
         var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
         var y = arguments.length > 1 ? arguments[1] : undefined;
-        var z = arguments.length > 2 && arguments[2] !== undefined && arguments[2];
       }
     `).toMatchInlineSnapshot(`
-      function f(x = 1, y, z = false) {}
+      function f(x = 1, y) {}
+    `));
+
+  test('default parameter with value true and false', () =>
+    expectJS(`
+      function f() {
+        var x = arguments.length > 0 && arguments[0] !== undefined && arguments[0];
+        var y = arguments.length <= 1 || arguments[1] === undefined || arguments[1];
+      }
+    `).toMatchInlineSnapshot(`
+      function f(x = false, y = true) {}
     `));
 
   test('default parameter with gap before the last one', () =>

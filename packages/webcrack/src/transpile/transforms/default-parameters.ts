@@ -15,7 +15,7 @@ export default {
     );
 
     // Example: arguments.length > 0 && arguments[0] !== undefined
-    const argumentCheck = m.logicalExpression(
+    const argumentCheckAnd = m.logicalExpression(
       '&&',
       m.binaryExpression(
         '>',
@@ -32,12 +32,30 @@ export default {
         m.identifier('undefined'),
       ),
     );
+    // Example: arguments.length > 0 && arguments[0] !== undefined
+    const argumentCheckOr = m.logicalExpression(
+      '||',
+      m.binaryExpression(
+        '<=',
+        constMemberExpression('arguments', 'length'),
+        index,
+      ),
+      m.binaryExpression(
+        '===',
+        m.memberExpression(
+          m.identifier('arguments'),
+          m.fromCapture(index),
+          true,
+        ),
+        m.identifier('undefined'),
+      ),
+    );
     // Example: arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
     const defaultParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
         varId,
         m.conditionalExpression(
-          argumentCheck,
+          argumentCheckAnd,
           m.memberExpression(
             m.identifier('arguments'),
             m.fromCapture(index),
@@ -53,7 +71,7 @@ export default {
         varId,
         m.logicalExpression(
           '&&',
-          argumentCheck,
+          argumentCheckAnd,
           m.memberExpression(
             m.identifier('arguments'),
             m.fromCapture(index),
@@ -62,6 +80,22 @@ export default {
         ),
       ),
     ]);
+    // Example: arguments.length <= 0 || arguments[0] === undefined || arguments[0]
+    const defaultTrueParam = m.variableDeclaration(undefined, [
+      m.variableDeclarator(
+        varId,
+        m.logicalExpression(
+          '||',
+          argumentCheckOr,
+          m.memberExpression(
+            m.identifier('arguments'),
+            m.fromCapture(index),
+            true,
+          ),
+        ),
+      ),
+    ]);
+
     // Example: if (x === undefined) { x = 1; }
     const defaultParamLoose = m.ifStatement(
       m.binaryExpression('===', varName, m.identifier('undefined')),
@@ -105,9 +139,11 @@ export default {
             ? t.assignmentPattern(varId.current!, defaultExpression.current!)
             : defaultFalseParam.match(path.node)
               ? t.assignmentPattern(varId.current!, t.booleanLiteral(false))
-              : normalParam.match(path.node)
-                ? varId.current!
-                : null;
+              : defaultTrueParam.match(path.node)
+                ? t.assignmentPattern(varId.current!, t.booleanLiteral(true))
+                : normalParam.match(path.node)
+                  ? varId.current!
+                  : null;
           if (!newParam) return;
 
           for (let i = fn.params.length; i < index.current!.value; i++) {
