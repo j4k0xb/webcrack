@@ -35,6 +35,22 @@ describe('Babel', () => {
       function f(e, x = {}, _param, _param2, _param3, y) {}
     `));
 
+  test('default destructuring parameter', () =>
+    expectJS(`
+      function f() {
+        let {
+          x,
+          y
+        } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        let [z] = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      }
+    `).toMatchInlineSnapshot(`
+      function f({
+        x,
+        y
+      } = {}, [z] = []) {}
+    `));
+
   test('default parameter (loose)', () =>
     expectJS(`
       function f(x, y) {

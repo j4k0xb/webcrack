@@ -10,11 +10,12 @@ export default {
     const defaultExpression = m.capture(m.anyExpression());
     const index = m.capture(m.numericLiteral());
     const varName = m.capture(m.identifier());
+    const varId = m.capture(m.or(m.identifier(), m.arrayPattern(), m.objectPattern()));
 
     // Example: arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
     const defaultParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
-        varName,
+        varId,
         m.conditionalExpression(
           m.logicalExpression(
             '&&',
@@ -58,7 +59,7 @@ export default {
     // Example: var y = arguments.length > 1 ? arguments[1] : undefined;
     const normalParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
-        varName,
+        varId,
         m.conditionalExpression(
           m.binaryExpression(
             '>',
@@ -86,7 +87,7 @@ export default {
               fn.params[i] = t.identifier(path.scope.generateUid('param'));
             }
             fn.params[index.current!.value] = t.assignmentPattern(
-              varName.current!,
+              varId.current!,
               defaultExpression.current!,
             );
             path.remove();
@@ -95,7 +96,7 @@ export default {
             for (let i = fn.params.length; i < index.current!.value; i++) {
               fn.params[i] = t.identifier(path.scope.generateUid('param'));
             }
-            fn.params[index.current!.value] = varName.current!;
+            fn.params[index.current!.value] = varId.current!;
             path.remove();
             this.changes++;
           }
