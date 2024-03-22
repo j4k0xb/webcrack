@@ -82,6 +82,9 @@ export default {
           if (!t.isFunction(fn) || path.key !== 0) return;
 
           if (defaultParam.match(path.node)) {
+            for (let i = fn.params.length; i < index.current!.value; i++) {
+              fn.params[i] = t.identifier(path.scope.generateUid('param'));
+            }
             fn.params[index.current!.value] = t.assignmentPattern(
               varName.current!,
               defaultExpression.current!,
@@ -89,6 +92,9 @@ export default {
             path.remove();
             this.changes++;
           } else if (normalParam.match(path.node)) {
+            for (let i = fn.params.length; i < index.current!.value; i++) {
+              fn.params[i] = t.identifier(path.scope.generateUid('param'));
+            }
             fn.params[index.current!.value] = varName.current!;
             path.remove();
             this.changes++;

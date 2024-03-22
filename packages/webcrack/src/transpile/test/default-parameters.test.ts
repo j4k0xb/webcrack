@@ -25,6 +25,16 @@ describe('Babel', () => {
       function f(x = 1, y) {}
     `));
 
+  test('default parameter with gap before the last one', () =>
+    expectJS(`
+      function f(e) {
+        var x = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var y = arguments.length > 5 ? arguments[5] : undefined;
+      }
+    `).toMatchInlineSnapshot(`
+      function f(e, x = {}, _param, _param2, _param3, y) {}
+    `));
+
   test('default parameter (loose)', () =>
     expectJS(`
       function f(x, y) {
