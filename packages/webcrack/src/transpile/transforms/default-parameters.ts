@@ -10,36 +10,55 @@ export default {
     const defaultExpression = m.capture(m.anyExpression());
     const index = m.capture(m.numericLiteral());
     const varName = m.capture(m.identifier());
-    const varId = m.capture(m.or(m.identifier(), m.arrayPattern(), m.objectPattern()));
+    const varId = m.capture(
+      m.or(m.identifier(), m.arrayPattern(), m.objectPattern()),
+    );
 
+    // Example: arguments.length > 0 && arguments[0] !== undefined
+    const argumentCheck = m.logicalExpression(
+      '&&',
+      m.binaryExpression(
+        '>',
+        constMemberExpression('arguments', 'length'),
+        index,
+      ),
+      m.binaryExpression(
+        '!==',
+        m.memberExpression(
+          m.identifier('arguments'),
+          m.fromCapture(index),
+          true,
+        ),
+        m.identifier('undefined'),
+      ),
+    );
     // Example: arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
     const defaultParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
         varId,
         m.conditionalExpression(
-          m.logicalExpression(
-            '&&',
-            m.binaryExpression(
-              '>',
-              constMemberExpression('arguments', 'length'),
-              index,
-            ),
-            m.binaryExpression(
-              '!==',
-              m.memberExpression(
-                m.identifier('arguments'),
-                m.fromCapture(index),
-                true,
-              ),
-              m.identifier('undefined'),
-            ),
-          ),
+          argumentCheck,
           m.memberExpression(
             m.identifier('arguments'),
             m.fromCapture(index),
             true,
           ),
           defaultExpression,
+        ),
+      ),
+    ]);
+    // Example: arguments.length > 0 && arguments[0] !== undefined && arguments[0];
+    const defaultFalseParam = m.variableDeclaration(undefined, [
+      m.variableDeclarator(
+        varId,
+        m.logicalExpression(
+          '&&',
+          argumentCheck,
+          m.memberExpression(
+            m.identifier('arguments'),
+            m.fromCapture(index),
+            true,
+          ),
         ),
       ),
     ]);
@@ -82,24 +101,21 @@ export default {
           const fn = path.parentPath.parent;
           if (!t.isFunction(fn) || path.key !== 0) return;
 
-          if (defaultParam.match(path.node)) {
-            for (let i = fn.params.length; i < index.current!.value; i++) {
-              fn.params[i] = t.identifier(path.scope.generateUid('param'));
-            }
-            fn.params[index.current!.value] = t.assignmentPattern(
-              varId.current!,
-              defaultExpression.current!,
-            );
-            path.remove();
-            this.changes++;
-          } else if (normalParam.match(path.node)) {
-            for (let i = fn.params.length; i < index.current!.value; i++) {
-              fn.params[i] = t.identifier(path.scope.generateUid('param'));
-            }
-            fn.params[index.current!.value] = varId.current!;
-            path.remove();
-            this.changes++;
+          const newParam = defaultParam.match(path.node)
+            ? t.assignmentPattern(varId.current!, defaultExpression.current!)
+            : defaultFalseParam.match(path.node)
+              ? t.assignmentPattern(varId.current!, t.booleanLiteral(false))
+              : normalParam.match(path.node)
+                ? varId.current!
+                : null;
+          if (!newParam) return;
+
+          for (let i = fn.params.length; i < index.current!.value; i++) {
+            fn.params[i] = t.identifier(path.scope.generateUid('param'));
           }
+          fn.params[index.current!.value] = newParam;
+          path.remove();
+          this.changes++;
         },
       },
       IfStatement: {
