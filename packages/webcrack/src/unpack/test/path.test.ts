@@ -5,6 +5,7 @@ test('relative paths', () => {
   expect(relativePath('./a.js', './x/y.js')).toBe('./x/y.js');
   expect(relativePath('./x/y.js', './a.js')).toBe('../a.js');
   expect(relativePath('./a.js', 'node_modules/lib')).toBe('lib');
+  expect(relativePath('./a.js', '.env')).toBe('./.env');
 });
 
 test('resolve browserify paths', () => {

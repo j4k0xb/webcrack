@@ -6,7 +6,7 @@ const { dirname, join, relative } = posix;
 export function relativePath(from: string, to: string): string {
   if (to.startsWith('node_modules/')) return to.replace('node_modules/', '');
   const relativePath = relative(dirname(from), to);
-  return relativePath.startsWith('.') ? relativePath : './' + relativePath;
+  return relativePath.startsWith('..') ? relativePath : './' + relativePath;
 }
 
 /**

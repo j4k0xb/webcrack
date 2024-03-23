@@ -2,6 +2,7 @@
 
 exports[`path mapping 1`] = `
 WebpackBundle {
+  "chunks": [],
   "entryId": "2",
   "modules": Map {
     "1" => WebpackModule {

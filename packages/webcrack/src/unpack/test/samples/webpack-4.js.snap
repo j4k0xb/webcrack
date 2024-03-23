@@ -1,0 +1,46 @@
+WebpackBundle {
+  "chunks": [],
+  "entryId": "2",
+  "modules": Map {
+    "1" => WebpackModule {
+      "ast": import "./3.js";,
+      "dependencies": Set {
+        "3",
+      },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "1",
+      "isEntry": false,
+      "path": "1.js",
+    },
+    "2" => WebpackModule {
+      "ast": import "./1.js";
+const _module = 1;
+module.exports.color = "#FBC02D";
+{
+  const _module2 = 2;
+  console.log(_module2);
+  console.log(module);
+}
+exports.a = 3;,
+      "dependencies": Set {
+        "1",
+      },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "2",
+      "isEntry": true,
+      "path": "index.js",
+    },
+    "3" => WebpackModule {
+      "ast": module.exports = 4;,
+      "dependencies": Set {},
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "3",
+      "isEntry": false,
+      "path": "3.js",
+    },
+  },
+  "type": "webpack",
+}

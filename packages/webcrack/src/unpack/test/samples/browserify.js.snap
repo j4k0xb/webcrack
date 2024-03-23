@@ -12,10 +12,10 @@ module.exports = add;,
       "path": "add.js",
     },
     "2" => BrowserifyModule {
-      "ast": var sum = require('./sum');
+      "ast": var sum = require("./sum");
 var numbers = [1, 2, 3];
 var result = sum(numbers);
-var outputElement = document.getElementById('output');
+var outputElement = document.getElementById("output");
 outputElement.innerHTML = result;,
       "dependencies": {
         "4": "./sum",
@@ -38,8 +38,8 @@ module.exports = reduce;,
       "path": "reduce.js",
     },
     "4" => BrowserifyModule {
-      "ast": var reduce = require('./reduce');
-var add = require('./add');
+      "ast": var reduce = require("./reduce");
+var add = require("./add");
 function sum(list) {
   return reduce(list, add, 0);
 }

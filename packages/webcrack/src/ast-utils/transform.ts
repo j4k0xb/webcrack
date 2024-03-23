@@ -12,7 +12,7 @@ export async function applyTransformAsync<TOptions>(
   logger(`${transform.name}: started`);
   const state: TransformState = { changes: 0 };
 
-  await transform.run?.(ast, state, options);
+  await transform.run?.call(state, ast, options);
   if (transform.visitor)
     traverse(ast, transform.visitor(options), undefined, state);
 
@@ -28,7 +28,7 @@ export function applyTransform<TOptions>(
 ): TransformState {
   logger(`${transform.name}: started`);
   const state: TransformState = { changes: 0 };
-  transform.run?.(ast, state, options);
+  transform.run?.call(state, ast, options);
 
   if (transform.visitor) {
     const visitor = transform.visitor(
@@ -53,7 +53,7 @@ export function applyTransforms(
   const state: TransformState = { changes: 0 };
 
   for (const transform of transforms) {
-    transform.run?.(ast, state);
+    transform.run?.call(state, ast, state);
   }
 
   const traverseOptions = transforms.flatMap((t) => t.visitor?.() ?? []);
@@ -93,13 +93,13 @@ export interface Transform<TOptions = unknown> {
   name: string;
   tags: Tag[];
   scope?: boolean;
-  run?: (ast: Node, state: TransformState, options?: TOptions) => void;
+  run?: (this: TransformState, ast: Node, options?: TOptions) => void;
   visitor?: (options?: TOptions) => Visitor<TransformState>;
 }
 
 export interface AsyncTransform<TOptions = unknown>
   extends Transform<TOptions> {
-  run?: (ast: Node, state: TransformState, options?: TOptions) => Promise<void>;
+  run?: (this: TransformState, ast: Node, options?: TOptions) => Promise<void>;
 }
 
 export type Tag = 'safe' | 'unsafe';

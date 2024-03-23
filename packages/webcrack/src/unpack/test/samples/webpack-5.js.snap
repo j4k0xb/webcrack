@@ -1,0 +1,56 @@
+WebpackBundle {
+  "chunks": [],
+  "entryId": "2",
+  "modules": Map {
+    "2" => WebpackModule {
+      "ast": import * as lib from "./3.js";
+console.log(lib);,
+      "dependencies": Set {
+        "3",
+      },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "2",
+      "isEntry": true,
+      "path": "index.js",
+    },
+    "3" => WebpackModule {
+      "ast": export { foo as default } from "./4.js";
+const obj = {
+  version: "2.0.0"
+};,
+      "dependencies": Set {
+        "4",
+      },
+      "exports": Set {
+        "default",
+        "version",
+      },
+      "externalModule": undefined,
+      "id": "3",
+      "isEntry": false,
+      "path": "3.js",
+    },
+    "4" => WebpackModule {
+      "ast": export const foo = 2;
+//webcrack:concatenated-module-namespace-object
+export var obj = {};
+//webcrack:concatenated-module-export
+Object.defineProperty(obj, "Console", {
+  enumerable: true,
+  get: () => bar
+});
+function bar() {},
+      "dependencies": Set {},
+      "exports": Set {
+        "foo",
+        "obj",
+      },
+      "externalModule": undefined,
+      "id": "4",
+      "isEntry": false,
+      "path": "4.js",
+    },
+  },
+  "type": "webpack",
+}

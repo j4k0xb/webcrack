@@ -1,0 +1,31 @@
+WebpackBundle {
+  "chunks": [],
+  "entryId": "./src/index.js",
+  "modules": Map {
+    "./src/index.js" => WebpackModule {
+      "ast": /* harmony import */
+import "./test.json";
+var _test_json__WEBPACK_IMPORTED_MODULE_0___namespace = /*#__PURE__*/__webpack_require__.t( /*! ./test.json */"./src/test.json", 1);,
+      "dependencies": Set {
+        "./src/test.json",
+      },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "./src/index.js",
+      "isEntry": true,
+      "path": "src/index.js",
+    },
+    "./src/test.json" => WebpackModule {
+      "ast": module.exports = {
+  foo: "bar"
+};,
+      "dependencies": Set {},
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "./src/test.json",
+      "isEntry": false,
+      "path": "src/test.json",
+    },
+  },
+  "type": "webpack",
+}

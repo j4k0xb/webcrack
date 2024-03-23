@@ -9,8 +9,8 @@ BrowserifyBundle {
       "path": "lib.js",
     },
     "2" => BrowserifyModule {
-      "ast": const vscode = require('vscode');
-const lib = require('./lib');
+      "ast": const vscode = require("vscode");
+const lib = require("./lib");
 console.log(lib);,
       "dependencies": {
         "1": "./lib",

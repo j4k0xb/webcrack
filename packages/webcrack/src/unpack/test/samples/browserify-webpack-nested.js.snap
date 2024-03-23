@@ -3,55 +3,86 @@ BrowserifyBundle {
   "modules": Map {
     "1" => BrowserifyModule {
       "ast": module.exports = 1;
-!function (e) {
+(function (e) {
   var a = {};
   function n(t) {
-    if (a[t]) return a[t].exports;
+    if (a[t]) {
+      return a[t].exports;
+    }
     var r = a[t] = {
       i: t,
-      l: !1,
+      l: false,
       exports: {}
     };
-    return e[t].call(r.exports, r, r.exports, n), r.l = !0, r.exports;
+    e[t].call(r.exports, r, r.exports, n);
+    r.l = true;
+    return r.exports;
   }
-  n.m = e, n.c = a, n.d = function (e, t, i) {
-    n.o(e, t) || Object.defineProperty(e, t, {
-      enumerable: !0,
-      get: i
+  n.m = e;
+  n.c = a;
+  n.d = function (e, t, i) {
+    if (!n.o(e, t)) {
+      Object.defineProperty(e, t, {
+        enumerable: true,
+        get: i
+      });
+    }
+  };
+  n.r = function (e) {
+    if (typeof Symbol != "undefined" && Symbol.toStringTag) {
+      Object.defineProperty(e, Symbol.toStringTag, {
+        value: "Module"
+      });
+    }
+    Object.defineProperty(e, "__esModule", {
+      value: true
     });
-  }, n.r = function (e) {
-    'undefined' != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-      value: 'Module'
-    }), Object.defineProperty(e, '__esModule', {
-      value: !0
-    });
-  }, n.t = function (e, t) {
-    if (1 & t && (e = n(e)), 8 & t) return e;
-    if (4 & t && 'object' == typeof e && e && e.__esModule) return e;
+  };
+  n.t = function (e, t) {
+    if (t & 1) {
+      e = n(e);
+    }
+    if (t & 8) {
+      return e;
+    }
+    if (t & 4 && typeof e == "object" && e && e.__esModule) {
+      return e;
+    }
     var i = Object.create(null);
-    if (n.r(i), Object.defineProperty(i, 'default', {
-      enumerable: !0,
+    n.r(i);
+    Object.defineProperty(i, "default", {
+      enumerable: true,
       value: e
-    }), 2 & t && 'string' != typeof e) for (var a in e) n.d(i, a, function (t) {
-      return e[t];
-    }.bind(null, a));
+    });
+    if (t & 2 && typeof e != "string") {
+      for (var a in e) {
+        n.d(i, a, function (t) {
+          return e[t];
+        }.bind(null, a));
+      }
+    }
     return i;
-  }, n.n = function (e) {
+  };
+  n.n = function (e) {
     var t = e && e.__esModule ? function () {
       return e.default;
     } : function () {
       return e;
     };
-    return n.d(t, 'a', t), t;
-  }, n.o = function (e, t) {
+    n.d(t, "a", t);
+    return t;
+  };
+  n.o = function (e, t) {
     return Object.prototype.hasOwnProperty.call(e, t);
-  }, n.p = '', n(n.s = 2);
-}([, function (e, t, i) {
+  };
+  n.p = "";
+  n(n.s = 2);
+})([, function (e, t, i) {
   const a = i(3);
 }, function (e, t, i) {
   const a = i(1);
   const module = 1;
-  e.exports.color = '#FBC02D';
+  e.exports.color = "#FBC02D";
   {
     const module = 2;
     console.log(module);
@@ -67,8 +98,8 @@ BrowserifyBundle {
       "path": "lib.js",
     },
     "2" => BrowserifyModule {
-      "ast": const vscode = require('vscode');
-const lib = require('./lib');
+      "ast": const vscode = require("vscode");
+const lib = require("./lib");
 console.log(lib);,
       "dependencies": {
         "1": "./lib",
