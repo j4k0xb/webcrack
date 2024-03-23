@@ -20,6 +20,20 @@ describe('rename variable', () => {
     `);
   });
 
+  test('conflict with existing binding 2', () => {
+    const ast = parse('let a = 1; let b = 2;');
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('a')!;
+        renameFast(binding, 'b');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot(`
+      let b = 1;
+      let _b = 2;
+    `);
+  });
+
   test('duplicate function binding', () => {
     const ast = parse('var a; function a() {}');
     traverse(ast, {
@@ -61,6 +75,23 @@ describe('rename variable', () => {
       for (b of []);
       for (b in []);
     `);
+  });
+
+  test.todo('unsupported node types', () => {
+    const ast = parse(
+      `
+        export var A = 1;
+        <A />;
+      `,
+      { sourceType: 'module', plugins: ['jsx'] },
+    );
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('A')!;
+        renameFast(binding, 'B');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot();
   });
 });
 

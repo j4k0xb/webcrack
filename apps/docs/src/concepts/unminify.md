@@ -117,6 +117,15 @@ if (x) {
 1 // [!code ++]
 ```
 
+## rename-destructuring
+
+```js
+const { gql: t, dispatchers: o, listener: i = noop } = n; // [!code --]
+o.delete(t, i); // [!code --]
+const { gql, dispatchers, listener = noop } = n; // [!code ++]
+dispatchers.delete(gql, listener); // [!code ++]
+```
+
 ## sequence
 
 ```js
