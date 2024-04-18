@@ -124,7 +124,11 @@ export async function webcrack(
 
   const isBookmarklet = /^javascript:./.test(code);
   if (isBookmarklet) {
-    code = decodeURIComponent(code.replace(/^javascript:/, ''));
+    code = code
+      .replace(/^javascript:/, '')
+      .split(/%(?![a-f\d]{2})/i)
+      .map(decodeURIComponent)
+      .join('%');
   }
 
   let ast: ParseResult<t.File> = null!;
