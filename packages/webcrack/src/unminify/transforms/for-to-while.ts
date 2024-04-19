@@ -11,9 +11,7 @@ export default {
           const { test, body, init, update } = path.node;
           if (init || update) return;
           path.replaceWith(
-            test
-              ? t.whileStatement(test, body)
-              : t.whileStatement(t.booleanLiteral(true), body),
+            t.whileStatement(test ?? t.booleanLiteral(true), body),
           );
           this.changes++;
         },
