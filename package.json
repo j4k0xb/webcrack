@@ -1,5 +1,6 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
@@ -11,15 +12,16 @@
   },
   "devDependencies": {
     "@webcrack/eslint-config": "workspace:*",
-    "eslint": "^8.56.0",
-    "prettier": "^3.2.4",
-    "turbo": "^1.11.3",
-    "vitest": "^1.2.1"
+    "eslint": "^9.1.0",
+    "prettier": "^3.2.5",
+    "turbo": "^1.13.2",
+    "vitest": "^1.5.0"
   },
-  "packageManager": "pnpm@8.14.1",
+  "packageManager": "pnpm@9.0.4",
   "pnpm": {
     "patchedDependencies": {
-      "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch"
+      "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch",
+      "monaco-editor@0.47.0": "patches/monaco-editor@0.47.0.patch"
     }
   }
 }

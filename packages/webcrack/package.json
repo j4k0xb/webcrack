@@ -40,15 +40,15 @@
     "unbundle"
   ],
   "dependencies": {
-    "@babel/generator": "^7.23.6",
+    "@babel/generator": "^7.24.4",
     "@babel/helper-validator-identifier": "^7.22.20",
-    "@babel/parser": "^7.23.6",
-    "@babel/template": "^7.22.15",
-    "@babel/traverse": "^7.23.7",
-    "@babel/types": "^7.23.6",
-    "@codemod/matchers": "^1.7.0",
+    "@babel/parser": "^7.24.4",
+    "@babel/template": "^7.24.0",
+    "@babel/traverse": "^7.24.1",
+    "@babel/types": "^7.24.0",
+    "@codemod/matchers": "^1.7.1",
     "babel-plugin-minify-mangle-names": "^0.5.1",
-    "commander": "^11.1.0",
+    "commander": "^12.0.0",
     "debug": "^4.3.4",
     "isolated-vm": "^4.7.2"
   },
@@ -58,10 +58,10 @@
     "@types/babel__template": "^7.4.4",
     "@types/babel__traverse": "^7.20.5",
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.11.5",
+    "@types/node": "^20.12.7",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
-    "esbuild": "^0.19.11",
-    "typescript": "^5.3.3"
+    "esbuild": "^0.20.2",
+    "typescript": "^5.4.5"
   }
 }
