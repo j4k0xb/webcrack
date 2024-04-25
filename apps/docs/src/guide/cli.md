@@ -56,7 +56,7 @@ The output directory will contain the following files:
 
 ## Invoke from other programming languages
 
-If the the package is installed locally instead of globally, the path of the CLI would look like `node_modules/.bin/webcrack`.
+If the package is installed locally instead of globally, the path of the CLI would look like `node_modules/.bin/webcrack`.
 
 Spawn a new process where the code is piped to stdin.
 The logs will be written to stderr and the output code will be written to stdout.
