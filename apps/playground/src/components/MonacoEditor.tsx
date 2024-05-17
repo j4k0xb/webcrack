@@ -9,6 +9,7 @@ interface Props {
   models: monaco.editor.ITextModel[];
   currentModel?: monaco.editor.ITextModel;
   onModelChange?: (model: monaco.editor.ITextModel) => void;
+  onValueChange?: (value: string) => void;
 }
 
 monaco.editor.defineTheme('dark', {
@@ -56,6 +57,11 @@ export default function MonacoEditor(props: Props) {
       if (model) editor.restoreViewState(viewStates.get(model) ?? null);
       editor.focus();
     }
+
+    editor.onDidChangeModelContent(() => {
+      const model = editor.getModel();
+      if (model) props.onValueChange?.(model.getValue());
+    });
 
     // Go to definition
     const editorOpener = monaco.editor.registerEditorOpener({
