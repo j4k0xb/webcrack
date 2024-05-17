@@ -20,6 +20,7 @@ import {
   saveModels,
   type SavedModel,
 } from './indexeddb';
+import { debounce } from './utils/debounce';
 import type { DeobfuscateResult } from './webcrack.worker';
 
 export const [settings, setSettings] = createStore({
@@ -57,15 +58,13 @@ function App() {
 
   loadSavedModels().then(setSavedModels).catch(console.error);
   setTimeout(() => setSavedModels([]), 5000);
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const saveModelsDebounced = debounce(() => saveModels(models()), 1000);
 
   createEffect(() => {
-    if (
-      models().length === 0 ||
-      models().every((m) => m.getValueLength() === 0)
-    ) {
-      return;
+    if (models().some((m) => m.getValueLength() > 0)) {
+      saveModelsDebounced();
     }
-    saveModels(models()).catch(console.error);
   });
 
   function restoreSavedModels() {
@@ -269,9 +268,7 @@ function App() {
             models={models()}
             currentModel={activeTab()}
             onModelChange={openTab}
-            onValueChange={() => {
-              saveModels(models()).catch(console.error);
-            }}
+            onValueChange={saveModelsDebounced}
           />
         </main>
       </div>

@@ -28,7 +28,7 @@ export async function saveModels(models: monaco.editor.ITextModel[]) {
   await db.clear('models');
   await Promise.all(
     models.map(async (model) => {
-      await db.add('models', {
+      await db.put('models', {
         value: model.getValue(),
         language: model.getLanguageId(),
         uri: model.uri.toString(),
