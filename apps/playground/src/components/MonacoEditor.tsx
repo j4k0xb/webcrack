@@ -98,6 +98,34 @@ export default function MonacoEditor(props: Props) {
       },
     });
 
+    const saveAction = editor.addAction({
+      id: 'editor.action.save',
+      label: 'Save',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+      run(editor) {
+        const code = editor.getValue();
+        if (code === '') return;
+
+        const blob = new Blob([code], {
+          type: 'application/javascript;charset=utf-8',
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.setAttribute('href', url);
+        link.setAttribute(
+          'download',
+          `deobfuscated-${new Date().toISOString()}.js`,
+        );
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+      },
+    });
+
     const evalAction = registerEvalSelection(editor);
 
     const commandPalette = editor.getAction('editor.action.quickCommand')!;
@@ -111,6 +139,7 @@ export default function MonacoEditor(props: Props) {
       placeholder.dispose();
       deobfuscateAction.dispose();
       evalAction.dispose();
+      saveAction.dispose();
     });
   });
 
