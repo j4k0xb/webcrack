@@ -1,4 +1,4 @@
-import { Show, createEffect, createSignal } from 'solid-js';
+import { Show } from 'solid-js';
 import { setSettings, settings } from '../App';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import { useTheme } from '../hooks/useTheme';
@@ -10,33 +10,12 @@ interface Props {
 }
 
 export default function Sidebar(props: Props) {
-  const { deobfuscate, deobfuscating, cancelDeobfuscate, progress } =
+  const { deobfuscate, deobfuscating, cancelDeobfuscate } =
     useDeobfuscateContext();
   const [theme, setTheme] = useTheme();
-  const [progressShown, setProgressShown] = createSignal(false);
-
-  createEffect(() => {
-    if (deobfuscating()) setProgressShown(true);
-    else if (progress() === 100) setTimeout(() => setProgressShown(false), 500);
-    else setProgressShown(false);
-  });
 
   return (
     <nav class="flex flex-col w-12 sm:w-72 bg-base-200">
-      <style>
-        {progressShown() &&
-          `
-          .progress::-webkit-progress-value {
-            transition: width 250ms ease;
-          }
-        `}
-      </style>
-      <progress
-        class="progress flex-shrink-0"
-        classList={{ invisible: !progressShown() }}
-        value={progress() / 100}
-      />
-
       <div class="flex justify-center py-4">
         <Show
           when={deobfuscating()}

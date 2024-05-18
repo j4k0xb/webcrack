@@ -11,6 +11,7 @@ import {
 import { createStore } from 'solid-js/store';
 import Breadcrumbs from './components/Breadcrumbs';
 import MonacoEditor from './components/MonacoEditor';
+import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
@@ -193,6 +194,7 @@ function App() {
       onResult={onDeobfuscateResult}
       onError={onDeobfuscateError}
     >
+      <ProgressBar />
       <Show when={savedModels().length > 0}>
         <div role="alert" class="alert absolute z-10 bottom-5 right-5 max-w-md">
           <svg
