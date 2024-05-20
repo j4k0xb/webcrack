@@ -1,5 +1,6 @@
 import { openDB, type DBSchema } from 'idb';
 import type * as monaco from 'monaco-editor';
+import { createSignal } from 'solid-js';
 
 const SESSION_ID = Math.random().toString(36).slice(2);
 const MAX_SESSIONS = 10;
@@ -31,8 +32,14 @@ async function initDB() {
   });
 }
 
-export async function saveModels(models: monaco.editor.ITextModel[]) {
-  console.log('Saving models...', models.length);
+const [sessions, setSessions] = createSignal<Session[]>([]);
+loadSessions().then(setSessions).catch(console.error);
+
+export function useSessions() {
+  return { sessions, saveModels };
+}
+
+async function saveModels(models: monaco.editor.ITextModel[]) {
   const db = await initDB();
   await db.put('sessions', {
     id: SESSION_ID,
@@ -48,14 +55,10 @@ export async function saveModels(models: monaco.editor.ITextModel[]) {
   if (sessions.length > MAX_SESSIONS) {
     await db.delete('sessions', sessions[0].id);
   }
+  setSessions(sessions.slice(0, 10));
 }
 
-export async function clearSavedModels() {
-  const db = await initDB();
-  await db.clear('sessions');
-}
-
-export async function loadSessions(): Promise<Session[]> {
+async function loadSessions(): Promise<Session[]> {
   const db = await initDB();
   const sessions = await db.getAll('sessions');
   sessions.sort((a, b) => b.timestamp - a.timestamp);

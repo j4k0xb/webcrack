@@ -16,7 +16,7 @@ import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
-import { saveModels, type SavedModel } from './indexeddb';
+import { useSessions, type SavedModel } from './indexeddb';
 import { debounce } from './utils/debounce';
 import type { DeobfuscateResult } from './webcrack.worker';
 
@@ -29,6 +29,7 @@ export const [settings, setSettings] = createStore({
 });
 
 function App() {
+  const { saveModels } = useSessions();
   const [untitledCounter, setUntitledCounter] = createSignal(1);
   const [models, setModels] = createSignal<monaco.editor.ITextModel[]>([
     monaco.editor.createModel(

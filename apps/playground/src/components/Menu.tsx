@@ -1,6 +1,6 @@
-import { For, createResource } from 'solid-js';
+import { For } from 'solid-js';
 import { useTheme } from '../hooks/useTheme';
-import { loadSessions, type SavedModel } from '../indexeddb';
+import { useSessions, type SavedModel } from '../indexeddb';
 
 interface Props {
   onFileOpen?: (content: string) => void;
@@ -8,8 +8,8 @@ interface Props {
 }
 
 export default function Menu(props: Props) {
+  const { sessions } = useSessions();
   const [theme, setTheme] = useTheme();
-  const [sessions] = createResource(loadSessions);
 
   function openFile() {
     const input = document.createElement('input');
