@@ -121,10 +121,6 @@ export default function MonacoEditor(props: Props) {
   });
 
   return (
-    <div
-      ref={container}
-      class="editor"
-      style="height: calc(100vh - 64px)"
-    ></div>
+    <div ref={container} class="editor" style="height: calc(100vh - 108px)" />
   );
 }

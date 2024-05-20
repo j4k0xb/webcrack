@@ -10,17 +10,13 @@ import {
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import Breadcrumbs from './components/Breadcrumbs';
+import Menu from './components/Menu';
 import MonacoEditor from './components/MonacoEditor';
 import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
-import {
-  clearSavedModels,
-  loadSavedModels,
-  saveModels,
-  type SavedModel,
-} from './indexeddb';
+import { saveModels, type SavedModel } from './indexeddb';
 import { debounce } from './utils/debounce';
 import type { DeobfuscateResult } from './webcrack.worker';
 
@@ -45,7 +41,6 @@ function App() {
   const [activeTab, setActiveTab] = createSignal<
     monaco.editor.ITextModel | undefined
   >(tabs()[0]);
-  const [savedModels, setSavedModels] = createSignal<SavedModel[]>([]);
 
   const fileModels = createMemo(() =>
     models().filter((m) => m.uri.scheme === 'file'),
@@ -57,8 +52,10 @@ function App() {
     fileModels().map((model) => model.uri.path),
   );
 
-  loadSavedModels().then(setSavedModels).catch(console.error);
-  setTimeout(() => setSavedModels([]), 5000);
+  const hasUnsavedChanges = () => models().some((m) => m.getValueLength() > 0);
+
+  window.onbeforeunload = () => hasUnsavedChanges();
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const saveModelsDebounced = debounce(() => saveModels(models()), 1000);
 
@@ -68,12 +65,12 @@ function App() {
     }
   });
 
-  function restoreSavedModels() {
+  function restoreSavedModels(savedModels: SavedModel[]) {
     batch(() => {
       models().forEach((model) => model.dispose());
 
       setModels(
-        savedModels().map((model) =>
+        savedModels.map((model) =>
           monaco.editor.createModel(
             model.value,
             model.language,
@@ -81,11 +78,6 @@ function App() {
           ),
         ),
       );
-      console.log(
-        'Loaded saved models',
-        savedModels().map((m) => m.uri),
-      );
-      setSavedModels([]);
 
       setTabs(untitledModels());
       setActiveTab(untitledModels()[0]);
@@ -195,42 +187,14 @@ function App() {
       onError={onDeobfuscateError}
     >
       <ProgressBar />
-      <Show when={savedModels().length > 0}>
-        <div role="alert" class="alert absolute z-10 bottom-5 right-5 max-w-md">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="stroke-info shrink-0 w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          <span>
-            Restore {savedModels().length} saved tabs from last session?
-          </span>
-          <div>
-            <button
-              class="btn btn-sm"
-              onClick={() => {
-                void clearSavedModels();
-                setSavedModels([]);
-              }}
-            >
-              Clear
-            </button>
-            <button class="btn btn-sm btn-primary" onClick={restoreSavedModels}>
-              Load
-            </button>
-          </div>
-        </div>
-      </Show>
+      <Menu
+        onFileOpen={(content) => {
+          openUntitledTab().setValue(content);
+        }}
+        onRestore={restoreSavedModels}
+      />
 
-      <div class="h-screen flex">
+      <div class="flex" style="height: calc(100vh - 44px)">
         <Sidebar paths={filePaths()} onFileClick={openFile} />
 
         <main class="flex-1 overflow-auto">

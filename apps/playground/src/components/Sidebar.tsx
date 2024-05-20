@@ -1,7 +1,6 @@
 import { Show } from 'solid-js';
 import { setSettings, settings } from '../App';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
-import { useTheme } from '../hooks/useTheme';
 import FileTree from './FileTree';
 
 interface Props {
@@ -12,7 +11,6 @@ interface Props {
 export default function Sidebar(props: Props) {
   const { deobfuscate, deobfuscating, cancelDeobfuscate } =
     useDeobfuscateContext();
-  const [theme, setTheme] = useTheme();
 
   return (
     <nav class="flex flex-col w-12 sm:w-72 bg-base-200">
@@ -218,66 +216,10 @@ export default function Sidebar(props: Props) {
         />
       </label>
 
-      <label class="label cursor-pointer px-4 hover:bg-base-100">
-        <Show
-          when={theme() === 'light'}
-          fallback={
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              fill="none"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
-            </svg>
-          }
-        >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-            <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
-          </svg>
-        </Show>
-        <span class="label-text ml-4 mr-auto hidden sm:inline">Dark Mode</span>
-        <input
-          type="checkbox"
-          class="toggle toggle-sm hidden sm:inline"
-          checked={theme() === 'dark'}
-          onClick={(e) => setTheme(e.currentTarget.checked ? 'dark' : 'light')}
-        ></input>
-      </label>
-
       <FileTree
         paths={props.paths}
         onFileClick={(node) => props.onFileClick?.(node.path)}
       />
-
-      <div class="flex flex-wrap gap-4 m-4 mt-auto">
-        <a
-          href="https://github.com/j4k0xb/webcrack"
-          class="link link-primary"
-          target="_blank"
-        >
-          GitHub
-        </a>
-        <a href="/docs" class="link link-primary" target="_blank">
-          Docs
-        </a>
-      </div>
     </nav>
   );
 }

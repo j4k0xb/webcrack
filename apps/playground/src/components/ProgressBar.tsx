@@ -21,7 +21,7 @@ export default function ProgressBar() {
         `}
       </style>
       <progress
-        class="progress absolute top-0 h-0.5 w-full z-10 pointer-events-none bg-transparent"
+        class="progress progress-info absolute top-0 h-0.5 w-full z-10 pointer-events-none bg-transparent"
         value={progress() / 100}
       />
     </Show>

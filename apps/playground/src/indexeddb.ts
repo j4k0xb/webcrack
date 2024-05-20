@@ -1,6 +1,15 @@
 import { openDB, type DBSchema } from 'idb';
 import type * as monaco from 'monaco-editor';
 
+const SESSION_ID = Math.random().toString(36).slice(2);
+const MAX_SESSIONS = 10;
+
+export interface Session {
+  timestamp: number;
+  id: string;
+  models: SavedModel[];
+}
+
 export interface SavedModel {
   value: string;
   language: string;
@@ -8,16 +17,16 @@ export interface SavedModel {
 }
 
 interface MyDB extends DBSchema {
-  models: {
+  sessions: {
     key: string;
-    value: SavedModel;
+    value: Session;
   };
 }
 
 async function initDB() {
   return openDB<MyDB>('models', 1, {
     upgrade(db) {
-      db.createObjectStore('models', { keyPath: 'uri' });
+      db.createObjectStore('sessions', { keyPath: 'id' });
     },
   });
 }
@@ -25,33 +34,28 @@ async function initDB() {
 export async function saveModels(models: monaco.editor.ITextModel[]) {
   console.log('Saving models...', models.length);
   const db = await initDB();
-  await db.clear('models');
-  await Promise.all(
-    models.map(async (model) => {
-      await db.put('models', {
-        value: model.getValue(),
-        language: model.getLanguageId(),
-        uri: model.uri.toString(),
-      });
-    }),
-  );
+  await db.put('sessions', {
+    id: SESSION_ID,
+    timestamp: Date.now(),
+    models: models.map((model) => ({
+      value: model.getValue(),
+      language: model.getLanguageId(),
+      uri: model.uri.toString(),
+    })),
+  });
+
+  const sessions = await db.getAll('sessions');
+  if (sessions.length > MAX_SESSIONS) {
+    await db.delete('sessions', sessions[0].id);
+  }
 }
 
 export async function clearSavedModels() {
   const db = await initDB();
-  await db.clear('models');
+  await db.clear('sessions');
 }
 
-export async function saveModel(model: monaco.editor.ITextModel) {
+export async function loadSessions(): Promise<Session[]> {
   const db = await initDB();
-  await db.put('models', {
-    value: model.getValue(),
-    language: model.getLanguageId(),
-    uri: model.uri.toString(),
-  });
-}
-
-export async function loadSavedModels(): Promise<SavedModel[]> {
-  const db = await initDB();
-  return db.getAll('models');
+  return db.getAll('sessions');
 }
