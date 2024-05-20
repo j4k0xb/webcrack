@@ -57,5 +57,7 @@ export async function clearSavedModels() {
 
 export async function loadSessions(): Promise<Session[]> {
   const db = await initDB();
-  return db.getAll('sessions');
+  const sessions = await db.getAll('sessions');
+  sessions.sort((a, b) => b.timestamp - a.timestamp);
+  return sessions;
 }

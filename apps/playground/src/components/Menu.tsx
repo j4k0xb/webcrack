@@ -30,7 +30,7 @@ export default function Menu(props: Props) {
           <summary>File</summary>
           <ul class="min-w-52 z-10 !px-0">
             <li>
-              <a onClick={openFile}>Open File...</a>
+              <a onClick={openFile}>Open File…</a>
             </li>
             <li>
               <div class="dropdown dropdown-right dropdown-hover transform-none">
@@ -39,7 +39,7 @@ export default function Menu(props: Props) {
                 </div>
                 <ul
                   tabindex="0"
-                  class="dropdown-content z-10 menu ml-0 p-2 shadow bg-base-100 rounded-box w-52"
+                  class="dropdown-content z-10 menu ml-0 p-2 shadow bg-base-100 rounded-box"
                 >
                   <For each={sessions()} fallback={<li>No recent files</li>}>
                     {(session) => (
@@ -48,8 +48,8 @@ export default function Menu(props: Props) {
                           onClick={() => props.onRestore?.(session.models)}
                           class="truncate"
                         >
-                          {new Date(session.timestamp).toLocaleString()} (
-                          {session.models.length} files)
+                          {new Date(session.timestamp).toLocaleString()} -
+                          <code>{session.models[0].value.slice(0, 20)}…</code>
                         </a>
                       </li>
                     )}
@@ -77,6 +77,16 @@ export default function Menu(props: Props) {
                   onClick={(e) =>
                     setTheme(e.currentTarget.checked ? 'dark' : 'light')
                   }
+                />
+              </label>
+            </li>
+            <li class="disabled">
+              <label class="h-10 flex items-center">
+                Prompt on leave
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm ml-auto"
+                  disabled
                 />
               </label>
             </li>
