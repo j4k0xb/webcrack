@@ -8,9 +8,18 @@ If you see errors like
 > - ERR_DLOPEN_FAILED
 > - Segmentation fault
 
-it means that the [isolated-vm](https://github.com/laverdet/isolated-vm) package was built against a different version of Node.js than the one you are using. This can happen if you upgrade Node.js after installing `webcrack`.
+it most likely means that the [isolated-vm](https://github.com/laverdet/isolated-vm) package was built against a different version of Node.js than the one you are using. This can happen if you upgrade Node.js after installing `webcrack`.
 
 To fix this, run `npm rebuild isolated-vm` in your project directory or delete the `node_modules/isolated-vm` directory and run `npm install` again.
+
+> ```sh
+> npm error prebuild-install warn install No prebuilt binaries found (target=22.1.0 runtime=node arch=arm64 libc= platform=darwin)
+> ...
+> npm error ../src/isolate/generic/error.h:84:65: error: value of type 'Local<Value> (Local<String>, Local<Value>)' is not implicitly convertible to 'v8::Local<v8::Value> (*)(v8::Local<v8::String>)'
+> npm error using RuntimeGenericError = detail::RuntimeErrorWithConstructor<v8::Exception::Error>;
+> ```
+
+When there are no prebuilt binaries available (Apple Silicon) and you are using Node.js v22, try switching to Node.js v20 ([see issue](https://github.com/laverdet/isolated-vm/issues/468)).
 
 ## Heap Out Of Memory
 
