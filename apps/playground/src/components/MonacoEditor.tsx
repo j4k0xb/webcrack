@@ -1,7 +1,7 @@
 import * as monaco from 'monaco-editor';
 import { createEffect, onCleanup, onMount } from 'solid-js';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
-import { useTheme } from '../hooks/useTheme';
+import { theme } from '../hooks/useTheme';
 import { registerEvalSelection } from '../monaco/eval-selection';
 import { PlaceholderContentWidget } from '../monaco/placeholder-widget';
 
@@ -21,7 +21,6 @@ monaco.editor.defineTheme('dark', {
 
 export default function MonacoEditor(props: Props) {
   const { deobfuscate } = useDeobfuscateContext();
-  const [theme] = useTheme();
   const viewStates = new WeakMap<
     monaco.editor.ITextModel,
     monaco.editor.ICodeEditorViewState

@@ -16,11 +16,12 @@ import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
+import { settings } from './hooks/useSettings';
 import { useSessions, type SavedModel } from './indexeddb';
 import { debounce } from './utils/debounce';
 import type { DeobfuscateResult } from './webcrack.worker';
 
-export const [settings, setSettings] = createStore({
+export const [config, setConfig] = createStore({
   deobfuscate: true,
   unminify: true,
   unpack: true,
@@ -52,15 +53,17 @@ function App() {
   const filePaths = createMemo(() =>
     fileModels().map((model) => model.uri.path),
   );
+  const hasNonEmptyModels = () => models().some((m) => m.getValueLength() > 0);
 
   window.onbeforeunload = () =>
-    models().some((m) => m.getValueLength() > 0) || undefined;
+    (settings.confirmOnLeave && hasNonEmptyModels()) || undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const saveModelsDebounced = debounce(() => saveModels(models()), 1000);
+  const saveModelsDebounced = debounce(() => {
+    settings.workspaceHistory && saveModels(models()).catch(console.error);
+  }, 1000);
 
   createEffect(() => {
-    if (models().some((m) => m.getValueLength() > 0)) {
+    if (hasNonEmptyModels()) {
       saveModelsDebounced();
     }
   });
@@ -182,7 +185,7 @@ function App() {
   return (
     <DeobfuscateContextProvider
       code={activeTab()?.getValue()}
-      options={{ ...settings }}
+      options={{ ...config }}
       onResult={onDeobfuscateResult}
       onError={onDeobfuscateError}
     >

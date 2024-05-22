@@ -1,5 +1,5 @@
 import { Show } from 'solid-js';
-import { setSettings, settings } from '../App';
+import { config, setConfig } from '../App';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import FileTree from './FileTree';
 
@@ -75,8 +75,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.deobfuscate}
-          onClick={(e) => setSettings('deobfuscate', e.currentTarget.checked)}
+          checked={config.deobfuscate}
+          onClick={(e) => setConfig('deobfuscate', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100 group">
@@ -112,8 +112,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.unminify}
-          onClick={(e) => setSettings('unminify', e.currentTarget.checked)}
+          checked={config.unminify}
+          onClick={(e) => setConfig('unminify', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100 group">
@@ -147,8 +147,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.unpack}
-          onClick={(e) => setSettings('unpack', e.currentTarget.checked)}
+          checked={config.unpack}
+          onClick={(e) => setConfig('unpack', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100 group">
@@ -184,8 +184,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.jsx}
-          onClick={(e) => setSettings('jsx', e.currentTarget.checked)}
+          checked={config.jsx}
+          onClick={(e) => setConfig('jsx', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100">
@@ -211,8 +211,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.mangle}
-          onClick={(e) => setSettings('mangle', e.currentTarget.checked)}
+          checked={config.mangle}
+          onClick={(e) => setConfig('mangle', e.currentTarget.checked)}
         />
       </label>
 

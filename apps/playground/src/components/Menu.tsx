@@ -1,5 +1,5 @@
 import { For } from 'solid-js';
-import { useTheme } from '../hooks/useTheme';
+import { setSettings, settings, type Settings } from '../hooks/useSettings';
 import { useSessions, type SavedModel } from '../indexeddb';
 
 interface Props {
@@ -9,7 +9,6 @@ interface Props {
 
 export default function Menu(props: Props) {
   const { sessions } = useSessions();
-  const [theme, setTheme] = useTheme();
 
   function openFile() {
     const input = document.createElement('input');
@@ -69,34 +68,46 @@ export default function Menu(props: Props) {
           <ul class="min-w-52 z-10">
             <li>
               <label class="h-10 flex items-center">
-                Dark Mode
+                Theme
+                <select
+                  class="select select-sm ml-auto"
+                  value={settings.theme}
+                  onChange={(e) =>
+                    setSettings(
+                      'theme',
+                      e.currentTarget.value as Settings['theme'],
+                    )
+                  }
+                >
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                  <option value="system">System</option>
+                </select>
+              </label>
+            </li>
+            <li>
+              <label class="h-10 flex items-center">
+                Confirm on Leave
                 <input
                   type="checkbox"
-                  class="toggle toggle-sm ml-auto"
-                  checked={theme() === 'dark'}
-                  onClick={(e) =>
-                    setTheme(e.currentTarget.checked ? 'dark' : 'light')
+                  class="checkbox checkbox-sm ml-auto"
+                  checked={settings.confirmOnLeave}
+                  onChange={(e) =>
+                    setSettings('confirmOnLeave', e.currentTarget.checked)
                   }
                 />
               </label>
             </li>
-            <li class="disabled">
+            <li>
               <label class="h-10 flex items-center">
-                Prompt on leave
+                Workspace History
                 <input
                   type="checkbox"
                   class="checkbox checkbox-sm ml-auto"
-                  disabled
-                />
-              </label>
-            </li>
-            <li class="disabled">
-              <label class="h-10 flex items-center">
-                File History
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm ml-auto"
-                  disabled
+                  checked={settings.workspaceHistory}
+                  onChange={(e) =>
+                    setSettings('workspaceHistory', e.currentTarget.checked)
+                  }
                 />
               </label>
             </li>
