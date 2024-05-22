@@ -53,9 +53,8 @@ function App() {
     fileModels().map((model) => model.uri.path),
   );
 
-  const hasUnsavedChanges = () => models().some((m) => m.getValueLength() > 0);
-
-  window.onbeforeunload = () => hasUnsavedChanges();
+  window.onbeforeunload = () =>
+    models().some((m) => m.getValueLength() > 0) || undefined;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const saveModelsDebounced = debounce(() => saveModels(models()), 1000);
