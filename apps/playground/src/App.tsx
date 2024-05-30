@@ -3,7 +3,6 @@ import {
   For,
   Show,
   batch,
-  createEffect,
   createMemo,
   createSignal,
   onCleanup,
@@ -17,7 +16,7 @@ import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
 import { settings } from './hooks/useSettings';
-import { useSessions, type SavedModel } from './indexeddb';
+import { useWorkspaces, type Workspace } from './indexeddb';
 import { debounce } from './utils/debounce';
 import type { DeobfuscateResult } from './webcrack.worker';
 
@@ -30,7 +29,7 @@ export const [config, setConfig] = createStore({
 });
 
 function App() {
-  const { saveModels } = useSessions();
+  const { saveModels, setWorkspaceId } = useWorkspaces();
   const [untitledCounter, setUntitledCounter] = createSignal(1);
   const [models, setModels] = createSignal<monaco.editor.ITextModel[]>([
     monaco.editor.createModel(
@@ -55,25 +54,27 @@ function App() {
   );
   const hasNonEmptyModels = () => models().some((m) => m.getValueLength() > 0);
 
-  window.onbeforeunload = () =>
-    (settings.confirmOnLeave && hasNonEmptyModels()) || undefined;
+  window.onbeforeunload = () => {
+    if (settings.confirmOnLeave && hasNonEmptyModels()) {
+      saveModels(models()).catch(console.error);
+      return true;
+    }
+    return undefined;
+  };
 
   const saveModelsDebounced = debounce(() => {
     settings.workspaceHistory && saveModels(models()).catch(console.error);
   }, 1000);
 
-  createEffect(() => {
-    if (hasNonEmptyModels()) {
-      saveModelsDebounced();
-    }
-  });
+  async function restoreWorkspace(workspace: Workspace) {
+    await saveModels(models());
+    setWorkspaceId(workspace.id);
 
-  function restoreSavedModels(savedModels: SavedModel[]) {
     batch(() => {
       models().forEach((model) => model.dispose());
 
       setModels(
-        savedModels.map((model) =>
+        workspace.models.map((model) =>
           monaco.editor.createModel(
             model.value,
             model.language,
@@ -194,7 +195,9 @@ function App() {
         onFileOpen={(content) => {
           openUntitledTab().setValue(content);
         }}
-        onRestore={restoreSavedModels}
+        onRestore={(workspace) => {
+          restoreWorkspace(workspace).catch(console.error);
+        }}
       />
 
       <div class="flex" style="height: calc(100vh - 44px)">

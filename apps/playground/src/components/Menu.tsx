@@ -1,14 +1,14 @@
 import { For } from 'solid-js';
 import { setSettings, settings, type Settings } from '../hooks/useSettings';
-import { useSessions, type SavedModel } from '../indexeddb';
+import { useWorkspaces, type Workspace } from '../indexeddb';
 
 interface Props {
   onFileOpen?: (content: string) => void;
-  onRestore?: (models: SavedModel[]) => void;
+  onRestore?: (workspace: Workspace) => void;
 }
 
 export default function Menu(props: Props) {
-  const { sessions } = useSessions();
+  const { workspaces } = useWorkspaces();
 
   function openFile() {
     const input = document.createElement('input');
@@ -40,15 +40,15 @@ export default function Menu(props: Props) {
                   tabindex="0"
                   class="dropdown-content z-10 menu ml-0 p-2 shadow bg-base-100 rounded-box"
                 >
-                  <For each={sessions()} fallback={<li>No recent files</li>}>
-                    {(session) => (
+                  <For each={workspaces()} fallback={<li>No recent files</li>}>
+                    {(workspace) => (
                       <li>
                         <a
-                          onClick={() => props.onRestore?.(session.models)}
+                          onClick={() => props.onRestore?.(workspace)}
                           class="truncate"
                         >
-                          {new Date(session.timestamp).toLocaleString()} -
-                          <code>{session.models[0].value.slice(0, 20)}…</code>
+                          {new Date(workspace.timestamp).toLocaleString()} -
+                          <code>{workspace.models[0].value.slice(0, 20)}…</code>
                         </a>
                       </li>
                     )}

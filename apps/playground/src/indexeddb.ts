@@ -2,10 +2,10 @@ import { openDB, type DBSchema } from 'idb';
 import type * as monaco from 'monaco-editor';
 import { createSignal } from 'solid-js';
 
-const SESSION_ID = Math.random().toString(36).slice(2);
-const MAX_SESSIONS = 10;
+let workspaceId = Math.random().toString(36).slice(2);
+const MAX_WORKSPACES = 10;
 
-export interface Session {
+export interface Workspace {
   timestamp: number;
   id: string;
   models: SavedModel[];
@@ -18,31 +18,35 @@ export interface SavedModel {
 }
 
 interface MyDB extends DBSchema {
-  sessions: {
+  workspaces: {
     key: string;
-    value: Session;
+    value: Workspace;
   };
 }
 
 async function initDB() {
-  return openDB<MyDB>('models', 1, {
+  return openDB<MyDB>('workspaces', 1, {
     upgrade(db) {
-      db.createObjectStore('sessions', { keyPath: 'id' });
+      db.createObjectStore('workspaces', { keyPath: 'id' });
     },
   });
 }
 
-const [sessions, setSessions] = createSignal<Session[]>([]);
-loadSessions().then(setSessions).catch(console.error);
+const [workspaces, setWorkspaces] = createSignal<Workspace[]>([]);
+loadWorkspaces().then(setWorkspaces).catch(console.error);
 
-export function useSessions() {
-  return { sessions, saveModels };
+export function useWorkspaces() {
+  return { workspaces, saveModels, setWorkspaceId };
+}
+
+function setWorkspaceId(id: string) {
+  workspaceId = id;
 }
 
 async function saveModels(models: monaco.editor.ITextModel[]) {
   const db = await initDB();
-  await db.put('sessions', {
-    id: SESSION_ID,
+  await db.put('workspaces', {
+    id: workspaceId,
     timestamp: Date.now(),
     models: models.map((model) => ({
       value: model.getValue(),
@@ -51,16 +55,18 @@ async function saveModels(models: monaco.editor.ITextModel[]) {
     })),
   });
 
-  const sessions = await db.getAll('sessions');
-  if (sessions.length > MAX_SESSIONS) {
-    await db.delete('sessions', sessions[0].id);
+  const workspaces = await db.getAll('workspaces');
+  if (workspaces.length > MAX_WORKSPACES) {
+    await db.delete('workspaces', workspaces[0].id);
   }
-  setSessions(sessions.slice(0, 10));
+  setWorkspaces(workspaces.slice(0, 10));
 }
 
-async function loadSessions(): Promise<Session[]> {
+async function loadWorkspaces(): Promise<Workspace[]> {
   const db = await initDB();
-  const sessions = await db.getAll('sessions');
-  sessions.sort((a, b) => b.timestamp - a.timestamp);
-  return sessions;
+  const start = performance.now();
+  const workspaces = await db.getAll('workspaces');
+  workspaces.sort((a, b) => b.timestamp - a.timestamp);
+  console.log('load', performance.now() - start, 'ms');
+  return workspaces;
 }
