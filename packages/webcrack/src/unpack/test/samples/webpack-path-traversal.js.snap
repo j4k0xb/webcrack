@@ -1,11 +1,15 @@
 WebpackBundle {
+  "chunks": [],
   "entryId": "386",
   "modules": Map {
     "../tmp.js" => WebpackModule {
       "ast": ,
+      "dependencies": Set {},
+      "exports": Set {},
+      "externalModule": undefined,
       "id": "../tmp.js",
       "isEntry": false,
-      "path": "./../tmp.js.js",
+      "path": "../tmp.js",
     },
   },
   "type": "webpack",

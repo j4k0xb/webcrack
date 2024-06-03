@@ -49,7 +49,7 @@ export const iife = matchIife();
 export const emptyIife = matchIife([]);
 
 /**
- * Matches both identifier properties and string literal computed properties
+ * Matches either `object.property` or `object['property']`
  */
 export function constMemberExpression(
   object: string | m.Matcher<t.Expression>,
@@ -105,6 +105,25 @@ export function findPath<T extends t.Node>(
   matcher: m.Matcher<T>,
 ): NodePath<T> | null {
   return path.find((path) => matcher.match(path.node)) as NodePath<T> | null;
+}
+
+/**
+ * Matches a function expression or arrow function expression with a block body.
+ */
+export function anyFunctionExpression(
+  params?:
+    | m.Matcher<(t.Identifier | t.Pattern | t.RestElement)[]>
+    | (
+        | m.Matcher<t.Identifier>
+        | m.Matcher<t.Pattern>
+        | m.Matcher<t.RestElement>
+      )[],
+  body?: m.Matcher<t.BlockStatement>,
+): m.Matcher<t.FunctionExpression | t.ArrowFunctionExpression> {
+  return m.or(
+    m.functionExpression(undefined, params, body),
+    m.arrowFunctionExpression(params, body),
+  );
 }
 
 /**

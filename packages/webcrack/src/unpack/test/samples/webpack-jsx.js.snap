@@ -1,0 +1,44 @@
+WebpackBundle {
+  "chunks": [
+    WebpackChunk {
+      "chunkIds": [
+        "1",
+      ],
+      "entryIds": [],
+      "modules": Map {
+        "0" => WebpackModule {
+          "ast": import { jsx } from "35250";
+function f() {
+  return <p />;
+},
+          "dependencies": Set {
+            "35250",
+          },
+          "exports": Set {},
+          "externalModule": undefined,
+          "id": "0",
+          "isEntry": false,
+          "path": "0.js",
+        },
+      },
+    },
+  ],
+  "entryId": "",
+  "modules": Map {
+    "0" => WebpackModule {
+      "ast": import { jsx } from "35250";
+function f() {
+  return <p />;
+},
+      "dependencies": Set {
+        "35250",
+      },
+      "exports": Set {},
+      "externalModule": undefined,
+      "id": "0",
+      "isEntry": false,
+      "path": "0.js",
+    },
+  },
+  "type": "webpack",
+}

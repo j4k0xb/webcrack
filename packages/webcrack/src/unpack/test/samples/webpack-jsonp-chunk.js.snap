@@ -1,18 +1,59 @@
 WebpackBundle {
+  "chunks": [
+    WebpackChunk {
+      "chunkIds": [
+        "15",
+      ],
+      "entryIds": [],
+      "modules": Map {
+        "2wwy" => WebpackModule {
+          "ast": import "./E8gZ.js";
+import "w6GO";,
+          "dependencies": Set {
+            "E8gZ",
+            "w6GO",
+          },
+          "exports": Set {},
+          "externalModule": undefined,
+          "id": "2wwy",
+          "isEntry": false,
+          "path": "2wwy.js",
+        },
+        "E8gZ" => WebpackModule {
+          "ast": module.exports = 4;,
+          "dependencies": Set {},
+          "exports": Set {},
+          "externalModule": undefined,
+          "id": "E8gZ",
+          "isEntry": false,
+          "path": "E8gZ.js",
+        },
+      },
+    },
+  ],
   "entryId": "",
   "modules": Map {
     "2wwy" => WebpackModule {
-      "ast": const a = require("./E8gZ.js");
-const b = require( /*webcrack:missing*/"./w6GO.js");,
+      "ast": import "./E8gZ.js";
+import "w6GO";,
+      "dependencies": Set {
+        "E8gZ",
+        "w6GO",
+      },
+      "exports": Set {},
+      "externalModule": undefined,
       "id": "2wwy",
       "isEntry": false,
-      "path": "./2wwy.js",
+      "path": "2wwy.js",
     },
     "E8gZ" => WebpackModule {
       "ast": module.exports = 4;,
+      "dependencies": Set {},
+      "exports": Set {},
+      "externalModule": undefined,
       "id": "E8gZ",
       "isEntry": false,
-      "path": "./E8gZ.js",
+      "path": "E8gZ.js",
     },
   },
   "type": "webpack",

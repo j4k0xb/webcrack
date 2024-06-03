@@ -10,7 +10,7 @@ export default {
   name: 'inline-decoded-strings',
   tags: ['unsafe'],
   scope: true,
-  async run(ast, state, options) {
+  async run(ast, options) {
     if (!options) return;
 
     const calls = options.vm.decoders.flatMap((decoder) =>
@@ -27,6 +27,6 @@ export default {
         call.addComment('leading', 'webcrack:decode_error');
     }
 
-    state.changes += calls.length;
+    this.changes += calls.length;
   },
 } satisfies AsyncTransform<{ vm: VMDecoder }>;

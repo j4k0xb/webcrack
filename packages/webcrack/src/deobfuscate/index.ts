@@ -26,7 +26,7 @@ export default {
   name: 'deobfuscate',
   tags: ['unsafe'],
   scope: true,
-  async run(ast, state, sandbox) {
+  async run(ast, sandbox) {
     if (!sandbox) return;
 
     const logger = debug('webcrack:deobfuscate');
@@ -44,10 +44,10 @@ export default {
     const decoders = findDecoders(stringArray);
     logger(`String Array Encodings: ${decoders.length}`);
 
-    state.changes += applyTransform(ast, inlineObjectProps).changes;
+    this.changes += applyTransform(ast, inlineObjectProps).changes;
 
     for (const decoder of decoders) {
-      state.changes += applyTransform(
+      this.changes += applyTransform(
         ast,
         inlineDecoderWrappers,
         decoder.path,
@@ -55,7 +55,7 @@ export default {
     }
 
     const vm = new VMDecoder(sandbox, stringArray, decoders, rotator);
-    state.changes += (
+    this.changes += (
       await applyTransformAsync(ast, inlineDecodedStrings, { vm })
     ).changes;
 
@@ -63,10 +63,10 @@ export default {
       stringArray.path.remove();
       rotator?.remove();
       decoders.forEach((decoder) => decoder.path.remove());
-      state.changes += 2 + decoders.length;
+      this.changes += 2 + decoders.length;
     }
 
-    state.changes += applyTransforms(
+    this.changes += applyTransforms(
       ast,
       [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
       { noScope: true },
