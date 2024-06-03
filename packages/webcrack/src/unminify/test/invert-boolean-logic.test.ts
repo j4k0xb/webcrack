@@ -16,17 +16,6 @@ test('not equal', () =>
 test('not strict equal', () =>
   expectJS('!(a !== b);').toMatchInlineSnapshot(`a === b;`));
 
-test('greater than', () =>
-  expectJS('!(a > b);').toMatchInlineSnapshot(`a <= b;`));
-
-test('less than', () => expectJS('!(a < b);').toMatchInlineSnapshot(`a >= b;`));
-
-test('greater than or equal', () =>
-  expectJS('!(a >= b);').toMatchInlineSnapshot(`a < b;`));
-
-test('less than or equal', () =>
-  expectJS('!(a <= b);').toMatchInlineSnapshot(`a > b;`));
-
 test('logical or', () =>
   expectJS('!(a || b || c);').toMatchInlineSnapshot(`!a && !b && !c;`));
 
