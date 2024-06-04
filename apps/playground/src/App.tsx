@@ -1,14 +1,27 @@
 import * as monaco from 'monaco-editor';
-import { For, Show, createMemo, createSignal, onCleanup } from 'solid-js';
+import {
+  For,
+  Show,
+  batch,
+  createMemo,
+  createSignal,
+  onCleanup,
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 import Breadcrumbs from './components/Breadcrumbs';
+import Menu from './components/Menu';
 import MonacoEditor from './components/MonacoEditor';
+import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
+import { settings } from './hooks/useSettings';
+import { useWorkspaces, type Workspace } from './indexeddb';
+import { debounce } from './utils/debounce';
+import { downloadFile } from './utils/download';
 import type { DeobfuscateResult } from './webcrack.worker';
 
-export const [settings, setSettings] = createStore({
+export const [config, setConfig] = createStore({
   deobfuscate: true,
   unminify: true,
   unpack: true,
@@ -17,6 +30,7 @@ export const [settings, setSettings] = createStore({
 });
 
 function App() {
+  const { saveModels, setWorkspaceId } = useWorkspaces();
   const [untitledCounter, setUntitledCounter] = createSignal(1);
   const [models, setModels] = createSignal<monaco.editor.ITextModel[]>([
     monaco.editor.createModel(
@@ -39,6 +53,41 @@ function App() {
   const filePaths = createMemo(() =>
     fileModels().map((model) => model.uri.path),
   );
+  const hasNonEmptyModels = () => models().some((m) => m.getValueLength() > 0);
+
+  window.onbeforeunload = () => {
+    if (settings.confirmOnLeave && hasNonEmptyModels()) {
+      saveModels(models()).catch(console.error);
+      return true;
+    }
+    return undefined;
+  };
+
+  const saveModelsDebounced = debounce(() => {
+    settings.workspaceHistory && saveModels(models()).catch(console.error);
+  }, 1000);
+
+  async function restoreWorkspace(workspace: Workspace) {
+    await saveModels(models());
+    setWorkspaceId(workspace.id);
+
+    batch(() => {
+      models().forEach((model) => model.dispose());
+
+      setModels(
+        workspace.models.map((model) =>
+          monaco.editor.createModel(
+            model.value,
+            model.language,
+            monaco.Uri.parse(model.uri),
+          ),
+        ),
+      );
+
+      setTabs(untitledModels());
+      setActiveTab(untitledModels()[0]);
+    });
+  }
 
   onCleanup(() => {
     models().forEach((model) => model.dispose());
@@ -138,11 +187,24 @@ function App() {
   return (
     <DeobfuscateContextProvider
       code={activeTab()?.getValue()}
-      options={{ ...settings }}
+      options={{ ...config }}
       onResult={onDeobfuscateResult}
       onError={onDeobfuscateError}
     >
-      <div class="h-screen flex">
+      <ProgressBar />
+      <Menu
+        onFileOpen={(content) => {
+          openUntitledTab().setValue(content);
+        }}
+        onSave={() => {
+          if (activeTab()) downloadFile(activeTab()!);
+        }}
+        onRestore={(workspace) => {
+          restoreWorkspace(workspace).catch(console.error);
+        }}
+      />
+
+      <div class="flex" style="height: calc(100vh - 44px)">
         <Sidebar paths={filePaths()} onFileClick={openFile} />
 
         <main class="flex-1 overflow-auto">
@@ -182,6 +244,7 @@ function App() {
             models={models()}
             currentModel={activeTab()}
             onModelChange={openTab}
+            onValueChange={saveModelsDebounced}
           />
         </main>
       </div>

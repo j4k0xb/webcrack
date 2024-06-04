@@ -1,14 +1,17 @@
 import * as monaco from 'monaco-editor';
 import { createEffect, onCleanup, onMount } from 'solid-js';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
-import { useTheme } from '../hooks/useTheme';
+import { theme } from '../hooks/useTheme';
 import { registerEvalSelection } from '../monaco/eval-selection';
 import { PlaceholderContentWidget } from '../monaco/placeholder-widget';
+import { downloadFile } from '../utils/download';
 
 interface Props {
   models: monaco.editor.ITextModel[];
   currentModel?: monaco.editor.ITextModel;
   onModelChange?: (model: monaco.editor.ITextModel) => void;
+  onValueChange?: (value: string) => void;
+  onSave?: (value: string) => void;
 }
 
 monaco.editor.defineTheme('dark', {
@@ -20,7 +23,6 @@ monaco.editor.defineTheme('dark', {
 
 export default function MonacoEditor(props: Props) {
   const { deobfuscate } = useDeobfuscateContext();
-  const [theme] = useTheme();
   const viewStates = new WeakMap<
     monaco.editor.ITextModel,
     monaco.editor.ICodeEditorViewState
@@ -56,6 +58,11 @@ export default function MonacoEditor(props: Props) {
       if (model) editor.restoreViewState(viewStates.get(model) ?? null);
       editor.focus();
     }
+
+    editor.onDidChangeModelContent(() => {
+      const model = editor.getModel();
+      if (model) props.onValueChange?.(model.getValue());
+    });
 
     // Go to definition
     const editorOpener = monaco.editor.registerEditorOpener({
@@ -100,29 +107,13 @@ export default function MonacoEditor(props: Props) {
 
     const saveAction = editor.addAction({
       id: 'editor.action.save',
-      label: 'Save',
+      label: 'File: Save',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
-      run(editor) {
-        const code = editor.getValue();
-        if (code === '') return;
-
-        const blob = new Blob([code], {
-          type: 'application/javascript;charset=utf-8',
-        });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-
-        link.setAttribute('href', url);
-        link.setAttribute(
-          'download',
-          `deobfuscated-${new Date().toISOString()}.js`,
-        );
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        URL.revokeObjectURL(url);
+      run() {
+        const model = editor.getModel();
+        if (model) {
+          downloadFile(model);
+        }
       },
     });
 
@@ -138,16 +129,13 @@ export default function MonacoEditor(props: Props) {
       editorOpener.dispose();
       placeholder.dispose();
       deobfuscateAction.dispose();
+      saveAction.dispose();
       evalAction.dispose();
       saveAction.dispose();
     });
   });
 
   return (
-    <div
-      ref={container}
-      class="editor"
-      style="height: calc(100vh - 64px)"
-    ></div>
+    <div ref={container} class="editor" style="height: calc(100vh - 108px)" />
   );
 }

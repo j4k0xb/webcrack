@@ -1,12 +1,14 @@
 import { createEffect, createRoot, createSignal } from 'solid-js';
-
-type Theme = 'dark' | 'light';
+import { settings } from './useSettings';
 
 const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-const preferredTheme = darkMediaQuery.matches ? 'dark' : 'light';
-const savedTheme = localStorage.getItem('theme') as Theme | null;
+const [preferredTheme, setPreferredTheme] = createSignal(
+  darkMediaQuery.matches ? 'dark' : 'light',
+);
 
-const [theme, setTheme] = createSignal<Theme>(savedTheme ?? preferredTheme);
+export function theme() {
+  return settings.theme === 'system' ? preferredTheme() : settings.theme;
+}
 
 createRoot(() => {
   createEffect(() => {
@@ -14,18 +16,6 @@ createRoot(() => {
   });
 
   darkMediaQuery.addEventListener('change', (event) => {
-    if (savedTheme === null) {
-      setTheme(event.matches ? 'dark' : 'light');
-    }
+    setPreferredTheme(event.matches ? 'dark' : 'light');
   });
 });
-
-export function useTheme() {
-  return [
-    theme,
-    (theme: Theme) => {
-      setTheme(theme);
-      localStorage.setItem('theme', theme);
-    },
-  ] as const;
-}
