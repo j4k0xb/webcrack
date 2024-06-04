@@ -64,9 +64,7 @@ async function saveModels(models: monaco.editor.ITextModel[]) {
 
 async function loadWorkspaces(): Promise<Workspace[]> {
   const db = await initDB();
-  const start = performance.now();
   const workspaces = await db.getAll('workspaces');
   workspaces.sort((a, b) => b.timestamp - a.timestamp);
-  console.log('load', performance.now() - start, 'ms');
   return workspaces;
 }
