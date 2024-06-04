@@ -18,6 +18,7 @@ import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
 import { settings } from './hooks/useSettings';
 import { useWorkspaces, type Workspace } from './indexeddb';
 import { debounce } from './utils/debounce';
+import { downloadFile } from './utils/download';
 import type { DeobfuscateResult } from './webcrack.worker';
 
 export const [config, setConfig] = createStore({
@@ -194,6 +195,9 @@ function App() {
       <Menu
         onFileOpen={(content) => {
           openUntitledTab().setValue(content);
+        }}
+        onSave={() => {
+          if (activeTab()) downloadFile(activeTab()!);
         }}
         onRestore={(workspace) => {
           restoreWorkspace(workspace).catch(console.error);

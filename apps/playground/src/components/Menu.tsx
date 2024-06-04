@@ -4,6 +4,7 @@ import { useWorkspaces, type Workspace } from '../indexeddb';
 
 interface Props {
   onFileOpen?: (content: string) => void;
+  onSave?: () => void;
   onRestore?: (workspace: Workspace) => void;
 }
 
@@ -56,8 +57,8 @@ export default function Menu(props: Props) {
                 </ul>
               </div>
             </li>
-            <li class="disabled">
-              <a>Save</a>
+            <li>
+              <a onClick={props.onSave}>Save</a>
             </li>
           </ul>
         </details>

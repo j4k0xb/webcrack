@@ -4,12 +4,14 @@ import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import { theme } from '../hooks/useTheme';
 import { registerEvalSelection } from '../monaco/eval-selection';
 import { PlaceholderContentWidget } from '../monaco/placeholder-widget';
+import { downloadFile } from '../utils/download';
 
 interface Props {
   models: monaco.editor.ITextModel[];
   currentModel?: monaco.editor.ITextModel;
   onModelChange?: (model: monaco.editor.ITextModel) => void;
   onValueChange?: (value: string) => void;
+  onSave?: (value: string) => void;
 }
 
 monaco.editor.defineTheme('dark', {
@@ -103,6 +105,18 @@ export default function MonacoEditor(props: Props) {
       },
     });
 
+    const saveAction = editor.addAction({
+      id: 'editor.action.save',
+      label: 'File: Save',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+      run() {
+        const model = editor.getModel();
+        if (model) {
+          downloadFile(model);
+        }
+      },
+    });
+
     const evalAction = registerEvalSelection(editor);
 
     const commandPalette = editor.getAction('editor.action.quickCommand')!;
@@ -115,6 +129,7 @@ export default function MonacoEditor(props: Props) {
       editorOpener.dispose();
       placeholder.dispose();
       deobfuscateAction.dispose();
+      saveAction.dispose();
       evalAction.dispose();
     });
   });
