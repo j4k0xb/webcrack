@@ -131,6 +131,7 @@ export default function MonacoEditor(props: Props) {
       deobfuscateAction.dispose();
       saveAction.dispose();
       evalAction.dispose();
+      saveAction.dispose();
     });
   });
 

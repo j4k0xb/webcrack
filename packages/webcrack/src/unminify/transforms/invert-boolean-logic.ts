@@ -2,15 +2,14 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../../ast-utils';
 
+// >, >=, <, <= are not invertible because NaN <= 0 is false and NaN > 0 is false
+// https://tc39.es/ecma262/multipage/abstract-operations.html#sec-islessthan
+
 const INVERTED_BINARY_OPERATORS = {
   '==': '!=',
   '===': '!==',
   '!=': '==',
   '!==': '===',
-  '>': '<=',
-  '<': '>=',
-  '>=': '<',
-  '<=': '>',
 } as const;
 
 const INVERTED_LOGICAL_OPERATORS = {

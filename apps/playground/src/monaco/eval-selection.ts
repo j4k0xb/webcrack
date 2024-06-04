@@ -89,14 +89,11 @@ export function registerEvalSelection(
   ) {
     if (ranges.some((range) => range.isEmpty())) return;
 
-    const expressions = ranges
-      .map((range) => {
-        const value = editor.getModel()!.getValueInRange(range);
-        return `eval(${JSON.stringify(value)})`;
-      })
-      .join(',');
-    // New lines are added so line comments don't mess up the rest of the code
-    const code = `[\n${expressions}\n]`;
+    const expressions = ranges.map((range) => {
+      const value = editor.getModel()!.getValueInRange(range);
+      return `eval(${JSON.stringify(value)})`;
+    });
+    const code = `[${expressions.join(',')}]`;
     const values = (await evalCode(code)) as unknown[];
 
     const edits = ranges.map((range, index) => ({

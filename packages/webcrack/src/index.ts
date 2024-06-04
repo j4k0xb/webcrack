@@ -137,14 +137,14 @@ export async function webcrack(
 
   const stages = [
     () => {
-      return (ast = parse(code, {
+      ast = parse(code, {
         sourceType: 'unambiguous',
         allowReturnOutsideFunction: true,
         plugins: ['jsx'],
-      }));
+      });
     },
     () => {
-      return applyTransforms(
+      applyTransforms(
         ast,
         [blockStatements, sequence, splitVariableDeclarations, varFunctions],
         { name: 'prepare' },
@@ -160,14 +160,13 @@ export async function webcrack(
     // TODO: Also merge unminify visitor (breaks selfDefending/debugProtection atm)
     (options.deobfuscate || options.jsx) &&
       (() => {
-        return applyTransforms(
+        applyTransforms(
           ast,
           [
             // Have to run this after unminify to properly detect it
             options.deobfuscate ? [selfDefending, debugProtection] : [],
             options.jsx ? [jsx, jsxNew] : [],
           ].flat(),
-          { noScope: true },
         );
       }),
     options.deobfuscate && (() => applyTransform(ast, mergeObjectAssignments)),
