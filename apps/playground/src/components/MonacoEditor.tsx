@@ -4,13 +4,14 @@ import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import { theme } from '../hooks/useTheme';
 import { registerEvalSelection } from '../monaco/eval-selection';
 import { PlaceholderContentWidget } from '../monaco/placeholder-widget';
-import { downloadFile } from '../utils/download';
+import { downloadFile, openFile } from '../utils/files';
 
 interface Props {
   models: monaco.editor.ITextModel[];
   currentModel?: monaco.editor.ITextModel;
   onModelChange?: (model: monaco.editor.ITextModel) => void;
   onValueChange?: (value: string) => void;
+  onFileOpen?: (content: string) => void;
   onSave?: (value: string) => void;
 }
 
@@ -105,6 +106,15 @@ export default function MonacoEditor(props: Props) {
       },
     });
 
+    const openAction = editor.addAction({
+      id: 'editor.action.open',
+      label: 'File: Open',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyO],
+      run() {
+        openFile(props.onFileOpen);
+      },
+    });
+
     const saveAction = editor.addAction({
       id: 'editor.action.save',
       label: 'File: Save',
@@ -129,6 +139,7 @@ export default function MonacoEditor(props: Props) {
       editorOpener.dispose();
       placeholder.dispose();
       deobfuscateAction.dispose();
+      openAction.dispose();
       saveAction.dispose();
       evalAction.dispose();
       saveAction.dispose();

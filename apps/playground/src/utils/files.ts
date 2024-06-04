@@ -17,3 +17,15 @@ export function downloadFile(model: monaco.editor.ITextModel) {
 
   URL.revokeObjectURL(url);
 }
+
+export function openFile(cb: (content: string) => void = () => {}) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.onchange = async (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      cb(await file.text());
+    }
+  };
+  input.click();
+}

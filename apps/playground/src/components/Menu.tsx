@@ -1,6 +1,7 @@
 import { For } from 'solid-js';
 import { setSettings, settings, type Settings } from '../hooks/useSettings';
 import { useWorkspaces, type Workspace } from '../indexeddb';
+import { openFile } from '../utils/files';
 
 interface Props {
   onFileOpen?: (content: string) => void;
@@ -11,18 +12,6 @@ interface Props {
 export default function Menu(props: Props) {
   const { workspaces } = useWorkspaces();
 
-  function openFile() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      const content = await file.text();
-      props.onFileOpen?.(content);
-    };
-    input.click();
-  }
-
   return (
     <ul class="menu menu-sm menu-horizontal bg-base-200 w-full">
       <li>
@@ -30,7 +19,13 @@ export default function Menu(props: Props) {
           <summary>File</summary>
           <ul class="min-w-52 z-10 !px-0">
             <li>
-              <a onClick={openFile}>Open File…</a>
+              <a onClick={() => openFile(props.onFileOpen)}>
+                Open File…{' '}
+                <span class="ml-auto">
+                  <kbd class="kbd kbd-sm">Ctrl</kbd>+
+                  <kbd class="kbd kbd-sm">O</kbd>
+                </span>
+              </a>
             </li>
             <li>
               <div class="dropdown dropdown-right dropdown-hover transform-none">
@@ -58,7 +53,13 @@ export default function Menu(props: Props) {
               </div>
             </li>
             <li>
-              <a onClick={props.onSave}>Save</a>
+              <a onClick={props.onSave}>
+                Save{' '}
+                <span class="ml-auto">
+                  <kbd class="kbd kbd-sm">Ctrl</kbd>+
+                  <kbd class="kbd kbd-sm">S</kbd>
+                </span>
+              </a>
             </li>
           </ul>
         </details>
