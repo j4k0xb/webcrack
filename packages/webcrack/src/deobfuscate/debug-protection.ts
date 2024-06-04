@@ -90,9 +90,9 @@ export default {
 
         const binding = path.scope.getBinding(
           debugProtectionFunctionName.current!,
-        )!;
+        );
 
-        binding.referencePaths.forEach((ref) => {
+        binding?.referencePaths.forEach((ref) => {
           if (intervalCall.match(ref.parent)) {
             findParent(ref, iife)?.remove();
           }
