@@ -1,5 +1,5 @@
 {
-  "name": "webcrack",
+  "name": "webcrack-webcrack",
   "version": "2.13.0",
   "description": "Deobfuscate, unminify and unpack bundled javascript",
   "author": "j4k0xb",
@@ -40,28 +40,28 @@
     "unbundle"
   ],
   "dependencies": {
-    "@babel/generator": "^7.24.4",
-    "@babel/helper-validator-identifier": "^7.22.20",
-    "@babel/parser": "^7.24.4",
-    "@babel/template": "^7.24.0",
-    "@babel/traverse": "^7.24.1",
-    "@babel/types": "^7.24.0",
+    "@babel/generator": "^7.24.7",
+    "@babel/helper-validator-identifier": "^7.24.7",
+    "@babel/parser": "^7.24.7",
+    "@babel/template": "^7.24.7",
+    "@babel/traverse": "^7.24.7",
+    "@babel/types": "^7.24.7",
     "@codemod/matchers": "^1.7.1",
     "babel-plugin-minify-mangle-names": "^0.5.1",
-    "commander": "^12.0.0",
-    "debug": "^4.3.4",
-    "isolated-vm": "^4.7.2"
+    "commander": "^12.1.0",
+    "debug": "^4.3.5",
+    "isolated-vm": "^5.0.0"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
     "@types/babel__helper-validator-identifier": "^7.15.2",
     "@types/babel__template": "^7.4.4",
-    "@types/babel__traverse": "^7.20.5",
+    "@types/babel__traverse": "^7.20.6",
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.12.7",
+    "@types/node": "^20.14.2",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.21.4",
     "typescript": "^5.4.5"
   }
 }

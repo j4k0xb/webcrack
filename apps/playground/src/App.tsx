@@ -65,7 +65,7 @@ function App() {
   };
 
   const saveModelsDebounced = debounce(() => {
-    settings.workspaceHistory && saveModels(models()).catch(console.error);
+    if (settings.workspaceHistory) saveModels(models()).catch(console.error);
   }, 1000);
 
   async function restoreWorkspace(workspace: Workspace) {

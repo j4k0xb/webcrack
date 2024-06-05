@@ -12,6 +12,6 @@ export async function evalCode(code: string) {
   const fn = await sandbox.addFunction(`() => ${code}`);
   return Promise.race([
     fn(),
-    sleep(10_000).then(() => Promise.reject('Sandbox timeout')),
+    sleep(10_000).then(() => Promise.reject(new Error('Sandbox timeout'))),
   ]).finally(() => sandbox.removeFunction(fn));
 }
