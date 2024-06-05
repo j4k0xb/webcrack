@@ -8,6 +8,7 @@ import {
   onCleanup,
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
+import Alert from './components/Alert';
 import Breadcrumbs from './components/Breadcrumbs';
 import Menu from './components/Menu';
 import MonacoEditor from './components/MonacoEditor';
@@ -180,16 +181,11 @@ function App() {
     ]);
   }
 
-  function onDeobfuscateError(error: unknown) {
-    console.error(error);
-  }
-
   return (
     <DeobfuscateContextProvider
       code={activeTab()?.getValue()}
       options={{ ...config }}
       onResult={onDeobfuscateResult}
-      onError={onDeobfuscateError}
     >
       <ProgressBar />
       <Menu
@@ -203,7 +199,6 @@ function App() {
           restoreWorkspace(workspace).catch(console.error);
         }}
       />
-
       <div class="flex" style="height: calc(100vh - 44px)">
         <Sidebar paths={filePaths()} onFileClick={openFile} />
 
@@ -251,6 +246,7 @@ function App() {
           />
         </main>
       </div>
+      <Alert />
     </DeobfuscateContextProvider>
   );
 }

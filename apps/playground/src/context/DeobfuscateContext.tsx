@@ -13,9 +13,16 @@ let worker = new WebcrackWorker();
 
 const postMessage = (message: WorkerRequest) => worker.postMessage(message);
 
+interface Props {
+  code: string | undefined;
+  options: Options;
+  onResult: (result: DeobfuscateResult) => void;
+}
+
 function useProviderValue(props: Props) {
   const [deobfuscating, setDeobfuscating] = createSignal(false);
   const [progress, setProgress] = createSignal(0);
+  const [alert, setAlert] = createSignal<string | null>(null);
 
   function cancelDeobfuscate() {
     if (!deobfuscating()) return console.warn('Not deobfuscating...');
@@ -43,16 +50,18 @@ function useProviderValue(props: Props) {
           .then((result) => postMessage({ type: 'sandbox', result }))
           .catch((error) => {
             cancelDeobfuscate();
-            props.onError(error);
+            setAlert(String(error));
+            console.error(error);
           });
       } else if (data.type === 'progress') {
         setProgress(data.value);
       } else if (data.type === 'result') {
+        setAlert(null);
         setDeobfuscating(false);
         props.onResult(data);
       } else if (data.type === 'error') {
         setDeobfuscating(false);
-        props.onError(data.error);
+        setAlert(data.error.toString());
       }
     };
   }
@@ -62,17 +71,12 @@ function useProviderValue(props: Props) {
     cancelDeobfuscate,
     deobfuscate,
     progress,
+    alert,
+    setAlert,
   };
 }
 
 const DeobfuscateContext = createContext<ReturnType<typeof useProviderValue>>();
-
-interface Props {
-  code: string | undefined;
-  options: Options;
-  onResult: (result: DeobfuscateResult) => void;
-  onError: (error: unknown) => void;
-}
 
 export function DeobfuscateContextProvider(props: ParentProps<Props>) {
   const value = useProviderValue(props);

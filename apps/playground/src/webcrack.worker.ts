@@ -9,7 +9,7 @@ export type WorkerResponse =
   | { type: 'sandbox'; code: string }
   | ({ type: 'result' } & DeobfuscateResult)
   | { type: 'progress'; value: number }
-  | { type: 'error'; error: unknown };
+  | { type: 'error'; error: Error };
 
 export interface DeobfuscateResult {
   code: string;
@@ -53,6 +53,6 @@ self.onmessage = async ({ data }: MessageEvent<WorkerRequest>) => {
 
     postMessage({ type: 'result', code: result.code, files });
   } catch (error) {
-    postMessage({ type: 'error', error });
+    postMessage({ type: 'error', error: error as Error });
   }
 };
