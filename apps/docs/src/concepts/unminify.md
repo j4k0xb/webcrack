@@ -117,6 +117,28 @@ if (x) {
 1 // [!code ++]
 ```
 
+## remove-double-not
+
+```js
+if (!!a) b(); // [!code --]
+if (a) b(); // [!code ++]
+```
+
+```js
+!!a ? b() : c(); // [!code --]
+a ? b() : c(); // [!code ++]
+```
+
+```js
+return !!!a; // [!code --]
+return !a; // [!code ++]
+```
+
+```js
+[].filter(a => !!a); // [!code --]
+[].filter(a => a); // [!code ++]
+```
+
 ## sequence
 
 ```js
