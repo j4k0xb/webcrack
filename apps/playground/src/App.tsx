@@ -10,11 +10,11 @@ import {
 import { createStore } from 'solid-js/store';
 import Alert from './components/Alert';
 import Breadcrumbs from './components/Breadcrumbs';
-import Menu from './components/Menu';
 import MonacoEditor from './components/MonacoEditor';
 import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
 import Tab from './components/Tab';
+import Menu from './components/menu/Menu';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
 import { settings } from './hooks/useSettings';
 import { useWorkspaces, type Workspace } from './indexeddb';
