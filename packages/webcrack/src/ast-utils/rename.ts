@@ -5,6 +5,8 @@ import * as m from '@codemod/matchers';
 import { codePreview } from './generator';
 
 export function renameFast(binding: Binding, newName: string): void {
+  binding.scope.rename(newName);
+
   binding.referencePaths.forEach((ref) => {
     if (!ref.isIdentifier()) {
       throw new Error(
@@ -12,19 +14,16 @@ export function renameFast(binding: Binding, newName: string): void {
       );
     }
 
-    // To avoid conflicts with other bindings of the same name
-    if (ref.scope.hasBinding(newName)) ref.scope.rename(newName);
+    ref.scope.rename(newName);
     ref.node.name = newName;
   });
 
-  // Also update assignments
   const patternMatcher = m.assignmentExpression(
     '=',
     m.or(m.arrayPattern(), m.objectPattern()),
   );
   binding.constantViolations.forEach((ref) => {
-    // To avoid conflicts with other bindings of the same name
-    if (ref.scope.hasBinding(newName)) ref.scope.rename(newName);
+    ref.scope.rename(newName);
 
     if (ref.isAssignmentExpression() && t.isIdentifier(ref.node.left)) {
       ref.node.left.name = newName;
@@ -54,6 +53,21 @@ export function renameFast(binding: Binding, newName: string): void {
   binding.scope.removeOwnBinding(binding.identifier.name);
   binding.scope.bindings[newName] = binding;
   binding.identifier.name = newName;
+}
+
+/**
+ * @returns the new name, unless it is invalid or conflicts with another binding,
+ * in which case it will generate a similar name instead.
+ */
+export function generateUid(binding: Binding, newName: string): string {
+  const hasConflicts = () =>
+    binding.scope.hasBinding(newName) ||
+    binding.referencePaths.some((ref) => ref.scope.hasBinding(newName)) ||
+    binding.constantViolations.some((ref) => ref.scope.hasBinding(newName));
+
+  return t.isValidIdentifier(newName) && !hasConflicts()
+    ? newName
+    : binding.scope.generateUid(newName);
 }
 
 export function renameParameters(
