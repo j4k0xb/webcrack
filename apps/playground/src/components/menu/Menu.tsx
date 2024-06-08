@@ -50,7 +50,10 @@ export default function Menu(props: Props) {
         <MenuDropdown title="Open Recent">
           <For each={workspaces()} fallback={<li>No recent files</li>}>
             {(workspace) => (
-              <MenuButton class="whitespace-nowrap">
+              <MenuButton
+                class="whitespace-nowrap"
+                onClick={() => props.onRestore?.(workspace)}
+              >
                 {new Date(workspace.timestamp).toLocaleString()} -
                 <code class="overflow-x-clip overflow-ellipsis max-w-36">
                   {workspace.models[0].value.slice(0, 50)}
