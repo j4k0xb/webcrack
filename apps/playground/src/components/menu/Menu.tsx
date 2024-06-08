@@ -2,6 +2,7 @@ import { For, createSignal, onCleanup, onMount } from 'solid-js';
 import { setSettings, settings, type Settings } from '../../hooks/useSettings';
 import { useWorkspaces, type Workspace } from '../../indexeddb';
 import { openFile } from '../../utils/files';
+import { ctrlCmdIcon } from '../../utils/platform';
 import MenuButton from './MenuButton';
 import MenuDropdown from './MenuDropdown';
 import MenuHeader from './MenuHeader';
@@ -42,7 +43,7 @@ export default function Menu(props: Props) {
         onOpen={() => setOpenedMenu('file')}
       >
         <MenuButton
-          shortcut={['Ctrl', 'O']}
+          shortcut={[ctrlCmdIcon, 'O']}
           onClick={() => openFile(props.onFileOpen)}
         >
           Open File…
@@ -62,7 +63,7 @@ export default function Menu(props: Props) {
             )}
           </For>
         </MenuDropdown>
-        <MenuButton shortcut={['Ctrl', 'S']} onClick={props.onSave}>
+        <MenuButton shortcut={[ctrlCmdIcon, 'S']} onClick={props.onSave}>
           Save
         </MenuButton>
       </MenuHeader>
