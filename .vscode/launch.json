@@ -20,7 +20,7 @@
       ]
     },
     {
-      "type": "pwa-chrome",
+      "type": "chrome",
       "request": "launch",
       "name": "Launch playground",
       "url": "http://localhost:5173",
