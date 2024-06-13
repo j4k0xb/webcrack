@@ -176,3 +176,9 @@ test('rearrange assignment', () => {
     }
   `);
 });
+
+// appears in some obfuscator.io forks
+test('simplify computed property with only literals', () =>
+  expectJS(`
+    Lr[("nnQB", "jcIgN")]();
+  `).toMatchInlineSnapshot('Lr["jcIgN"]();'));

@@ -153,6 +153,15 @@ export default {
           this.changes++;
         },
       },
+      SequenceExpression: {
+        exit(path) {
+          const { expressions } = path.node;
+          if (expressions.every((node) => safeLiteral.match(node))) {
+            path.replaceWith(expressions.at(-1)!);
+            this.changes++;
+          }
+        },
+      },
     };
   },
 } satisfies Transform;
