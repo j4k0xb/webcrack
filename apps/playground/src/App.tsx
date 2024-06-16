@@ -181,6 +181,25 @@ function App() {
     ]);
   }
 
+  (async () => {
+    const queryParams = new URLSearchParams(location.search);
+    const urlParam = queryParams.get('url');
+    const codeParam = queryParams.get('code');
+
+    if (urlParam !== null) {
+      const response = await fetch(urlParam).catch(() =>
+        fetch('https://corsproxy.io/?' + encodeURIComponent(urlParam)),
+      );
+      if (response.ok) {
+        const model = activeTab() || openUntitledTab();
+        model.setValue(await response.text());
+      }
+    } else if (codeParam !== null) {
+      const model = activeTab() || openUntitledTab();
+      model.setValue(codeParam);
+    }
+  })().catch(console.error);
+
   return (
     <DeobfuscateContextProvider
       code={activeTab()?.getValue()}
