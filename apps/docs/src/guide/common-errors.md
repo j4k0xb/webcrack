@@ -12,14 +12,19 @@ it most likely means that the [isolated-vm](https://github.com/laverdet/isolated
 
 To fix this, run `npm rebuild isolated-vm` in your project directory or delete the `node_modules/isolated-vm` directory and run `npm install` again.
 
-> ```sh
-> npm error prebuild-install warn install No prebuilt binaries found (target=22.1.0 runtime=node arch=arm64 libc= platform=darwin)
-> ...
-> npm error ../src/isolate/generic/error.h:84:65: error: value of type 'Local<Value> (Local<String>, Local<Value>)' is not implicitly convertible to 'v8::Local<v8::Value> (*)(v8::Local<v8::String>)'
-> npm error using RuntimeGenericError = detail::RuntimeErrorWithConstructor<v8::Exception::Error>;
-> ```
+For Node 20.x and above, disabling snapshots may be necessary:
 
-When there are no prebuilt binaries available (Apple Silicon) and you are using Node.js v22, try switching to Node.js v20 ([see issue](https://github.com/laverdet/isolated-vm/issues/468)).
+```sh
+NODE_OPTIONS=--no-node-snapshot webcrack input.js
+```
+
+or
+
+```sh
+node --no-node-snapshot your-script.js
+```
+
+For any other issues, please refer to the [isolated-vm readme](https://github.com/laverdet/isolated-vm#requirements).
 
 ## Heap Out Of Memory
 
