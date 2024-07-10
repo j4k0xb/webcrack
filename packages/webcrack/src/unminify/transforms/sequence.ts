@@ -105,11 +105,20 @@ export default {
       },
       ForInStatement: {
         exit(path) {
-          const sequence = m.capture(m.sequenceExpression());
-          const matcher = m.forInStatement(m.anything(), sequence);
-          if (!matcher.match(path.node)) return;
+          if (!t.isSequenceExpression(path.node.right)) return;
 
-          const { expressions } = sequence.current!;
+          const { expressions } = path.node.right;
+          path.node.right = expressions.pop()!;
+          const statements = expressions.map(t.expressionStatement);
+          path.insertBefore(statements);
+          this.changes++;
+        },
+      },
+      ForOfStatement: {
+        exit(path) {
+          if (!t.isSequenceExpression(path.node.right)) return;
+
+          const { expressions } = path.node.right;
           path.node.right = expressions.pop()!;
           const statements = expressions.map(t.expressionStatement);
           path.insertBefore(statements);

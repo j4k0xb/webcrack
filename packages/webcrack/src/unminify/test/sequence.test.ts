@@ -59,6 +59,14 @@ test('rearrange from for-in', () =>
     for (let key in object) {}
   `));
 
+test('rearrange from for-of', () =>
+  expectJS(`
+    for (let value of (a = 1, array)) {}
+  `).toMatchInlineSnapshot(`
+    a = 1;
+    for (let value of array) {}
+  `));
+
 test('rearrange from for loop init', () => {
   expectJS(`
     for((a(), b());;);

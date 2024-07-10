@@ -171,6 +171,12 @@ for (let key in object) {} // [!code ++]
 ```
 
 ```js
+for (let value of (a = 1, array)) {} // [!code --]
+a = 1; // [!code ++]
+for (let value of array) {} // [!code ++]
+```
+
+```js
 for((a(), b());;) {} // [!code --]
 a(); // [!code ++]
 b(); // [!code ++]
