@@ -1,4 +1,5 @@
 {
+  "name": "webcrack",
   "private": true,
   "type": "module",
   "scripts": {
@@ -6,8 +7,7 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "test": "vitest --pool=vmThreads",
-    "test:coverage": "vitest --coverage",
+    "test": "vitest --no-isolate",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
@@ -22,6 +22,5 @@
     "patchedDependencies": {
       "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch"
     }
-  },
-  "name": "webcrack"
+  }
 }
