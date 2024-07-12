@@ -22,6 +22,13 @@ test('keep false branch', () =>
     }
   `).toMatchInlineSnapshot(`console.log("bar");`));
 
+test('remove false branch without else', () =>
+  expectJS(`
+    if ("a" !== "a") {
+      console.log("foo");
+    }
+  `).toMatchInlineSnapshot(``));
+
 test('merge scopes', () =>
   expectJS(`
     let foo = 1;

@@ -37,8 +37,11 @@ describe('inline decoder', () => {
 
   test('inline function', () => {
     const ast = parse(`
-      function decoder() {}
-      decoder(1);
+      function decoder(a, b) {}
+      decoder(1, 2);
+      function ignore() {
+        return decoder(3, 4);
+      }
       (() => {
         function alias(a, b) {
           return decoder(a - 625, b);

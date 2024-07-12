@@ -44,11 +44,6 @@ function unshift(template: t.TemplateLiteral, value: t.Expression) {
   if (value.type === 'StringLiteral') {
     const firstQuasi = template.quasis[0];
     firstQuasi.value.raw = escape(value.value) + firstQuasi.value.raw;
-  } else if (value.type === 'TemplateLiteral') {
-    const firstQuasi = template.quasis[0];
-    firstQuasi.value.raw = value.quasis[0].value.raw + firstQuasi.value.raw;
-    template.expressions.unshift(...value.expressions);
-    template.quasis.unshift(...value.quasis.slice(0, -1));
   } else {
     template.expressions.unshift(value);
     template.quasis.unshift(t.templateElement({ raw: '' }));

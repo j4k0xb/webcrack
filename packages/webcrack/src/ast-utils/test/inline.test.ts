@@ -1,8 +1,10 @@
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
+import * as t from '@babel/types';
 import { expect, test } from 'vitest';
 import {
   inlineArrayElements,
+  inlineFunction,
   inlineObjectProperties,
   inlineVariable,
 } from '..';
@@ -55,4 +57,49 @@ test('inline object properties', () => {
     },
   });
   expect(ast).toMatchInlineSnapshot(`console.log(0x2f2, '0x396');`);
+});
+
+test('inline function', () => {
+  const ast = parse(`
+    function f(a, b) {
+      return a + b;
+    }
+    fn(1, 2);
+  `);
+  traverse(ast, {
+    CallExpression(path) {
+      const fn = path.parentPath.getPrevSibling().node as t.FunctionDeclaration;
+      inlineFunction(fn, path);
+    },
+  });
+  expect(ast).toMatchInlineSnapshot(`
+    function f(a, b) {
+      return a + b;
+    }
+    1 + 2;
+  `);
+});
+
+test('inline function with rest arg', () => {
+  const ast = parse(`
+    function f(a, ...b) {
+      return a(...b);
+    }
+    fn(x, 1, 2, 3);
+  `);
+  traverse(ast, {
+    CallExpression(path) {
+      if (t.isIdentifier(path.node.callee, { name: 'fn' })) {
+        const fn = path.parentPath.getPrevSibling()
+          .node as t.FunctionDeclaration;
+        inlineFunction(fn, path);
+      }
+    },
+  });
+  expect(ast).toMatchInlineSnapshot(`
+    function f(a, ...b) {
+      return a(...b);
+    }
+    x(1, 2, 3);
+  `);
 });
