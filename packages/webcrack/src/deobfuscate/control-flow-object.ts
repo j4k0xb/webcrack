@@ -1,6 +1,6 @@
 import type { Binding, NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
 import type { FunctionExpression } from '@babel/types';
+import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../ast-utils';
 import {
@@ -101,7 +101,12 @@ export default {
     );
     const varMatcher = m.variableDeclarator(
       varId,
-      m.capture(m.objectExpression(objectProperties)),
+      m.objectExpression(objectProperties),
+    );
+    // Example: { YhxvC: "default" }.YhxvC
+    const inlineMatcher = constMemberExpression(
+      m.objectExpression(objectProperties),
+      propertyName,
     );
 
     function isConstantBinding(binding: Binding) {
@@ -220,6 +225,27 @@ export default {
       VariableDeclarator: {
         exit(path) {
           this.changes += transform(path);
+        },
+      },
+      MemberExpression: {
+        exit(path) {
+          if (!inlineMatcher.match(path.node)) return;
+
+          const propName = getPropName(path.node.property)!;
+          const value = objectProperties.current!.find(
+            (prop) => getPropName(prop.key) === propName,
+          )?.value as t.FunctionExpression | t.StringLiteral | undefined;
+          if (!value) return;
+
+          if (t.isStringLiteral(value)) {
+            path.replaceWith(value);
+          } else {
+            inlineFunction(
+              value,
+              path.parentPath as NodePath<t.CallExpression>,
+            );
+          }
+          this.changes++;
         },
       },
     };
