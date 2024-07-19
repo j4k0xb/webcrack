@@ -15,6 +15,18 @@ test('inlined object', () => {
   `).toMatchInlineSnapshot(`u === undefined;`);
 
   expectJS(`
+    a = ({
+      QuFtJ: function (n, r) {
+        return n === r;
+      }
+    }).QuFtJ;
+  `).toMatchInlineSnapshot(`
+    a = function (n, r) {
+      return n === r;
+    };
+  `);
+
+  expectJS(`
     ({ YhxvC: "default" }).YhxvC;
   `).toMatchInlineSnapshot(`"default";`);
 });

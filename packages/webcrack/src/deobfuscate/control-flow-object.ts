@@ -239,11 +239,10 @@ export default {
 
           if (t.isStringLiteral(value)) {
             path.replaceWith(value);
+          } else if (path.parentPath.isCallExpression()) {
+            inlineFunction(value, path.parentPath);
           } else {
-            inlineFunction(
-              value,
-              path.parentPath as NodePath<t.CallExpression>,
-            );
+            path.replaceWith(value);
           }
           this.changes++;
         },
