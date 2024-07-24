@@ -192,12 +192,6 @@ for(; i < 10; i++) { // [!code ++]
 ```
 
 ```js
-while (a(), b()) {} // [!code --]
-a(); // [!code ++]
-while (b()) {} // [!code ++]
-```
-
-```js
 a = (b = null, c); // [!code --]
 b = null; // [!code ++]
 a = c; // [!code ++]
