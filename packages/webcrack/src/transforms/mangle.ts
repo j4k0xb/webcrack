@@ -1,66 +1,91 @@
-import { statement } from '@babel/template';
-import type { Visitor } from '@babel/traverse';
-import traverse, { NodePath, visitors } from '@babel/traverse';
-import * as t from '@babel/types';
-import mangle from 'babel-plugin-minify-mangle-names';
-import type { Transform } from '../ast-utils';
-import { safeLiteral } from '../ast-utils';
-
-// See https://github.com/j4k0xb/webcrack/issues/41 and https://github.com/babel/minify/issues/1023
-const fixDefaultParamError: Visitor = {
-  Function(path) {
-    const { params } = path.node;
-
-    for (let i = params.length - 1; i >= 0; i--) {
-      const param = params[i];
-      if (!t.isAssignmentPattern(param) || safeLiteral.match(param.right))
-        continue;
-
-      if (!t.isBlockStatement(path.node.body)) {
-        path.node.body = t.blockStatement([t.returnStatement(path.node.body)]);
-      }
-
-      const body = path.get('body') as NodePath<t.BlockStatement>;
-      if (t.isIdentifier(param.left)) {
-        body.unshiftContainer(
-          'body',
-          statement`if (${param.left} === undefined) ${param.left} = ${param.right}`(),
-        );
-      } else {
-        const tempId = path.scope.generateUidIdentifier();
-        body.unshiftContainer(
-          'body',
-          statement`var ${param.left} = ${tempId} === undefined ? ${param.right} : ${tempId}`(),
-        );
-        param.left = tempId;
-      }
-      param.right = t.identifier('undefined');
-    }
-  },
-};
+import type { NodePath } from '@babel/traverse';
+import type * as t from '@babel/types';
+import * as m from '@codemod/matchers';
+import { renameFast, type Transform } from '../ast-utils';
+import { generateUid } from '../ast-utils/scope';
 
 export default {
   name: 'mangle',
   tags: ['safe'],
   scope: true,
-  run(ast) {
-    // path.hub is undefined for some reason, monkey-patch to avoid error...
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { getSource } = NodePath.prototype;
-    NodePath.prototype.getSource = () => '';
-    const visitor = visitors.merge([
-      fixDefaultParamError,
-      mangle({ types: t, traverse }).visitor,
-    ]);
+  visitor(match = () => true) {
+    return {
+      BindingIdentifier: {
+        exit(path) {
+          if (!path.isBindingIdentifier()) return;
+          if (path.parentPath.isImportSpecifier()) return;
+          if (path.parentPath.isObjectProperty()) return;
+          if (!match(path.node.name)) return;
 
-    traverse(ast, visitor, undefined, {
-      opts: {
-        eval: true,
-        topLevel: true,
-        exclude: { React: true },
+          const binding = path.scope.getBinding(path.node.name);
+          if (!binding) return;
+          if (
+            binding.referencePaths.some((ref) => ref.isExportNamedDeclaration())
+          )
+            return;
+
+          renameFast(binding, inferName(path));
+        },
       },
-    });
-
-    NodePath.prototype.getSource = getSource;
+    };
   },
-} satisfies Transform;
+} satisfies Transform<(id: string) => boolean>;
+
+const requireMatcher = m.variableDeclarator(
+  m.identifier(),
+  m.callExpression(m.identifier('require'), [m.stringLiteral()]),
+);
+
+function inferName(path: NodePath<t.Identifier>): string {
+  if (path.parentPath.isClass({ id: path.node })) {
+    return generateUid(path.scope, 'C');
+  } else if (path.parentPath.isFunction({ id: path.node })) {
+    return generateUid(path.scope, 'f');
+  } else if (
+    path.listKey === 'params' ||
+    (path.parentPath.isAssignmentPattern({ left: path.node }) &&
+      path.parentPath.listKey === 'params')
+  ) {
+    return generateUid(path.scope, 'p');
+  } else if (requireMatcher.match(path.parent)) {
+    return generateUid(
+      path.scope,
+      (path.parentPath.get('init.arguments.0') as NodePath<t.StringLiteral>)
+        .node.value,
+    );
+  } else if (path.parentPath.isVariableDeclarator({ id: path.node })) {
+    const init = path.parentPath.get('init');
+    const suffix = (init.isExpression() && generateExpressionName(init)) || '';
+    return generateUid(path.scope, 'v' + titleCase(suffix));
+  } else if (path.parentPath.isArrayPattern()) {
+    return generateUid(path.scope, 'v');
+  } else {
+    return path.node.name;
+  }
+}
+
+function generateExpressionName(
+  expression: NodePath<t.Expression>,
+): string | undefined {
+  if (expression.isIdentifier()) {
+    return expression.node.name;
+  } else if (expression.isFunctionExpression()) {
+    return expression.node.id?.name ?? 'f';
+  } else if (expression.isArrowFunctionExpression()) {
+    return 'f';
+  } else if (expression.isClassExpression()) {
+    return expression.node.id?.name ?? 'C';
+  } else if (expression.isCallExpression()) {
+    return generateExpressionName(
+      expression.get('callee') as NodePath<t.Expression>,
+    );
+  } else if (expression.isThisExpression()) {
+    return 'this';
+  } else {
+    return undefined;
+  }
+}
+
+function titleCase(str: string) {
+  return str.length > 0 ? str[0].toUpperCase() + str.slice(1) : str;
+}

@@ -17,8 +17,8 @@ test('deeply nested member expression type', () =>
 
 test('any other expression type', () =>
   expectJS('jsx(r ? "a" : "div", {});').toMatchInlineSnapshot(`
-    const _Component = r ? "a" : "div";
-    <_Component />;
+    const Component = r ? "a" : "div";
+    <Component />;
   `));
 
 test('rename component with conflicting name', () =>
