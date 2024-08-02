@@ -8,7 +8,7 @@ export function generateUid(scope: Scope, name: string = 'temp'): string {
   let uid = '';
   let i = 1;
   do {
-    uid = i > 1 ? `${name}${i}` : toIdentifier(name);
+    uid = toIdentifier(i > 1 ? `${name}${i}` : name);
     i++;
   } while (
     scope.hasLabel(uid) ||

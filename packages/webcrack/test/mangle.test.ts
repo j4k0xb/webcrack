@@ -16,6 +16,13 @@ test('variable', () => {
   expectJS('const x = require("fs");').toMatchInlineSnapshot(
     `const fs = require("fs");`,
   );
+  expectJS(`
+    const x = require("node:fs");
+    const y = require("node:fs");
+  `).toMatchInlineSnapshot(`
+    const nodeFs = require("node:fs");
+    const nodeFs2 = require("node:fs");
+  `);
 });
 
 test('ignore exports', () => {
