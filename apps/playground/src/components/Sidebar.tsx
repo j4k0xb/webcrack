@@ -1,5 +1,5 @@
 import { Show } from 'solid-js';
-import { config, setConfig } from '../App';
+import { config, setConfig, type MangleMode } from '../App';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import FileTree from './FileTree';
 
@@ -205,15 +205,19 @@ export default function Sidebar(props: Props) {
           <path d="M10 8v6a2 2 0 1 0 4 0v-1a2 2 0 1 0 -4 0v1" />
           <path d="M20.732 12a2 2 0 0 0 -3.732 1v1a2 2 0 0 0 3.726 1.01" />
         </svg>
-        <span class="label-text ml-4 mr-auto hidden sm:inline">
-          Mangle Variables
-        </span>
-        <input
-          type="checkbox"
-          class="checkbox checkbox-sm hidden sm:inline"
-          checked={config.mangle}
-          onClick={(e) => setConfig('mangle', e.currentTarget.checked)}
-        />
+        <span class="label-text ml-4 mr-auto hidden sm:inline">Mangle</span>
+        <select
+          class="select select-sm select-bordered ml-4 flex-1 w-full"
+          value={config.mangleMode}
+          onChange={(e) =>
+            setConfig('mangleMode', e.currentTarget.value as MangleMode)
+          }
+        >
+          <option value="off">Off</option>
+          <option value="hex">Hex (_0x)</option>
+          <option value="short">Short Names</option>
+          <option value="all">All Names</option>
+        </select>
       </label>
 
       <FileTree

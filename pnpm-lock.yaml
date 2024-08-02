@@ -157,9 +157,6 @@ importers:
       '@codemod/matchers':
         specifier: ^1.7.1
         version: 1.7.1
-      babel-plugin-minify-mangle-names:
-        specifier: ^0.5.1
-        version: 0.5.1
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -1161,16 +1158,10 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  babel-helper-mark-eval-scopes@0.4.3:
-    resolution: {integrity: sha512-+d/mXPP33bhgHkdVOiPkmYoeXJ+rXRWi7OdhwpyseIqOS8CmzHQXHUp/+/Qr8baXsT0kjGpMHHofHs6C3cskdA==}
-
   babel-plugin-jsx-dom-expressions@0.37.21:
     resolution: {integrity: sha512-WbQo1NQ241oki8bYasVzkMXOTSIri5GO/K47rYJb2ZBh8GaPUEWiWbMV3KwXz+96eU2i54N6ThzjQG/f5n8Azw==}
     peerDependencies:
       '@babel/core': ^7.20.12
-
-  babel-plugin-minify-mangle-names@0.5.1:
-    resolution: {integrity: sha512-8KMichAOae2FHlipjNDTo2wz97MdEb2Q0jrn4NIRXzHH7SJ3c5TaNNBkeTHbk9WUsMnqpNUx949ugM9NFWewzw==}
 
   babel-preset-solid@1.8.17:
     resolution: {integrity: sha512-s/FfTZOeds0hYxYqce90Jb+0ycN2lrzC7VP1k1JIn3wBqcaexDKdYi6xjB+hMNkL+Q6HobKbwsriqPloasR9LA==}
@@ -3796,8 +3787,6 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.0.0
 
-  babel-helper-mark-eval-scopes@0.4.3: {}
-
   babel-plugin-jsx-dom-expressions@0.37.21(@babel/core@7.24.7):
     dependencies:
       '@babel/core': 7.24.7
@@ -3806,10 +3795,6 @@ snapshots:
       '@babel/types': 7.24.7
       html-entities: 2.3.3
       validate-html-nesting: 1.2.2
-
-  babel-plugin-minify-mangle-names@0.5.1:
-    dependencies:
-      babel-helper-mark-eval-scopes: 0.4.3
 
   babel-preset-solid@1.8.17(@babel/core@7.24.7):
     dependencies:

@@ -1,6 +1,7 @@
 import type { ParentProps } from 'solid-js';
 import { createContext, createSignal, useContext } from 'solid-js';
 import type { Options } from 'webcrack';
+import type { MangleMode } from '../App';
 import { evalCode } from '../sandbox';
 import type {
   DeobfuscateResult,
@@ -15,7 +16,7 @@ const postMessage = (message: WorkerRequest) => worker.postMessage(message);
 
 interface Props {
   code: string | undefined;
-  options: Options;
+  options: Options & { mangleMode: MangleMode };
   onResult: (result: DeobfuscateResult) => void;
 }
 

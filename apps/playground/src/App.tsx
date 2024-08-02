@@ -22,12 +22,14 @@ import { debounce } from './utils/debounce';
 import { downloadFile } from './utils/files';
 import type { DeobfuscateResult } from './webcrack.worker';
 
+export type MangleMode = 'off' | 'all' | 'hex' | 'short';
+
 export const [config, setConfig] = createStore({
   deobfuscate: true,
   unminify: true,
   unpack: true,
   jsx: true,
-  mangle: false,
+  mangleMode: 'off' as MangleMode,
 });
 
 function App() {

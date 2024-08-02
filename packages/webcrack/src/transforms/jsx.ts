@@ -2,6 +2,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../ast-utils';
 import { codePreview, constMemberExpression } from '../ast-utils';
+import { generateUid } from '../ast-utils/scope';
 
 export default {
   name: 'jsx',
@@ -72,7 +73,7 @@ export default {
             ) {
               const binding = path.scope.getBinding(type.current.name);
               if (!binding) return;
-              name = t.jsxIdentifier(path.scope.generateUid('Component'));
+              name = t.jsxIdentifier(generateUid(path.scope, 'Component'));
               path.scope.rename(type.current.name, name.name);
             }
 

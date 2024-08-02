@@ -18,7 +18,7 @@ const result = await webcrack('const a = 1+1;');
 console.log(result.code); // 'const a = 2;'
 ```
 
-Save the deobufscated code and the unpacked bundle to the given directory:
+Save the deobfuscated code and the unpacked bundle to the given directory:
 
 ```js
 import fs from 'fs';
@@ -54,6 +54,14 @@ await webcrack(code, {
   unminify: true, // Unminify the code
   deobfuscate: true, // Deobfuscate the code
   mangle: false, // Mangle variable names
+});
+```
+
+Only mangle variable names that match a filter:
+
+```js
+await webcrack(code, {
+  mangle: (id) => id.startsWith('_0x'),
 });
 ```
 
