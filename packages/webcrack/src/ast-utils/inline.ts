@@ -46,7 +46,11 @@ export function inlineVariable(
     binding.referencePaths.forEach((ref) => {
       ref.replaceWith(assignment.node.right);
     });
-    assignment.remove();
+    if (assignment.parentPath.isExpressionStatement()) {
+      assignment.remove();
+    } else {
+      assignment.replaceWith(assignment.node.right);
+    }
     binding.path.remove();
   }
 }
