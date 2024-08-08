@@ -140,8 +140,12 @@ export async function webcrack(
       ast = parse(code, {
         sourceType: 'unambiguous',
         allowReturnOutsideFunction: true,
+        errorRecovery: true,
         plugins: ['jsx'],
       });
+      if (ast.errors.length) {
+        debug('webcrack:parse')('Errors', ast.errors);
+      }
     },
     () => {
       applyTransforms(

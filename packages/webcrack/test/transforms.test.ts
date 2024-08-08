@@ -20,3 +20,12 @@ test('decode malformed bookmarklet', async () => {
     })();"
   `);
 });
+
+test('parser error recovery', async () => {
+  const code = 'foo()+=1; 1+1;';
+  const result = await webcrack(code);
+  expect(result.code).toMatchInlineSnapshot(`
+    "foo() += 1;
+    2;"
+  `);
+});
