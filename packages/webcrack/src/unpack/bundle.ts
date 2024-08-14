@@ -1,10 +1,7 @@
 import traverse from '@babel/traverse';
 import type * as m from '@codemod/matchers';
-import { posix } from 'node:path';
+import { dirname, join, normalize } from 'node:path';
 import type { Module } from './module';
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { dirname, join, normalize } = posix;
 
 export class Bundle {
   type: 'webpack' | 'browserify';
