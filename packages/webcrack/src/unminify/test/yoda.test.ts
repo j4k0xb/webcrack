@@ -63,3 +63,6 @@ test('ignore other operators', () =>
 
 test('ignore when right side is a literal', () =>
   expectJS('1 === 2').toMatchInlineSnapshot('1 === 2;'));
+
+test('ignore when both sides are pure values', () =>
+  expectJS('NaN == Infinity').toMatchInlineSnapshot(`NaN == Infinity;`));

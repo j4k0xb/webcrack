@@ -23,22 +23,23 @@ export default {
   name: 'yoda',
   tags: ['safe'],
   visitor: () => {
+    const pureValue = m.or(
+      m.stringLiteral(),
+      m.numericLiteral(),
+      m.unaryExpression(
+        '-',
+        m.or(m.numericLiteral(), m.identifier('Infinity')),
+      ),
+      m.booleanLiteral(),
+      m.nullLiteral(),
+      m.identifier('undefined'),
+      m.identifier('NaN'),
+      m.identifier('Infinity'),
+    );
     const matcher = m.binaryExpression(
       m.or(...Object.values(FLIPPED_OPERATORS)),
-      m.or(
-        m.stringLiteral(),
-        m.numericLiteral(),
-        m.unaryExpression(
-          '-',
-          m.or(m.numericLiteral(), m.identifier('Infinity')),
-        ),
-        m.booleanLiteral(),
-        m.nullLiteral(),
-        m.identifier('undefined'),
-        m.identifier('NaN'),
-        m.identifier('Infinity'),
-      ),
-      m.matcher((node) => !t.isLiteral(node)),
+      pureValue,
+      m.matcher((node) => !pureValue.match(node)),
     );
 
     return {
