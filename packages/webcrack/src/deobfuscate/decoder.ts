@@ -80,6 +80,9 @@ export class Decoder {
         if (literalCall.match(ref.parent)) {
           calls.push(ref.parentPath as NodePath<t.CallExpression>);
         }
+      } else if (ref.parentPath?.isExpressionStatement()) {
+        // `decode;` may appear on it's own in some forked obfuscators
+        ref.parentPath.remove();
       }
     }
 
