@@ -17,6 +17,7 @@ import deobfuscate, {
   createNodeSandbox,
 } from './deobfuscate';
 import debugProtection from './deobfuscate/debug-protection';
+import evaluateGlobals from './deobfuscate/evaluate-globals';
 import mergeObjectAssignments from './deobfuscate/merge-object-assignments';
 import selfDefending from './deobfuscate/self-defending';
 import varFunctions from './deobfuscate/var-functions';
@@ -179,7 +180,8 @@ export async function webcrack(
           ].flat(),
         );
       }),
-    options.deobfuscate && (() => applyTransform(ast, mergeObjectAssignments)),
+    options.deobfuscate &&
+      (() => applyTransforms(ast, [mergeObjectAssignments, evaluateGlobals])),
     () => (outputCode = generate(ast)),
     // Unpacking modifies the same AST and may result in imports not at top level
     // so the code has to be generated before
