@@ -49,6 +49,7 @@ test('class', () => {
 
 test('function', () => {
   expectJS('function abc() {}').toMatchInlineSnapshot('function f() {}');
+  expectJS('export default function x() {}').toMatchInlineSnapshot(`export default function f() {}`);
 });
 
 test('parameters', () => {

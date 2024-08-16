@@ -41,9 +41,11 @@ describe('rename variable', () => {
       a = 3;
       a++;
       [a] = [2];
+      var [a] = [1];
       ({...a} = {});
       for (a of []);
       for (a in []);
+      delete a;
     `);
     traverse(ast, {
       Program(path) {
@@ -57,11 +59,13 @@ describe('rename variable', () => {
       b = 3;
       b++;
       [b] = [2];
+      var [b] = [1];
       ({
         ...b
       } = {});
       for (b of []);
       for (b in []);
+      delete b;
     `);
   });
 });
