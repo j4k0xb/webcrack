@@ -25,6 +25,10 @@
       "name": "Launch playground",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/**/node_modules/**",
+      ],
       "preLaunchTask": "Run playground dev server"
     }
   ]
