@@ -1,6 +1,6 @@
 import traverse from '@babel/traverse';
 import type * as m from '@codemod/matchers';
-import { dirname, join, normalize } from 'node:path';
+import { dirname, join, normalize, sep } from 'node:path';
 import type { Module } from './module';
 
 export class Bundle {
@@ -74,7 +74,7 @@ export class Bundle {
     await Promise.all(
       Array.from(this.modules.values(), async (module) => {
         const modulePath = normalize(join(path, module.path));
-        if (!modulePath.startsWith(path)) {
+        if (!modulePath.startsWith(path + sep)) {
           throw new Error(`detected path traversal: ${module.path}`);
         }
         await mkdir(dirname(modulePath), { recursive: true });
