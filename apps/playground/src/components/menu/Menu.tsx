@@ -10,6 +10,7 @@ import MenuSetting from './MenuSetting';
 
 interface Props {
   onFileOpen?: (content: string) => void;
+  onLoadFromURL?: (url: string) => void;
   onSave?: () => void;
   onRestore?: (workspace: Workspace) => void;
 }
@@ -47,6 +48,16 @@ export default function Menu(props: Props) {
           onClick={() => openFile(props.onFileOpen)}
         >
           Open File…
+        </MenuButton>
+        <MenuButton
+          onClick={() => {
+            const url = prompt('Enter URL');
+            if (url) {
+              props.onLoadFromURL?.(url);
+            }
+          }}
+        >
+          Open File From URL…
         </MenuButton>
         <MenuDropdown title="Open Recent">
           <For each={workspaces()} fallback={<li>No recent files</li>}>

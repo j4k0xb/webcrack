@@ -183,24 +183,28 @@ function App() {
     ]);
   }
 
-  (async () => {
+  async function loadFromURL(url: string) {
+    const response = await fetch(url).catch(() =>
+      fetch('https://corsproxy.io/?' + encodeURIComponent(url)),
+    );
+    if (response.ok) {
+      const model = activeTab() || openUntitledTab();
+      model.setValue(await response.text());
+    }
+  }
+
+  {
     const queryParams = new URLSearchParams(location.search);
     const urlParam = queryParams.get('url');
     const codeParam = queryParams.get('code');
 
     if (urlParam !== null) {
-      const response = await fetch(urlParam).catch(() =>
-        fetch('https://corsproxy.io/?' + encodeURIComponent(urlParam)),
-      );
-      if (response.ok) {
-        const model = activeTab() || openUntitledTab();
-        model.setValue(await response.text());
-      }
+      loadFromURL(urlParam).catch(console.error);
     } else if (codeParam !== null) {
       const model = activeTab() || openUntitledTab();
       model.setValue(codeParam);
     }
-  })().catch(console.error);
+  }
 
   return (
     <DeobfuscateContextProvider
@@ -212,6 +216,9 @@ function App() {
       <Menu
         onFileOpen={(content) => {
           openUntitledTab().setValue(content);
+        }}
+        onLoadFromURL={(url) => {
+          loadFromURL(url).catch(console.error);
         }}
         onSave={() => {
           if (activeTab()) downloadFile(activeTab()!);
