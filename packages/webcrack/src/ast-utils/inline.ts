@@ -70,7 +70,7 @@ export function inlineArrayElements(
     const property = memberPath.node.property as t.NumericLiteral;
     const index = property.value;
     const replacement = array.elements[index]!;
-    memberPath.replaceWith(replacement);
+    memberPath.replaceWith(t.cloneNode(replacement));
   }
 }
 
