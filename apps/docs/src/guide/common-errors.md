@@ -14,9 +14,18 @@ To fix this, run `npm rebuild isolated-vm` in your project directory or delete t
 
 For Node 20.x and above, disabling snapshots may be necessary:
 
-```sh
+::: code-group
+
+```sh [Windows]
+set NODE_OPTIONS=--no-node-snapshot
+webcrack input.js
+```
+
+```sh [Linux/Mac]
 NODE_OPTIONS=--no-node-snapshot webcrack input.js
 ```
+
+:::
 
 or
 
@@ -32,9 +41,18 @@ For any other issues, please refer to the [isolated-vm readme](https://github.co
 
 Fix by running node with the [--max-old-space-size](https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-megabytes) flag. For example:
 
-```sh
+::: code-group
+
+```sh [Windows]
+set NODE_OPTIONS=--max-old-space-size=8192
+webcrack bundle.js
+```
+
+```sh [Linux/Mac]
 NODE_OPTIONS="--max-old-space-size=8192" webcrack bundle.js
 ```
+
+:::
 
 or
 
