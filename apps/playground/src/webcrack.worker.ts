@@ -59,6 +59,9 @@ self.onmessage = async ({ data }: MessageEvent<WorkerRequest>) => {
 
     postMessage({ type: 'result', code: result.code, files });
   } catch (error) {
+    // Babel SyntaxError dynamically sets `error.message`, has to be
+    // accessed/logged before postMessage to be properly cloned.
+    console.error(error);
     postMessage({ type: 'error', error: error as Error });
   }
 };

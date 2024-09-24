@@ -63,7 +63,6 @@ function useProviderValue(props: Props) {
       } else if (data.type === 'error') {
         setDeobfuscating(false);
         setAlert(data.error.toString());
-        console.error(data.error);
       }
     };
   }
