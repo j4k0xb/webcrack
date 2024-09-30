@@ -87,7 +87,8 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
         m.fromCapture(arrayIdentifier),
         m.numericLiteral(m.matcher((value) => value < length)),
       );
-      if (!isReadonlyObject(binding, memberAccess)) return;
+      if (!binding.referenced || !isReadonlyObject(binding, memberAccess))
+        return;
 
       inlineArrayElements(arrayExpression.current!, binding.referencePaths);
       path.remove();
