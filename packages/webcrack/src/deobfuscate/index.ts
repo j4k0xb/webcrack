@@ -1,4 +1,3 @@
-import type * as t from '@babel/types';
 import debug from 'debug';
 import type { AsyncTransform } from '../ast-utils';
 import {
@@ -31,52 +30,46 @@ export default {
     if (!sandbox) return;
 
     const logger = debug('webcrack:deobfuscate');
-    const visitedStringArrays = new Set<t.Node>();
+    const stringArray = findStringArray(ast);
+    logger(
+      stringArray
+        ? `String Array: ${stringArray.length} strings`
+        : 'String Array: no',
+    );
+    if (!stringArray) return;
 
-    while (true) {
-      const stringArray = findStringArray(ast);
-      logger(
-        stringArray
-          ? `String Array: ${stringArray.length} strings`
-          : 'String Array: no',
-      );
-      if (!stringArray) break;
-      if (visitedStringArrays.has(stringArray.path.node)) break;
-      visitedStringArrays.add(stringArray.path.node);
+    const rotator = findArrayRotator(stringArray);
+    logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
 
-      const rotator = findArrayRotator(stringArray);
-      logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
+    const decoders = findDecoders(stringArray);
+    logger(`String Array Encodings: ${decoders.length}`);
 
-      const decoders = findDecoders(stringArray);
-      logger(`String Array Encodings: ${decoders.length}`);
+    state.changes += applyTransform(ast, inlineObjectProps).changes;
 
-      state.changes += applyTransform(ast, inlineObjectProps).changes;
-
-      for (const decoder of decoders) {
-        state.changes += applyTransform(
-          ast,
-          inlineDecoderWrappers,
-          decoder.path,
-        ).changes;
-      }
-
-      const vm = new VMDecoder(sandbox, stringArray, decoders, rotator);
-      state.changes += (
-        await applyTransformAsync(ast, inlineDecodedStrings, { vm })
-      ).changes;
-
-      if (decoders.length > 0) {
-        stringArray.path.remove();
-        rotator?.remove();
-        decoders.forEach((decoder) => decoder.path.remove());
-        state.changes += 2 + decoders.length;
-      }
-
-      state.changes += applyTransforms(
+    for (const decoder of decoders) {
+      state.changes += applyTransform(
         ast,
-        [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
-        { noScope: true },
+        inlineDecoderWrappers,
+        decoder.path,
       ).changes;
     }
+
+    const vm = new VMDecoder(sandbox, stringArray, decoders, rotator);
+    state.changes += (
+      await applyTransformAsync(ast, inlineDecodedStrings, { vm })
+    ).changes;
+
+    if (decoders.length > 0) {
+      stringArray.path.remove();
+      rotator?.remove();
+      decoders.forEach((decoder) => decoder.path.remove());
+      state.changes += 2 + decoders.length;
+    }
+
+    state.changes += applyTransforms(
+      ast,
+      [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
+      { noScope: true },
+    ).changes;
   },
 } satisfies AsyncTransform<Sandbox>;
