@@ -21,7 +21,7 @@ decoder(1);
   decoder(2);
   decoder(3);
   () => {
-    alias(4);
+    decoder(4);
   };
   decoder(5);
 };"
