@@ -109,6 +109,20 @@ export default {
       propertyName,
     );
 
+    const anyMemberAccess = constMemberExpression(m.identifier(), propertyName);
+    const deadBranchTest = m.or(
+      m.callExpression(anyMemberAccess, [anyMemberAccess, anyMemberAccess]),
+      m.binaryExpression(
+        m.or('===', '!=='),
+        m.stringLiteral(),
+        m.stringLiteral(),
+      ),
+    );
+    const deadBranchMatcher = m.or(
+      m.ifStatement(deadBranchTest),
+      m.conditionalExpression(deadBranchTest),
+    );
+
     function isConstantBinding(binding: Binding) {
       // Workaround because sometimes babel treats the VariableDeclarator/binding itself as a violation
       return binding.constant || binding.constantViolations[0] === binding.path;
@@ -121,9 +135,13 @@ export default {
         // would have generated the code (no reassignments, etc.)
         const binding = path.scope.getBinding(varId.current!.name);
         if (!binding) return changes;
-        if (!isConstantBinding(binding)) return changes;
+        const isInDeadBranchMaybe = binding.constantViolations.every((path) =>
+          findParent(path, deadBranchMatcher),
+        );
+        if (!isInDeadBranchMaybe && !isConstantBinding(binding)) return changes;
         if (!transformObjectKeys(binding)) return changes;
-        if (!isReadonlyObject(binding, memberAccess)) return changes;
+        if (!isInDeadBranchMaybe && !isReadonlyObject(binding, memberAccess))
+          return changes;
 
         const props = new Map(
           objectProperties.current!.map((p) => [
@@ -138,7 +156,11 @@ export default {
         // Have to loop backwards because we might replace a node that
         // contains another reference to the binding (https://github.com/babel/babel/issues/12943)
         [...binding.referencePaths].reverse().forEach((ref) => {
-          const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
+          const memberPath = ref.parentPath;
+
+          // It should always be a MemberExpression unless when dead code injection is enabled
+          if (!t.isMemberExpression(memberPath?.node)) return;
+
           const propName = getPropName(memberPath.node.property)!;
           const value = props.get(propName);
           if (!value) {
@@ -148,7 +170,7 @@ export default {
 
           if (t.isStringLiteral(value)) {
             memberPath.replaceWith(value);
-          } else {
+          } else if (t.isFunctionExpression(value)) {
             inlineFunction(
               value,
               memberPath.parentPath as NodePath<t.CallExpression>,
