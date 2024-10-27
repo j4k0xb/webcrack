@@ -12,26 +12,26 @@
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^20.15.0",
+    "@types/node": "^22.8.1",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
     "autoprefixer": "^10.4.20",
-    "daisyui": "^4.12.10",
-    "postcss": "^8.4.41",
-    "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.1",
+    "daisyui": "^4.12.13",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
     "vite-plugin-monaco-editor": "^1.1.0",
     "vite-plugin-node-polyfills": "^0.22.0",
     "vite-plugin-solid": "^2.10.2"
   },
   "dependencies": {
-    "@babel/generator": "^7.25.0",
-    "@babel/types": "^7.25.2",
+    "@babel/generator": "^7.26.0",
+    "@babel/types": "^7.26.0",
     "idb": "^8.0.0",
-    "monaco-editor": "^0.50.0",
+    "monaco-editor": "^0.52.0",
     "sandybox": "^1.1.2",
-    "solid-js": "^1.8.21",
+    "solid-js": "^1.9.3",
     "webcrack": "workspace:*"
   }
 }

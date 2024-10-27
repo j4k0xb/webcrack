@@ -1,4 +1,4 @@
 function hi() {
-  console.log( /*webcrack:decode_error*/undefined);
+  console.log(/*webcrack:decode_error*/undefined);
 }
 hi();

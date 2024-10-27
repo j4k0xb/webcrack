@@ -108,7 +108,7 @@ test('dont rearrange from do-while', () =>
   expectJS(`
     do {} while (a(), b());
   `).toMatchInlineSnapshot(`
-    do {} while ((a(), b()));
+    do {} while (a(), b());
   `));
 
 test('rearrange variable declarator', () => {
