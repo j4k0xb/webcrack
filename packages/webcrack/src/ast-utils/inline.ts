@@ -36,21 +36,29 @@ export function inlineVariable(
       ref.replaceWith(varDeclarator.init!);
     });
     binding.path.remove();
-  } else if (
-    unsafeAssignments &&
-    binding.constantViolations.length === 1 &&
-    assignmentMatcher.match(binding.constantViolations[0]?.node)
-  ) {
-    const assignment = binding
-      .constantViolations[0] as NodePath<t.AssignmentExpression>;
-    binding.referencePaths.forEach((ref) => {
-      ref.replaceWith(assignment.node.right);
-    });
-    if (assignment.parentPath.isExpressionStatement()) {
-      assignment.remove();
-    } else {
-      assignment.replaceWith(assignment.node.right);
+  } else if (unsafeAssignments && binding.constantViolations.length >= 1) {
+    const assignments = binding.constantViolations
+      .map((path) => path.node)
+      .filter((node) => assignmentMatcher.match(node));
+    if (!assignments.length) return;
+
+    function getNearestAssignment(location: number) {
+      return assignments.findLast((assignment) => assignment.start! < location);
     }
+
+    for (const ref of binding.referencePaths) {
+      const assignment = getNearestAssignment(ref.node.start!);
+      if (assignment) ref.replaceWith(assignment.right);
+    }
+
+    for (const path of binding.constantViolations) {
+      if (path.parentPath?.isExpressionStatement()) {
+        path.remove();
+      } else if (path.isAssignmentExpression()) {
+        path.replaceWith(path.node.right);
+      }
+    }
+
     binding.path.remove();
   }
 }

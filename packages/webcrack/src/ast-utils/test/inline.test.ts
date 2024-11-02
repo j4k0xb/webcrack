@@ -31,6 +31,20 @@ test('inline variable with assignment', () => {
   expect(ast).toMatchInlineSnapshot(`let b = 1;`);
 });
 
+test('inline variable with multiple assignments', () => {
+  const ast = parse('let a; a = 1; let b = a; a = 2; let c = a; a = 3;');
+  traverse(ast, {
+    Program(path) {
+      const binding = path.scope.getBinding('a')!;
+      inlineVariable(binding, undefined, true);
+    },
+  });
+  expect(ast).toMatchInlineSnapshot(`
+    let b = 1;
+    let c = 2;
+  `);
+});
+
 test('inline variable with assignment in an expression', () => {
   const ast = parse('let a; x = a = 1; let b = a;');
   traverse(ast, {
