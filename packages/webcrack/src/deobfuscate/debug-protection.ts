@@ -94,7 +94,7 @@ export default {
 
         binding?.referencePaths.forEach((ref) => {
           if (intervalCall.match(ref.parent)) {
-            findParent(ref, iife)?.remove();
+            findParent(ref, iife())?.remove();
           }
         });
 

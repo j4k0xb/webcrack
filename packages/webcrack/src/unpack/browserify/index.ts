@@ -2,12 +2,7 @@ import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../../ast-utils';
-import {
-  constKey,
-  getPropName,
-  matchIife,
-  renameParameters,
-} from '../../ast-utils';
+import { constKey, getPropName, iife, renameParameters } from '../../ast-utils';
 import type { Bundle } from '../bundle';
 import { resolveDependencyTree } from '../path';
 import { BrowserifyBundle } from './bundle';
@@ -55,14 +50,17 @@ export const unpackBrowserify = {
           m.identifier(),
         ]),
         // (function () { function init(files, cache, entryIds) {...} return init; })()(...)
-        matchIife([
-          m.functionDeclaration(undefined, [
-            m.identifier(),
-            m.identifier(),
-            m.identifier(),
+        iife(
+          [],
+          m.blockStatement([
+            m.functionDeclaration(undefined, [
+              m.identifier(),
+              m.identifier(),
+              m.identifier(),
+            ]),
+            m.returnStatement(m.identifier()),
           ]),
-          m.returnStatement(m.identifier()),
-        ]),
+        ),
       ),
       [
         m.objectExpression(files),

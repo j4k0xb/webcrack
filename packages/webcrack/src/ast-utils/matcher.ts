@@ -36,17 +36,34 @@ export function constObjectProperty(
   );
 }
 
-export function matchIife(
-  body?: m.Matcher<t.Statement[]> | m.Matcher<t.Statement>[],
-): m.Matcher<t.CallExpression> {
-  return m.callExpression(
-    m.functionExpression(null, [], body ? m.blockStatement(body) : undefined),
-    [],
+export function anonymousFunction(
+  params?:
+    | m.Matcher<(t.Identifier | t.RestElement | t.Pattern)[]>
+    | (
+        | m.Matcher<t.Identifier>
+        | m.Matcher<t.Pattern>
+        | m.Matcher<t.RestElement>
+      )[],
+  body?: m.Matcher<t.BlockStatement>,
+): m.Matcher<t.FunctionExpression | t.ArrowFunctionExpression> {
+  return m.or(
+    m.functionExpression(null, params, body, false),
+    m.arrowFunctionExpression(params, body),
   );
 }
 
-export const iife = matchIife();
-export const emptyIife = matchIife([]);
+export function iife(
+  params?:
+    | m.Matcher<(t.Identifier | t.RestElement | t.Pattern)[]>
+    | (
+        | m.Matcher<t.Identifier>
+        | m.Matcher<t.Pattern>
+        | m.Matcher<t.RestElement>
+      )[],
+  body?: m.Matcher<t.BlockStatement>,
+): m.Matcher<t.CallExpression> {
+  return m.callExpression(anonymousFunction(params, body));
+}
 
 /**
  * Matches both identifier properties and string literal computed properties
