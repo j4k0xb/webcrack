@@ -33,7 +33,7 @@ export default {
     const stringArray = findStringArray(ast);
     logger(
       stringArray
-        ? `String Array: ${stringArray.length} strings`
+        ? `String Array: ${stringArray.originalName}, length ${stringArray.length}`
         : 'String Array: no',
     );
     if (!stringArray) return;
@@ -42,7 +42,11 @@ export default {
     logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
 
     const decoders = findDecoders(stringArray);
-    logger(`String Array Encodings: ${decoders.length}`);
+    logger(
+      `String Array Decoders: ${decoders
+        .map((d) => d.originalName)
+        .join(', ')}`,
+    );
 
     state.changes += applyTransform(ast, inlineObjectProps).changes;
 

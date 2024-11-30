@@ -13,6 +13,7 @@ export interface StringArray {
   path: NodePath<t.FunctionDeclaration>;
   references: NodePath[];
   name: string;
+  originalName: string;
   length: number;
 }
 
@@ -70,6 +71,7 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
         result = {
           path,
           references: binding.referencePaths,
+          originalName: name,
           name: '__STRING_ARRAY__',
           length,
         };
