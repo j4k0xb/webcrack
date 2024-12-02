@@ -54,6 +54,7 @@ await webcrack(code, {
   unminify: true, // Unminify the code
   deobfuscate: true, // Deobfuscate the code
   mangle: false, // Mangle variable names
+  sandbox, // Explained below
 });
 ```
 
@@ -63,6 +64,43 @@ Only mangle variable names that match a filter:
 await webcrack(code, {
   mangle: (id) => id.startsWith('_0x'),
 });
+```
+
+## Browser Usage & Sandbox
+
+The `sandbox` option has to be passed when trying to deobfuscate string arrays in a browser.
+In future versions, this should hopefully not be necessary anymore.
+
+It is an (optionally async) function that takes a `code` parameter and returns the evaluated value.
+
+::: danger Security warning
+Simplest possible implementation, avoid using due to potentially executing malicious code
+:::
+
+```js
+const result = await webcrack('function _0x317a(){....', { sandbox: eval });
+```
+
+More secure version with [sandybox](https://github.com/trentmwillis/sandybox) and CSP:
+
+```js
+const sandbox = await Sandybox.create();
+const iframe = document.querySelector('.sandybox');
+iframe?.contentDocument?.head.insertAdjacentHTML(
+  'afterbegin',
+  `<meta http-equiv="Content-Security-Policy" content="default-src 'none';">`,
+);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function evalCode(code) {
+  const fn = await sandbox.addFunction(`() => ${code}`);
+  return Promise.race([
+    fn(),
+    sleep(10_000).then(() => Promise.reject(new Error('Sandbox timeout'))),
+  ]).finally(() => sandbox.removeFunction(fn));
+}
+
+const result = await webcrack('function _0x317a(){....', { sandbox: evalCode });
 ```
 
 ## Customize Paths
