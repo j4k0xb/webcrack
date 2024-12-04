@@ -2,9 +2,21 @@
 
 Installation:
 
-```bash
+::: code-group
+
+```bash [npm]
 npm install webcrack
 ```
+
+```bash [yarn]
+yarn add webcrack
+```
+
+```bash [pnpm]
+pnpm add webcrack
+```
+
+:::
 
 :::info
 This is a pure ESM package, so you need to use `import` instead of `require`.

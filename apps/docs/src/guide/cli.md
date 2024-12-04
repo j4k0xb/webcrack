@@ -2,9 +2,21 @@
 
 Install the package globally:
 
-```bash
+::: code-group
+
+```bash [npm]
 npm install -g webcrack
 ```
+
+```bash [yarn]
+yarn global add webcrack
+```
+
+```bash [pnpm]
+pnpm add -g webcrack
+```
+
+:::
 
 ```txt
 Usage: webcrack [options] [file]
