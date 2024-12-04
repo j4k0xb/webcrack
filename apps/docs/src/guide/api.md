@@ -1,13 +1,24 @@
 # API Examples
 
-:::info
-This is a pure ESM package, so you need to use `import` instead of `require`.
-For more info, check out [this gist](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
-:::
+Installation:
 
 ```bash
 npm install webcrack
 ```
+
+:::info
+This is a pure ESM package, so you need to use `import` instead of `require`.
+For more info, check out [this gist](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
+Or use the following wrapper in commonjs projects:
+
+```js
+async function webcrack(...args) {
+  const { webcrack } = await import('webcrack');
+  return webcrack(...args);
+}
+```
+
+:::
 
 ## Basic Usage
 
