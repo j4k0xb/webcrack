@@ -16,23 +16,23 @@ yarn add webcrack
 pnpm add webcrack
 ```
 
+## Basic Usage
+
 :::
 
 :::info
-This is a pure ESM package, so you need to use `import` instead of `require`.
-For more info, check out [this gist](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
-Or use the following wrapper in commonjs projects:
+All examples are shown with ESM syntax.
+For CommonJS, use the following instead:
 
 ```js
-async function webcrack(...args) {
-  const { webcrack } = await import('webcrack');
-  return webcrack(...args);
-}
+const { webcrack } = require('webcrack');
+
+webcrack('const a = 1+1;').then((result) => {
+  console.log(result.code); // 'const a = 2;'
+});
 ```
 
 :::
-
-## Basic Usage
 
 ```js
 import { webcrack } from 'webcrack';
