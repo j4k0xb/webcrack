@@ -35,6 +35,14 @@ node --no-node-snapshot your-script.js
 
 For any other issues, please refer to the [isolated-vm readme](https://github.com/laverdet/isolated-vm#requirements).
 
+## Cannot Find Module
+
+> Error: Cannot find module './out/isolated_vm'
+
+This error may happen when using pnpm 10 or later, because it does not run the `postinstall` script by default to build or download the native modules of isolated-vm.
+
+To fix this, re-run the install command with `--allow-build=isolated-vm --force` added or see the [pnpm 10 changelog](https://github.com/pnpm/pnpm/releases/tag/v10.0.0).
+
 ## Heap Out Of Memory
 
 > FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
@@ -44,8 +52,7 @@ Fix by running node with the [--max-old-space-size](https://nodejs.org/api/cli.h
 ::: code-group
 
 ```sh [Windows]
-set NODE_OPTIONS=--max-old-space-size=8192
-webcrack bundle.js
+set NODE_OPTIONS=--max-old-space-size=8192 && webcrack bundle.js
 ```
 
 ```sh [Linux/Mac]
