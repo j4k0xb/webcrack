@@ -39,7 +39,7 @@ function App() {
     monaco.editor.createModel(
       '',
       'javascript',
-      monaco.Uri.from({ scheme: 'untitled', path: 'Untitled-1' }),
+      monaco.Uri.from({ scheme: 'untitled', path: 'Untitled-1.js' }),
     ),
   ]);
   const [tabs, setTabs] = createSignal<monaco.editor.ITextModel[]>(models());
@@ -131,7 +131,7 @@ function App() {
       'javascript',
       monaco.Uri.from({
         scheme: 'untitled',
-        path: `Untitled-${untitledCounter()}`,
+        path: `Untitled-${untitledCounter()}.js`,
       }),
     );
     setModels([...models(), model]);
@@ -225,6 +225,11 @@ function App() {
         }}
         onSave={() => {
           if (activeTab()) downloadFile(activeTab()!);
+        }}
+        onSaveAll={() => {
+          import('./utils/zip.js')
+            .then((module) => module.downloadModelsZIP(models()))
+            .catch(console.error);
         }}
         onRestore={(workspace) => {
           restoreWorkspace(workspace).catch(console.error);
