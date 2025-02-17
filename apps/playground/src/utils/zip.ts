@@ -3,7 +3,9 @@ import type * as monaco from 'monaco-editor';
 import { downloadBlob } from './files.js';
 
 export async function downloadModelsZIP(models: monaco.editor.ITextModel[]) {
-  const zipWriter = new ZipWriter(new BlobWriter('application/zip'));
+  const zipWriter = new ZipWriter(new BlobWriter('application/zip'), {
+    dataDescriptor: false,
+  });
 
   await Promise.all(
     models.map((model) => {
