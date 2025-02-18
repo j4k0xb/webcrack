@@ -159,15 +159,18 @@ export function isReadonlyObject(
     return false;
 
   function isPatternAssignment(member: NodePath<t.Node>) {
+    const { parentPath } = member;
     return (
       // [obj.property] = [1];
-      member.parentPath?.isArrayPattern() ||
-      // ([obj.property = 1] = [])
-      member.parentPath?.isAssignmentPattern() ||
+      parentPath?.isArrayPattern() ||
       // ({ property: obj.property } = {})
-      member.parentPath?.parentPath?.isObjectPattern() ||
+      // ({ ...obj.property } = {})
+      (parentPath?.parentPath?.isObjectPattern() &&
+        (parentPath.isObjectProperty({ value: member.node }) ||
+          parentPath.isRestElement())) ||
+      // ([obj.property = 1] = [])
       // ({ property: obj.property = 1 } = {})
-      member.parentPath?.isAssignmentPattern()
+      parentPath?.isAssignmentPattern({ left: member.node })
     );
   }
 
