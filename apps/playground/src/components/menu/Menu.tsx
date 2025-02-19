@@ -12,6 +12,7 @@ interface Props {
   onFileOpen?: (content: string) => void;
   onLoadFromURL?: (url: string) => void;
   onSave?: () => void;
+  onSaveAll?: () => void;
   onRestore?: (workspace: Workspace) => void;
 }
 
@@ -77,6 +78,7 @@ export default function Menu(props: Props) {
         <MenuButton shortcut={[ctrlCmdIcon, 'S']} onClick={props.onSave}>
           Save
         </MenuButton>
+        <MenuButton onClick={props.onSaveAll}>Save All (.zip)</MenuButton>
       </MenuHeader>
       <MenuHeader
         title="Settings"

@@ -28,6 +28,7 @@
   "dependencies": {
     "@babel/generator": "^7.26.0",
     "@babel/types": "^7.26.0",
+    "@zip.js/zip.js": "^2.7.57",
     "idb": "^8.0.0",
     "monaco-editor": "^0.52.0",
     "sandybox": "^1.1.2",
