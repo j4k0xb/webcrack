@@ -4,7 +4,7 @@ import * as t from '@babel/types';
 import { expect, test } from 'vitest';
 import {
   inlineArrayElements,
-  inlineFunction,
+  inlineFunctionCall,
   inlineObjectProperties,
   inlineVariable,
 } from '..';
@@ -87,7 +87,7 @@ test('inline object properties', () => {
   expect(ast).toMatchInlineSnapshot(`console.log(0x2f2, '0x396');`);
 });
 
-test('inline function', () => {
+test('inline function call', () => {
   const ast = parse(`
     function f(a, b) {
       return a + b;
@@ -97,7 +97,7 @@ test('inline function', () => {
   traverse(ast, {
     CallExpression(path) {
       const fn = path.parentPath.getPrevSibling().node as t.FunctionDeclaration;
-      inlineFunction(fn, path);
+      inlineFunctionCall(fn, path);
     },
   });
   expect(ast).toMatchInlineSnapshot(`
@@ -108,7 +108,28 @@ test('inline function', () => {
   `);
 });
 
-test('inline function with rest arg', () => {
+test('inline function call with too few args', () => {
+  const ast = parse(`
+    function f(a, b, c) {
+      return a + b + c;
+    }
+    fn(1, 2);
+  `);
+  traverse(ast, {
+    CallExpression(path) {
+      const fn = path.parentPath.getPrevSibling().node as t.FunctionDeclaration;
+      inlineFunctionCall(fn, path);
+    },
+  });
+  expect(ast).toMatchInlineSnapshot(`
+    function f(a, b, c) {
+      return a + b + c;
+    }
+    1 + 2 + void 0;
+  `);
+});
+
+test('inline function call with rest arg', () => {
   const ast = parse(`
     function f(a, ...b) {
       return a(...b);
@@ -120,7 +141,7 @@ test('inline function with rest arg', () => {
       if (t.isIdentifier(path.node.callee, { name: 'fn' })) {
         const fn = path.parentPath.getPrevSibling()
           .node as t.FunctionDeclaration;
-        inlineFunction(fn, path);
+        inlineFunctionCall(fn, path);
       }
     },
   });

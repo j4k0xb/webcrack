@@ -125,7 +125,7 @@ export function inlineObjectProperties(
  * ->
  * `a(1)`
  */
-export function inlineFunction(
+export function inlineFunctionCall(
   fn: t.FunctionExpression | t.FunctionDeclaration,
   caller: NodePath<t.CallExpression>,
 ): void {
@@ -149,7 +149,10 @@ export function inlineFunction(
         (p) => (p as t.Identifier).name === path.node.name,
       );
       if (paramIndex !== -1) {
-        path.replaceWith(caller.node.arguments[paramIndex]);
+        path.replaceWith(
+          caller.node.arguments[paramIndex] ??
+            t.unaryExpression('void', t.numericLiteral(0)),
+        );
         path.skip();
       }
     },
@@ -213,7 +216,7 @@ export function inlineFunctionAliases(binding: Binding): { changes: number } {
         .map((ref) => ref.parentPath!) as NodePath<t.CallExpression>[];
 
       for (const callRef of callRefs) {
-        inlineFunction(fn.node, callRef);
+        inlineFunctionCall(fn.node, callRef);
         state.changes++;
       }
 

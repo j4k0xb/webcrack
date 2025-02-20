@@ -10,7 +10,7 @@ import {
   createFunctionMatcher,
   findParent,
   getPropName,
-  inlineFunction,
+  inlineFunctionCall,
   isReadonlyObject,
 } from '../ast-utils';
 import mergeStrings from '../unminify/transforms/merge-strings';
@@ -149,7 +149,7 @@ export default {
           if (t.isStringLiteral(value)) {
             memberPath.replaceWith(value);
           } else {
-            inlineFunction(
+            inlineFunctionCall(
               value,
               memberPath.parentPath as NodePath<t.CallExpression>,
             );
@@ -240,7 +240,7 @@ export default {
           if (t.isStringLiteral(value)) {
             path.replaceWith(value);
           } else if (path.parentPath.isCallExpression()) {
-            inlineFunction(value, path.parentPath);
+            inlineFunctionCall(value, path.parentPath);
           } else {
             path.replaceWith(value);
           }
