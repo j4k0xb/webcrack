@@ -1,6 +1,7 @@
 import * as monaco from 'monaco-editor';
 import { createEffect, onCleanup, onMount } from 'solid-js';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
+import { settings } from '../hooks/useSettings.js';
 import { theme } from '../hooks/useTheme';
 import { registerEvalSelection } from '../monaco/eval-selection';
 import { PlaceholderContentWidget } from '../monaco/placeholder-widget';
@@ -44,6 +45,13 @@ export default function MonacoEditor(props: Props) {
 
     createEffect(() => {
       monaco.editor.setTheme(theme());
+    });
+
+    createEffect(() => {
+      editor.updateOptions({
+        stickyScroll: { enabled: settings.stickyScroll },
+        wordWrap: settings.wordWrap ? 'on' : 'off',
+      });
     });
 
     createEffect(() => {

@@ -5,6 +5,8 @@ const defaultSettings = {
   theme: 'system' as 'dark' | 'light' | 'system',
   confirmOnLeave: true,
   workspaceHistory: true,
+  stickyScroll: true,
+  wordWrap: true,
 };
 
 export type Settings = typeof defaultSettings;

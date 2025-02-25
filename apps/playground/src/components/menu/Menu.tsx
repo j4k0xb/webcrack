@@ -121,6 +121,26 @@ export default function Menu(props: Props) {
             }
           />
         </MenuSetting>
+        <MenuSetting>
+          Word Wrap
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm ml-auto"
+            checked={settings.wordWrap}
+            onChange={(e) => setSettings('wordWrap', e.currentTarget.checked)}
+          />
+        </MenuSetting>
+        <MenuSetting>
+          Sticky Scroll
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm ml-auto"
+            checked={settings.stickyScroll}
+            onChange={(e) =>
+              setSettings('stickyScroll', e.currentTarget.checked)
+            }
+          />
+        </MenuSetting>
       </MenuHeader>
       <li>
         <a
