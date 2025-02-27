@@ -31,6 +31,7 @@
     "tmp": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
+    "typecheck": "tsc",
     "test": "vitest --no-isolate"
   },
   "repository": {
