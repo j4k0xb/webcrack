@@ -157,7 +157,7 @@ export async function webcrack(
         debug('webcrack:parse')('Errors', ast.errors);
       }
     },
-    plugins.parse && (() => plugins.parse!(ast)),
+    plugins.parse && (() => plugins.parse(ast)),
 
     () => {
       applyTransforms(
@@ -166,17 +166,17 @@ export async function webcrack(
         { name: 'prepare' },
       );
     },
-    plugins.prepare && (() => plugins.prepare!(ast)),
+    plugins.prepare && (() => plugins.prepare(ast)),
 
     options.deobfuscate &&
       (() => applyTransformAsync(ast, deobfuscate, options.sandbox)),
-    plugins.deobfuscate && (() => plugins.deobfuscate!(ast)),
+    plugins.deobfuscate && (() => plugins.deobfuscate(ast)),
 
     options.unminify &&
       (() => {
         applyTransforms(ast, [transpile, unminify]);
       }),
-    plugins.unminify && (() => plugins.unminify!(ast)),
+    plugins.unminify && (() => plugins.unminify(ast)),
     options.mangle &&
       (() =>
         applyTransform(
@@ -202,7 +202,7 @@ export async function webcrack(
     // Unpacking modifies the same AST and may result in imports not at top level
     // so the code has to be generated before
     options.unpack && (() => (bundle = unpackAST(ast, options.mappings(m)))),
-    plugins.unpack && (() => plugins.unpack!(ast)),
+    plugins.unpack && (() => plugins.unpack(ast)),
   ].filter(Boolean) as (() => unknown)[];
 
   for (let i = 0; i < stages.length; i++) {
