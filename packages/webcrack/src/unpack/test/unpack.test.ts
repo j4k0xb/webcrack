@@ -1,7 +1,7 @@
 import * as m from '@codemod/matchers';
 import { readFile } from 'fs/promises';
 import { tmpdir } from 'os';
-import { join } from 'path';
+import { join, sep } from 'path';
 import { expect, test } from 'vitest';
 import { unpack } from '../index';
 
@@ -26,9 +26,21 @@ test('path mapping', async () => {
   expect(bundle!).toMatchSnapshot();
 });
 
-test('prevent path traversal', async () => {
+test.runIf(sep === '/')('prevent path traversal (posix)', async () => {
   const code = await readFile(
     join(SAMPLES_DIR, 'webpack-path-traversal.js'),
+    'utf8',
+  );
+  const bundle = unpack(code);
+  expect(bundle).toBeDefined();
+
+  const dir = join(tmpdir(), 'path-traversal-test');
+  await expect(bundle!.save(dir)).rejects.toThrow('path traversal');
+});
+
+test.runIf(sep === '\\')('prevent path traversal (windows)', async () => {
+  const code = await readFile(
+    join(SAMPLES_DIR, 'webpack-path-traversal-windows.js'),
     'utf8',
   );
   const bundle = unpack(code);

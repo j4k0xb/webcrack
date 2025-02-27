@@ -3,9 +3,14 @@
   "version": "0.0.0",
   "main": "index.js",
   "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./eslint.config.js"
+    }
+  },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "eslint-config-prettier": "^9.1.0"
+    "eslint-config-prettier": "^9.1.0",
+    "typescript-eslint": "8.0.0-alpha.27"
   }
 }

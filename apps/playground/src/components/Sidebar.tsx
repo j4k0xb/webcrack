@@ -1,7 +1,6 @@
-import { Show, createEffect, createSignal } from 'solid-js';
-import { setSettings, settings } from '../App';
+import { Show } from 'solid-js';
+import { config, setConfig, type MangleMode } from '../App';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
-import { useTheme } from '../hooks/useTheme';
 import FileTree from './FileTree';
 
 interface Props {
@@ -10,33 +9,11 @@ interface Props {
 }
 
 export default function Sidebar(props: Props) {
-  const { deobfuscate, deobfuscating, cancelDeobfuscate, progress } =
+  const { deobfuscate, deobfuscating, cancelDeobfuscate } =
     useDeobfuscateContext();
-  const [theme, setTheme] = useTheme();
-  const [progressShown, setProgressShown] = createSignal(false);
-
-  createEffect(() => {
-    if (deobfuscating()) setProgressShown(true);
-    else if (progress() === 100) setTimeout(() => setProgressShown(false), 500);
-    else setProgressShown(false);
-  });
 
   return (
     <nav class="flex flex-col w-12 sm:w-72 bg-base-200">
-      <style>
-        {progressShown() &&
-          `
-          .progress::-webkit-progress-value {
-            transition: width 250ms ease;
-          }
-        `}
-      </style>
-      <progress
-        class="progress flex-shrink-0"
-        classList={{ invisible: !progressShown() }}
-        value={progress() / 100}
-      />
-
       <div class="flex justify-center py-4">
         <Show
           when={deobfuscating()}
@@ -98,8 +75,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.deobfuscate}
-          onClick={(e) => setSettings('deobfuscate', e.currentTarget.checked)}
+          checked={config.deobfuscate}
+          onClick={(e) => setConfig('deobfuscate', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100 group">
@@ -135,8 +112,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.unminify}
-          onClick={(e) => setSettings('unminify', e.currentTarget.checked)}
+          checked={config.unminify}
+          onClick={(e) => setConfig('unminify', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100 group">
@@ -170,8 +147,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.unpack}
-          onClick={(e) => setSettings('unpack', e.currentTarget.checked)}
+          checked={config.unpack}
+          onClick={(e) => setConfig('unpack', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100 group">
@@ -207,8 +184,8 @@ export default function Sidebar(props: Props) {
         <input
           type="checkbox"
           class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.jsx}
-          onClick={(e) => setSettings('jsx', e.currentTarget.checked)}
+          checked={config.jsx}
+          onClick={(e) => setConfig('jsx', e.currentTarget.checked)}
         />
       </label>
       <label class="label cursor-pointer px-4 hover:bg-base-100">
@@ -228,77 +205,25 @@ export default function Sidebar(props: Props) {
           <path d="M10 8v6a2 2 0 1 0 4 0v-1a2 2 0 1 0 -4 0v1" />
           <path d="M20.732 12a2 2 0 0 0 -3.732 1v1a2 2 0 0 0 3.726 1.01" />
         </svg>
-        <span class="label-text ml-4 mr-auto hidden sm:inline">
-          Mangle Variables
-        </span>
-        <input
-          type="checkbox"
-          class="checkbox checkbox-sm hidden sm:inline"
-          checked={settings.mangle}
-          onClick={(e) => setSettings('mangle', e.currentTarget.checked)}
-        />
-      </label>
-
-      <label class="label cursor-pointer px-4 hover:bg-base-100">
-        <Show
-          when={theme() === 'light'}
-          fallback={
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              fill="none"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
-            </svg>
+        <span class="label-text ml-4 mr-auto hidden sm:inline">Mangle</span>
+        <select
+          class="select select-sm select-bordered ml-4 flex-1 w-full"
+          value={config.mangleMode}
+          onChange={(e) =>
+            setConfig('mangleMode', e.currentTarget.value as MangleMode)
           }
         >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-            <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
-          </svg>
-        </Show>
-        <span class="label-text ml-4 mr-auto hidden sm:inline">Dark Mode</span>
-        <input
-          type="checkbox"
-          class="toggle toggle-sm hidden sm:inline"
-          checked={theme() === 'dark'}
-          onClick={(e) => setTheme(e.currentTarget.checked ? 'dark' : 'light')}
-        ></input>
+          <option value="off">Off</option>
+          <option value="hex">Hex (_0x)</option>
+          <option value="short">Short Names</option>
+          <option value="all">All Names</option>
+        </select>
       </label>
 
       <FileTree
         paths={props.paths}
         onFileClick={(node) => props.onFileClick?.(node.path)}
       />
-
-      <div class="flex flex-wrap gap-4 m-4 mt-auto">
-        <a
-          href="https://github.com/j4k0xb/webcrack"
-          class="link link-primary"
-          target="_blank"
-        >
-          GitHub
-        </a>
-        <a href="/docs" class="link link-primary" target="_blank">
-          Docs
-        </a>
-      </div>
     </nav>
   );
 }

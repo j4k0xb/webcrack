@@ -25,7 +25,7 @@ export default {
               const parsed = parseExpression(string.current!);
               path.replaceWith(parsed);
               this.changes++;
-            } catch (error) {
+            } catch {
               // ignore
             }
           }

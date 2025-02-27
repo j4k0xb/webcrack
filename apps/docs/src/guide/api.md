@@ -1,15 +1,38 @@
 # API Examples
 
-:::info
-This is a pure ESM package, so you need to use `import` instead of `require`.
-For more info, check out [this gist](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
-:::
+Installation:
 
-```bash
+::: code-group
+
+```bash [npm]
 npm install webcrack
 ```
 
+```bash [yarn]
+yarn add webcrack
+```
+
+```bash [pnpm]
+pnpm add webcrack --allow-build=isolated-vm
+```
+
 ## Basic Usage
+
+:::
+
+:::info
+All examples are shown with ESM syntax.
+For CommonJS, use the following instead:
+
+```js
+const { webcrack } = require('webcrack');
+
+webcrack('const a = 1+1;').then((result) => {
+  console.log(result.code); // 'const a = 2;'
+});
+```
+
+:::
 
 ```js
 import { webcrack } from 'webcrack';
@@ -18,7 +41,7 @@ const result = await webcrack('const a = 1+1;');
 console.log(result.code); // 'const a = 2;'
 ```
 
-Save the deobufscated code and the unpacked bundle to the given directory:
+Save the deobfuscated code and the unpacked bundle to the given directory:
 
 ```js
 import fs from 'fs';
@@ -54,7 +77,53 @@ await webcrack(code, {
   unminify: true, // Unminify the code
   deobfuscate: true, // Deobfuscate the code
   mangle: false, // Mangle variable names
+  sandbox, // Explained below
 });
+```
+
+Only mangle variable names that match a filter:
+
+```js
+await webcrack(code, {
+  mangle: (id) => id.startsWith('_0x'),
+});
+```
+
+## Browser Usage & Sandbox
+
+The `sandbox` option has to be passed when trying to deobfuscate string arrays in a browser.
+In future versions, this should hopefully not be necessary anymore.
+
+It is an (optionally async) function that takes a `code` parameter and returns the evaluated value.
+
+::: danger Security warning
+Simplest possible implementation, avoid using due to potentially executing malicious code
+:::
+
+```js
+const result = await webcrack('function _0x317a(){....', { sandbox: eval });
+```
+
+More secure version with [sandybox](https://github.com/trentmwillis/sandybox) and CSP:
+
+```js
+const sandbox = await Sandybox.create();
+const iframe = document.querySelector('.sandybox');
+iframe?.contentDocument?.head.insertAdjacentHTML(
+  'afterbegin',
+  `<meta http-equiv="Content-Security-Policy" content="default-src 'none';">`,
+);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function evalCode(code) {
+  const fn = await sandbox.addFunction(`() => ${code}`);
+  return Promise.race([
+    fn(),
+    sleep(10_000).then(() => Promise.reject(new Error('Sandbox timeout'))),
+  ]).finally(() => sandbox.removeFunction(fn));
+}
+
+const result = await webcrack('function _0x317a(){....', { sandbox: evalCode });
 ```
 
 ## Customize Paths

@@ -17,6 +17,5 @@ to resemble the original source code as much as possible.
 - Smarter variable renaming, possibly with LLMs like GPT-3.5
 - Support older obfuscator.io versions
 - Unpack multi-chunk bundles
-- Download zip of all unpacked modules in the playground
 - Decompile [@babel/preset-env](https://babeljs.io/docs/babel-preset-env) helpers
 - Decompile TypeScript helpers, modules and enums

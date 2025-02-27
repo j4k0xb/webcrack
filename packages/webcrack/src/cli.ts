@@ -18,7 +18,11 @@ debug.enable('webcrack:*');
 interface Options {
   force: boolean;
   output?: string;
-  mangle?: boolean;
+  mangle: boolean;
+  jsx: boolean;
+  unpack: boolean;
+  deobfuscate: boolean;
+  unminify: boolean;
 }
 
 async function readStdin() {
@@ -34,9 +38,13 @@ program
   .option('-o, --output <path>', 'output directory for bundled files')
   .option('-f, --force', 'overwrite output directory')
   .option('-m, --mangle', 'mangle variable names')
+  .option('--no-jsx', 'do not decompile JSX')
+  .option('--no-unpack', 'do not extract modules from the bundle')
+  .option('--no-deobfuscate', 'do not deobfuscate the code')
+  .option('--no-unminify', 'do not unminify the code')
   .argument('[file]', 'input file, defaults to stdin')
   .action(async (input: string | undefined) => {
-    const { output, force, mangle } = program.opts<Options>();
+    const { output, force, ...options } = program.opts<Options>();
     const code = await (input ? readFile(input, 'utf8') : readStdin());
 
     if (output) {
@@ -47,7 +55,7 @@ program
       }
     }
 
-    const result = await webcrack(code, { mangle });
+    const result = await webcrack(code, options);
 
     if (output) {
       await result.save(output);

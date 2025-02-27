@@ -1,15 +1,11 @@
 import { statement } from '@babel/template';
-import type * as t from '@babel/types';
-import * as m from '@codemod/matchers';
+import * as t from '@babel/types';
 import type { Transform } from '../../ast-utils';
 
 export default {
   name: 'logical-to-if',
   tags: ['safe'],
   visitor: () => {
-    const andMatcher = m.expressionStatement(m.logicalExpression('&&'));
-    const orMatcher = m.expressionStatement(m.logicalExpression('||'));
-
     const buildIf = statement`if (TEST) { BODY; }`;
     const buildIfNot = statement`if (!TEST) { BODY; }`;
 
@@ -17,7 +13,8 @@ export default {
       ExpressionStatement: {
         exit(path) {
           const expression = path.node.expression as t.LogicalExpression;
-          if (andMatcher.match(path.node)) {
+          if (!t.isLogicalExpression(expression)) return;
+          if (expression.operator === '&&') {
             path.replaceWith(
               buildIf({
                 TEST: expression.left,
@@ -25,7 +22,7 @@ export default {
               }),
             );
             this.changes++;
-          } else if (orMatcher.match(path.node)) {
+          } else if (expression.operator === '||') {
             path.replaceWith(
               buildIfNot({
                 TEST: expression.left,

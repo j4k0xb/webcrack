@@ -9,6 +9,8 @@
     "src"
   ],
   "exclude": [
-    "**/test"
+    "**/test",
+    "src/cli.ts",
+    "src/cjs-wrapper.ts"
   ]
 }

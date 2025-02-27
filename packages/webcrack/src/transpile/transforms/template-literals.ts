@@ -44,11 +44,6 @@ function unshift(template: t.TemplateLiteral, value: t.Expression) {
   if (value.type === 'StringLiteral') {
     const firstQuasi = template.quasis[0];
     firstQuasi.value.raw = escape(value.value) + firstQuasi.value.raw;
-  } else if (value.type === 'TemplateLiteral') {
-    const firstQuasi = template.quasis[0];
-    firstQuasi.value.raw = value.quasis[0].value.raw + firstQuasi.value.raw;
-    template.expressions.unshift(...value.expressions);
-    template.quasis.unshift(...value.quasis.slice(0, -1));
   } else {
     template.expressions.unshift(value);
     template.quasis.unshift(t.templateElement({ raw: '' }));
@@ -59,17 +54,10 @@ export default {
   name: 'template-literals',
   tags: ['unsafe'],
   visitor() {
-    const concatMatcher: m.Matcher<t.CallExpression> = m.or(
-      m.callExpression(
-        constMemberExpression(
-          m.or(
-            m.stringLiteral(),
-            m.matcher((node) => concatMatcher.match(node)),
-          ),
-          'concat',
-        ),
-        m.arrayOf(m.anyExpression()),
-      ),
+    const string = m.capture(m.or(m.stringLiteral(), m.templateLiteral()));
+    const concatMatcher = m.callExpression(
+      constMemberExpression(string, 'concat'),
+      m.arrayOf(m.anyExpression()),
     );
 
     return {
@@ -93,22 +81,17 @@ export default {
       },
       CallExpression: {
         exit(path) {
-          if (
-            concatMatcher.match(path.node) &&
-            !concatMatcher.match(path.parentPath.parent)
-          ) {
+          if (concatMatcher.match(path.node)) {
             const template = t.templateLiteral(
               [t.templateElement({ raw: '' })],
               [],
             );
-            let current: t.Expression = path.node;
-            while (current.type === 'CallExpression') {
-              for (const arg of current.arguments.reverse()) {
-                unshift(template, arg as t.Expression);
-              }
-              current = (current.callee as t.MemberExpression).object;
+            push(template, string.current!);
+
+            for (const arg of path.node.arguments) {
+              push(template, arg as t.Expression);
             }
-            unshift(template, current);
+
             path.replaceWith(template);
             this.changes++;
           }

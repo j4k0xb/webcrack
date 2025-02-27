@@ -4,42 +4,57 @@ import mangle from '../src/transforms/mangle';
 
 const expectJS = testTransform(mangle);
 
-// https://github.com/j4k0xb/webcrack/issues/41
-test('rename default parameters of function', () => {
+test('variable', () => {
+  expectJS('let x = 1;').toMatchInlineSnapshot('let v = 1;');
+  expectJS('let x = exports;').toMatchInlineSnapshot(`let vExports = exports;`);
+  expectJS('let x = () => {};').toMatchInlineSnapshot(`let vF = () => {};`);
+  expectJS('let x = class {};').toMatchInlineSnapshot(`let vC = class {};`);
+  expectJS('let x = Array(100);').toMatchInlineSnapshot(
+    `let vArray = Array(100);`,
+  );
+  expectJS('let [x] = 1;').toMatchInlineSnapshot(`let [v] = 1;`);
+  expectJS('const x = require("fs");').toMatchInlineSnapshot(
+    `const fs = require("fs");`,
+  );
   expectJS(`
-    function func(arg1, arg2 = 0, arg3 = arg1, arg4 = arg1) {
-      return arg1;
-    }
+    const x = require("node:fs");
+    const y = require("node:fs");
   `).toMatchInlineSnapshot(`
-    function a(a, b = 0, c = undefined, d = undefined) {
-      if (c === undefined) c = a;
-      if (d === undefined) d = a;
-      return a;
-    }
+    const nodeFs = require("node:fs");
+    const nodeFs2 = require("node:fs");
   `);
 });
 
-test('rename default parameters of arrow function', () => {
-  expectJS(`
-    const func = (arg1, arg2 = 0, arg3 = arg1, arg4 = arg1) => arg1;
-  `).toMatchInlineSnapshot(`
-    const a = (a, b = 0, c = undefined, d = undefined) => {
-      if (c === undefined) c = a;
-      if (d === undefined) d = a;
-      return a;
-    };
+test('ignore exports', () => {
+  expectJS('export const x = 1;').toMatchInlineSnapshot('export const x = 1;');
+  expectJS('export class X {}').toMatchInlineSnapshot(`export class X {}`);
+});
+
+test('only rename _0x variable', () => {
+  expectJS(
+    `
+    let _0x4c3e = 1;
+    let foo = 2;
+    `,
+    (id) => id.startsWith('_0x'),
+  ).toMatchInlineSnapshot(`
+    let v = 1;
+    let foo = 2;
   `);
 });
 
-test('rename default destructuring parameters', () => {
+test('class', () => {
+  expectJS('class abc {}').toMatchInlineSnapshot('class C {}');
+});
+
+test('function', () => {
+  expectJS('function abc() {}').toMatchInlineSnapshot('function f() {}');
+  expectJS('export default function x() {}').toMatchInlineSnapshot(`export default function f() {}`);
+});
+
+test('parameters', () => {
   expectJS(`
-    function func(arg1, [arg2] = arg1) {
-      return arg2;
-    }
-  `).toMatchInlineSnapshot(`
-    function a(a, b = undefined) {
-      var [c] = b === undefined ? a : b;
-      return c;
-    }
-  `);
+    (x, y, z) => x + y + z;
+  `).toMatchInlineSnapshot(`(p, p2, p3) => p + p2 + p3;`);
+  expectJS('(x = 1) => x;').toMatchInlineSnapshot(`(p = 1) => p;`);
 });

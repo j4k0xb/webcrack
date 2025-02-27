@@ -22,9 +22,9 @@ test('deeply nested member expression type', () =>
 test('rename component with conflicting name', () =>
   expectJS('function a(){} React.createElement(a, null);')
     .toMatchInlineSnapshot(`
-    function _Component() {}
-    <_Component />;
-  `));
+      function Component() {}
+      <Component />;
+    `));
 
 test('attributes', () =>
   expectJS(

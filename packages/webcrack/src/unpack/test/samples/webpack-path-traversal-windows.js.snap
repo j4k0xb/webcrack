@@ -1,0 +1,12 @@
+WebpackBundle {
+  "entryId": "386",
+  "modules": Map {
+    "./\..\node_modules\debug\src\index" => WebpackModule {
+      "ast": ,
+      "id": "./\..\node_modules\debug\src\index",
+      "isEntry": false,
+      "path": "././\..\node_modules\debug\src\index.js",
+    },
+  },
+  "type": "webpack",
+}

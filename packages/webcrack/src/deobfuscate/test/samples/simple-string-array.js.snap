@@ -4,3 +4,8 @@ console.log("Hello, World!");
 const arr2 = ["log", "Hello, World!"];
 arr2[0] = "warn";
 console[arr2[0]](arr2[1]);
+const vm = eval("require(\"vm\")");
+const v8 = eval("require(\"v8\")");
+
+// ignore unreferenced array
+const arr4 = ["log", "Hello, World!"];

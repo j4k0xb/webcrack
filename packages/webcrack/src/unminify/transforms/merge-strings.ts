@@ -1,42 +1,31 @@
-import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../../ast-utils';
 
+// "a" + "b" -> "ab"
+// (a + "b") + "c" -> a + "bc"
+//  left ^      ^ right (path)
 export default {
   name: 'merge-strings',
   tags: ['safe'],
   visitor() {
-    const left = m.capture(m.stringLiteral(m.anyString()));
-    const right = m.capture(m.stringLiteral(m.anyString()));
+    const left = m.capture(m.stringLiteral());
+    const right = m.capture(m.stringLiteral());
 
-    const matcher = m.binaryExpression('+', left, right);
-    const nestedMatcher = m.binaryExpression(
+    const matcher = m.binaryExpression(
       '+',
-      m.binaryExpression('+', m.anything(), left),
+      m.or(left, m.binaryExpression('+', m.anything(), left)),
       right,
     );
 
     return {
       BinaryExpression: {
         exit(path) {
-          if (matcher.match(path.node)) {
-            // "a" + "b" -> "ab"
-            path.replaceWith(
-              t.stringLiteral(left.current!.value + right.current!.value),
-            );
-            this.changes++;
-          }
-        },
-      },
-      StringLiteral: {
-        exit(path) {
-          if (nestedMatcher.match(path.parent)) {
-            // (a + "b") + "c" -> a + "bc"
-            //  left ^      ^ right (path)
-            left.current!.value += right.current!.value;
-            path.remove();
-            this.changes++;
-          }
+          if (!matcher.match(path.node)) return;
+          left.current!.value += right.current!.value;
+          right.current!.value = ''; // Otherwise it concatenates multiple times for some reason
+          path.replaceWith(path.node.left);
+          path.skip();
+          this.changes++;
         },
       },
     };

@@ -24,7 +24,6 @@ export function applyTransform<TOptions>(
   ast: Node,
   transform: Transform<TOptions>,
   options?: TOptions,
-  noScopeOverride?: boolean,
 ): TransformState {
   logger(`${transform.name}: started`);
   const state: TransformState = { changes: 0 };
@@ -34,7 +33,7 @@ export function applyTransform<TOptions>(
     const visitor = transform.visitor(
       options,
     ) as TraverseOptions<TransformState>;
-    visitor.noScope = noScopeOverride || !transform.scope;
+    visitor.noScope = !transform.scope;
     traverse(ast, visitor, undefined, state);
   }
 

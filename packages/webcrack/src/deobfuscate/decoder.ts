@@ -11,10 +11,16 @@ import type { StringArray } from './string-array';
  * the string with Base64 or RC4.
  */
 export class Decoder {
+  originalName: string;
   name: string;
   path: NodePath<t.FunctionDeclaration>;
 
-  constructor(name: string, path: NodePath<t.FunctionDeclaration>) {
+  constructor(
+    originalName: string,
+    name: string,
+    path: NodePath<t.FunctionDeclaration>,
+  ) {
+    this.originalName = originalName;
     this.name = name;
     this.path = path;
   }
@@ -80,6 +86,9 @@ export class Decoder {
         if (literalCall.match(ref.parent)) {
           calls.push(ref.parentPath as NodePath<t.CallExpression>);
         }
+      } else if (ref.parentPath?.isExpressionStatement()) {
+        // `decode;` may appear on it's own in some forked obfuscators
+        ref.parentPath.remove();
       }
     }
 
@@ -123,7 +132,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
       const newName = `__DECODE_${decoders.length}__`;
       const binding = decoderFn.scope.getBinding(oldName)!;
       renameFast(binding, newName);
-      decoders.push(new Decoder(newName, decoderFn));
+      decoders.push(new Decoder(oldName, newName, decoderFn));
     }
   }
 

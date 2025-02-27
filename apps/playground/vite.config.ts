@@ -1,9 +1,8 @@
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import monacoEditor from 'vite-plugin-monaco-editor';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import solid from 'vite-plugin-solid';
-
-const __dirname = new URL('.', import.meta.url).pathname;
 
 // https://github.com/vdesjs/vite-plugin-monaco-editor/issues/21
 const { default: monacoEditorPlugin } = monacoEditor as unknown as {
@@ -34,9 +33,12 @@ export default defineConfig({
     alias: {
       // @codemod/matchers imports @codemod/utils which imports @babel/core, but it's not needed
       // by replacing it with a dummy module we can reduce the bundle size by 360kb
-      '@babel/core': __dirname + '/src/_empty.ts',
-      'isolated-vm': __dirname + '/src/_empty.ts',
-      webcrack: __dirname + '../../packages/webcrack/src',
+      '@babel/core': path.resolve(import.meta.dirname, 'src/_empty.ts'),
+      'isolated-vm': path.resolve(import.meta.dirname, 'src/_empty.ts'),
+      webcrack: path.resolve(
+        import.meta.dirname,
+        '../../packages/webcrack/src',
+      ),
     },
   },
   plugins: [

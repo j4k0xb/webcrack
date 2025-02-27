@@ -56,7 +56,8 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/j4k0xb/webcrack-ui/edit/master/docs/:path',
+      pattern:
+        'https://github.com/j4k0xb/webcrack/edit/master/apps/docs/src/:path',
     },
   },
 });

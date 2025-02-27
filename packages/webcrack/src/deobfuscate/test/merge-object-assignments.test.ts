@@ -61,3 +61,143 @@ test('ignore call with possible circular reference', () =>
     const obj = {};
     obj.foo = fn();
   `));
+
+test('do not inline object into function', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    function f() {
+      return obj;
+    }
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    function f() {
+      return obj;
+    }
+  `));
+
+test('do not inline object into arrow function', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    const f = () => obj;
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    const f = () => obj;
+  `));
+
+test('do not inline object into method', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    const obj2 = { f() { return obj; } };
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    const obj2 = {
+      f() {
+        return obj;
+      }
+    };
+  `));
+
+test('do not inline object into class', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    class C {
+      f = obj;
+    }
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    class C {
+      f = obj;
+    }
+  `));
+
+test('do not inline object into while-loop', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    while (i < 2) {
+      arr.push(obj);
+    }
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    while (i < 2) {
+      arr.push(obj);
+    }
+  `));
+
+test('do not inline object into do-while-loop', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    do {
+      arr.push(obj);
+    } while (i < 2);
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    do {
+      arr.push(obj);
+    } while (i < 2);
+  `));
+
+test('do not inline object into for-loop', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    for (let i = 0; i < 2; i++) {
+      arr.push(obj);
+    }
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    for (let i = 0; i < 2; i++) {
+      arr.push(obj);
+    }
+  `));
+
+test('do not inline object into for-of-loop', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    for (const item of items) {
+      arr.push(obj);
+    }
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    for (const item of items) {
+      arr.push(obj);
+    }
+  `));
+
+test('do not inline object into for-in-loop', () =>
+  expectJS(`
+    const obj = {};
+    obj.foo = 1;
+    for (const key in [1, 2]) {
+      arr.push(obj);
+    }
+  `).toMatchInlineSnapshot(`
+    const obj = {
+      foo: 1
+    };
+    for (const key in [1, 2]) {
+      arr.push(obj);
+    }
+  `));

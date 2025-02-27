@@ -15,7 +15,7 @@ export class Module {
     this.id = id;
     this.ast = ast;
     this.isEntry = isEntry;
-    this.path = `./${isEntry ? 'index' : id}.js`;
+    this.path = `./${isEntry ? 'index' : id.replace(/\.js$/, '')}.js`;
   }
 
   /**

@@ -10,6 +10,11 @@ test('inline property', () =>
       console.log(a.x);
     `).toMatchInlineSnapshot('console.log(1);'));
 
+test('inline property of object literal', () =>
+  expectJS(`
+    console.log(({ x: 1 }).x);
+  `).toMatchInlineSnapshot('console.log(1);'));
+
 test('ignore non-existent properties', () =>
   expectJS(`
     const a = { x: 1 };

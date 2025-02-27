@@ -1,11 +1,14 @@
 import generate from '@babel/generator';
 import * as t from '@babel/types';
 import * as monaco from 'monaco-editor';
+import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import { evalCode } from '../sandbox';
 
 export function registerEvalSelection(
   editor: monaco.editor.IStandaloneCodeEditor,
 ): monaco.IDisposable {
+  const { setAlert } = useDeobfuscateContext();
+
   const codeAction = monaco.languages.registerCodeActionProvider('javascript', {
     provideCodeActions(_model, range) {
       if (range.isEmpty()) return;
@@ -89,23 +92,25 @@ export function registerEvalSelection(
   ) {
     if (ranges.some((range) => range.isEmpty())) return;
 
-    const expressions = ranges
-      .map((range) => {
-        const value = editor.getModel()!.getValueInRange(range);
-        return `eval(${JSON.stringify(value)})`;
-      })
-      .join(',');
-    // New lines are added so line comments don't mess up the rest of the code
-    const code = `[\n${expressions}\n]`;
-    const values = (await evalCode(code)) as unknown[];
+    const expressions = ranges.map((range) => {
+      const value = editor.getModel()!.getValueInRange(range);
+      return `eval(${JSON.stringify(value)})`;
+    });
+    const code = `[${expressions.join(',')}]`;
+    try {
+      const values = (await evalCode(code)) as unknown[];
 
-    const edits = ranges.map((range, index) => ({
-      range,
-      text: mapper(values[index]),
-    }));
+      const edits = ranges.map((range, index) => ({
+        range,
+        text: mapper(values[index]),
+      }));
 
-    editor.pushUndoStop();
-    editor.executeEdits('evaluate-expression', edits);
+      editor.pushUndoStop();
+      editor.executeEdits('evaluate-expression', edits);
+      setAlert(null);
+    } catch (error) {
+      setAlert(`${String(error)}, at ${ranges.join(', ')}`);
+    }
   }
 
   return {

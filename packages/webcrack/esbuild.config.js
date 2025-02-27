@@ -9,15 +9,15 @@ const watch = args.length > 0 && /^(?:--watch|-w)$/i.test(args[0]);
  */
 const babelImportPlugin = {
   name: 'babel-import',
-  setup: build => {
-    build.onResolve({ filter: /^@babel\/(traverse|generator)$/ }, args => {
+  setup: (build) => {
+    build.onResolve({ filter: /^@babel\/(traverse|generator)$/ }, (args) => {
       return {
         path: args.path,
         namespace: 'babel-import',
       };
     });
 
-    build.onLoad({ filter: /.*/, namespace: 'babel-import' }, args => {
+    build.onLoad({ filter: /.*/, namespace: 'babel-import' }, (args) => {
       return {
         resolveDir: 'node_modules',
         contents: `import module from '${args.path}/lib/index.js';
@@ -34,6 +34,17 @@ const babelImportPlugin = {
 const configs = [
   {
     entryPoints: ['src/index.ts'],
+  },
+  {
+    entryPoints: [
+      {
+        in: 'src/cjs-wrapper.ts',
+        out: 'index',
+      },
+    ],
+    outExtension: { '.js': '.cjs' },
+    format: 'cjs',
+    bundle: false,
   },
   {
     entryPoints: ['src/cli.ts'],

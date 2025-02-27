@@ -39,11 +39,11 @@ export default {
         exit(path) {
           if (!assignmentMatcher.match(path.node)) return;
 
-          const value = assignedSequence.current!.expressions.pop()!;
-          path.get('right').replaceWith(value);
+          const { expressions } = assignedSequence.current!;
+          path.node.right = expressions.pop()!;
           const newNodes = path.parentPath.isExpressionStatement()
-            ? assignedSequence.current!.expressions.map(t.expressionStatement)
-            : assignedSequence.current!.expressions;
+            ? expressions.map(t.expressionStatement)
+            : expressions;
           path.insertBefore(newNodes);
           this.changes++;
         },
@@ -105,11 +105,20 @@ export default {
       },
       ForInStatement: {
         exit(path) {
-          const sequence = m.capture(m.sequenceExpression());
-          const matcher = m.forInStatement(m.anything(), sequence);
-          if (!matcher.match(path.node)) return;
+          if (!t.isSequenceExpression(path.node.right)) return;
 
-          const { expressions } = sequence.current!;
+          const { expressions } = path.node.right;
+          path.node.right = expressions.pop()!;
+          const statements = expressions.map(t.expressionStatement);
+          path.insertBefore(statements);
+          this.changes++;
+        },
+      },
+      ForOfStatement: {
+        exit(path) {
+          if (!t.isSequenceExpression(path.node.right)) return;
+
+          const { expressions } = path.node.right;
           path.node.right = expressions.pop()!;
           const statements = expressions.map(t.expressionStatement);
           path.insertBefore(statements);
@@ -122,8 +131,8 @@ export default {
             const statements = path.node.init.expressions.map(
               t.expressionStatement,
             );
-            path.insertBefore(statements);
             path.node.init = null;
+            path.insertBefore(statements);
             this.changes++;
           }
           if (
@@ -136,17 +145,6 @@ export default {
             path.node.body = t.blockStatement(statements);
             this.changes++;
           }
-        },
-      },
-      WhileStatement: {
-        exit(path) {
-          if (!t.isSequenceExpression(path.node.test)) return;
-
-          const { expressions } = path.node.test;
-          path.node.test = expressions.pop()!;
-          const statements = expressions.map(t.expressionStatement);
-          path.insertBefore(statements);
-          this.changes++;
         },
       },
       VariableDeclaration: {
@@ -162,6 +160,15 @@ export default {
           const statements = expressions.map(t.expressionStatement);
           path.getStatementParent()?.insertBefore(statements);
           this.changes++;
+        },
+      },
+      SequenceExpression: {
+        exit(path) {
+          const { expressions } = path.node;
+          if (expressions.every((node) => safeLiteral.match(node))) {
+            path.replaceWith(expressions.at(-1)!);
+            this.changes++;
+          }
         },
       },
     };

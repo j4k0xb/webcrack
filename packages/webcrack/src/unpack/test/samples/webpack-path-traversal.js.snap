@@ -5,7 +5,7 @@ WebpackBundle {
       "ast": ,
       "id": "../tmp.js",
       "isEntry": false,
-      "path": "./../tmp.js.js",
+      "path": "./../tmp.js",
     },
   },
   "type": "webpack",

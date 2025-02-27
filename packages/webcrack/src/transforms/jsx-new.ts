@@ -2,6 +2,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../ast-utils';
 import { codePreview, constMemberExpression } from '../ast-utils';
+import { generateUid } from '../ast-utils/scope';
 
 const DEFAULT_PRAGMA_CANDIDATES = [
   'jsx',
@@ -55,7 +56,7 @@ export default {
           if (convertibleName.match(type.current!)) {
             name = convertType(type.current);
           } else {
-            name = t.jsxIdentifier(path.scope.generateUid('Component'));
+            name = t.jsxIdentifier(generateUid(path.scope, 'Component'));
             const componentVar = t.variableDeclaration('const', [
               t.variableDeclarator(t.identifier(name.name), type.current),
             ]);

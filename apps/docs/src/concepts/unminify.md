@@ -117,6 +117,28 @@ if (x) {
 1 // [!code ++]
 ```
 
+## remove-double-not
+
+```js
+if (!!a) b(); // [!code --]
+if (a) b(); // [!code ++]
+```
+
+```js
+!!a ? b() : c(); // [!code --]
+a ? b() : c(); // [!code ++]
+```
+
+```js
+return !!!a; // [!code --]
+return !a; // [!code ++]
+```
+
+```js
+[].filter(a => !!a); // [!code --]
+[].filter(a => a); // [!code ++]
+```
+
 ## sequence
 
 ```js
@@ -149,6 +171,12 @@ for (let key in object) {} // [!code ++]
 ```
 
 ```js
+for (let value of (a = 1, array)) {} // [!code --]
+a = 1; // [!code ++]
+for (let value of array) {} // [!code ++]
+```
+
+```js
 for((a(), b());;) {} // [!code --]
 a(); // [!code ++]
 b(); // [!code ++]
@@ -164,21 +192,9 @@ for(; i < 10; i++) { // [!code ++]
 ```
 
 ```js
-while (a(), b()) {} // [!code --]
-a(); // [!code ++]
-while (b()) {} // [!code ++]
-```
-
-```js
 a = (b = null, c); // [!code --]
 b = null; // [!code ++]
 a = c; // [!code ++]
-```
-
-```js
-while (a = (b = null, c)) {} // [!code --]
-b = null; // [!code ++]
-while (a = c) {} // [!code ++]
 ```
 
 ## split-for-loops-vars

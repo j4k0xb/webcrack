@@ -38,11 +38,14 @@ describe('rename variable', () => {
     const ast = parse(`
       var a = 1;
       var a = 2;
+      a = 3;
       a++;
       [a] = [2];
+      var [a] = [1];
       ({...a} = {});
       for (a of []);
       for (a in []);
+      delete a;
     `);
     traverse(ast, {
       Program(path) {
@@ -53,13 +56,16 @@ describe('rename variable', () => {
     expect(ast).toMatchInlineSnapshot(`
       var b = 1;
       var b = 2;
+      b = 3;
       b++;
       [b] = [2];
+      var [b] = [1];
       ({
         ...b
       } = {});
       for (b of []);
       for (b in []);
+      delete b;
     `);
   });
 });

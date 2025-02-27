@@ -59,14 +59,33 @@ test('rearrange from for-in', () =>
     for (let key in object) {}
   `));
 
-test('rearrange from for loop init', () =>
+test('rearrange from for-of', () =>
+  expectJS(`
+    for (let value of (a = 1, array)) {}
+  `).toMatchInlineSnapshot(`
+    a = 1;
+    for (let value of array) {}
+  `));
+
+test('rearrange from for loop init', () => {
   expectJS(`
     for((a(), b());;);
   `).toMatchInlineSnapshot(`
     a();
     b();
     for (;;);
-  `));
+  `);
+
+  expectJS(`
+    if (1) for ((a(), b());;) {}
+  `).toMatchInlineSnapshot(`
+    if (1) {
+      a();
+      b();
+      for (;;) {}
+    }
+  `);
+});
 
 test('rearrange from for loop update', () =>
   expectJS(`
@@ -78,12 +97,18 @@ test('rearrange from for loop update', () =>
     }
   `));
 
-test('rearrange from while', () =>
+test('dont rearrange from while', () =>
   expectJS(`
     while (a(), b()) c();
   `).toMatchInlineSnapshot(`
-    a();
-    while (b()) c();
+    while (a(), b()) c();
+  `));
+
+test('dont rearrange from do-while', () =>
+  expectJS(`
+    do {} while (a(), b());
+  `).toMatchInlineSnapshot(`
+    do {} while (a(), b());
   `));
 
 test('rearrange variable declarator', () => {
@@ -137,8 +162,7 @@ test('rearrange assignment', () => {
   expectJS(`
     while (a = (b(), c()));
   `).toMatchInlineSnapshot(`
-    b();
-    while (a = c());
+    while (b(), a = c());
   `);
 
   expectJS(`
@@ -160,3 +184,9 @@ test('rearrange assignment', () => {
     }
   `);
 });
+
+// appears in some obfuscator.io forks
+test('simplify computed property with only literals', () =>
+  expectJS(`
+    Lr[("nnQB", "jcIgN")]();
+  `).toMatchInlineSnapshot('Lr["jcIgN"]();'));

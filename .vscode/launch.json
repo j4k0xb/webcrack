@@ -20,11 +20,15 @@
       ]
     },
     {
-      "type": "pwa-chrome",
+      "type": "chrome",
       "request": "launch",
       "name": "Launch playground",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/**/node_modules/**",
+      ],
       "preLaunchTask": "Run playground dev server"
     }
   ]
