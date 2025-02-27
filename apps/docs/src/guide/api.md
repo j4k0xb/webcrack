@@ -163,6 +163,10 @@ See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages
 
 ## Plugins
 
+::: warning Experimental
+This API is only available in the beta version and might change in future versions.
+:::
+
 There are 5 stages you can hook into to manipulate the AST, which run in this order:
 
 - parse
