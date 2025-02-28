@@ -1,0 +1,27 @@
+BrowserifyBundle {
+  "entryId": "BattleHint",
+  "modules": Map {
+    "BattleHint" => BrowserifyModule {
+      "ast": ,
+      "dependencies": {},
+      "id": "BattleHint",
+      "isEntry": true,
+      "path": "index.js",
+    },
+    "GChangeCount" => BrowserifyModule {
+      "ast": ,
+      "dependencies": {},
+      "id": "GChangeCount",
+      "isEntry": false,
+      "path": "./GChangeCount.js",
+    },
+    "pako_deflate.min" => BrowserifyModule {
+      "ast": ,
+      "dependencies": {},
+      "id": "pako_deflate.min",
+      "isEntry": false,
+      "path": "./pako_deflate.min.js",
+    },
+  },
+  "type": "browserify",
+}

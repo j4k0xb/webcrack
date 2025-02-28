@@ -18,7 +18,7 @@ export const unpackBrowserify = {
     const files = m.capture(
       m.arrayOf(
         m.objectProperty(
-          m.numericLiteral(),
+          m.or(m.numericLiteral(), m.stringLiteral(), m.identifier()),
           m.arrayExpression([
             // function(require, module, exports) {...}
             m.functionExpression(),
@@ -39,7 +39,10 @@ export const unpackBrowserify = {
         ),
       ),
     );
-    const entryIdMatcher = m.capture(m.numericLiteral());
+    // TODO: support multiple entry points
+    const entryIdMatcher = m.capture(
+      m.or(m.numericLiteral(), m.stringLiteral()),
+    );
 
     const matcher = m.callExpression(
       m.or(
@@ -65,7 +68,7 @@ export const unpackBrowserify = {
       [
         m.objectExpression(files),
         m.objectExpression(),
-        m.arrayExpression([entryIdMatcher]),
+        m.arrayExpression(m.anyList(entryIdMatcher, m.zeroOrMore())),
       ],
     );
 
@@ -83,9 +86,7 @@ export const unpackBrowserify = {
         const dependencyTree: Record<string, Record<string, string>> = {};
 
         for (const moduleWrapper of modulesPath) {
-          const id = (
-            moduleWrapper.node.key as t.NumericLiteral
-          ).value.toString();
+          const id = getPropName(moduleWrapper.node.key)!;
           const fn = moduleWrapper.get(
             'value.elements.0',
           ) as NodePath<t.FunctionExpression>;
@@ -125,7 +126,9 @@ export const unpackBrowserify = {
         const resolvedPaths = resolveDependencyTree(dependencyTree, entryId);
 
         for (const module of modules.values()) {
-          module.path = resolvedPaths[module.id];
+          if (Object.hasOwn(resolvedPaths, module.id)) {
+            module.path = resolvedPaths[module.id];
+          }
         }
 
         if (modules.size > 0) {
