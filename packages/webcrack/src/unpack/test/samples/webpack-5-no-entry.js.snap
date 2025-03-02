@@ -2,7 +2,7 @@ WebpackBundle {
   "entryId": "",
   "modules": Map {
     "97418" => WebpackModule {
-      "ast": module.exports = 'foo';,
+      "ast": module.exports = "foo";,
       "id": "97418",
       "isEntry": false,
       "path": "./97418.js",
