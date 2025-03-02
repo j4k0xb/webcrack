@@ -11,7 +11,7 @@ console.log(lib);,
     "3" => WebpackModule {
       "ast": import * as a from "./4.js";
 const obj = {
-  version: '2.0.0'
+  version: "2.0.0"
 };
 export let version = obj.version;
 export default a.foo;,

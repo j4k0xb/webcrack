@@ -10,7 +10,7 @@ const _0x8da276 = require(require.ab + "build/Release/spdlog.node");,
       "path": "./index.js",
     },
     "3" => WebpackModule {
-      "ast": module.exports = 'foo';,
+      "ast": module.exports = "foo";,
       "id": "3",
       "isEntry": false,
       "path": "./3.js",

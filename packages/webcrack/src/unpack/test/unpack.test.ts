@@ -3,23 +3,26 @@ import { readFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join, sep } from 'path';
 import { expect, test } from 'vitest';
-import { unpack } from '../index';
+import { webcrack } from '../../index';
 
 const SAMPLES_DIR = join(__dirname, 'samples');
 
 test('detect top-level bundle first', async () => {
-  const bundle = unpack(
+  const { bundle } = await webcrack(
     await readFile(join(SAMPLES_DIR, 'browserify-webpack-nested.js'), 'utf8'),
   );
+  expect(bundle).toBeDefined();
   expect(bundle!.type).toBe('browserify');
 });
 
 test('path mapping', async () => {
-  const bundle = unpack(
-    await readFile(join(SAMPLES_DIR, 'webpack.js'), 'utf8'),
+  const { bundle } = await webcrack(
+    await readFile(join(SAMPLES_DIR, 'webpack-4.js'), 'utf8'),
     {
-      './utils/color.js': m.stringLiteral('#FBC02D'),
-      package: m.numericLiteral(4),
+      mappings: () => ({
+        './utils/color.js': m.stringLiteral('#FBC02D'),
+        package: m.numericLiteral(4),
+      }),
     },
   );
   expect(bundle).toBeDefined();
@@ -31,7 +34,7 @@ test.runIf(sep === '/')('prevent path traversal (posix)', async () => {
     join(SAMPLES_DIR, 'webpack-path-traversal.js'),
     'utf8',
   );
-  const bundle = unpack(code);
+  const { bundle } = await webcrack(code);
   expect(bundle).toBeDefined();
 
   const dir = join(tmpdir(), 'path-traversal-test');
@@ -43,7 +46,7 @@ test.runIf(sep === '\\')('prevent path traversal (windows)', async () => {
     join(SAMPLES_DIR, 'webpack-path-traversal-windows.js'),
     'utf8',
   );
-  const bundle = unpack(code);
+  const { bundle } = await webcrack(code);
   expect(bundle).toBeDefined();
 
   const dir = join(tmpdir(), 'path-traversal-test');

@@ -13,7 +13,7 @@ WebpackBundle {
     "2" => WebpackModule {
       "ast": const a = require("../1.js");
 const _module = 1;
-module.exports.color = '#FBC02D';
+module.exports.color = "#FBC02D";
 {
   const _module2 = 2;
   console.log(_module2);

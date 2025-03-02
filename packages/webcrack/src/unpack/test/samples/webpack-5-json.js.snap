@@ -1,0 +1,21 @@
+WebpackBundle {
+  "entryId": "",
+  "modules": Map {
+    "0" => WebpackModule {
+      "ast": var json = require("./1.js");
+console.log(json);,
+      "id": "0",
+      "isEntry": false,
+      "path": "./0.js",
+    },
+    "1" => WebpackModule {
+      "ast": module.exports = {
+  foo: "bar"
+};,
+      "id": "1",
+      "isEntry": false,
+      "path": "./1.js",
+    },
+  },
+  "type": "webpack",
+}
