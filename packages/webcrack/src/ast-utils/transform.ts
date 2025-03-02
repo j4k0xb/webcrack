@@ -97,7 +97,7 @@ export interface Transform<TOptions = unknown> {
 }
 
 export interface AsyncTransform<TOptions = unknown>
-  extends Transform<TOptions> {
+  extends Omit<Transform<TOptions>, 'run'> {
   run?: (ast: Node, state: TransformState, options?: TOptions) => Promise<void>;
 }
 

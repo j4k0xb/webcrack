@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "eslint-config-prettier": "^9.1.0",
-    "typescript-eslint": "8.0.0-alpha.27"
+    "typescript-eslint": "^8.25.0"
   }
 }

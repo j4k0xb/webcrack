@@ -39,3 +39,12 @@ declare module '@codemod/matchers/build/matchers/predicate' {
   // Convenience overload for not having to cast the value when using it
   export function predicate<T>(predicate: (value: T) => boolean): Matcher<T>;
 }
+
+declare module '@babel/traverse' {
+  interface NodePath {
+    /**
+     * Turns an AST into code
+     */
+    toString(): string;
+  }
+}
