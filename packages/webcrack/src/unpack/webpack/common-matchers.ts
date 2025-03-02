@@ -3,6 +3,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
   anonymousFunction,
+  anySubList,
   constMemberExpression,
   getPropName,
 } from '../../ast-utils';
@@ -25,8 +26,7 @@ export function webpackRequireFunctionMatcher() {
       m.identifier(), // __webpack_require__
       [m.identifier()], // moduleId
       m.blockStatement(
-        m.anyList(
-          m.zeroOrMore(),
+        anySubList(
           m.expressionStatement(
             m.callExpression(
               m.or(
@@ -49,7 +49,6 @@ export function webpackRequireFunctionMatcher() {
               ),
             ),
           ),
-          m.zeroOrMore(),
         ),
       ),
     ),

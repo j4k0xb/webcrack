@@ -218,3 +218,38 @@ export function isTemporaryVariable(
       : binding.path.listKey === 'params' && binding.path.isIdentifier())
   );
 }
+
+export class AnySubListMatcher<T> extends m.Matcher<T[]> {
+  constructor(private readonly matchers: m.Matcher<T>[]) {
+    super();
+  }
+
+  matchValue(array: unknown, keys: readonly PropertyKey[]): array is T[] {
+    if (!Array.isArray(array)) return false;
+    if (this.matchers.length === 0 && array.length === 0) return true;
+
+    let j = 0;
+    for (let i = 0; i < array.length; i++) {
+      const matches = this.matchers[j].matchValue(array[i], [...keys, i]);
+
+      if (matches) {
+        j++;
+
+        if (j === this.matchers.length) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+}
+
+/**
+ * Greedy matches elements in the specified order, allowing for any number of elements in between
+ */
+export function anySubList<T>(
+  ...elements: Array<m.Matcher<T>>
+): m.Matcher<Array<T>> {
+  return new AnySubListMatcher(elements);
+}

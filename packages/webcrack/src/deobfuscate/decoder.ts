@@ -2,7 +2,12 @@ import { expression } from '@babel/template';
 import type { NodePath } from '@babel/traverse';
 import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
-import { findParent, inlineVariable, renameFast } from '../ast-utils';
+import {
+  anySubList,
+  findParent,
+  inlineVariable,
+  renameFast,
+} from '../ast-utils';
 import type { StringArray } from './string-array';
 
 /**
@@ -105,7 +110,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
     m.identifier(functionName),
     m.anything(),
     m.blockStatement(
-      m.anyList(
+      anySubList(
         // var array = getStringArray();
         m.variableDeclaration(undefined, [
           m.variableDeclarator(
@@ -113,13 +118,11 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
             m.callExpression(m.identifier(stringArray.name)),
           ),
         ]),
-        m.zeroOrMore(),
         // var h = array[e]; return h;
         // or return array[e -= 254];
         m.containerOf(
           m.memberExpression(m.fromCapture(arrayIdentifier), undefined, true),
         ),
-        m.zeroOrMore(),
       ),
     ),
   );

@@ -3,7 +3,7 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Bundle } from '..';
 import type { Transform } from '../../ast-utils';
-import { renameParameters } from '../../ast-utils';
+import { anySubList, renameParameters } from '../../ast-utils';
 import { WebpackBundle } from './bundle';
 import {
   findAssignedEntryId,
@@ -33,15 +33,12 @@ export default {
     const container = modulesContainerMatcher();
 
     const matcher = m.blockStatement(
-      m.anyList(
-        m.zeroOrMore(),
+      anySubList<t.Statement>(
         // Example: var __webpack_modules__ = { ... };
         m.variableDeclaration(undefined, [
           m.variableDeclarator(containerId, container),
         ]),
-        m.zeroOrMore(),
         webpackRequire,
-        m.zeroOrMore(),
       ),
     );
 
