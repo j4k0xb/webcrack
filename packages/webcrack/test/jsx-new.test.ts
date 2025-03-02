@@ -90,3 +90,6 @@ test('props with escaped strings', () =>
     <Foo bar={'ab"c'} />;
     <Foo bar="ab'c" />;
   `));
+
+test('indirect jsx call', () =>
+  expectJS('(0, r.jsx)("div", {})').toMatchInlineSnapshot('<div />;'));

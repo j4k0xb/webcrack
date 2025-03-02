@@ -41,9 +41,15 @@ export default {
     const key = m.capture(m.anyExpression());
 
     const jsxFunction = m.capture(m.or(...DEFAULT_PRAGMA_CANDIDATES));
-    // jsx(type, props, key?)
+    // jsx(type, props, key?) or (0, r.jsx)(type, props, key?)
     const jsxMatcher = m.callExpression(
-      m.identifier(jsxFunction),
+      m.or(
+        m.identifier(jsxFunction),
+        m.sequenceExpression([
+          m.numericLiteral(0),
+          constMemberExpression(m.identifier(), jsxFunction),
+        ]),
+      ),
       m.anyList(type, props, m.slice({ min: 0, max: 1, matcher: key })),
     );
 
