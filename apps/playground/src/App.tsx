@@ -175,11 +175,6 @@ function App() {
           monaco.Uri.file(file.path),
         ),
       ),
-      monaco.editor.createModel(
-        result.code,
-        'javascript',
-        monaco.Uri.file('deobfuscated.js'),
-      ),
     ]);
   }
 
