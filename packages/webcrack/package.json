@@ -70,10 +70,10 @@
     "@types/babel__template": "^7.4.4",
     "@types/babel__traverse": "^7.20.6",
     "@types/debug": "^4.1.12",
-    "@types/node": "^22.8.1",
+    "@types/node": "^22.13.8",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
-    "esbuild": "^0.24.0",
-    "typescript": "^5.6.3"
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.2"
   }
 }
