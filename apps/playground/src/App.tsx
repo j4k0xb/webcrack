@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import { parse as parsePath } from 'path';
 import {
   For,
   Show,
@@ -10,6 +11,7 @@ import {
 import { createStore } from 'solid-js/store';
 import Alert from './components/Alert';
 import Breadcrumbs from './components/Breadcrumbs';
+import FileDropZone from './components/FileDropZone';
 import MonacoEditor from './components/MonacoEditor';
 import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
@@ -278,6 +280,30 @@ function App() {
         </main>
       </div>
       <Alert />
+      <FileDropZone
+        onDrop={(files) => {
+          const existingPaths = new Set(
+            untitledModels().map((m) => m.uri.path),
+          );
+
+          const newModels = files.map((file) => {
+            let path = file.name;
+            for (let i = 1; existingPaths.has(path); i++) {
+              const parts = parsePath(path);
+              path = `${parts.name.replace(/ \(\d+\)$/, '')} (${i})${parts.ext}`;
+            }
+            return monaco.editor.createModel(
+              file.content,
+              'javascript',
+              monaco.Uri.from({ scheme: 'untitled', path }),
+            );
+          });
+
+          setModels([...models(), ...newModels]);
+          setTabs([...tabs(), ...newModels]);
+          openTab(newModels.at(-1)!);
+        }}
+      />
     </DeobfuscateContextProvider>
   );
 }

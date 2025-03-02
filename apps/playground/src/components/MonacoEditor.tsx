@@ -101,7 +101,7 @@ export default function MonacoEditor(props: Props) {
     monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
 
     const placeholder = new PlaceholderContentWidget(
-      '// Paste your obfuscated or bundled code here',
+      '// Paste your code here or drag & drop files to open',
       editor,
     );
 
