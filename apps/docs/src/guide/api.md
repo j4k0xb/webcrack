@@ -89,6 +89,10 @@ await webcrack(code, {
 });
 ```
 
+Other options include:
+
+- `mappings`: The `mappings` option takes a function that receives an instance of [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers#readme), and returns an object that maps any matching nodes, to the path specified in the object key.
+
 ## Browser Usage & Sandbox
 
 The `sandbox` option has to be passed when trying to deobfuscate string arrays in a browser.
@@ -129,6 +133,8 @@ const result = await webcrack('function _0x317a(){....', { sandbox: evalCode });
 ## Customize Paths
 
 Useful for reverse-engineering and tracking changes across multiple versions of a bundle.
+
+The `mappings` option takes a function that receives an instance of [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers#readme), and returns an object that maps any matching nodes, to the path specified in the object key.
 
 If a matching node in the AST of a module is found, it will be renamed to the given path.
 
