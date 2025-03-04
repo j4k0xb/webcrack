@@ -19,3 +19,5 @@ export { default as unaryExpressions } from './unary-expressions';
 export { default as unminifyBooleans } from './unminify-booleans';
 export { default as voidToUndefined } from './void-to-undefined';
 export { default as yoda } from './yoda';
+
+export { default as renameDestructuring } from '../../my/rename-destructuring';

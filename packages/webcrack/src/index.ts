@@ -21,6 +21,7 @@ import evaluateGlobals from './deobfuscate/evaluate-globals';
 import mergeObjectAssignments from './deobfuscate/merge-object-assignments';
 import selfDefending from './deobfuscate/self-defending';
 import varFunctions from './deobfuscate/var-functions';
+import { MyJSX } from './my';
 import type { Plugin } from './plugin';
 import { loadPlugins } from './plugin';
 import jsx from './transforms/jsx';
@@ -192,7 +193,7 @@ export async function webcrack(
           [
             // Have to run this after unminify to properly detect it
             options.deobfuscate ? [selfDefending, debugProtection] : [],
-            options.jsx ? [jsx, jsxNew] : [],
+            options.jsx ? [MyJSX, jsx, jsxNew] : [],
           ].flat(),
         );
       }),

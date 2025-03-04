@@ -98,12 +98,12 @@ export function convertESM(module: WebpackModule): void {
         module.ast.program.sourceType === 'module' &&
         requireMatcher.match(path.node)
       ) {
-        path.replaceWith(
-          buildNamespaceImport({
-            NAME: requireVariable.current,
-            PATH: String(requiredModuleId.current),
-          }),
-        );
+        // path.replaceWith(
+        //   buildNamespaceImport({
+        //     NAME: requireVariable.current,
+        //     PATH: String(requiredModuleId.current),
+        //   }),
+        // );
       } else if (defineExportsMatcher.match(path.node)) {
         const exportsBinding = path.scope.getBinding(exportsName.current!.name);
         const emptyObject = emptyObjectVarMatcher.match(

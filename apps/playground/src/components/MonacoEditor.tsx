@@ -7,6 +7,38 @@ import { registerEvalSelection } from '../monaco/eval-selection';
 import { PlaceholderContentWidget } from '../monaco/placeholder-widget';
 import { downloadFile, openFile } from '../utils/files';
 
+import parseBabel from 'prettier/plugins/babel';
+import parseEsTree from 'prettier/plugins/estree';
+import parseHtml from 'prettier/plugins/html';
+import parseMd from 'prettier/plugins/markdown';
+import parseCss from 'prettier/plugins/postcss';
+import parserTypeScript from 'prettier/plugins/typescript';
+import prettier from 'prettier/standalone';
+
+const formatProvider = {
+  provideDocumentFormattingEdits(model) {
+    let code = model.getValue();
+    prettier
+      .format(code, {
+        parser: 'typescript', // 格式化react
+        jsxSingleQuote: true,
+        plugins: [
+          parseBabel,
+          parseEsTree,
+          parseCss,
+          parserTypeScript,
+          parseMd,
+          parseHtml,
+        ],
+        vueIndentScriptAndStyle: true,
+      })
+      .then((res) => {
+        model.setValue(res);
+      });
+    return [];
+  },
+};
+
 interface Props {
   models: monaco.editor.ITextModel[];
   currentModel?: monaco.editor.ITextModel;
@@ -38,6 +70,18 @@ export default function MonacoEditor(props: Props) {
       wordWrap: 'on',
       tabSize: 2,
     });
+
+    // Add JSX support
+    // monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    //   jsx: monaco.languages.typescript.JsxEmit.React,
+    // });
+
+    monaco.languages.registerDocumentFormattingEditProvider(
+      'javascript',
+      formatProvider,
+    );
+
+    monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
     createEffect(() => {
       setModel(props.currentModel);
