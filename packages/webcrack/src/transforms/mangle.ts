@@ -81,11 +81,17 @@ function generateExpressionName(
     );
   } else if (expression.isThisExpression()) {
     return 'this';
+  } else if (expression.isNumericLiteral()) {
+    return 'LN' + expression.node.value.toString();
+  } else if (expression.isStringLiteral()) {
+    return 'LS' + titleCase(expression.node.value);
   } else {
     return undefined;
   }
 }
 
 function titleCase(str: string) {
-  return str.length > 0 ? str[0].toUpperCase() + str.slice(1) : str;
+  return str
+    .replace(/(?:^|\s)([a-z])/g, (_, m) => m.toUpperCase())
+    .replace(/[^a-zA-Z0-9$_]/g, '');
 }
