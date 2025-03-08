@@ -36,38 +36,39 @@ export default {
         ? `String Array: ${stringArray.originalName}, length ${stringArray.length}`
         : 'String Array: no',
     );
-    if (!stringArray) return;
 
-    const rotator = findArrayRotator(stringArray);
-    logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
+    if (stringArray) {
+      const rotator = findArrayRotator(stringArray);
+      logger(`String Array Rotate: ${rotator ? 'yes' : 'no'}`);
 
-    const decoders = findDecoders(stringArray);
-    logger(
-      `String Array Decoders: ${decoders
-        .map((d) => d.originalName)
-        .join(', ')}`,
-    );
+      const decoders = findDecoders(stringArray);
+      logger(
+        `String Array Decoders: ${decoders
+          .map((d) => d.originalName)
+          .join(', ')}`,
+      );
 
-    state.changes += applyTransform(ast, inlineObjectProps).changes;
+      state.changes += applyTransform(ast, inlineObjectProps).changes;
 
-    for (const decoder of decoders) {
-      state.changes += applyTransform(
-        ast,
-        inlineDecoderWrappers,
-        decoder.path,
+      for (const decoder of decoders) {
+        state.changes += applyTransform(
+          ast,
+          inlineDecoderWrappers,
+          decoder.path,
+        ).changes;
+      }
+
+      const vm = new VMDecoder(sandbox, stringArray, decoders, rotator);
+      state.changes += (
+        await applyTransformAsync(ast, inlineDecodedStrings, { vm })
       ).changes;
-    }
 
-    const vm = new VMDecoder(sandbox, stringArray, decoders, rotator);
-    state.changes += (
-      await applyTransformAsync(ast, inlineDecodedStrings, { vm })
-    ).changes;
-
-    if (decoders.length > 0) {
-      stringArray.path.remove();
-      rotator?.remove();
-      decoders.forEach((decoder) => decoder.path.remove());
-      state.changes += 2 + decoders.length;
+      if (decoders.length > 0) {
+        stringArray.path.remove();
+        rotator?.remove();
+        decoders.forEach((decoder) => decoder.path.remove());
+        state.changes += 2 + decoders.length;
+      }
     }
 
     state.changes += applyTransforms(
