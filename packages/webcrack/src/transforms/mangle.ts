@@ -85,6 +85,10 @@ function generateExpressionName(
     return 'LN' + expression.node.value.toString();
   } else if (expression.isStringLiteral()) {
     return 'LS' + titleCase(expression.node.value);
+  } else if (expression.isObjectExpression()) {
+    return 'O';
+  } else if (expression.isArrayExpression()) {
+    return 'A';
   } else {
     return undefined;
   }

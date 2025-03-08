@@ -12,6 +12,8 @@ test('variable', () => {
   expectJS('let x = Array(100);').toMatchInlineSnapshot(
     `let vArray = Array(100);`,
   );
+  expectJS('let x = []').toMatchInlineSnapshot(`let vA = [];`);
+  expectJS('let x = {}').toMatchInlineSnapshot(`let vO = {};`);
   expectJS('let [x] = 1;').toMatchInlineSnapshot(`let [v] = 1;`);
   expectJS('const x = require("fs");').toMatchInlineSnapshot(
     `const fs = require("fs");`,
