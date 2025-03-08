@@ -34,8 +34,10 @@ export default {
               globalThis,
               arg.current!,
             );
-            path.replaceWith(t.stringLiteral(value));
-            this.changes++;
+            if (isStringSafe(value)) {
+              path.replaceWith(t.stringLiteral(value));
+              this.changes++;
+            }
           } catch {
             // ignore
           }
@@ -44,3 +46,9 @@ export default {
     };
   },
 } satisfies Transform;
+
+// Don't unpack strings which contain weird unicode characters which can cause issues when the file
+// is parsed by other tools after the transformation.
+function isStringSafe(s: string) {
+  return /^[\x00-\x7F]*$/.test(s);
+}
