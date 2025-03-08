@@ -89,3 +89,11 @@ test('parameters', () => {
   `).toMatchInlineSnapshot(`(p, p2, p3) => p + p2 + p3;`);
   expectJS('(x = 1) => x;').toMatchInlineSnapshot(`(p = 1) => p;`);
 });
+
+test('try-catch', () => {
+  expectJS(`
+    try {} catch (x) {}
+  `).toMatchInlineSnapshot(`
+    try {} catch (e) {}
+  `);
+});

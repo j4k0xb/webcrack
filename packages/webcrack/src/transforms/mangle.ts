@@ -57,6 +57,8 @@ function inferName(path: NodePath<t.Identifier>): string {
     const init = path.parentPath.get('init');
     const suffix = (init.isExpression() && generateExpressionName(init)) || '';
     return generateUid(path.scope, 'v' + titleCase(suffix));
+  } else if (path.parentPath.isCatchClause()) {
+    return generateUid(path.scope, 'e');
   } else if (path.parentPath.isArrayPattern()) {
     return generateUid(path.scope, 'v');
   } else {
