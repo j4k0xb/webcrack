@@ -5,13 +5,15 @@ import mangle from '../src/transforms/mangle';
 const expectJS = testTransform(mangle);
 
 test('variable', () => {
-  expectJS('let x = 1;').toMatchInlineSnapshot('let v = 1;');
+  expectJS('let x = 1;').toMatchInlineSnapshot('let vLN1 = 1;');
   expectJS('let x = exports;').toMatchInlineSnapshot(`let vExports = exports;`);
   expectJS('let x = () => {};').toMatchInlineSnapshot(`let vF = () => {};`);
   expectJS('let x = class {};').toMatchInlineSnapshot(`let vC = class {};`);
   expectJS('let x = Array(100);').toMatchInlineSnapshot(
     `let vArray = Array(100);`,
   );
+  expectJS('let x = []').toMatchInlineSnapshot(`let vA = [];`);
+  expectJS('let x = {}').toMatchInlineSnapshot(`let vO = {};`);
   expectJS('let [x] = 1;').toMatchInlineSnapshot(`let [v] = 1;`);
   expectJS('const x = require("fs");').toMatchInlineSnapshot(
     `const fs = require("fs");`,
@@ -23,6 +25,33 @@ test('variable', () => {
     const nodeFs = require("node:fs");
     const nodeFs2 = require("node:fs");
   `);
+
+  expectJS(
+    `
+    let a = 100;
+    let b = 200;
+    let c = 300;
+  `,
+  ).toMatchInlineSnapshot(`
+    let vLN100 = 100;
+    let vLN200 = 200;
+    let vLN300 = 300;
+  `);
+
+  expectJS(
+    `
+    let a = "hello world";
+    let b = "foo-bar-🗿-ä";
+  `,
+  ).toMatchInlineSnapshot(`
+    let vLSHelloWorld = "hello world";
+    let vLSFoobar = "foo-bar-🗿-ä";
+  `);
+
+  const veryLongString = 'a'.repeat(1000);
+  expectJS(`let x = "${veryLongString}";`).toMatchInlineSnapshot(
+    `let vLSA${veryLongString.slice(0, 99)} = "${veryLongString}";`,
+  );
 });
 
 test('ignore exports', () => {
@@ -38,7 +67,7 @@ test('only rename _0x variable', () => {
     `,
     (id) => id.startsWith('_0x'),
   ).toMatchInlineSnapshot(`
-    let v = 1;
+    let vLN1 = 1;
     let foo = 2;
   `);
 });
@@ -49,7 +78,9 @@ test('class', () => {
 
 test('function', () => {
   expectJS('function abc() {}').toMatchInlineSnapshot('function f() {}');
-  expectJS('export default function x() {}').toMatchInlineSnapshot(`export default function f() {}`);
+  expectJS('export default function x() {}').toMatchInlineSnapshot(
+    `export default function f() {}`,
+  );
 });
 
 test('parameters', () => {
