@@ -17,6 +17,7 @@ import inlineObjectProps from './inline-object-props';
 import { findStringArray } from './string-array';
 import type { Sandbox } from './vm';
 import { VMDecoder, createBrowserSandbox, createNodeSandbox } from './vm';
+import varTransformation from './var-transformation';
 
 export { createBrowserSandbox, createNodeSandbox, type Sandbox };
 
@@ -30,6 +31,9 @@ export default {
     if (!sandbox) return;
 
     const logger = debug('webcrack:deobfuscate');
+
+    state.changes += applyTransforms(ast, [varTransformation]).changes;
+
     const stringArray = findStringArray(ast);
     logger(
       stringArray
