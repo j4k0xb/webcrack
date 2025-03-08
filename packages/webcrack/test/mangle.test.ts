@@ -51,6 +51,11 @@ test('variable', () => {
     let vLN200 = 200;
     let vLN300 = 300;
   `);
+
+  const veryLongString = 'a'.repeat(1000);
+  expectJS(`let x = "${veryLongString}";`).toMatchInlineSnapshot(
+    `let vLSA${veryLongString.slice(0, 99)} = "${veryLongString}";`,
+  );
 });
 
 test('ignore exports', () => {
