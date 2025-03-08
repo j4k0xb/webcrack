@@ -41,15 +41,11 @@ test('variable', () => {
   expectJS(
     `
     let a = "hello world";
-    let b = 100;
-    let c = 200;
-    let d = 300;
+    let b = "foo-bar-🗿-ä";
   `,
   ).toMatchInlineSnapshot(`
     let vLSHelloWorld = "hello world";
-    let vLN100 = 100;
-    let vLN200 = 200;
-    let vLN300 = 300;
+    let vLSFoobar = "foo-bar-🗿-ä";
   `);
 
   const veryLongString = 'a'.repeat(1000);

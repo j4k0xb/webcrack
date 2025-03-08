@@ -96,6 +96,6 @@ function generateExpressionName(
 
 function titleCase(str: string) {
   return str
-    .replace(/(?:^|\s)([a-z])/g, (_, m) => m.toUpperCase())
+    .replace(/(?:^|\s)([a-z])/g, (_, m) => (m as string).toUpperCase())
     .replace(/[^a-zA-Z0-9$_]/g, '');
 }
