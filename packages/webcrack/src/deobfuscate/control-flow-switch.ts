@@ -1,7 +1,11 @@
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import type { Transform } from '../ast-utils';
-import { constMemberExpression, infiniteLoop } from '../ast-utils';
+import {
+  constMemberExpression,
+  declarationOrAssignment,
+  infiniteLoop,
+} from '../ast-utils';
 
 export default {
   name: 'control-flow-switch',
@@ -28,17 +32,15 @@ export default {
     const matcher = m.blockStatement(
       m.anyList<t.Statement>(
         // E.g. const sequence = "2|4|3|0|1".split("|")
-        m.variableDeclaration(undefined, [
-          m.variableDeclarator(
-            sequenceName,
-            m.callExpression(
-              constMemberExpression(m.stringLiteral(sequenceString), 'split'),
-              [m.stringLiteral('|')],
-            ),
+        declarationOrAssignment(
+          sequenceName,
+          m.callExpression(
+            constMemberExpression(m.stringLiteral(sequenceString), 'split'),
+            [m.stringLiteral('|')],
           ),
-        ]),
+        ),
         // E.g. let iterator = 0 or -0x1a70 + 0x93d + 0x275 * 0x7
-        m.variableDeclaration(undefined, [m.variableDeclarator(iterator)]),
+        declarationOrAssignment(iterator, m.anything()),
         infiniteLoop(
           m.blockStatement([
             m.switchStatement(
