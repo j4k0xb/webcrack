@@ -12,9 +12,14 @@ export default {
       m.anything(),
       m.blockStatement([nestedIf]),
     );
-    const matchedIf = m.ifStatement(
+    const matcherIf = m.ifStatement(
       m.anything(),
       m.blockStatement([nestedIf]),
+      m.anything(),
+    );
+    const matchIfNegation = m.ifStatement(
+      m.unaryExpression('!', m.anything()),
+      m.anything(),
       m.anything(),
     );
 
@@ -30,10 +35,24 @@ export default {
 
           // if (cond) { if(cond2) { branch1 } else { branch2 } } else { branch3 }
           // -> if (!cond) { branch3 } else if (cond2) { branch1 } else { branch2 }
-          if (matchedIf.match(path.node) && path.node.alternate) {
+          if (matcherIf.match(path.node) && path.node.alternate) {
             path.node.test = t.unaryExpression('!', path.node.test);
             path.node.consequent = path.node.alternate!;
             path.node.alternate = nestedIf.current;
+            this.changes++;
+          }
+
+          // if (!cond) { branch1 } else { branch2 }
+          // -> if (cond) { branch2 } else { branch1 }
+          if (
+            matchIfNegation.match(path.node) &&
+            path.node.alternate &&
+            !nestedIf.match(path.node.alternate)
+          ) {
+            path.node.test = (path.node.test as t.UnaryExpression).argument;
+            const temp = path.node.consequent;
+            path.node.consequent = path.node.alternate!;
+            path.node.alternate = temp;
             this.changes++;
           }
         },

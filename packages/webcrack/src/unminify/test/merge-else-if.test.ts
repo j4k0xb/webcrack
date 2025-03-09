@@ -42,6 +42,19 @@ test('merge', () => {
         }
       }
     `);
+
+  expectJS(`
+    if (!cond) {
+      console.log("branch 1");
+    } else {
+      console.log("branch 2");
+    }`).toMatchInlineSnapshot(`
+      if (cond) {
+        console.log("branch 2");
+      } else {
+        console.log("branch 1");
+      }
+    `);
 });
 
 test('ignore when it contains other statements', () =>
