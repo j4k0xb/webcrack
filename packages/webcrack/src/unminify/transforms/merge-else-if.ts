@@ -35,7 +35,11 @@ export default {
 
           // if (cond) { if(cond2) { branch1 } else { branch2 } } else { branch3 }
           // -> if (!cond) { branch3 } else if (cond2) { branch1 } else { branch2 }
-          if (matcherIf.match(path.node) && path.node.alternate) {
+          if (
+            matcherIf.match(path.node) &&
+            path.node.alternate &&
+            !nestedIf.match(path.node.alternate)
+          ) {
             path.node.test = t.unaryExpression('!', path.node.test);
             path.node.consequent = path.node.alternate!;
             path.node.alternate = nestedIf.current;
