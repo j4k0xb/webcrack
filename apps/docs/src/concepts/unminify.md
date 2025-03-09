@@ -93,12 +93,12 @@ if (x) {
 ```
 
 ```js
-if (x) {
+if (x) {  // [!code --]
   if (y) {}  // [!code --]
 } else {  // [!code --]
 }  // [!code --]
 
-if (!x) {
+if (!x) {  // [!code ++]
 } else if (y) { // [!code ++]
 } else {} // [!code ++]
 ```
