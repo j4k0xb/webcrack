@@ -8,9 +8,12 @@ import {
   constKey,
   constMemberExpression,
   createFunctionMatcher,
+  declarationOrAssignment,
+  declarationOrAssignmentExpression,
   findParent,
   getPropName,
   inlineFunctionCall,
+  isConstantBinding,
   isReadonlyObject,
 } from '../ast-utils';
 import mergeStrings from '../unminify/transforms/merge-strings';
@@ -73,9 +76,7 @@ export default {
       m.arrayOf(m.objectProperty(propertyKey, propertyValue)),
     );
     const aliasId = m.capture(m.identifier());
-    const aliasVar = m.variableDeclaration(m.anything(), [
-      m.variableDeclarator(aliasId, m.fromCapture(varId)),
-    ]);
+    const aliasVar = declarationOrAssignment(aliasId, m.fromCapture(varId));
     // E.g. "rLxJs"
     const assignedKey = m.capture(propertyName);
     // E.g. "6|0|4|3|1|5|2"
@@ -99,7 +100,7 @@ export default {
       m.or(m.fromCapture(varId), m.fromCapture(aliasId)),
       propertyName,
     );
-    const varMatcher = m.variableDeclarator(
+    const varMatcher = declarationOrAssignmentExpression(
       varId,
       m.objectExpression(objectProperties),
     );
@@ -109,12 +110,7 @@ export default {
       propertyName,
     );
 
-    function isConstantBinding(binding: Binding) {
-      // Workaround because sometimes babel treats the VariableDeclarator/binding itself as a violation
-      return binding.constant || binding.constantViolations[0] === binding.path;
-    }
-
-    function transform(path: NodePath<t.VariableDeclarator>) {
+    function transform(path: NodePath<t.VariableDeclarator | t.Expression>) {
       let changes = 0;
       if (varMatcher.match(path.node)) {
         // Verify all references to make sure they match how the obfuscator
@@ -177,8 +173,14 @@ export default {
      * and others are assigned later.
      */
     function transformObjectKeys(objBinding: Binding): boolean {
-      const container = objBinding.path.parentPath!.container as t.Statement[];
-      const startIndex = (objBinding.path.parentPath!.key as number) + 1;
+      const path =
+        objBinding.kind === 'param'
+          ? (objBinding.path.parentPath!.get('body') as NodePath<t.Statement>)
+          : objBinding.path.parentPath!;
+      const container = path.isBlock()
+        ? path.node.body
+        : (path.container as t.Statement[]);
+      const startIndex = path.isBlock() ? 1 : (path.key as number) + 1;
       const properties: t.ObjectProperty[] = [];
 
       for (let i = startIndex; i < container.length; i++) {
@@ -222,6 +224,11 @@ export default {
     }
 
     return {
+      Expression: {
+        exit(path) {
+          this.changes += transform(path);
+        },
+      },
       VariableDeclarator: {
         exit(path) {
           this.changes += transform(path);
