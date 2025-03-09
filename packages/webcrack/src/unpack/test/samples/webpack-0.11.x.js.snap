@@ -172,22 +172,22 @@ exports.attrs = function attrs(obj, escaped) {
     for (var i = 0; i < len; ++i) {
       var key = keys[i];
       var val = obj[key];
-      if (typeof val == "boolean" || val == null) {
-        if (val) {
-          if (terse) {
-            buf.push(key);
-          } else {
-            buf.push(key + "=\"" + key + "\"");
-          }
+      if (!(typeof val == "boolean" || val == null)) {
+        if (key.indexOf("data") == 0 && typeof val != "string") {
+          buf.push(key + "='" + JSON.stringify(val) + "'");
+        } else if (key == "class" && Array.isArray(val)) {
+          buf.push(key + "=\"" + exports.escape(val.join(" ")) + "\"");
+        } else if (escaped && escaped[key]) {
+          buf.push(key + "=\"" + exports.escape(val) + "\"");
+        } else {
+          buf.push(key + "=\"" + val + "\"");
         }
-      } else if (key.indexOf("data") == 0 && typeof val != "string") {
-        buf.push(key + "='" + JSON.stringify(val) + "'");
-      } else if (key == "class" && Array.isArray(val)) {
-        buf.push(key + "=\"" + exports.escape(val.join(" ")) + "\"");
-      } else if (escaped && escaped[key]) {
-        buf.push(key + "=\"" + exports.escape(val) + "\"");
-      } else {
-        buf.push(key + "=\"" + val + "\"");
+      } else if (val) {
+        if (terse) {
+          buf.push(key);
+        } else {
+          buf.push(key + "=\"" + key + "\"");
+        }
       }
     }
   }
