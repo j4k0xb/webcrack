@@ -13,20 +13,26 @@ test('merge', () => {
 
   expectJS(`
     if (!cond) {
-      if (cond2) {
-        console.log("branch 2");
+      if (cond2 !== 5) {
+        if (cond3) {
+          console.log("branch 3");
+        } else {
+          console.log("branch 4");
+        }
       } else {
-        console.log("branch 3");
+        console.log("branch 2");
       }
     } else {
       console.log("branch 1");
     }`).toMatchInlineSnapshot(`
       if (!!cond) {
         console.log("branch 1");
-      } else if (cond2) {
+      } else if (cond2 === 5) {
         console.log("branch 2");
-      } else {
+      } else if (cond3) {
         console.log("branch 3");
+      } else {
+        console.log("branch 4");
       }
     `);
 

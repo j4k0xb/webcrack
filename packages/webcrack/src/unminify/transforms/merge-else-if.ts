@@ -1,6 +1,8 @@
 import * as m from '@codemod/matchers';
 import * as t from '@babel/types';
-import type { Transform } from '../../ast-utils';
+import { applyTransforms, type Transform } from '../../ast-utils';
+import invertBooleanLogic from './invert-boolean-logic';
+import removeDoubleNot from './remove-double-not';
 
 export default {
   name: 'merge-else-if',
@@ -43,6 +45,13 @@ export default {
             path.node.test = t.unaryExpression('!', path.node.test);
             path.node.consequent = path.node.alternate!;
             path.node.alternate = nestedIf.current;
+            this.changes += applyTransforms(
+              path.node,
+              [invertBooleanLogic, removeDoubleNot],
+              {
+                log: false,
+              },
+            ).changes;
             this.changes++;
           }
 
