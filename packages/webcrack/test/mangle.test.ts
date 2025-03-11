@@ -48,6 +48,10 @@ test('variable', () => {
     let vLSFoobar = "foo-bar-🗿-ä";
   `);
 
+  expectJS(`let x = "";`).toMatchInlineSnapshot(
+    `let vLS = "";`,
+  );
+
   const veryLongString = 'a'.repeat(1000);
   expectJS(`let x = "${veryLongString}";`).toMatchInlineSnapshot(
     `let vLSA${veryLongString.slice(0, 19)} = "${veryLongString}";`,
