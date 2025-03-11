@@ -86,7 +86,7 @@ function generateExpressionName(
   } else if (expression.isNumericLiteral()) {
     return 'LN' + expression.node.value.toString();
   } else if (expression.isStringLiteral()) {
-    return 'LS' + titleCase(expression.node.value).slice(0, 100);
+    return 'LS' + titleCase(expression.node.value).slice(0, 20);
   } else if (expression.isObjectExpression()) {
     return 'O';
   } else if (expression.isArrayExpression()) {
