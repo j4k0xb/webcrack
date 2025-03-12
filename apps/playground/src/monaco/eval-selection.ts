@@ -1,5 +1,3 @@
-import generate from '@babel/generator';
-import * as t from '@babel/types';
 import * as monaco from 'monaco-editor';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import { evalCode } from '../sandbox';
@@ -68,6 +66,10 @@ export function registerEvalSelection(
   async function evalValues() {
     const selections = editor.getSelections();
     if (!selections) return;
+
+    const t = await import('@babel/types');
+    const { default: generate } = await import('@babel/generator');
+
     await evalSelections(
       selections,
       (value) => generate(t.valueToNode(value)).code,
