@@ -3,7 +3,6 @@ import traverse from '@babel/traverse';
 import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
-  constMemberExpression,
   declarationOrAssignment,
   inlineArrayElements,
   isReadonlyObject,
