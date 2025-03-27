@@ -9,7 +9,7 @@ import {
   constMemberExpression,
   createFunctionMatcher,
   declarationOrAssignment,
-  declarationOrAssignmentExpression,
+  declaratorOrAssignmentExpression,
   findParent,
   getPropName,
   inlineFunctionCall,
@@ -100,7 +100,7 @@ export default {
       m.or(m.fromCapture(varId), m.fromCapture(aliasId)),
       propertyName,
     );
-    const varMatcher = declarationOrAssignmentExpression(
+    const varMatcher = declaratorOrAssignmentExpression(
       varId,
       m.objectExpression(objectProperties),
     );
@@ -116,6 +116,7 @@ export default {
         // Verify all references to make sure they match how the obfuscator
         // would have generated the code (no reassignments, etc.)
         const binding = path.scope.getBinding(varId.current!.name);
+        console.log(binding);
         if (!binding) return changes;
         if (!isConstantBinding(binding)) return changes;
         if (!transformObjectKeys(binding)) return changes;

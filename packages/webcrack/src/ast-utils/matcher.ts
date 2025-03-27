@@ -199,9 +199,9 @@ export function isConstantBinding(binding: Binding) {
   if (binding.constant || binding.constantViolations[0] === binding.path)
     return true;
 
-  // if there is only a single assignment to the variable with no initial value
-  // consider it a constant
-  if (binding.constantViolations.length === 1) {
+  // if there is only a single assignment to the variable and it is a param
+  // then consider it a constant (this may not be very safe)
+  if (binding.kind === 'param' && binding.constantViolations.length === 1) {
     const [path] = binding.constantViolations;
     if (path.isAssignmentExpression()) return true;
   }
@@ -278,12 +278,12 @@ export function declarationOrAssignment(
   );
 }
 
-export function declarationOrAssignmentExpression(
+export function declaratorOrAssignmentExpression(
   name: m.Matcher<t.Identifier>,
   matcher: m.Matcher<t.Expression>,
-): m.Matcher<t.VariableDeclaration | t.AssignmentExpression> {
+): m.Matcher<t.VariableDeclarator | t.AssignmentExpression> {
   return m.or(
-    m.variableDeclaration(m.anything(), [m.variableDeclarator(name, matcher)]),
+    m.variableDeclarator(name, matcher),
     m.assignmentExpression('=', name, matcher),
   );
 }
