@@ -154,7 +154,5 @@ export default function MonacoEditor(props: Props) {
     });
   });
 
-  return (
-    <div ref={container} class="editor" style="height: calc(100vh - 108px)" />
-  );
+  return <div ref={container} class="editor flex-1 overflow-y-auto" />;
 }

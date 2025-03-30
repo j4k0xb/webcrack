@@ -239,11 +239,13 @@ function App() {
           restoreWorkspace(workspace).catch(console.error);
         }}
       />
-      <div class="flex" style="height: calc(100vh - 44px)">
+      {/* Page */}
+      <div class="flex flex-1 overflow-hidden">
         <Sidebar paths={filePaths()} onFileClick={openFile} />
 
-        <main class="flex-1 overflow-auto">
-          <div class="tabs tabs-lifted justify-start overflow-x-auto bg-base-300">
+        {/* Workspace */}
+        <main class="flex-1 flex flex-col overflow-hidden">
+          <div class="tabs tabs-lifted flex-shrink-0 justify-start overflow-x-auto bg-base-300">
             <For each={tabs()}>
               {(tab) => (
                 <Tab
