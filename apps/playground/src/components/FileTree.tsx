@@ -1,4 +1,4 @@
-import { For, Show } from 'solid-js';
+import { createMemo, For, Show } from 'solid-js';
 import DirectoryNode from './DirectoryNode';
 import FileNode from './FileNode';
 
@@ -15,10 +15,13 @@ interface Props {
 }
 
 export default function FileTree(props: Props) {
-  const items = () => generateTreeNodes(props.paths);
+  const cachedPaths = createMemo(() => props.paths, props.paths, {
+    equals: (a, b) => a.length === b.length && a.every((v, i) => v === b[i]),
+  });
+  const items = () => generateTreeNodes(cachedPaths());
 
   return (
-    <ul class="menu menu-xs flex-nowrap bg-base-200 rounded-lg w-full overflow-y-auto">
+    <ul class="menu menu-xs flex-nowrap bg-base-200 rounded-lg w-full overflow-y-auto scrollbar-thin">
       <For each={items()}>
         {(node) => (
           <Show

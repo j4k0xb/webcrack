@@ -63,7 +63,7 @@ program
       console.log(result.code);
       if (result.bundle) {
         debug('webcrack:unpack')(
-          `${result.bundle.modules.size} modules are not displayed in the terminal. Use the --output option to save them`,
+          'Modules are not displayed in the terminal. Use the --output option to save them to a directory.',
         );
       }
     }
