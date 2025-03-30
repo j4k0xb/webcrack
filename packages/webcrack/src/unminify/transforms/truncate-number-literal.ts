@@ -5,7 +5,7 @@ export default {
   name: 'truncate-number-literal',
   tags: ['safe'],
   visitor: () => {
-    const binaryOperators = m.or("|", "&", "^", "<<", ">>", ">>>");
+    const binaryOperators = m.or('|', '&', '^', '<<', '>>', '>>>');
     const literal = m.capture(m.numericLiteral());
     const matcher = m.or(
       m.binaryExpression(binaryOperators, literal, m.anything()),
@@ -19,15 +19,17 @@ export default {
 
           const value = literal.current!.value;
 
-          const truncation = path.node.operator === "<<" || path.node.operator === ">>" ? 31 : 0xFFFFFFFF;
+          const isShifter =
+            literal.current! === path.node.right &&
+            (path.node.operator === '<<' || path.node.operator === '>>');
+          const truncation = isShifter ? 31 : 0xffffffff;
           const truncated = value & truncation;
 
-          if(truncated === value) return;
+          if (truncated === value) return;
 
           literal.current!.value = truncated;
-        }
+        },
       },
-    }
+    };
   },
 } satisfies Transform;
-
