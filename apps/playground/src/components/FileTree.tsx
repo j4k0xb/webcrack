@@ -62,7 +62,7 @@ function generateTreeNodes(paths: string[]): TreeNode[] {
 
       if (!childNode) {
         childNode = {
-          path: currentNode.path + '/' + part,
+          path: (currentNode.path + '/' + part).replace(/^\//, ''),
           name: part,
           isDirectory: !isLastPart,
           children: [],
