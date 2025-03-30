@@ -14,6 +14,7 @@ export { default as sequence } from './sequence';
 export { default as splitForLoopVars } from './split-for-loop-vars';
 export { default as splitVariableDeclarations } from './split-variable-declarations';
 export { default as ternaryToIf } from './ternary-to-if';
+export { default as truncateNumberLiteral } from './truncate-number-literal';
 export { default as typeofUndefined } from './typeof-undefined';
 export { default as unaryExpressions } from './unary-expressions';
 export { default as unminifyBooleans } from './unminify-booleans';
