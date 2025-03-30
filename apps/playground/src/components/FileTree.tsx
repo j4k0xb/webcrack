@@ -39,69 +39,45 @@ export default function FileTree(props: Props) {
 }
 
 function generateTreeNodes(paths: string[]): TreeNode[] {
-  const tree: TreeNode[] = [];
-  const treeCache = new Map<string, TreeNode>();
-
-  sortPathsTokens(paths).forEach((tokens) => {
-    let currentLevel = tree;
-
-    tokens.forEach((token, i) => {
-      const existingPath = treeCache.get(token);
-
-      if (existingPath) {
-        currentLevel = existingPath.children;
-      } else {
-        const subtree: TreeNode = {
-          name: token,
-          path: tokens.slice(0, i + 1).join('/'),
-          isDirectory: i < tokens.length - 1,
-          children: [],
-        };
-
-        treeCache.set(token, subtree);
-        currentLevel.push(subtree);
-        currentLevel = subtree.children;
-      }
-    });
-  });
-
-  return tree;
-}
-
-// Based on https://github.com/ghornich/sort-paths
-function sortPathsTokens(paths: string[]): string[][] {
   const collator = new Intl.Collator(undefined, {
     numeric: true,
     sensitivity: 'base',
   });
 
-  return paths
-    .map((path) => path.replace(/^\//, '').split('/'))
-    .sort((a, b) => {
-      const maxDepth = Math.max(a.length, b.length);
-      for (let depth = 0; depth < maxDepth; depth++) {
-        if (depth >= a.length) {
-          return -1;
-        } else if (depth >= b.length) {
-          return 1;
-        }
+  const root: TreeNode = {
+    path: '',
+    name: '',
+    isDirectory: true,
+    children: [],
+  };
 
-        const aToken = a[depth];
-        const bToken = b[depth];
-        if (aToken === bToken) {
-          continue;
-        }
+  for (const path of paths) {
+    const parts = path.split('/').filter(Boolean);
+    let currentNode = root;
 
-        const aIsDir = depth < a.length - 1;
-        const bIsDir = depth < b.length - 1;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const isLastPart = i === parts.length - 1;
+      let childNode = currentNode.children.find((child) => child.name === part);
 
-        if (aIsDir === bIsDir) {
-          return collator.compare(aToken, bToken);
-        } else {
-          return aIsDir ? -1 : 1;
-        }
+      if (!childNode) {
+        childNode = {
+          path: currentNode.path + '/' + part,
+          name: part,
+          isDirectory: !isLastPart,
+          children: [],
+        };
+        currentNode.children.push(childNode);
+        currentNode.children.sort(
+          (a, b) =>
+            Number(b.isDirectory) - Number(a.isDirectory) ||
+            collator.compare(a.name, b.name),
+        );
       }
 
-      return -1;
-    });
+      currentNode = childNode;
+    }
+  }
+
+  return root.children;
 }

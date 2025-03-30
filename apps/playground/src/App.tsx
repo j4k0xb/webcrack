@@ -168,9 +168,16 @@ function App() {
     fileModels().forEach((model) => model.dispose());
     setTabs(untitledModels());
 
+    const seenPaths = new Set<string>();
+    const deduplicatedFiles = result.files.filter((file) => {
+      if (seenPaths.has(file.path)) return false;
+      seenPaths.add(file.path);
+      return true;
+    });
+
     setModels([
       ...untitledModels(),
-      ...result.files.map((file) =>
+      ...deduplicatedFiles.map((file) =>
         monaco.editor.createModel(
           file.code,
           'javascript',
