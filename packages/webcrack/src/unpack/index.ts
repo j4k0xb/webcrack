@@ -26,7 +26,9 @@ export function unpackAST(
   if (options.bundle) {
     options.bundle.applyMappings(mappings);
     options.bundle.applyTransforms();
-    debug('webcrack:unpack')('Bundle:', options.bundle.type);
+    debug('webcrack:unpack')(
+      `Bundle: ${options.bundle.type}, modules: ${options.bundle.modules.size}, entry id: ${options.bundle.entryId}`,
+    );
   }
   return options.bundle;
 }
