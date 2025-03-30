@@ -116,7 +116,6 @@ export default {
         // Verify all references to make sure they match how the obfuscator
         // would have generated the code (no reassignments, etc.)
         const binding = path.scope.getBinding(varId.current!.name);
-        console.log(binding);
         if (!binding) return changes;
         if (!isConstantBinding(binding)) return changes;
         if (!transformObjectKeys(binding)) return changes;
