@@ -175,12 +175,10 @@ export default {
     function transformObjectKeys(objBinding: Binding): boolean {
       const path =
         objBinding.kind === 'param'
-          ? (objBinding.path.parentPath!.get('body') as NodePath<t.Statement>)
+          ? objBinding.constantViolations[0].parentPath!
           : objBinding.path.parentPath!;
-      const container = path.isBlock()
-        ? path.node.body
-        : (path.container as t.Statement[]);
-      const startIndex = path.isBlock() ? 1 : (path.key as number) + 1;
+      const container = path.container as t.Statement[];
+      const startIndex = (path.key as number) + 1;
       const properties: t.ObjectProperty[] = [];
 
       for (let i = startIndex; i < container.length; i++) {
