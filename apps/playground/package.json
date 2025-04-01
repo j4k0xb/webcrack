@@ -25,8 +25,8 @@
     "typescript": "^5.8.2",
     "vite": "^6.2.4",
     "vite-plugin-monaco-editor": "^1.1.0",
-    "vite-plugin-node-polyfills": "^0.22.0",
-    "vite-plugin-solid": "^2.10.2"
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
     "@babel/generator": "^7.26.0",
@@ -35,7 +35,7 @@
     "idb": "^8.0.0",
     "monaco-editor": "^0.52.0",
     "sandybox": "^1.1.2",
-    "solid-js": "^1.9.4",
+    "solid-js": "^1.9.5",
     "webcrack": "workspace:*"
   }
 }
