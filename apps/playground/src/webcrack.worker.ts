@@ -1,12 +1,11 @@
 import type { Options, Sandbox } from 'webcrack';
 import { webcrack } from 'webcrack';
-import type { MangleMode } from './App';
 
 export type WorkerRequest =
   | {
       type: 'deobfuscate';
       code: string;
-      options: Options & { mangleMode: MangleMode };
+      options: Options & { mangleRegex: RegExp | null };
     }
   | { type: 'sandbox'; result: unknown };
 
@@ -46,11 +45,13 @@ self.onmessage = async ({ data }: MessageEvent<WorkerRequest>) => {
   }
 
   try {
+    const { mangleRegex } = data.options;
+
     const result = await webcrack(data.code, {
       sandbox,
       onProgress,
       ...data.options,
-      mangle: convertMangleMode(data.options.mangleMode),
+      mangle: mangleRegex ? (id) => mangleRegex.test(id) : undefined,
     });
     const files = Array.from(result.bundle?.modules ?? [], ([, module]) => ({
       code: module.code,
@@ -65,18 +66,3 @@ self.onmessage = async ({ data }: MessageEvent<WorkerRequest>) => {
     postMessage({ type: 'error', error: error as Error });
   }
 };
-
-function convertMangleMode(mode: MangleMode) {
-  const HEX_IDENTIFIER = /_0x[a-f\d]+/i;
-
-  switch (mode) {
-    case 'off':
-      return false;
-    case 'all':
-      return true;
-    case 'hex':
-      return (id: string) => HEX_IDENTIFIER.test(id);
-    case 'short':
-      return (id: string) => id.length <= 2;
-  }
-}

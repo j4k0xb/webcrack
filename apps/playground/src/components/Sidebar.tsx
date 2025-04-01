@@ -1,5 +1,5 @@
-import { Show } from 'solid-js';
-import { config, setConfig, type MangleMode } from '../App';
+import { createEffect, createSignal, Show } from 'solid-js';
+import { config, setConfig } from '../App';
 import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 import FileTree from './FileTree';
 
@@ -8,9 +8,34 @@ interface Props {
   onFileClick?: (path: string) => void;
 }
 
+type MangleMode = 'off' | 'all' | 'hex' | 'short' | 'custom';
+
 export default function Sidebar(props: Props) {
   const { deobfuscate, deobfuscating, cancelDeobfuscate } =
     useDeobfuscateContext();
+
+  const [mangleMode, setMangleMode] = createSignal<MangleMode>('off');
+  const [mangleString, setMangleString] = createSignal<string>('');
+  const [mangleFlags, setMangleFlags] = createSignal<string>('');
+
+  createEffect(() => {
+    if (mangleMode() === 'off' || mangleString() === '') {
+      setConfig('mangleRegex', null);
+    } else if (mangleMode() === 'all') {
+      setConfig('mangleRegex', /./);
+    } else if (mangleMode() === 'hex') {
+      setConfig('mangleRegex', /_0x[a-f\d]+/i);
+    } else if (mangleMode() === 'short') {
+      setConfig('mangleRegex', /../);
+    } else if (mangleMode() === 'custom') {
+      try {
+        setConfig('mangleRegex', new RegExp(mangleString(), mangleFlags()));
+      } catch (error) {
+        console.error(error);
+        setConfig('mangleRegex', null);
+      }
+    }
+  });
 
   return (
     <nav class="flex flex-col w-12 sm:w-72 bg-base-200">
@@ -208,17 +233,45 @@ export default function Sidebar(props: Props) {
         <span class="label-text ml-4 mr-auto hidden sm:inline">Mangle</span>
         <select
           class="select select-sm ml-4 flex-1 w-full"
-          value={config.mangleMode}
-          onChange={(e) =>
-            setConfig('mangleMode', e.currentTarget.value as MangleMode)
-          }
+          value={mangleMode()}
+          onChange={(e) => setMangleMode(e.currentTarget.value as MangleMode)}
         >
           <option value="off">Off</option>
           <option value="hex">Hex (_0x)</option>
           <option value="short">Short Names</option>
           <option value="all">All Names</option>
+          <option value="custom">Custom Regex</option>
         </select>
       </label>
+
+      <Show when={mangleMode() === 'custom'}>
+        <label class="label cursor-pointer px-4 py-2">
+          <div class="join">
+            <label class="input input-sm join-item">
+              /
+              <input
+                type="text"
+                class="grow"
+                placeholder="Regular expression"
+                value={mangleString()}
+                onInput={(e) => setMangleString(e.currentTarget.value)}
+              />
+              /
+            </label>
+
+            <input
+              class="input input-sm join-item basis-30"
+              placeholder="Flags"
+              value={mangleFlags()}
+              onInput={(e) => {
+                const value = e.currentTarget.value.replace(/[^gimuy]/g, '');
+                setMangleFlags(value);
+                e.currentTarget.value = value;
+              }}
+            />
+          </div>
+        </label>
+      </Show>
 
       <FileTree
         paths={props.paths}
