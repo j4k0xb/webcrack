@@ -68,7 +68,7 @@ export default function Menu(props: Props) {
                 onClick={() => props.onRestore?.(workspace)}
               >
                 {new Date(workspace.timestamp).toLocaleString()} -
-                <code class="overflow-x-clip overflow-ellipsis max-w-36">
+                <code class="overflow-x-clip text-ellipsis max-w-36">
                   {workspace.models[0].value.slice(0, 50)}
                 </code>
               </MenuButton>

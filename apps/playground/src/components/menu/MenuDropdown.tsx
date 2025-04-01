@@ -27,7 +27,7 @@ export default function MenuDropdown(props: ParentProps<Props>) {
         </svg>
         <ul
           tabindex="0"
-          class="dropdown-content z-10 menu ml-0 p-2 shadow bg-base-100 rounded-box"
+          class="dropdown-content z-10 menu ml-0 p-2 shadow-sm bg-base-100 rounded-box"
         >
           {props.children}
         </ul>

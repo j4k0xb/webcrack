@@ -17,7 +17,7 @@ export default function Tab(props: Props) {
     >
       <span class="max-w-[200px] truncate">{basename(props.path)}</span>
       <button
-        class="btn btn-xs btn-ghost btn-circle ml-auto !translate-x-2"
+        class="btn btn-xs btn-ghost btn-circle ml-auto translate-x-2!"
         title="Close tab"
         onClick={(e) => {
           e.stopPropagation();

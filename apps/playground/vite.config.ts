@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 import { defineConfig } from 'vite';
 import monacoEditor from 'vite-plugin-monaco-editor';
@@ -42,6 +43,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    tailwindcss(),
     nodePolyfills({ exclude: ['fs'] }),
     monacoEditorPlugin({
       languageWorkers: ['editorWorkerService', 'typescript'],

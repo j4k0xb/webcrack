@@ -245,7 +245,7 @@ function App() {
 
         {/* Workspace */}
         <main class="flex-1 flex flex-col overflow-hidden">
-          <div class="tabs tabs-lifted flex-shrink-0 justify-start overflow-x-auto bg-base-300">
+          <div class="tabs tabs-lifted shrink-0 justify-start overflow-x-auto bg-base-300">
             <For each={tabs()}>
               {(tab) => (
                 <Tab
