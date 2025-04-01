@@ -1,6 +1,6 @@
 {
   "extends": "@webcrack/typescript-config/vite.json",
   "include": [
-    "src"
+    "src/.vitepress/**/*.ts"
   ]
 }

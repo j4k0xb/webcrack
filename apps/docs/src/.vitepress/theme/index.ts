@@ -1,6 +1,8 @@
 import DefaultTheme from 'vitepress/theme';
 import './custom.css';
 
-export default {
+const theme: typeof DefaultTheme = {
   ...DefaultTheme,
 };
+
+export default theme;

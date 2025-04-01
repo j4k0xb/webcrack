@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",

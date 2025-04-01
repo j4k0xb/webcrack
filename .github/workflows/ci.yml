@@ -6,8 +6,28 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Build and Test
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+
+  test:
+    name: Test
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -20,14 +40,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Test
-        run: pnpm test
+          node-version: '20.x'
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm test

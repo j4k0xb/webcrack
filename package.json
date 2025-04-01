@@ -7,9 +7,11 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
+    "typecheck": "turbo run typecheck",
+    "format:check": "turbo run format:check",
+    "format": "turbo run format",
     "test": "vitest --no-isolate",
-    "test:coverage": "vitest run --coverage --no-isolate",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "test:coverage": "vitest run --coverage --no-isolate"
   },
   "devDependencies": {
     "@vitest/coverage-istanbul": "^3.0.7",

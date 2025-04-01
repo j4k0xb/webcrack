@@ -1,5 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    ".prettierrc",
+    "eslint.config.js",
+    "packages/config-eslint/**",
+    "packages/config-typescript/**"
+  ],
   "tasks": {
     "build": {
       "dependsOn": [
@@ -9,19 +15,45 @@
         "dist/**"
       ]
     },
+    "typecheck": {
+      "dependsOn": [
+        "topo-typecheck"
+      ],
+      "inputs": [
+        "**/*.{ts,tsx}",
+        "test/**/*.{ts,tsx}",
+        "tsconfig*.json"
+      ]
+    },
     "lint": {
-      "cache": false
+      "inputs": [
+        "**/*.{ts,tsx}",
+        "eslint.config.js"
+      ]
     },
     "lint:fix": {
-      "cache": false
+      "inputs": [
+        "**/*.{ts,tsx}",
+        "eslint.config.js"
+      ]
+    },
+    "format": {
+      "inputs": [
+        "**/*.{ts,tsx,md}"
+      ]
+    },
+    "format:check": {
+      "inputs": [
+        "**/*.{ts,tsx,md}"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "topo": {
+    "topo-typecheck": {
       "dependsOn": [
-        "^topo"
+        "^topo-typecheck"
       ]
     }
   }

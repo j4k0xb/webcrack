@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vitepress dev src",
     "build": "vitepress build src",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@webcrack/eslint-config": "workspace:*",

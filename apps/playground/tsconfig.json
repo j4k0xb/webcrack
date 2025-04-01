@@ -9,4 +9,8 @@
       ]
     }
   },
+  "include": [
+    "src",
+    "../../packages/webcrack/src/**/*.d.ts",
+  ]
 }
