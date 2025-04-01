@@ -19,7 +19,7 @@ export default function Sidebar(props: Props) {
   const [mangleFlags, setMangleFlags] = createSignal<string>('');
 
   createEffect(() => {
-    if (mangleMode() === 'off' || mangleString() === '') {
+    if (mangleMode() === 'off') {
       setConfig('mangleRegex', null);
     } else if (mangleMode() === 'all') {
       setConfig('mangleRegex', /./);
