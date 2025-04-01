@@ -102,9 +102,6 @@ importers:
       daisyui:
         specifier: ^5.0.9
         version: 5.0.9
-      postcss:
-        specifier: ^8.5.3
-        version: 8.5.3
       tailwindcss:
         specifier: ^4.0.17
         version: 4.0.17
@@ -1144,7 +1141,7 @@ packages:
     resolution: {integrity: sha512-IYSLEQj4LgZZuoVpdSUCw3dIynTWQgPlaRP6iAvMle4My0HdYwr5g5wQAfwOeHQBmYwEkqF70nRpSilr6PoUDg==}
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
-      vite: '>=5.4.12'
+      vite: ^5.0.0 || ^6.0.0
       vue: ^3.2.25
 
   '@vitest/coverage-istanbul@3.1.1':
