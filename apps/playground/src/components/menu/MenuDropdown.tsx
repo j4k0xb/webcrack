@@ -7,7 +7,7 @@ interface Props {
 export default function MenuDropdown(props: ParentProps<Props>) {
   return (
     <li>
-      <div class="dropdown dropdown-right dropdown-hover transform-none">
+      <div class="dropdown dropdown-right dropdown-hover flex">
         <div tabindex="0" role="button">
           {props.title}
         </div>
@@ -27,7 +27,7 @@ export default function MenuDropdown(props: ParentProps<Props>) {
         </svg>
         <ul
           tabindex="0"
-          class="dropdown-content z-10 menu ml-0 p-2 shadow-sm bg-base-100 rounded-box"
+          class="dropdown-content z-10 menu ml-0 p-2 shadow-sm bg-base-100 rounded-box -translate-y-4"
         >
           {props.children}
         </ul>

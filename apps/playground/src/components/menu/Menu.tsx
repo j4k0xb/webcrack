@@ -38,7 +38,7 @@ export default function Menu(props: Props) {
   }
 
   return (
-    <ul ref={menuRef} class="menu menu-sm menu-horizontal bg-base-200 w-full">
+    <ul ref={menuRef} class="menu menu-horizontal bg-base-200 w-full">
       <MenuHeader
         title="File"
         open={openedMenu() === 'file'}

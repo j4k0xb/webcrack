@@ -16,7 +16,7 @@ export default function MenuHeader(props: ParentProps<Props>) {
           if (e.currentTarget.open) props.onOpen?.();
         }}
       >
-        <summary>{props.title}</summary>
+        <summary class="cursor-default">{props.title}</summary>
         <ul class="min-w-52 z-10">{props.children}</ul>
       </details>
     </li>

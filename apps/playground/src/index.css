@@ -20,6 +20,9 @@
   --color-primary: #409eea;
   --color-secondary: #6366f1;
   --color-accent: #34eca2;
+  --radius-field: 0.4rem;
+  --color-primary-content: oklch(13.5612% .028553 246.580548);
+  --color-base-content: oklch(0.85 0.0216 264.436);
 }
 
 /*

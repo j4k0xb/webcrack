@@ -9,23 +9,37 @@ interface Props {
 
 export default function Tab(props: Props) {
   return (
-    <a
-      class="tab flex-nowrap min-w-[120px] whitespace-nowrap"
-      classList={{ 'tab-active': props.active, 'bg-base-200': !props.active }}
+    <label
+      class="tab flex-nowrap min-w-[120px] whitespace-nowrap group"
       title={props.path}
       onClick={props.onClick}
     >
-      <span class="max-w-[200px] truncate">{basename(props.path)}</span>
+      <input type="radio" name="tab" checked={props.active} />
+      <span class="max-w-[200px] truncate ml-1">{basename(props.path)}</span>
       <button
-        class="btn btn-xs btn-ghost btn-circle ml-auto translate-x-2!"
+        class="btn btn-xs btn-ghost btn-circle ml-auto mr-1.5 translate-x-2! group-hover:visible"
+        classList={{ invisible: !props.active }}
         title="Close tab"
         onClick={(e) => {
           e.stopPropagation();
           props.onClose?.();
         }}
       >
-        ✕
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          width="12"
+          height="12"
+          stroke-width="2"
+        >
+          <path d="M18 6l-12 12"></path>
+          <path d="M6 6l12 12"></path>
+        </svg>
       </button>
-    </a>
+    </label>
   );
 }

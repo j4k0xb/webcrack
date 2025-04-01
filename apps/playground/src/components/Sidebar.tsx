@@ -46,7 +46,7 @@ export default function Sidebar(props: Props) {
         </Show>
       </div>
 
-      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
+      <label class="label cursor-pointer px-4 py-2 hover:bg-base-100 group text-base-content">
         <svg
           width="28"
           height="28"
@@ -79,7 +79,7 @@ export default function Sidebar(props: Props) {
           onClick={(e) => setConfig('deobfuscate', e.currentTarget.checked)}
         />
       </label>
-      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
+      <label class="label cursor-pointer px-4 py-2 hover:bg-base-100 group text-base-content">
         <svg
           width="28"
           height="28"
@@ -116,7 +116,7 @@ export default function Sidebar(props: Props) {
           onClick={(e) => setConfig('unminify', e.currentTarget.checked)}
         />
       </label>
-      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
+      <label class="label cursor-pointer px-4 py-2 hover:bg-base-100 group text-base-content">
         <svg
           width="28"
           height="28"
@@ -151,7 +151,7 @@ export default function Sidebar(props: Props) {
           onClick={(e) => setConfig('unpack', e.currentTarget.checked)}
         />
       </label>
-      <label class="label cursor-pointer px-4 hover:bg-base-100 group">
+      <label class="label cursor-pointer px-4 py-2 hover:bg-base-100 group text-base-content">
         <svg
           width="28"
           height="28"
@@ -188,7 +188,7 @@ export default function Sidebar(props: Props) {
           onClick={(e) => setConfig('jsx', e.currentTarget.checked)}
         />
       </label>
-      <label class="label cursor-pointer px-4 hover:bg-base-100">
+      <label class="label cursor-pointer px-4 py-2 hover:bg-base-100 text-base-content">
         <svg
           width="28"
           height="28"
@@ -207,7 +207,7 @@ export default function Sidebar(props: Props) {
         </svg>
         <span class="label-text ml-4 mr-auto hidden sm:inline">Mangle</span>
         <select
-          class="select select-sm select-bordered ml-4 flex-1 w-full"
+          class="select select-sm ml-4 flex-1 w-full"
           value={config.mangleMode}
           onChange={(e) =>
             setConfig('mangleMode', e.currentTarget.value as MangleMode)

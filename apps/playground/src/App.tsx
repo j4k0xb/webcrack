@@ -15,7 +15,7 @@ import FileDropZone from './components/FileDropZone';
 import MonacoEditor from './components/MonacoEditor';
 import ProgressBar from './components/ProgressBar';
 import Sidebar from './components/Sidebar';
-import Tab from './components/Tab';
+import Tab from './components/Tab.jsx';
 import Menu from './components/menu/Menu';
 import { DeobfuscateContextProvider } from './context/DeobfuscateContext';
 import { settings } from './hooks/useSettings';
@@ -245,7 +245,7 @@ function App() {
 
         {/* Workspace */}
         <main class="flex-1 flex flex-col overflow-hidden">
-          <div class="tabs tabs-lifted shrink-0 justify-start overflow-x-auto bg-base-300">
+          <div class="tabs tabs-lift tabs-sm shrink-0 justify-start flex-nowrap overflow-x-auto bg-base-300">
             <For each={tabs()}>
               {(tab) => (
                 <Tab
