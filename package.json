@@ -17,8 +17,8 @@
     "@vitest/coverage-istanbul": "^3.1.1",
     "@vitest/coverage-v8": "^3.1.1",
     "@webcrack/eslint-config": "workspace:*",
-    "eslint": "^9.21.0",
-    "prettier": "^3.5.2",
+    "eslint": "^9.23.0",
+    "prettier": "^3.5.3",
     "turbo": "^2.4.4",
     "vitest": "^3.1.1"
   },
