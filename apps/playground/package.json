@@ -29,8 +29,8 @@
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
-    "@babel/generator": "^7.26.0",
-    "@babel/types": "^7.26.0",
+    "@babel/generator": "^7.27.0",
+    "@babel/types": "^7.27.0",
     "@zip.js/zip.js": "^2.7.57",
     "idb": "^8.0.0",
     "monaco-editor": "^0.52.0",

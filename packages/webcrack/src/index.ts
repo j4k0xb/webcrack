@@ -153,8 +153,8 @@ export async function webcrack(
         errorRecovery: true,
         plugins: ['jsx'],
       });
-      if (ast.errors.length) {
-        debug('webcrack:parse')('Errors', ast.errors);
+      if (ast.errors?.length) {
+        debug('webcrack:parse')('Recovered from parse errors', ast.errors);
       }
     },
     plugins.parse && (() => plugins.parse(ast)),

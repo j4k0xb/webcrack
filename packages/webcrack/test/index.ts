@@ -1,5 +1,6 @@
 import type { ParseResult } from '@babel/parser';
 import { parse } from '@babel/parser';
+import type { File } from '@babel/types';
 import type { Assertion } from 'vitest';
 import { expect } from 'vitest';
 import type { Transform } from '../src/ast-utils';

@@ -28,7 +28,6 @@
       "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch"
     },
     "overrides": {
-      "@babel/helpers@<7.26.10": ">=7.26.10",
       "esbuild@<=0.24.2": ">=0.25.0",
       "tar-fs@>=2.0.0 <2.1.2": ">=2.1.2"
     }
