@@ -28,11 +28,9 @@
       "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch"
     },
     "overrides": {
-      "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5",
-      "elliptic@<6.6.1": ">=6.6.1",
-      "micromatch@<4.0.8": ">=4.0.8",
-      "rollup@>=4.0.0 <4.22.4": ">=4.22.4",
-      "vite@>=5.2.0 <5.4.12": ">=5.4.12"
+      "esbuild@<=0.24.2": ">=0.25.0",
+      "@babel/helpers@<7.26.10": ">=7.26.10",
+      "tar-fs@>=2.0.0 <2.1.2": ">=2.1.2"
     }
   }
 }
