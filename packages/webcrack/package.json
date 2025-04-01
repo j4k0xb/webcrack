@@ -62,9 +62,9 @@
     "@babel/traverse": "^7.27.0",
     "@babel/types": "^7.27.0",
     "@codemod/matchers": "^1.7.1",
-    "commander": "^12.1.0",
-    "debug": "^4.3.7",
-    "isolated-vm": "^5.0.1"
+    "commander": "^13.1.0",
+    "debug": "^4.4.0",
+    "isolated-vm": "^5.0.4"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
@@ -72,10 +72,10 @@
     "@types/babel__template": "^7.4.4",
     "@types/babel__traverse": "^7.20.7",
     "@types/debug": "^4.1.12",
-    "@types/node": "^22.13.8",
+    "@types/node": "^22.13.16",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.2",
     "typescript": "^5.8.2"
   }
 }
