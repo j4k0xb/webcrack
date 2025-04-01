@@ -1,11 +1,11 @@
 import config from '@webcrack/eslint-config';
 
 /**
- * @type {import('eslint').Linter.FlatConfig[]}
+ * @type {import('eslint').Linter.Config[]}
  */
 export default [
   ...config,
   {
-    ignores: ['tmp', '**/test/samples', 'vitest.config.ts'],
+    ignores: ['tmp', '**/test/samples'],
   },
 ];

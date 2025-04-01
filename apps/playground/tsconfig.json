@@ -11,6 +11,7 @@
   },
   "include": [
     "src",
+    "*.ts",
     "../../packages/webcrack/src/**/*.d.ts",
   ]
 }

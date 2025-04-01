@@ -15,6 +15,6 @@
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
     "typescript": "^5.8.2",
-    "vitepress": "1.0.0-rc.31"
+    "vitepress": "1.6.3"
   }
 }
