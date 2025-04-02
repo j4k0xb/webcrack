@@ -95,10 +95,6 @@ test('indirect jsx call', () =>
   expectJS('(0, r.jsx)("div", {})').toMatchInlineSnapshot('<div />;'));
 
 test('object member jsxs and jsx', () =>
-  expectJS('r.jsxs(Foo, { bar: 1, children: [r.jsx(Child, {})] });').toMatchInlineSnapshot(
-    '<Foo bar={1}><Child /></Foo>;',
-  ));
-
-
-
-
+  expectJS(
+    'r.jsxs(Foo, { bar: 1, children: [r.jsx(Child, {})] });',
+  ).toMatchInlineSnapshot('<Foo bar={1}><Child /></Foo>;'));
