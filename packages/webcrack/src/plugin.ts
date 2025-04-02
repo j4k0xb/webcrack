@@ -4,15 +4,12 @@ import traverse, { visitors, type Visitor } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
-const stages = [
-  'afterParse',
-  'afterPrepare',
-  'afterDeobfuscate',
-  'afterUnminify',
-  'afterUnpack',
-] as const;
-
-export type Stage = (typeof stages)[number];
+export type Stage =
+  | 'afterParse'
+  | 'afterPrepare'
+  | 'afterDeobfuscate'
+  | 'afterUnminify'
+  | 'afterUnpack';
 
 export type PluginState = { opts: Record<string, unknown> };
 
