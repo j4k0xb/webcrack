@@ -21,8 +21,12 @@ import evaluateGlobals from './deobfuscate/evaluate-globals';
 import mergeObjectAssignments from './deobfuscate/merge-object-assignments';
 import selfDefending from './deobfuscate/self-defending';
 import varFunctions from './deobfuscate/var-functions';
-import type { Plugin } from './plugin';
-import { loadPlugins } from './plugin';
+import {
+  runPlugins,
+  type Plugin,
+  type PluginState,
+  type Stage,
+} from './plugin';
 import jsx from './transforms/jsx';
 import jsxNew from './transforms/jsx-new';
 import mangle from './transforms/mangle';
@@ -38,7 +42,7 @@ import { unpackAST } from './unpack';
 import { isBrowser } from './utils/platform';
 
 export { type Sandbox } from './deobfuscate';
-export type { Plugin, PluginAPI, PluginObject, Stage } from './plugin';
+export type { Plugin } from './plugin';
 
 type Matchers = typeof m;
 
@@ -81,7 +85,7 @@ export interface Options {
   /**
    * Run AST transformations after specific stages
    */
-  plugins?: Plugin[];
+  plugins?: Partial<Record<Stage, Plugin[]>>;
   /**
    * Assigns paths to modules based on the given matchers.
    * This will also rewrite `require()` calls to use the new paths.
@@ -111,7 +115,7 @@ function mergeOptions(options: Options): asserts options is Required<Options> {
     unpack: true,
     deobfuscate: true,
     mangle: false,
-    plugins: [],
+    plugins: options.plugins ?? {},
     mappings: () => ({}),
     onProgress: () => {},
     sandbox: isBrowser() ? createBrowserSandbox() : createNodeSandbox(),
@@ -143,7 +147,9 @@ export async function webcrack(
   let ast: ParseResult<t.File> = null!;
   let outputCode = '';
   let bundle: Bundle | undefined;
-  const plugins = loadPlugins(options.plugins);
+
+  const { plugins } = options;
+  const state: PluginState = { opts: {} };
 
   const stages = [
     () => {
@@ -157,7 +163,7 @@ export async function webcrack(
         debug('webcrack:parse')('Recovered from parse errors', ast.errors);
       }
     },
-    plugins.parse && (() => plugins.parse(ast)),
+    plugins.afterParse && (() => runPlugins(ast, plugins.afterParse!, state)),
 
     () => {
       applyTransforms(
@@ -166,17 +172,21 @@ export async function webcrack(
         { name: 'prepare' },
       );
     },
-    plugins.prepare && (() => plugins.prepare(ast)),
+    plugins.afterPrepare &&
+      (() => runPlugins(ast, plugins.afterPrepare!, state)),
 
     options.deobfuscate &&
       (() => applyTransformAsync(ast, deobfuscate, options.sandbox)),
-    plugins.deobfuscate && (() => plugins.deobfuscate(ast)),
+    plugins.afterDeobfuscate &&
+      (() => runPlugins(ast, plugins.afterDeobfuscate!, state)),
 
     options.unminify &&
       (() => {
         applyTransforms(ast, [transpile, unminify]);
       }),
-    plugins.unminify && (() => plugins.unminify(ast)),
+    plugins.afterUnminify &&
+      (() => runPlugins(ast, plugins.afterUnminify!, state)),
+
     options.mangle &&
       (() =>
         applyTransform(
@@ -202,7 +212,7 @@ export async function webcrack(
     // Unpacking modifies the same AST and may result in imports not at top level
     // so the code has to be generated before
     options.unpack && (() => (bundle = unpackAST(ast, options.mappings(m)))),
-    plugins.unpack && (() => plugins.unpack(ast)),
+    plugins.afterUnpack && (() => runPlugins(ast, plugins.afterUnpack!, state)),
   ].filter(Boolean) as (() => unknown)[];
 
   for (let i = 0; i < stages.length; i++) {

@@ -5,11 +5,11 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 
 const stages = [
-  'parse',
-  'prepare',
-  'deobfuscate',
-  'unminify',
-  'unpack',
+  'afterParse',
+  'afterPrepare',
+  'afterDeobfuscate',
+  'afterUnminify',
+  'afterUnpack',
 ] as const;
 
 export type Stage = (typeof stages)[number];
@@ -18,7 +18,6 @@ export type PluginState = { opts: Record<string, unknown> };
 
 export interface PluginObject {
   name?: string;
-  runAfter: Stage;
   pre?: (this: PluginState, state: PluginState) => Promise<void> | void;
   post?: (this: PluginState, state: PluginState) => Promise<void> | void;
   visitor?: Visitor<PluginState>;
@@ -34,43 +33,34 @@ export interface PluginAPI {
 
 export type Plugin = (api: PluginAPI) => PluginObject;
 
-export function loadPlugins(plugins: Plugin[]) {
-  const groups = new Map<Stage, PluginObject[]>(
-    stages.map((stage) => [stage, []]),
-  );
-  for (const plugin of plugins) {
-    const obj = plugin({
+export async function runPlugins(
+  ast: t.File,
+  plugins: Plugin[],
+  state: PluginState,
+): Promise<void> {
+  const pluginObjects = plugins.map((plugin) =>
+    plugin({
       parse,
       types: t,
       traverse,
       template,
       matchers: m,
-    });
-    groups.get(obj.runAfter)?.push(obj);
+    }),
+  );
+
+  for (const plugin of pluginObjects) {
+    await plugin.pre?.call(state, state);
   }
-  return Object.fromEntries(
-    [...groups].map(([stage, plugins]) => [
-      stage,
-      plugins.length
-        ? async (ast: t.File) => {
-            const state: PluginState = { opts: {} };
-            for (const transform of plugins) {
-              await transform.pre?.call(state, state);
-            }
 
-            const pluginVisitors = plugins.flatMap(
-              (plugin) => plugin.visitor ?? [],
-            );
-            if (pluginVisitors.length > 0) {
-              const mergedVisitor = visitors.merge(pluginVisitors);
-              traverse(ast, mergedVisitor, undefined, state);
-            }
+  const pluginVisitors = pluginObjects.flatMap(
+    (plugin) => plugin.visitor ?? [],
+  );
+  if (pluginVisitors.length > 0) {
+    const mergedVisitor = visitors.merge(pluginVisitors);
+    traverse(ast, mergedVisitor, undefined, state);
+  }
 
-            for (const plugin of plugins) {
-              await plugin.post?.call(state, state);
-            }
-          }
-        : undefined,
-    ]),
-  ) as Record<Stage, (ast: t.File) => Promise<void>>;
+  for (const plugin of pluginObjects) {
+    await plugin.post?.call(state, state);
+  }
 }

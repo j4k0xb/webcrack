@@ -77,6 +77,7 @@ await webcrack(code, {
   unminify: true, // Unminify the code
   deobfuscate: true, // Deobfuscate the code
   mangle: false, // Mangle variable names
+  plugins: {}, // Explained below
   sandbox, // Explained below
 });
 ```
@@ -173,62 +174,83 @@ See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages
 This API is only available in the beta version and might change in future versions.
 :::
 
-There are 5 stages you can hook into to manipulate the AST, which run in this order:
+Webcrack's processing pipeline consists of six key stages:
 
-- parse
-- prepare
-- deobfuscate
-- unminify
-- unpack
+1. **Parse**: The input code is parsed into an Abstract Syntax Tree (AST).
+2. **Prepare**: Performs basic normalization, such as adding block statements.
+3. **[Deobfuscate](../concepts/deobfuscate.md)**
+4. **[Transpile](../concepts/transpile.md)** and **[Unminify](../concepts/unminify.md)**
+5. **[JSX](../concepts/jsx.md)** and **[Unpack](../concepts/unpack.md)**
+6. **Generate**: Converts the modified AST back into executable code.
 
-See the [babel plugin handbook](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/en/plugin-handbook.md#writing-your-first-babel-plugin) for more information about writing plugins.
-This API is pretty similar, but there are some differences:
+You can extend or modify webcrack's behavior by hooking into its pipeline stages using plugins. Plugins allow you to manipulate the AST at specific stages of the pipeline.
 
-- The required `runAfter` property specifies the stage
-- Only `visitor`, `pre` and `post` are supported
-- [parse](https://babeljs.io/docs/babel-parser),
-  [types](https://babeljs.io/docs/babel-types),
-  [traverse](https://babeljs.io/docs/babel-traverse),
-  [template](https://babeljs.io/docs/babel-template) and
-  [matchers](https://github.com/codemod-js/codemod/tree/main/packages/matchers) are passed to the plugin function
+### Supported Stages
 
-### Example
+The `plugins` option lets you specify an array of plugins for the following stages:
+
+- `afterParse`
+- `afterPrepare`
+- `afterDeobfuscate`
+- `afterUnminify`
+- `afterUnpack`
+
+Plugins are executed sequentially in the order they are defined for each stage.
+
+### Writing Plugins
+
+Refer to the [Babel Plugin Handbook](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/en/plugin-handbook.md#writing-your-first-babel-plugin) for a detailed guide on writing plugins.
+
+Webcrack's plugin API is similar to Babel's but only the following utility libraries are provided to the plugin function:
+
+- [`parse`](https://babeljs.io/docs/babel-parser)
+- [`types`](https://babeljs.io/docs/babel-types)
+- [`traverse`](https://babeljs.io/docs/babel-traverse)
+- [`template`](https://babeljs.io/docs/babel-template)
+- [`matchers`](https://github.com/codemod-js/codemod/tree/main/packages/matchers)
+
+### Example Plugin
 
 ```js
 import { webcrack } from 'webcrack';
 
-function myPlugin({ types: t, matchers: m }) {
+function myPlugin({ types: t }) {
   return {
-    runAfter: 'parse', // change it to 'unminify' and see what happens
-    pre(state) {
-      this.cache = new Set();
+    pre() {
+      console.log('Running before traversal');
     },
     visitor: {
-      StringLiteral(path) {
-        this.cache.add(path.node.value);
+      NumericLiteral(path) {
+        console.log('Found a number:', path.node.value);
+        path.replaceWith(t.stringLiteral('x'));
       },
     },
-    post(state) {
-      console.log(this.cache); // Set(2) {'a', 'b'}
+    post() {
+      console.log('Running after traversal');
     },
   };
 }
 
-const result = await webcrack('"a" + "b"', { plugins: [myPlugin] });
+const result = await webcrack('1 + 1', {
+  plugins: {
+    afterParse: [myPlugin],
+  },
+});
+console.log(result.code); // '"xx"'
 ```
 
 ### Using Babel plugins
 
 It should be compatible with most Babel plugins as long as they only access the limited API specified above.
-They have to be wrapped to set the `runAfter` property.
 
 ```js
 import removeConsole from 'babel-plugin-transform-remove-console';
+import { webcrack } from 'webcrack';
 
-function removeConsoleWrapper(babel) {
-  return {
-    runAfter: 'deobfuscate',
-    ...removeConsole(babel),
-  };
-}
+const result = await webcrack('consol.log(a), b()', {
+  plugins: {
+    afterUnminify: [removeConsole],
+  },
+});
+console.log(result.code); // 'b();'
 ```

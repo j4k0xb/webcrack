@@ -12,13 +12,15 @@ test('run plugin after parse', async () => {
     post,
     visitor: {
       NumericLiteral(path) {
-        path.replaceWith(t.stringLiteral(path.node.value.toString()));
+        path.replaceWith(t.stringLiteral('x'));
       },
     },
   });
-  const result = await webcrack('1 + 1;', { plugins: [plugin] });
+  const result = await webcrack('1 + 1;', {
+    plugins: { afterParse: [plugin] },
+  });
 
   expect(pre).toHaveBeenCalledOnce();
   expect(post).toHaveBeenCalledOnce();
-  expect(result.code).toBe('"11";');
+  expect(result.code).toBe('"xx";');
 });
