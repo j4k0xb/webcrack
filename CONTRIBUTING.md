@@ -11,6 +11,10 @@ This project uses [pnpm](https://pnpm.js.org/) for package management. Please ma
 3. Install dependencies: `pnpm install`
 4. Test your changes in the playground: `pnpm dev`
 
+## Before submitting a PR
+
+Run `pnpm lint:fix format typecheck`
+
 ## Attach a Debugger
 
 Press `F5` in VSCode to build the project and launch the debugger.
@@ -35,12 +39,6 @@ If the snapshots are outdated, make sure the changes are correct and update them
 
 The tests can also be debugged by installing the [Vitest extension](https://marketplace.visualstudio.com/items?itemName=vitest.explorer) and right-clicking on the play icon:
 ![vitest debug](https://github.com/j4k0xb/webcrack/assets/55899582/9661b202-7f85-4615-bf83-c132cfdaa9f7)
-
-## Linting and Formatting
-
-```bash
-pnpm lint:fix && pnpm format
-```
 
 ## Create a new Transform
 
