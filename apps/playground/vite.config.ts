@@ -45,6 +45,7 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     nodePolyfills({ exclude: ['fs'] }),
+    // @ts-expect-error Not compatible with Vite 6 types
     monacoEditorPlugin({
       languageWorkers: ['editorWorkerService', 'typescript'],
     }),

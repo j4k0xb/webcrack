@@ -66,7 +66,7 @@ export function iife(
 }
 
 /**
- * Matches both identifier properties and string literal computed properties
+ * Matches either `object.property` and `object["property"]`
  */
 export function constMemberExpression(
   object: string | m.Matcher<t.Expression>,

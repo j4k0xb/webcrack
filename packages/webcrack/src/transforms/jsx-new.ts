@@ -49,11 +49,7 @@ export default {
           m.numericLiteral(0),
           constMemberExpression(m.identifier(), jsxFunction),
         ]),
-        m.memberExpression(
-          m.anyExpression(),
-          m.identifier(jsxFunction),
-          false
-        )
+        constMemberExpression(m.identifier(), jsxFunction),
       ),
       m.anyList(type, props, m.slice({ min: 0, max: 1, matcher: key })),
     );
