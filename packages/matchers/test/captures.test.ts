@@ -3,14 +3,12 @@ import { expect, test } from 'vitest';
 import * as m from '../src';
 
 test('capture number', () => {
-  // @ts-expect-error idk
   const matcher = m.compile(m.numericLiteral(m.capture('value')));
   const captures = matcher(t.numericLiteral(1));
   expect(captures).toEqual({ value: 1 });
 });
 
 test('capture node', () => {
-  // @ts-expect-error idk
   const matcher = m.compile(m.variableDeclarator(m.capture('id')));
   const id = t.identifier('foo');
   const captures = matcher(t.variableDeclarator(id));

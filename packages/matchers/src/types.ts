@@ -17,7 +17,7 @@ export type NodeSchema<T extends t.Node> = {
   [K in Exclude<keyof T, ExcludedNodeKeys>]?: Schema<T[K]> | undefined;
 };
 
-export type OrMatcher<T extends unknown[]> = {
+export type OrMatcher<T> = {
   type: 'or';
   schema: T;
 };
@@ -41,7 +41,7 @@ export type FromCaptureMatcher = {
 export type PredicateMatcher<T> = (input: T) => boolean;
 
 export type Matcher<T> =
-  | OrMatcher<T[]>
+  | OrMatcher<T>
   | ArraySchema<T>
   | NullableSchema<T>
   | CaptureMatcher<T>
@@ -62,9 +62,9 @@ export type Infer<T> =
   T extends NullableSchema<infer U>
     ? U | null
     : T extends ArraySchema<infer U>
-      ? U
+      ? U[]
       : T extends OrMatcher<infer U>
-        ? U[number]
+        ? U
         : T extends CaptureMatcher<infer U>
           ? U
           : T extends FromCaptureMatcher
