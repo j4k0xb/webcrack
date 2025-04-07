@@ -147,6 +147,9 @@ importers:
         specifier: ^7.27.0
         version: 7.27.0
     devDependencies:
+      '@babel/traverse':
+        specifier: ^7.27.0
+        version: 7.27.0
       '@codemod/matchers':
         specifier: ^1.7.1
         version: 1.7.1

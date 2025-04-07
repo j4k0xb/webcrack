@@ -31,13 +31,13 @@ export function compile<T extends t.Node>(
   checkType = true,
 ): (input: t.Node) => object | undefined {
   const context: Context = { captures: [] };
-  const checks = compileNode(schema, 'input', context, checkType);
+  const checks = compileNode(schema, 'node', context, checkType);
   const code = `
 const captures = { ${context.captures.map((v) => `${v}: undefined`).join(', ')} };
 if (${checks ?? true}) { return captures; }`;
 
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
-  return Function('input', code) as never;
+  return Function('node', code) as never;
 }
 
 /**
@@ -46,25 +46,26 @@ if (${checks ?? true}) { return captures; }`;
  */
 export function compileVisitor<T extends t.Node>(
   schema: NodeSchema<T>,
-  cb: (path: NodePath<T>) => void,
+  cb: (path: NodePath<T>, captures: object) => void,
   phase: 'enter' | 'exit' = 'enter',
 ): Visitor {
   const context: Context = { captures: [] };
-  const checks = compileNode(schema, 'input', context, false);
+  const checks = compileNode(schema, 'node', context, false);
   const code = `
 const captures = { ${context.captures.map((v) => `${v}: undefined`).join(', ')} };
-if (${checks ?? true}) { cb(captures); }`;
+if (${checks ?? true}) { cb(path, captures); }`;
 
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
-  const match = Function('input', 'cb', code) as (
-    input: T,
-    cb: (path: NodePath<T>) => void,
+  const match = Function('path', 'node', 'cb', code) as (
+    path: NodePath<T>,
+    node: T,
+    cb: (path: NodePath<T>, captures: object) => void,
   ) => void;
 
   return {
     [schema.type]: {
       [phase](path: NodePath<T>) {
-        match(path.node, cb);
+        match(path, path.node, cb);
       },
     },
   };

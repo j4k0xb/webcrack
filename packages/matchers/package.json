@@ -17,6 +17,7 @@
     "@babel/types": "^7.27.0"
   },
   "devDependencies": {
+    "@babel/traverse": "^7.27.0",
     "@codemod/matchers": "^1.7.1",
     "@types/babel__traverse": "^7.20.7",
     "@types/node": "^22.13.16",
