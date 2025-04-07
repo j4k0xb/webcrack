@@ -48,7 +48,10 @@ b.suite(
     if (captures) {
       captures.left === captures.right;
     }
-    webcrackMatcher(binExp2);
+    const captures2 = webcrackMatcher(binExp2);
+    if (captures2) {
+      captures2.left === captures2.right;
+    }
   }),
   b.add('@codemod/matchers', () => {
     if (codemodMatcher.match(binExp)) {
