@@ -10,10 +10,6 @@ import {
   type Schema,
 } from './types.js';
 
-export type CompiledMatcher<T extends t.Node> = (
-  input: T,
-) => object | undefined;
-
 interface Context {
   captures: string[];
 }
@@ -22,17 +18,26 @@ interface Context {
  * **Warning**: only compile a schema from trustworthy sources.
  * Otherwise, it could lead to code injection attacks.
  */
+export function compile(
+  schema: NodeSchema<t.Node>,
+  checkType?: true,
+): (input: t.Node) => object | undefined;
 export function compile<T extends t.Node>(
   schema: NodeSchema<T>,
-): CompiledMatcher<T> {
+  checkType: false,
+): (input: T) => object | undefined;
+export function compile<T extends t.Node>(
+  schema: NodeSchema<T>,
+  checkType = true,
+): (input: t.Node) => object | undefined {
   const context: Context = { captures: [] };
-  const checks = compileNode(schema, 'input', context, false);
+  const checks = compileNode(schema, 'input', context, checkType);
   const code = `
 const captures = { ${context.captures.map((v) => `${v}: undefined`).join(', ')} };
 if (${checks ?? true}) { return captures; }`;
 
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
-  return Function('input', code) as CompiledMatcher<T>;
+  return Function('input', code) as never;
 }
 
 /**
@@ -51,7 +56,7 @@ const captures = { ${context.captures.map((v) => `${v}: undefined`).join(', ')} 
 if (${checks ?? true}) { cb(captures); }`;
 
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
-  const match = Function('input', code) as (
+  const match = Function('input', 'cb', code) as (
     input: T,
     cb: (path: NodePath<T>) => void,
   ) => void;
