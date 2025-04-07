@@ -1,25 +1,18 @@
 import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
+import * as m from '@webcrack/matchers';
 import type { Transform } from '../../ast-utils';
+
+const visitor = m.compileVisitor(m.unaryExpression('void', m.numericLiteral()));
 
 export default {
   name: 'void-to-undefined',
   tags: ['safe'],
   scope: true,
-  visitor: () => {
-    const matcher = m.unaryExpression('void', m.numericLiteral(0));
-    return {
-      UnaryExpression: {
-        exit(path) {
-          if (
-            matcher.match(path.node) &&
-            !path.scope.hasBinding('undefined', { noGlobals: true })
-          ) {
-            path.replaceWith(t.identifier('undefined'));
-            this.changes++;
-          }
-        },
-      },
-    };
-  },
+  visitor: () =>
+    visitor((path, state) => {
+      if (!path.scope.hasBinding('undefined', { noGlobals: true })) {
+        path.replaceWith(t.identifier('undefined'));
+        state.changes++;
+      }
+    }),
 } satisfies Transform;

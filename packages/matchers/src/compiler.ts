@@ -46,30 +46,37 @@ if (${checks ?? true}) { return captures; }`;
  */
 export function compileVisitor<T extends t.Node>(
   schema: NodeSchema<T>,
-  cb: (path: NodePath<T>, captures: object) => void,
   phase: 'enter' | 'exit' = 'enter',
-): Visitor {
+): <S = unknown>(cb: VisitNodeFunction<S, T>) => Visitor<S> {
   const context: Context = { captures: [] };
   const checks = compileNode(schema, 'node', context, false);
   const code = `
+const node = path.node;
 const captures = { ${context.captures.map((v) => `${v}: undefined`).join(', ')} };
-if (${checks ?? true}) { cb(path, captures); }`;
+if (${checks ?? true}) { cb.call(state, path, state, captures); }`;
 
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
-  const match = Function('path', 'node', 'cb', code) as (
+  const match = Function('path', 'state', 'cb', code) as (
     path: NodePath<T>,
-    node: T,
-    cb: (path: NodePath<T>, captures: object) => void,
+    state: unknown,
+    cb: VisitNodeFunction<unknown, T>,
   ) => void;
 
-  return {
+  return <S>(cb: VisitNodeFunction<S, T>) => ({
     [schema.type]: {
-      [phase](path: NodePath<T>) {
-        match(path, path.node, cb);
+      [phase](path: NodePath<T>, state: S) {
+        match(path, state, cb as never);
       },
     },
-  };
+  });
 }
+
+export type VisitNodeFunction<S, T extends t.Node> = (
+  this: S,
+  path: NodePath<T>,
+  state: S,
+  captures: object,
+) => void;
 
 type CompileFunction = (
   schema: never,
