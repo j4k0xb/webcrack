@@ -1,10 +1,11 @@
 import { parse, parseExpression, type ParserOptions } from '@babel/parser';
 import * as t from '@babel/types';
+import type { Schema } from './types';
 import { type NodeSchema } from './types.js';
 
 export function expression(
   strings: TemplateStringsArray,
-  ...schemas: NodeSchema<t.Node>[]
+  ...schemas: Schema<unknown>[]
 ): NodeSchema<t.Expression> {
   return parseTemplate(
     strings,
@@ -15,7 +16,7 @@ export function expression(
 
 export function statement(
   strings: TemplateStringsArray,
-  ...schemas: NodeSchema<t.Statement>[]
+  ...schemas: Schema<unknown>[]
 ): NodeSchema<t.Statement> {
   return parseTemplate(
     strings,
@@ -30,7 +31,7 @@ function parseStatement(input: string) {
 
 function parseTemplate(
   strings: TemplateStringsArray,
-  schemas: NodeSchema<t.Node>[],
+  schemas: Schema<unknown>[],
   parse: (input: string, options?: ParserOptions) => t.Node,
 ): NodeSchema<t.Node> {
   let schemaIndex = 0;
@@ -60,7 +61,7 @@ function parseTemplate(
           ancestor.node[ancestor.key as keyof t.Node] = matcher as never;
         }
       } else {
-        rootSchema = matcher;
+        rootSchema = matcher as NodeSchema<t.Node>;
       }
     },
   });

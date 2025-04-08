@@ -3,7 +3,6 @@ import { expect, test } from 'vitest';
 import * as m from '../src';
 
 test('parse expression template', () => {
-  // @ts-expect-error idk
   const schema = m.expression`console.log(${m.or(m.numericLiteral(), m.stringLiteral())})`;
   const matcher = m.compile(schema);
 
@@ -12,7 +11,6 @@ test('parse expression template', () => {
 });
 
 test('parse statement template', () => {
-  // @ts-expect-error idk
   const schema = m.statement`if (${m.capture('test')});`;
   const matcher = m.compile(schema);
 
