@@ -5,6 +5,7 @@ import * as m from '../src';
 
 test('visitor', () => {
   const ast = t.program([t.emptyStatement(), t.returnStatement()]);
+  const testState = { foo: 'bar' };
   const cb = vi.fn(function (
     this: undefined,
     path: NodePath<t.ReturnStatement>,
@@ -12,12 +13,12 @@ test('visitor', () => {
     captures: object,
   ) {
     expect(path.type).toBe('ReturnStatement');
-    expect(this).toBe(state);
-    expect(this).toBeUndefined();
+    expect(this).toBe(testState);
+    expect(state).toBe(testState);
     expect(captures).toEqual({});
   });
   const visitor = m.compileVisitor(m.returnStatement());
-  traverse(ast, visitor(cb));
+  traverse(ast, visitor(cb), undefined, testState);
 
   expect(cb).toHaveBeenCalledOnce();
 });

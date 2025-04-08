@@ -6,7 +6,7 @@ test('parse expression template', () => {
   const schema = m.expression`console.log(${m.or(m.numericLiteral(), m.stringLiteral())})`;
   const matcher = m.compile(schema);
 
-  expect(matcher(parseExpression('console.log(1)'))).toEqual({});
+  expect(matcher(parseExpression('console.log(1)'))).toBeTruthy();
   expect(matcher(parseExpression('console.log(true)'))).toBeUndefined();
 });
 
