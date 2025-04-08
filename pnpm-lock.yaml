@@ -143,6 +143,9 @@ importers:
 
   packages/matchers:
     dependencies:
+      '@babel/parser':
+        specifier: ^7.27.0
+        version: 7.27.0
       '@babel/types':
         specifier: ^7.27.0
         version: 7.27.0

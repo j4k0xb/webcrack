@@ -15,6 +15,7 @@
     "test": "vitest --no-isolate"
   },
   "dependencies": {
+    "@babel/parser": "^7.27.0",
     "@babel/types": "^7.27.0"
   },
   "devDependencies": {
