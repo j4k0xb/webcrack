@@ -1,7 +1,7 @@
 import { parse, parseExpression, type ParserOptions } from '@babel/parser';
 import * as t from '@babel/types';
 import type { Schema } from './types';
-import { type NodeSchema } from './types.js';
+import { any, type NodeSchema } from './types.js';
 
 export function expression(
   strings: TemplateStringsArray,
@@ -38,30 +38,53 @@ function parseTemplate(
   const pattern = strings.reduce((acc, curr, i) => {
     acc += curr;
 
-    if (schemas[i]) {
+    if (i < schemas.length) {
       acc += `$${schemaIndex++}`;
     }
 
     return acc;
   }, '');
 
+  function isPlaceholder(node: t.Node): node is t.Identifier {
+    return t.isIdentifier(node) && /^\$\d+$/.test(node.name);
+  }
+
   const ast = parse(pattern);
   let rootSchema: NodeSchema<t.Node> | undefined;
   t.traverse(ast, {
     enter(node, ancestors) {
-      if (!t.isIdentifier(node)) return;
-      if (!/^\$\d+$/.test(node.name)) return;
-      const matcher = schemas[Number(node.name.slice(1))];
-      const ancestor = ancestors.at(-1);
-      if (ancestor) {
-        const container = ancestor.node[ancestor.key as keyof t.Node];
-        if (Array.isArray(container)) {
-          container[ancestor.index!] = matcher as never;
+      function replace(
+        ancestor: { node: t.Node; key: string; index?: number },
+        value?: unknown,
+      ) {
+        if (ancestor) {
+          const container = ancestor.node[ancestor.key as keyof t.Node];
+          if (Array.isArray(container)) {
+            container[ancestor.index!] = value as never;
+          } else {
+            ancestor.node[ancestor.key as keyof t.Node] = value as never;
+          }
         } else {
-          ancestor.node[ancestor.key as keyof t.Node] = matcher as never;
+          rootSchema = value as NodeSchema<t.Node>;
         }
+      }
+
+      if (!isPlaceholder(node)) return;
+      const schema = schemas[Number(node.name.slice(1))];
+
+      if (ancestors.length === 0) {
+        rootSchema = schema as never;
+        return;
+      }
+
+      if (
+        ancestors.length >= 2 &&
+        t.isExpressionStatement(ancestors.at(-1)!.node) &&
+        schema === any
+      ) {
+        replace(ancestors.at(-2)!, any);
       } else {
-        rootSchema = matcher as NodeSchema<t.Node>;
+        replace(ancestors.at(-1)!, schema);
       }
     },
   });
