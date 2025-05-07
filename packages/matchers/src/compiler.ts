@@ -3,6 +3,7 @@ import * as t from '@babel/types';
 import {
   type ArraySchema,
   type CaptureMatcher,
+  type FromCaptureMatcher,
   type Matcher,
   type NodeSchema,
   type NullableSchema,
@@ -11,7 +12,7 @@ import {
 } from './types.js';
 
 interface Context {
-  captures: string[];
+  captures: Map<string, Schema<unknown>>;
 }
 
 /**
@@ -30,10 +31,10 @@ export function compile<T extends t.Node>(
   schema: NodeSchema<T>,
   checkType = true,
 ): (input: t.Node) => object | undefined {
-  const context: Context = { captures: [] };
+  const context: Context = { captures: new Map() };
   const checks = compileNode(schema, 'node', context, checkType);
   const code = `
-const captures = { ${context.captures.map((v) => `${v}: undefined`).join(', ')} };
+const captures = { ${Array.from(context.captures.keys(), (name) => `${name}: undefined`).join(', ')} };
 if (${checks ?? true}) { return captures; }`;
 
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
@@ -48,11 +49,11 @@ export function compileVisitor<T extends t.Node>(
   schema: NodeSchema<T>,
   phase: 'enter' | 'exit' = 'enter',
 ): <S = unknown>(cb: VisitNodeFunction<S, T>) => Visitor<S> {
-  const context: Context = { captures: [] };
+  const context: Context = { captures: new Map() };
   const checks = compileNode(schema, 'node', context, false);
   const code = `
 const node = path.node;
-const captures = { ${context.captures.map((v) => `${v}: undefined`).join(', ')} };
+const captures = { ${Array.from(context.captures.keys(), (name) => `${name}: undefined`).join(', ')} };
 if (${checks ?? true}) { cb.call(state, path, state, captures); }`;
 
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
@@ -90,7 +91,7 @@ const compilers: Record<string, CompileFunction> = {
   arrayOf: compileArrayOf,
   or: compileOr,
   capture: compileCapture,
-  fromCapture: () => null,
+  fromCapture: compileFromCapture,
 };
 Object.keys(t.BUILDER_KEYS).forEach((type) => {
   compilers[type as t.Node['type']] = compileNode;
@@ -171,14 +172,21 @@ function compileCapture(
   schema: CaptureMatcher<unknown>,
   input: string,
   ctx: Context,
-) {
-  ctx.captures.push(schema.name);
+): string | null {
+  ctx.captures.set(schema.name, schema.schema);
   const checks = compileSchema(schema.schema, input, ctx);
   if (checks === null) {
     return `(captures['${schema.name}'] = ${input}, true)`;
   } else {
     return `${checks} && (captures['${schema.name}'] = ${input}, true)`;
   }
+}
+
+function compileFromCapture(
+  schema: FromCaptureMatcher,
+  input: string,
+): string | null {
+  return `(captures['${schema.name}'] != null && typeof captures['${schema.name}'] === 'object' ? captures['${schema.name}'].name === ${input}.name : captures['${schema.name}'] === ${input})`;
 }
 
 function compileNode(

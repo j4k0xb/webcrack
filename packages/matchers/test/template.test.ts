@@ -47,3 +47,13 @@ test('template with non-capturing meta variable syntax', () => {
 
   expect(matcher(parseExpression('print(1)'))).not.toHaveProperty('_method');
 });
+
+test('backreference', () => {
+  const schema = m.expression`$foo + $foo`;
+  const matcher = m.compile(schema);
+
+  expect(matcher(parseExpression('a + a'))).toMatchObject({
+    foo: { name: 'a' },
+  });
+  expect(matcher(parseExpression('a + b'))).toBeUndefined();
+});

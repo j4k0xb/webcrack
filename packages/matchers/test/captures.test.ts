@@ -1,3 +1,4 @@
+import { parseExpression } from '@babel/parser';
 import * as t from '@babel/types';
 import { expect, test } from 'vitest';
 import * as m from '../src';
@@ -28,4 +29,14 @@ test('capture node with schema', () => {
     t.binaryExpression('+', t.stringLiteral('x'), t.numericLiteral(2)),
   );
   expect(captures2).toBeUndefined();
+});
+
+test('backreference', () => {
+  const matcher = m.compile(
+    m.binaryExpression('+', m.capture('id'), m.fromCapture('id')),
+  );
+  expect(matcher(parseExpression('foo + foo'))).toMatchObject({
+    id: { name: 'foo' },
+  });
+  expect(matcher(parseExpression('foo + bar'))).toBeUndefined();
 });

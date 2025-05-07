@@ -68,7 +68,7 @@ export type Infer<T> =
         : T extends CaptureMatcher<infer U>
           ? U
           : T extends FromCaptureMatcher
-            ? never
+            ? t.Identifier
             : T;
 
 export const any = undefined;

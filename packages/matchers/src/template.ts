@@ -1,7 +1,7 @@
 import { parse, parseExpression, type ParserOptions } from '@babel/parser';
 import * as t from '@babel/types';
 import type { Schema } from './types';
-import { any, capture, type NodeSchema } from './types.js';
+import { any, capture, fromCapture, type NodeSchema } from './types.js';
 
 export function expression(
   strings: TemplateStringsArray,
@@ -35,6 +35,7 @@ function parseTemplate(
   parse: (input: string, options?: ParserOptions) => t.Node,
 ): NodeSchema<t.Node> {
   let schemaIndex = 0;
+  const captures = new Set<string>();
 
   const pattern = strings.reduce((acc, curr, i) => {
     acc += curr;
@@ -75,10 +76,14 @@ function parseTemplate(
       }
 
       if (isMetaVariable(node)) {
-        if (node.name.startsWith('$_')) {
+        const name = node.name.slice(1);
+        if (name.startsWith('_')) {
           schemas.push(any);
+        } else if (captures.has(name)) {
+          schemas.push(fromCapture(name));
         } else {
-          schemas.push(capture(node.name.slice(1)));
+          schemas.push(capture(name));
+          captures.add(name);
         }
         node.name = `$${schemaIndex++}`;
       }
