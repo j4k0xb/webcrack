@@ -33,10 +33,10 @@ test('expression statement template with any', () => {
 });
 
 test('template with meta variable syntax', () => {
-  const schema = m.expression`console.log($GREETING)`;
+  const schema = m.expression`console.log($greeting)`;
   const matcher = m.compile(schema);
 
   expect(matcher(parseExpression('console.log("hello")'))).toMatchObject({
-    GREETING: { value: 'hello' },
+    greeting: { value: 'hello' },
   });
 });

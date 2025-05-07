@@ -35,7 +35,6 @@ function parseTemplate(
   parse: (input: string, options?: ParserOptions) => t.Node,
 ): NodeSchema<t.Node> {
   let schemaIndex = 0;
-  const metaVariables = new Map<string, number>();
 
   const pattern = strings.reduce((acc, curr, i) => {
     acc += curr;
@@ -52,7 +51,7 @@ function parseTemplate(
   }
 
   function isMetaVariable(node: t.Node): node is t.Identifier {
-    return t.isIdentifier(node) && /^\$[A-Z_][A-Z0-9_]*$/.test(node.name);
+    return t.isIdentifier(node) && /^\$[A-Z_][A-Z0-9_]*$/i.test(node.name);
   }
 
   const ast = parse(pattern);
@@ -76,9 +75,8 @@ function parseTemplate(
       }
 
       if (isMetaVariable(node)) {
-        const name = node.name.slice(1);
-        metaVariables.set(name, schemaIndex);
-        replace(ancestors.at(-1)!, capture(name));
+        schemas.push(capture(node.name.slice(1)));
+        node.name = `$${schemaIndex++}`;
       }
 
       if (!isPlaceholder(node)) return;
