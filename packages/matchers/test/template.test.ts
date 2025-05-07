@@ -31,3 +31,12 @@ test('expression statement template with any', () => {
   expect(matcher(parseStatement('if (1) var a;'))).toBeTruthy();
   expect(matcher(parseStatement('if (1) var a; else;'))).toBeUndefined();
 });
+
+test('template with meta variable syntax', () => {
+  const schema = m.expression`console.log($GREETING)`;
+  const matcher = m.compile(schema);
+
+  expect(matcher(parseExpression('console.log("hello")'))).toMatchObject({
+    GREETING: { value: 'hello' },
+  });
+});
