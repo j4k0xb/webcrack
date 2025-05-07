@@ -75,7 +75,11 @@ function parseTemplate(
       }
 
       if (isMetaVariable(node)) {
-        schemas.push(capture(node.name.slice(1)));
+        if (node.name.startsWith('$_')) {
+          schemas.push(any);
+        } else {
+          schemas.push(capture(node.name.slice(1)));
+        }
         node.name = `$${schemaIndex++}`;
       }
 

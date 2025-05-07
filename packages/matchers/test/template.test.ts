@@ -40,3 +40,10 @@ test('template with meta variable syntax', () => {
     greeting: { value: 'hello' },
   });
 });
+
+test('template with non-capturing meta variable syntax', () => {
+  const schema = m.expression`$_method($_arg)`;
+  const matcher = m.compile(schema);
+
+  expect(matcher(parseExpression('print(1)'))).not.toHaveProperty('_method');
+});
