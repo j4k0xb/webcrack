@@ -16,7 +16,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.17",
     "@tailwindcss/vite": "^4.0.17",
-    "@types/babel__generator": "^7.6.8",
+    "@types/babel__generator": "^7.27.0",
     "@types/node": "^22.13.16",
     "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
@@ -29,8 +29,8 @@
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
-    "@babel/generator": "^7.27.0",
-    "@babel/types": "^7.27.0",
+    "@babel/generator": "^7.27.1",
+    "@babel/types": "^7.27.1",
     "@zip.js/zip.js": "^2.7.60",
     "idb": "^8.0.2",
     "monaco-editor": "^0.52.2",

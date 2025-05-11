@@ -186,12 +186,10 @@ function App() {
   }
 
   async function loadFromURL(url: string) {
-    let response = await fetch(url);
-    if (!response.ok) {
-      response = await fetch(
-        'https://corsproxy.io/?' + encodeURIComponent(url),
-      );
-    }
+    const response = await fetch(url)
+      .then((res) => (res.ok ? res : Promise.reject(new Error())))
+      .catch(() => fetch('https://corsproxy.io/?url=' + encodeURIComponent(url)));
+
     if (response.ok) {
       const model = activeTab() || openUntitledTab();
       model.setValue(await response.text());
