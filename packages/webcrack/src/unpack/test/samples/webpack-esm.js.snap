@@ -18,7 +18,7 @@ console.log(cDefault.VERSION);,
     },
     "1" => WebpackModule {
       "ast": export class counter {}
-let _counter = 1;
+const _counter = 1;
 counter = 2;,
       "id": "1",
       "isEntry": false,
