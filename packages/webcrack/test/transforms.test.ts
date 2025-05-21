@@ -11,6 +11,28 @@ test('decode bookmarklet', async () => {
   `);
 });
 
+test('should not rename exported component starting with lowercase', async () => {
+  const input = `
+    import React from 'react';
+    export function myComponent() {
+      return React.createElement("div", null, "Hello");
+    }
+    const usage = React.createElement(myComponent);
+  `;
+  // Note: webcrack enables jsx transform by default if react is imported.
+  const result = await webcrack(input);
+  expect(result.code).toContain('export function myComponent()');
+  // The usage of myComponent results in <myComponent />
+  // The component itself returns <div>Hello</div>
+  expect(result.code).toMatchInlineSnapshot(`
+    "import React from 'react';
+    export function myComponent() {
+      return <div>Hello</div>;
+    }
+    const usage = <myComponent />;"
+  `);
+});
+
 test('decode malformed bookmarklet', async () => {
   const code = `javascript:(function()%7Breturn%20v%F%3B%7D)()`;
   const result = await webcrack(code);

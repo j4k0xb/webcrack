@@ -77,9 +77,11 @@ export default {
             /^[a-z]/.test(type.current.name)
           ) {
             const binding = path.scope.getBinding(type.current.name);
-            if (!binding) return;
-            name = t.jsxIdentifier(path.scope.generateUid('Component'));
-            path.scope.rename(type.current.name, name.name);
+            // MODIFIED: skip if binding is part of an export declaration
+            if (binding && !t.isExportDeclaration(binding.path.parentPath?.node)) {
+              name = t.jsxIdentifier(path.scope.generateUid('Component'));
+              path.scope.rename(type.current.name, name.name);
+            }
           }
 
           const attributes = convertAttributes(props.current!);
