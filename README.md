@@ -37,6 +37,8 @@ webcrack input.js > output.js
 webcrack bundle.js -o output-dir
 ```
 
+[CLI Reference](https://webcrack.netlify.app/docs/guide/cli.html)
+
 ## API
 
 ```bash
@@ -56,3 +58,5 @@ console.log(result.code);
 console.log(result.bundle);
 await result.save('output-dir');
 ```
+
+[API Reference](https://webcrack.netlify.app/docs/guide/api.html)
