@@ -56,3 +56,7 @@ console.log(result.code);
 console.log(result.bundle);
 await result.save('output-dir');
 ```
+
+Further Reading:
+
+- [apps/docs/src/guide/api.md](apps/docs/src/guide/api.md)
