@@ -171,8 +171,8 @@ importers:
         specifier: ^4.4.0
         version: 4.4.0
       isolated-vm:
-        specifier: ^5.0.4
-        version: 5.0.4
+        specifier: ^6.0.0
+        version: 6.0.0
     devDependencies:
       '@types/babel__generator':
         specifier: ^7.6.8
@@ -1355,8 +1355,8 @@ packages:
   bare-events@2.5.4:
     resolution: {integrity: sha512-+gFfDkR8pj4/TrWCGUGWmJIkBwuxPS5F+a5yWjOHQt2hHvNZd5YLzadjmDUtFmMM4y429bnKLa8bYBMHcYdnQA==}
 
-  bare-fs@4.0.2:
-    resolution: {integrity: sha512-S5mmkMesiduMqnz51Bfh0Et9EX0aTCJxhsI4bvzFFLs8Z1AV8RDHadfY5CyLwdoLHgXbNBEN1gQcbEtGwuvixw==}
+  bare-fs@4.1.5:
+    resolution: {integrity: sha512-1zccWBMypln0jEE05LzZt+V/8y8AQsQQqxtklqaIyg5nu6OAYFhZxPXinJTSG+kU5qyNmeLgcn9AW7eHiCHVLA==}
     engines: {bare: '>=1.16.0'}
     peerDependencies:
       bare-buffer: '*'
@@ -1583,6 +1583,10 @@ packages:
     resolution: {integrity: sha512-bwy0MGW55bG41VqxxypOsdSdGqLwXPI/focwgTYCFMbdUiBAxLg9CFzG08sz2aqzknwiX7Hkl0bQENjg8iLByw==}
     engines: {node: '>=8'}
 
+  detect-libc@2.0.4:
+    resolution: {integrity: sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==}
+    engines: {node: '>=8'}
+
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
@@ -1611,8 +1615,8 @@ packages:
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
 
-  end-of-stream@1.4.4:
-    resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
+  end-of-stream@1.4.5:
+    resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
 
   enhanced-resolve@5.18.1:
     resolution: {integrity: sha512-ZSW3ma5GkcQBIpwZTSRAI8N71Uuwgs93IezB7mf7R60tC8ZbJideoDNKjHn2O9KIlx6rkGTTEk1xUCK2E1Y2Yg==}
@@ -1948,9 +1952,9 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  isolated-vm@5.0.4:
-    resolution: {integrity: sha512-RYUf/JC4ldWz/oi2BVs8a1XIprQ71q6eQPBwySaF5Apu0KMyf2gIpElbCyPh2OEmRT+FYw1GOKSdkv7jw2KLxw==}
-    engines: {node: '>=18.0.0'}
+  isolated-vm@6.0.0:
+    resolution: {integrity: sha512-MMhgIssDZ2g3eD5tyqiWPx0k8Ps2H5halFOGGE9cUjNymJ1xL24ebU8EV7J6z2gEXiiX51VNcXM7BJp3355/LA==}
+    engines: {node: '>=24.0.0'}
 
   isomorphic-timers-promises@1.0.1:
     resolution: {integrity: sha512-u4sej9B1LPSxTGKB/HiuzvEQnXH0ECYkSVQU39koSwmFAxhlEAFl9RdTvLv4TOTQUgBS5O3O5fwUxk6byBZ+IQ==}
@@ -2192,14 +2196,14 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  napi-build-utils@1.0.2:
-    resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
+  napi-build-utils@2.0.0:
+    resolution: {integrity: sha512-GEbrYkbfF7MoNaoh2iGG84Mnf/WZfB0GdGEsM8wz7Expx/LlWf5U8t9nvJKXSp3qr5IsEbK04cBGhol/KwOsWA==}
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  node-abi@3.63.0:
-    resolution: {integrity: sha512-vAszCsOUrUxjGAmdnM/pq7gUgie0IRteCQMX6d4A534fQCR93EJU5qgzBvU6EkFfK27s0T3HEV3BOyJIr7OMYw==}
+  node-abi@3.75.0:
+    resolution: {integrity: sha512-OhYaY5sDsIka7H7AtijtI9jwGYLyl29eQn/W623DiN/MIv5sUqc4g7BIDThX+gb7di9f6xK02nkp8sdfFWZLTg==}
     engines: {node: '>=10'}
 
   node-releases@2.0.18:
@@ -2310,8 +2314,8 @@ packages:
   preact@10.22.0:
     resolution: {integrity: sha512-RRurnSjJPj4rp5K6XoP45Ui33ncb7e4H7WiOHVpjbkvqvA3U+N8Z6Qbo0AE6leGYBV66n8EhEaFixvIu3SkxFw==}
 
-  prebuild-install@7.1.2:
-    resolution: {integrity: sha512-UnNke3IQb6sgarcZIDU3gbMeTp/9SSU1DAIkil7PrqG1vZlBtY5msYccSKSHDqa3hNg436IXK+SNImReuA1wEQ==}
+  prebuild-install@7.1.3:
+    resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -2337,8 +2341,8 @@ packages:
   public-encrypt@4.0.3:
     resolution: {integrity: sha512-zVpa8oKZSz5bTMTFClc1fQOnyyEzpl5ozpi1B5YcvBrdohMjH2rfsBtyXcuNuwjsDIXmBYlF2N5FlJYhR29t8Q==}
 
-  pump@3.0.0:
-    resolution: {integrity: sha512-LwZy+p3SFs1Pytd/jYct4wpv49HiYCqd9Rlc5ZVdk0V+8Yzv6jR5Blk3TRmPL1ft69TxP0IMZGJ+WPFU2BFhww==}
+  pump@3.0.3:
+    resolution: {integrity: sha512-todwxLMY7/heScKmntwQG8CXVkWUOdYxIvY2s0VWAAMh/nd8SoYiRaKjlr7+iCs984f2P8zvrfWcDDYVb73NfA==}
 
   punycode@1.4.1:
     resolution: {integrity: sha512-jmYNElW7yvO7TV33CjSmvSiE2yco3bV2czu/OzDKdMNVZQWfxCblURLhf+47syQRBntjfLdd/H0egrzIG+oaFQ==}
@@ -2431,6 +2435,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.7.2:
+    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   seroval-plugins@1.2.1:
     resolution: {integrity: sha512-H5vs53+39+x4Udwp4J5rNZfgFuA+Lt+uU+09w1gYBVWomtAl98B+E9w7yC05Xc81/HgLvJdlyqJbU0fJCKCmdw==}
     engines: {node: '>=10'}
@@ -2511,8 +2520,8 @@ packages:
   stream-http@3.2.0:
     resolution: {integrity: sha512-Oq1bLqisTyK3TSCXpPbT4sdeYNdmyZJv1LxpEm2vu1ZhK89kSE5YXwZc3cWk0MagGaKriBh9mCFbVGtO+vY29A==}
 
-  streamx@2.22.0:
-    resolution: {integrity: sha512-sLh1evHOzBy/iWRiR6d1zRcLao4gGZr3C1kzNz4fopCOKJb6xD9ub8Mpi9Mr1R6id5o43S+d93fI48UC5uM9aw==}
+  streamx@2.22.1:
+    resolution: {integrity: sha512-znKXEBxfatz2GBNK02kRnCXjV+AA4kjZIUxeWSr3UGirZMJfTE9uiwKHobnbgxWyL/JWro8tTq+vOqAK1/qbSA==}
 
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
@@ -2569,8 +2578,8 @@ packages:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
     engines: {node: '>=6'}
 
-  tar-fs@3.0.8:
-    resolution: {integrity: sha512-ZoROL70jptorGAlgAYiLoBLItEKw/fUxg9BSYK/dF/GAGYFJOJJJMvjPAKDJraCXFwadD456FCuvLWgfhMsPwg==}
+  tar-fs@3.0.10:
+    resolution: {integrity: sha512-C1SwlQGNLe/jPNqapK8epDsXME7CAJR5RL3GcE6KWx1d9OUByzoHVcbu1VPI8tevg9H8Alae0AApHHFGzrD5zA==}
 
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
@@ -4054,7 +4063,7 @@ snapshots:
   bare-events@2.5.4:
     optional: true
 
-  bare-fs@4.0.2:
+  bare-fs@4.1.5:
     dependencies:
       bare-events: 2.5.4
       bare-path: 3.0.0
@@ -4071,7 +4080,7 @@ snapshots:
 
   bare-stream@2.6.5(bare-events@2.5.4):
     dependencies:
-      streamx: 2.22.0
+      streamx: 2.22.1
     optionalDependencies:
       bare-events: 2.5.4
     optional: true
@@ -4310,6 +4319,8 @@ snapshots:
 
   detect-libc@2.0.3: {}
 
+  detect-libc@2.0.4: {}
+
   devlop@1.1.0:
     dependencies:
       dequal: 2.0.3
@@ -4342,7 +4353,7 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  end-of-stream@1.4.4:
+  end-of-stream@1.4.5:
     dependencies:
       once: 1.4.0
 
@@ -4734,9 +4745,9 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  isolated-vm@5.0.4:
+  isolated-vm@6.0.0:
     dependencies:
-      prebuild-install: 7.1.2
+      prebuild-install: 7.1.3
     transitivePeerDependencies:
       - bare-buffer
 
@@ -4962,13 +4973,13 @@ snapshots:
 
   nanoid@3.3.8: {}
 
-  napi-build-utils@1.0.2: {}
+  napi-build-utils@2.0.0: {}
 
   natural-compare@1.4.0: {}
 
-  node-abi@3.63.0:
+  node-abi@3.75.0:
     dependencies:
-      semver: 7.6.2
+      semver: 7.7.2
 
   node-releases@2.0.18: {}
 
@@ -5107,19 +5118,19 @@ snapshots:
 
   preact@10.22.0: {}
 
-  prebuild-install@7.1.2:
+  prebuild-install@7.1.3:
     dependencies:
-      detect-libc: 2.0.3
+      detect-libc: 2.0.4
       expand-template: 2.0.3
       github-from-package: 0.0.0
       minimist: 1.2.8
       mkdirp-classic: 0.5.3
-      napi-build-utils: 1.0.2
-      node-abi: 3.63.0
-      pump: 3.0.0
+      napi-build-utils: 2.0.0
+      node-abi: 3.75.0
+      pump: 3.0.3
       rc: 1.2.8
       simple-get: 4.0.1
-      tar-fs: 3.0.8
+      tar-fs: 3.0.10
       tunnel-agent: 0.6.0
     transitivePeerDependencies:
       - bare-buffer
@@ -5143,9 +5154,9 @@ snapshots:
       randombytes: 2.1.0
       safe-buffer: 5.2.1
 
-  pump@3.0.0:
+  pump@3.0.3:
     dependencies:
-      end-of-stream: 1.4.4
+      end-of-stream: 1.4.5
       once: 1.4.0
 
   punycode@1.4.1: {}
@@ -5260,6 +5271,8 @@ snapshots:
 
   semver@7.6.2: {}
 
+  semver@7.7.2: {}
+
   seroval-plugins@1.2.1(seroval@1.2.1):
     dependencies:
       seroval: 1.2.1
@@ -5355,7 +5368,7 @@ snapshots:
       readable-stream: 3.6.2
       xtend: 4.0.2
 
-  streamx@2.22.0:
+  streamx@2.22.1:
     dependencies:
       fast-fifo: 1.3.2
       text-decoder: 1.2.3
@@ -5415,12 +5428,12 @@ snapshots:
 
   tapable@2.2.1: {}
 
-  tar-fs@3.0.8:
+  tar-fs@3.0.10:
     dependencies:
-      pump: 3.0.0
+      pump: 3.0.3
       tar-stream: 3.1.7
     optionalDependencies:
-      bare-fs: 4.0.2
+      bare-fs: 4.1.5
       bare-path: 3.0.0
     transitivePeerDependencies:
       - bare-buffer
@@ -5429,7 +5442,7 @@ snapshots:
     dependencies:
       b4a: 1.6.7
       fast-fifo: 1.3.2
-      streamx: 2.22.0
+      streamx: 2.22.1
 
   test-exclude@7.0.1:
     dependencies:
