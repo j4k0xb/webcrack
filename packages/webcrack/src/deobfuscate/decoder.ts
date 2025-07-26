@@ -4,6 +4,7 @@ import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
   anySubList,
+  declarationOrAssignment,
   findParent,
   inlineVariable,
   renameFast,
@@ -112,12 +113,10 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
     m.blockStatement(
       anySubList(
         // var array = getStringArray();
-        m.variableDeclaration(undefined, [
-          m.variableDeclarator(
-            arrayIdentifier,
-            m.callExpression(m.identifier(stringArray.name)),
-          ),
-        ]),
+        declarationOrAssignment(
+          arrayIdentifier,
+          m.callExpression(m.identifier(stringArray.name)),
+        ),
         // var h = array[e]; return h;
         // or return array[e -= 254];
         m.containerOf(

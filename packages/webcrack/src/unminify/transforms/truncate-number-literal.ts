@@ -28,6 +28,7 @@ export default {
           if (truncated === value) return;
 
           literal.current!.value = truncated;
+          this.changes++;
         },
       },
     };
