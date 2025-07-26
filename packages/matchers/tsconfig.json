@@ -1,0 +1,13 @@
+{
+  "extends": "@webcrack/typescript-config/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "verbatimModuleSyntax": true,
+  },
+  "include": [
+    "*.ts",
+    "src",
+    "test",
+    "scripts",
+  ]
+}
