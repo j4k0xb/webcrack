@@ -24,6 +24,9 @@
     "dist",
     "src/cli-wrapper.js"
   ],
+  "engines": {
+    "node": ">=18.0.0 <19 || >=20.0.0 <21 || >=22.0.0 <23"
+  },
   "scripts": {
     "build": "node esbuild.config.js && tsc -p tsconfig.build.json",
     "watch": "node esbuild.config.js --watch",
