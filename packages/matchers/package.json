@@ -1,0 +1,32 @@
+{
+  "name": "@webcrack/matchers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "bench": "tsx benchmark/test.js",
+    "lint": "eslint src scripts",
+    "lint:fix": "eslint src scripts --fix",
+    "format:check": "prettier --check \"{src,scripts}/**/*.ts\"",
+    "format": "prettier --write \"{src,scripts}**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --no-isolate"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.27.0",
+    "@babel/types": "^7.27.0"
+  },
+  "devDependencies": {
+    "@babel/traverse": "^7.27.0",
+    "@codemod/matchers": "^1.7.1",
+    "@types/babel__traverse": "^7.20.7",
+    "@types/node": "^22.13.16",
+    "@webcrack/eslint-config": "workspace:*",
+    "@webcrack/typescript-config": "workspace:*",
+    "benny": "^3.7.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

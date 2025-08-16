@@ -77,6 +77,7 @@
     "@types/debug": "^4.1.12",
     "@types/node": "^22.13.16",
     "@webcrack/eslint-config": "workspace:*",
+    "@webcrack/matchers": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
     "esbuild": "^0.25.2",
     "typescript": "^5.8.2"
