@@ -8,9 +8,10 @@ If you see errors like
 > - ERR_DLOPEN_FAILED
 > - Segmentation fault
 
-it most likely means that the [isolated-vm](https://github.com/laverdet/isolated-vm) package was built against a different version of Node.js than the one you are using. This can happen if you upgrade Node.js after installing `webcrack`.
+it most likely means that the Node.js version you are using is not compatible with the [isolated-vm](https://github.com/laverdet/isolated-vm) package. This can also happen if you upgrade Node.js after installing `webcrack`.
+See [Requirements](./introduction.md#requirements) for the supported Node.js versions.
 
-To fix this, run `npm rebuild isolated-vm` in your project directory or delete the `node_modules/isolated-vm` directory and run `npm install` again.
+A possibly fix is to run `npm rebuild isolated-vm` in your project directory or delete the `node_modules/isolated-vm` directory and run `npm install` again.
 
 For Node 20.x and above, disabling snapshots may be necessary:
 

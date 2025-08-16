@@ -12,6 +12,10 @@ to resemble the original source code as much as possible.
 - ⌨️ **TypeScript** - All code is written in TypeScript
 - 🧪 **Tests** - To make sure nothing breaks
 
+## Requirements
+
+Node.js 22 or 24.
+
 ## Planned Features
 
 - Smarter variable renaming, possibly with LLMs like GPT-3.5

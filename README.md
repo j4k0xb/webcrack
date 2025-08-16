@@ -23,6 +23,10 @@ Try it in the [online playground](https://webcrack.netlify.app/) or view the [do
 - ⌨️ **TypeScript** - All code is written in TypeScript
 - 🧪 **Tests** - To make sure nothing breaks
 
+## Requirements
+
+Node.js 22 or 24.
+
 ## Command Line Interface
 
 ```bash
