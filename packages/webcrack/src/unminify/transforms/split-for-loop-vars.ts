@@ -36,7 +36,10 @@ export default {
             );
           if (isUsedInTestOrUpdate) break;
 
-          path.insertBefore(t.variableDeclaration('var', [declarator]));
+          const [replacement] = path.insertBefore(
+            t.variableDeclaration('var', [declarator]),
+          );
+          binding.path = replacement.get('declarations.0');
           declarations.shift();
           i--;
           this.changes++;

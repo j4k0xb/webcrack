@@ -35,7 +35,7 @@
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
     "format:check": "prettier --check \"{src,test}/**/*.ts\"",
-    "format": "prettier --write \"{src,test}**/*.ts\"",
+    "format": "prettier --write \"{src,test}/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "test": "vitest --no-isolate"
   },

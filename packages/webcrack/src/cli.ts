@@ -16,9 +16,9 @@ const { version, description } = JSON.parse(
 debug.enable('webcrack:*');
 
 interface Options {
-  force: boolean;
+  force?: boolean;
   output?: string;
-  mangle: boolean;
+  mangle?: boolean;
   jsx: boolean;
   unpack: boolean;
   deobfuscate: boolean;

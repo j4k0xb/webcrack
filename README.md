@@ -1,4 +1,4 @@
-[![Test](https://github.com/j4k0xb/webcrack/actions/workflows/ci.yml/badge.svg)](https://github.com/j4k0xb/webcrack/actions/workflows/test.yml)
+[![Test](https://github.com/j4k0xb/webcrack/actions/workflows/ci.yml/badge.svg)](https://github.com/j4k0xb/webcrack/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/webcrack)](https://www.npmjs.com/package/webcrack)
 [![license](https://img.shields.io/github/license/j4k0xb/webcrack)](https://github.com/j4k0xb/webcrack/blob/master/LICENSE)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/ba64bf80-7053-4ed8-a282-d3762742c0dd/deploy-status)](https://app.netlify.com/sites/webcrack/deploys)
@@ -37,6 +37,8 @@ webcrack input.js > output.js
 webcrack bundle.js -o output-dir
 ```
 
+[CLI Reference](https://webcrack.netlify.app/docs/guide/cli.html)
+
 ## API
 
 ```bash
@@ -56,3 +58,5 @@ console.log(result.code);
 console.log(result.bundle);
 await result.save('output-dir');
 ```
+
+[API Reference](https://webcrack.netlify.app/docs/guide/api.html)
