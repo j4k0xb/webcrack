@@ -4,6 +4,7 @@ export { default as forToWhile } from './for-to-while';
 export { default as infinity } from './infinity';
 export { default as invertBooleanLogic } from './invert-boolean-logic';
 export { default as jsonParse } from './json-parse';
+export { default as letToConst } from './let-to-const';
 export { default as logicalToIf } from './logical-to-if';
 export { default as mergeElseIf } from './merge-else-if';
 export { default as mergeStrings } from './merge-strings';

@@ -3,6 +3,7 @@ import traverse from '@babel/traverse';
 import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import {
+  declarationOrAssignment,
   inlineArrayElements,
   isReadonlyObject,
   renameFast,
@@ -34,9 +35,10 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
       m.blockStatement([m.returnStatement(m.fromCapture(arrayIdentifier))]),
     ),
   );
-  const variableDeclaration = m.variableDeclaration(undefined, [
-    m.variableDeclarator(arrayIdentifier, arrayExpression),
-  ]);
+  const variableDeclaration = declarationOrAssignment(
+    arrayIdentifier,
+    arrayExpression,
+  );
   // function getStringArray() { ... }
   const matcher = m.functionDeclaration(
     m.identifier(functionName),
