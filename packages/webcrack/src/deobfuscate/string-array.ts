@@ -22,7 +22,7 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
   const functionName = m.capture(m.anyString());
   const arrayIdentifier = m.capture(m.identifier());
   const arrayExpression = m.capture(
-    m.arrayExpression(m.arrayOf(m.or(m.stringLiteral(), undefinedMatcher))),
+    m.arrayExpression(m.arrayOf(m.or(m.stringLiteral(), m.templateLiteral(), undefinedMatcher))),
   );
   // getStringArray = function () { return array; };
   const functionAssignment = m.assignmentExpression(
