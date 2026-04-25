@@ -33,7 +33,7 @@
     "@babel/types": "^7.29.0",
     "@zip.js/zip.js": "^2.8.26",
     "idb": "^8.0.3",
-    "monaco-editor": "^0.55.1",
+    "monaco-editor": "^0.52.2",
     "sandybox": "^1.1.2",
     "solid-js": "^1.9.12",
     "webcrack": "workspace:*"
