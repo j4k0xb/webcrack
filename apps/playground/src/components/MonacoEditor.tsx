@@ -29,6 +29,7 @@ export default function MonacoEditor(props: Props) {
     monaco.editor.ITextModel,
     monaco.editor.ICodeEditorViewState
   >();
+  // eslint-disable-next-line no-unassigned-vars
   let container: HTMLDivElement | undefined;
 
   onMount(() => {
@@ -98,7 +99,7 @@ export default function MonacoEditor(props: Props) {
     });
 
     // Enable IntelliSense for multiple files
-    monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+    monaco.typescript.javascriptDefaults.setEagerModelSync(true);
 
     const placeholder = new PlaceholderContentWidget(
       '// Paste your code here or drag & drop files to open',

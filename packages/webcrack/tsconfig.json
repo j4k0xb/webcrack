@@ -3,6 +3,9 @@
   "compilerOptions": {
     "noEmit": true,
     "verbatimModuleSyntax": true,
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "*.ts",

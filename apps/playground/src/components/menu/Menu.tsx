@@ -21,6 +21,7 @@ export default function Menu(props: Props) {
   const [openedMenu, setOpenedMenu] = createSignal<
     'file' | 'settings' | undefined
   >();
+  // eslint-disable-next-line no-unassigned-vars
   let menuRef: HTMLUListElement | undefined;
 
   onMount(() => {

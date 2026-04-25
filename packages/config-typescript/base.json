@@ -15,10 +15,10 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
+    "noUncheckedSideEffectImports": true,
     "skipLibCheck": true,
+    "types": [],
     "strict": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

@@ -5,7 +5,7 @@ import { toIdentifier } from '@babel/types';
  * Like scope.generateUid from babel, but without the underscore prefix and name filters
  */
 export function generateUid(scope: Scope, name: string = 'temp'): string {
-  let uid = '';
+  let uid: string;
   let i = 1;
   do {
     uid = toIdentifier(i > 1 ? `${name}${i}` : name);

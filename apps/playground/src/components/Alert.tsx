@@ -3,6 +3,7 @@ import { useDeobfuscateContext } from '../context/DeobfuscateContext';
 
 export default function Alert() {
   const { alert, setAlert } = useDeobfuscateContext();
+  // eslint-disable-next-line no-unassigned-vars
   let divRef: HTMLDivElement | undefined;
 
   createEffect(

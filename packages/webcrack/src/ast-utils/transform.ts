@@ -96,8 +96,10 @@ export interface Transform<TOptions = unknown> {
   visitor?: (options?: TOptions) => Visitor<TransformState>;
 }
 
-export interface AsyncTransform<TOptions = unknown>
-  extends Omit<Transform<TOptions>, 'run'> {
+export interface AsyncTransform<TOptions = unknown> extends Omit<
+  Transform<TOptions>,
+  'run'
+> {
   run?: (ast: Node, state: TransformState, options?: TOptions) => Promise<void>;
 }
 
