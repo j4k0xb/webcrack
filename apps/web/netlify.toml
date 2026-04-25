@@ -1,3 +1,5 @@
 [build]
 publish = "apps/web/dist"
 command = "turbo run build --filter web"
+[build.environment]
+NODE_OPTIONS = "--max_old_space_size=4096"
