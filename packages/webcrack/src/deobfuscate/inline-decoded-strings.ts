@@ -17,7 +17,7 @@ export default {
       decoder.collectCalls(),
     );
     if (calls.length === 0) return;
-    
+
     const decodedValues = await options.vm.decode(calls);
 
     for (let i = 0; i < calls.length; i++) {

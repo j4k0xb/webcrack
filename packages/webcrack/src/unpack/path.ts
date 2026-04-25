@@ -1,6 +1,5 @@
 import { posix } from 'node:path';
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
 const { dirname, join, relative } = posix;
 
 export function relativePath(from: string, to: string): string {
