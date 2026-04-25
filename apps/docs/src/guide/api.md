@@ -170,10 +170,6 @@ See [@codemod/matchers](https://github.com/codemod-js/codemod/tree/main/packages
 
 ## Plugins
 
-::: warning Experimental
-This API is only available in the beta version and might change in future versions.
-:::
-
 Webcrack's processing pipeline consists of six key stages:
 
 1. **Parse**: The input code is parsed into an Abstract Syntax Tree (AST).
