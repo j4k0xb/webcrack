@@ -99,7 +99,7 @@ export default function MonacoEditor(props: Props) {
     });
 
     // Enable IntelliSense for multiple files
-    monaco.typescript.javascriptDefaults.setEagerModelSync(true);
+    monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
 
     const placeholder = new PlaceholderContentWidget(
       '// Paste your code here or drag & drop files to open',
