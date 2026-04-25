@@ -24,7 +24,7 @@
     "dist",
     "src/cli-wrapper.js"
   ],
-   "engines": {
+  "engines": {
     "node": ">=22.0.0 <23 || >=24.0.0 <25"
   },
   "scripts": {
