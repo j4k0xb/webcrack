@@ -64,3 +64,13 @@ await result.save('output-dir');
 ```
 
 [API Reference](https://webcrack.netlify.app/docs/guide/api.html)
+
+## Donations
+
+If this project has helped you, consider donating to support its development:
+
+- [GitHub Sponsors](https://github.com/sponsors/j4k0xb)
+- Ethereum: `0xb3eFD474Dd8aFA715F563EfA322F6ae9Ae9DfCeA`
+- Bitcoin: `bc1qc3u7ef2rue75f6t8x290r0qk0u84f0ln8ndjun`
+- Solana: `6w9SFAYBxCKdtuj8DEAV9YT5zP68g4PyEkb21AmdxcBq`
+- Monero: `87iYegrerGf1DUsTvUnbsv8gjTMJmzS3idRxHWkCy4iz1Xz5CUnDXy3VkTToSg32LUW3cwNrgLKd1TXRJqJY7MnvVR9yidm`
