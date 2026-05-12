@@ -3,7 +3,7 @@ import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { getPropName } from '.';
-import { findParent } from './matcher';
+import { findParent, varFunctionOrDeclaration } from './matcher';
 
 /**
  * Replace all references of a variable with the initializer.
@@ -165,64 +165,70 @@ export function inlineFunctionCall(
 /**
  * Example:
  * `function alias(a, b) { return decode(b - 938, a); } alias(1071, 1077);`
+ * or
+ * `var alias = function(a, b) { return decode(b - 938, a); }; alias(1071, 1077);`
  * ->
  * `decode(1077 - 938, 1071)`
  */
 export function inlineFunctionAliases(binding: Binding): { changes: number } {
   const state = { changes: 0 };
   const refs = [...binding.referencePaths];
-  for (const ref of refs) {
-    const fn = findParent(ref, m.functionDeclaration());
 
-    // E.g. alias
-    const fnName = m.capture(m.anyString());
-    // E.g. decode(b - 938, a)
-    const returnedCall = m.capture(
-      m.callExpression(
-        m.identifier(binding.identifier.name),
-        m.anyList(m.slice({ min: 2 })),
-      ),
-    );
-    const matcher = m.functionDeclaration(
-      m.identifier(fnName),
+  // E.g. alias
+  const fnName = m.capture(m.anyString());
+  // E.g. decode(b - 938, a)
+  const returnedCall = m.capture(
+    m.callExpression(
+      m.identifier(binding.identifier.name),
       m.anyList(m.slice({ min: 2 })),
-      m.blockStatement([m.returnStatement(returnedCall)]),
-    );
+    ),
+  );
+  const matcher = varFunctionOrDeclaration(
+    m.identifier(fnName),
+    m.anyList(m.slice({ min: 2, matcher: m.identifier() })),
+    m.blockStatement([m.returnStatement(returnedCall)]),
+  );
 
-    if (fn && matcher.match(fn.node)) {
-      // Avoid false positives of functions that return a string
-      // It's only a wrapper if the function's params are used in the decode call
-      const paramUsedInDecodeCall = fn.node.params.some((param) => {
-        const binding = fn.scope.getBinding((param as t.Identifier).name);
-        return binding?.referencePaths.some((ref) =>
-          ref.findParent((p) => p.node === returnedCall.current),
-        );
-      });
-      if (!paramUsedInDecodeCall) continue;
+  for (const ref of refs) {
+    const decl = findParent(ref, matcher);
+    if (!decl) continue;
 
-      const fnBinding = fn.scope.parent.getBinding(fnName.current!);
-      if (!fnBinding) continue;
-      // Check all further aliases (`function alias2(a, b) { return alias(a - 1, b + 3); }`)
-      const fnRefs = fnBinding.referencePaths;
-      refs.push(...fnRefs);
+    const fnPath = decl.isFunctionDeclaration()
+      ? decl
+      : (decl.get('declarations.0.init') as NodePath<t.FunctionExpression>);
 
-      // E.g. [alias(1071, 1077), alias(1, 2)]
-      const callRefs = fnRefs
-        .filter(
-          (ref) =>
-            t.isCallExpression(ref.parent) &&
-            t.isIdentifier(ref.parent.callee, { name: fnName.current! }),
-        )
-        .map((ref) => ref.parentPath!) as NodePath<t.CallExpression>[];
+    // Avoid false positives of functions that return a string
+    // It's only a wrapper if the function's params are used in the decode call
+    const paramUsedInDecodeCall = fnPath.node.params.some((param) => {
+      const binding = fnPath.scope.getBinding((param as t.Identifier).name);
+      return binding?.referencePaths.some((ref) =>
+        ref.findParent((p) => p.node === returnedCall.current),
+      );
+    });
+    if (!paramUsedInDecodeCall) continue;
 
-      for (const callRef of callRefs) {
-        inlineFunctionCall(fn.node, callRef);
-        state.changes++;
-      }
+    const fnBinding = fnPath.scope.parent.getBinding(fnName.current!);
+    if (!fnBinding) continue;
+    // Check all further aliases (`function alias2(a, b) { return alias(a - 1, b + 3); }`)
+    const fnRefs = fnBinding.referencePaths;
+    refs.push(...fnRefs);
 
-      fn.remove();
+    // E.g. [alias(1071, 1077), alias(1, 2)]
+    const callRefs = fnRefs
+      .filter(
+        (ref) =>
+          t.isCallExpression(ref.parent) &&
+          t.isIdentifier(ref.parent.callee, { name: fnName.current! }),
+      )
+      .map((ref) => ref.parentPath!) as NodePath<t.CallExpression>[];
+
+    for (const callRef of callRefs) {
+      inlineFunctionCall(fnPath.node, callRef);
       state.changes++;
     }
+
+    decl.remove();
+    state.changes++;
   }
 
   // Have to crawl again because renaming messed up the references

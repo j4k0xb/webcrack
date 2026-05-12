@@ -1,0 +1,10 @@
+// v4.0.0
+
+function hi() {
+  console.log("Hello World!");
+  console.log(/*webcrack:decode_error*/undefined);
+  console.log(/*webcrack:decode_error*/undefined);
+  const p = true;
+  console.log(p ? "log" : "Hello World!");
+}
+hi();

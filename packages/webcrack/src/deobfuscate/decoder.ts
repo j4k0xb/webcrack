@@ -7,6 +7,7 @@ import {
   findParent,
   inlineVariable,
   renameFast,
+  varFunctionOrDeclaration,
 } from '../ast-utils';
 import type { StringArray } from './string-array';
 
@@ -18,12 +19,12 @@ import type { StringArray } from './string-array';
 export class Decoder {
   originalName: string;
   name: string;
-  path: NodePath<t.FunctionDeclaration>;
+  path: NodePath<t.FunctionDeclaration | t.VariableDeclaration>;
 
   constructor(
     originalName: string,
     name: string,
-    path: NodePath<t.FunctionDeclaration>,
+    path: NodePath<t.FunctionDeclaration | t.VariableDeclaration>,
   ) {
     this.originalName = originalName;
     this.name = name;
@@ -106,7 +107,7 @@ export function findDecoders(stringArray: StringArray): Decoder[] {
 
   const functionName = m.capture(m.anyString());
   const arrayIdentifier = m.capture(m.identifier());
-  const matcher = m.functionDeclaration(
+  const matcher = varFunctionOrDeclaration(
     m.identifier(functionName),
     m.anything(),
     m.blockStatement(

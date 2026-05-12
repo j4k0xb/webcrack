@@ -7,10 +7,11 @@ import {
   isReadonlyObject,
   renameFast,
   undefinedMatcher,
+  varFunctionOrDeclaration,
 } from '../ast-utils';
 
 export interface StringArray {
-  path: NodePath<t.FunctionDeclaration>;
+  path: NodePath<t.FunctionDeclaration | t.VariableDeclaration>;
   references: NodePath[];
   name: string;
   originalName: string;
@@ -37,8 +38,8 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
   const variableDeclaration = m.variableDeclaration(undefined, [
     m.variableDeclarator(arrayIdentifier, arrayExpression),
   ]);
-  // function getStringArray() { ... }
-  const matcher = m.functionDeclaration(
+  // `function getStringArray() { ... }` or `var getStringArray = function() { ... }`
+  const matcher = varFunctionOrDeclaration(
     m.identifier(functionName),
     [],
     m.or(
@@ -59,41 +60,52 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
     ),
   );
 
+  function onFunctionFound(
+    path: NodePath<t.FunctionDeclaration | t.VariableDeclaration>,
+  ) {
+    const length = arrayExpression.current!.elements.length;
+    const name = functionName.current!;
+    const binding = path.scope.getBinding(name)!;
+    renameFast(binding, '__STRING_ARRAY__');
+
+    result = {
+      path,
+      references: binding.referencePaths,
+      originalName: name,
+      name: '__STRING_ARRAY__',
+      length,
+    };
+    path.stop();
+  }
+
   traverse(ast, {
     // Wrapped string array from later javascript-obfuscator versions
     FunctionDeclaration(path) {
       if (matcher.match(path.node)) {
-        const length = arrayExpression.current!.elements.length;
-        const name = functionName.current!;
-        const binding = path.scope.getBinding(name)!;
-        renameFast(binding, '__STRING_ARRAY__');
-
-        result = {
-          path,
-          references: binding.referencePaths,
-          originalName: name,
-          name: '__STRING_ARRAY__',
-          length,
-        };
-        path.stop();
+        onFunctionFound(path);
       }
     },
-    // Simple string array inlining (only `array[0]`, `array[1]` etc references, no rotating/decoding).
-    // May be used by older or different obfuscators
     VariableDeclaration(path) {
-      if (!variableDeclaration.match(path.node)) return;
-
-      const length = arrayExpression.current!.elements.length;
-      const binding = path.scope.getBinding(arrayIdentifier.current!.name)!;
-      const memberAccess = m.memberExpression(
-        m.fromCapture(arrayIdentifier),
-        m.numericLiteral(m.matcher((value) => value < length)),
-      );
-      if (!binding.referenced || !isReadonlyObject(binding, memberAccess))
+      if (matcher.match(path.node)) {
+        onFunctionFound(path);
         return;
+      }
 
-      inlineArrayElements(arrayExpression.current!, binding.referencePaths);
-      path.remove();
+      if (variableDeclaration.match(path.node)) {
+        // Simple string array inlining (only `array[0]`, `array[1]` etc references, no rotating/decoding).
+        // May be used by older or different obfuscators
+        const length = arrayExpression.current!.elements.length;
+        const binding = path.scope.getBinding(arrayIdentifier.current!.name)!;
+        const memberAccess = m.memberExpression(
+          m.fromCapture(arrayIdentifier),
+          m.numericLiteral(m.matcher((value) => value < length)),
+        );
+        if (!binding.referenced || !isReadonlyObject(binding, memberAccess))
+          return;
+
+        inlineArrayElements(arrayExpression.current!, binding.referencePaths);
+        path.remove();
+      }
     },
   });
 

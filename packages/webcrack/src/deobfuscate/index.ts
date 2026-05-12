@@ -54,7 +54,7 @@ export default {
       state.changes += applyTransform(
         ast,
         inlineDecoderWrappers,
-        decoder.path,
+        decoder,
       ).changes;
     }
 

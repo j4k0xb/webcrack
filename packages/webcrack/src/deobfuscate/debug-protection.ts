@@ -1,7 +1,14 @@
+import type { NodePath } from '@babel/traverse';
+import type * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { ifStatement } from '@codemod/matchers';
 import type { Transform } from '../ast-utils';
-import { constMemberExpression, findParent, iife } from '../ast-utils';
+import {
+  constMemberExpression,
+  findParent,
+  iife,
+  varFunctionOrDeclaration,
+} from '../ast-utils';
 
 // https://github.com/javascript-obfuscator/javascript-obfuscator/blob/d7f73935557b2cd15a2f7cd0b01017d9cddbd015/src/custom-code-helpers/debug-protection/templates/debug-protection-function-interval/DebugProtectionFunctionIntervalTemplate.ts
 
@@ -43,12 +50,12 @@ export default {
     );
 
     // function debugProtectionFunctionName(ret) {
-    const matcher = m.functionDeclaration(
+    const matcher = varFunctionOrDeclaration(
       m.identifier(debugProtectionFunctionName),
       [ret],
       m.blockStatement([
         // function debuggerProtection (counter) {
-        m.functionDeclaration(
+        varFunctionOrDeclaration(
           debuggerProtection,
           [counter],
           m.blockStatement([
@@ -85,10 +92,13 @@ export default {
     );
 
     return {
-      FunctionDeclaration(path) {
+      'FunctionDeclaration|VariableDeclaration'(path) {
         if (!matcher.match(path.node)) return;
 
-        const binding = path.scope.getBinding(
+        const fnPath = path.isFunctionDeclaration()
+          ? path
+          : (path.get('declarations.0.init') as NodePath<t.FunctionExpression>);
+        const binding = fnPath.scope.parent.getBinding(
           debugProtectionFunctionName.current!,
         );
 

@@ -148,6 +148,33 @@ export function createFunctionMatcher(
 }
 
 /**
+ * `function <id>(<params>) { <body> }` or `var <id> = function(<params>) { <body> }`
+ */
+export function varFunctionOrDeclaration(
+  id?: m.Matcher<t.Identifier>,
+  params?:
+    | m.Matcher<Array<t.Identifier | t.Pattern | t.RestElement>>
+    | Array<
+        | m.Matcher<t.Identifier>
+        | m.Matcher<t.Pattern>
+        | m.Matcher<t.RestElement>
+      >,
+  body?: m.Matcher<t.BlockStatement>,
+  generator?: m.Matcher<boolean> | boolean,
+  async?: m.Matcher<boolean> | boolean,
+): m.Matcher<(t.FunctionDeclaration | t.VariableDeclaration) & {}> {
+  return m.or(
+    m.functionDeclaration(id, params, body, generator, async),
+    m.variableDeclaration('var', [
+      m.variableDeclarator(
+        id,
+        m.functionExpression(null, params, body, generator, async),
+      ),
+    ]),
+  );
+}
+
+/**
  * Returns true if every reference is a member expression whose value is read
  */
 export function isReadonlyObject(

@@ -20,7 +20,6 @@ import debugProtection from './deobfuscate/debug-protection';
 import evaluateGlobals from './deobfuscate/evaluate-globals';
 import mergeObjectAssignments from './deobfuscate/merge-object-assignments';
 import selfDefending from './deobfuscate/self-defending';
-import varFunctions from './deobfuscate/var-functions';
 import {
   runPlugins,
   type Plugin,
@@ -168,7 +167,7 @@ export async function webcrack(
     () => {
       applyTransforms(
         ast,
-        [blockStatements, sequence, splitVariableDeclarations, varFunctions],
+        [blockStatements, sequence, splitVariableDeclarations],
         { name: 'prepare' },
       );
     },
