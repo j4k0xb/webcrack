@@ -27,10 +27,13 @@ Try it in the [online playground](https://webcrack.netlify.app/) or view the [do
 
 Node.js 22 or 24.
 
+> [!NOTE]
+> webcrack depends on [`isolated-vm`](https://github.com/laverdet/isolated-vm), which [does not recommend using odd-numbered Node.js releases](https://github.com/laverdet/isolated-vm#security) because they frequently break ABI/API compatibility with V8.
+
 ## Command Line Interface
 
 ```bash
-npm install -g webcrack
+npm install -g webcrack@latest
 ```
 
 Examples:
@@ -46,7 +49,7 @@ webcrack bundle.js -o output-dir
 ## API
 
 ```bash
-npm install webcrack
+npm install webcrack@latest
 ```
 
 Examples:
