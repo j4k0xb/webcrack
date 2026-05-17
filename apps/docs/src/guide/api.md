@@ -5,15 +5,15 @@ Installation:
 ::: code-group
 
 ```bash [npm]
-npm install webcrack
+npm install webcrack@latest
 ```
 
 ```bash [yarn]
-yarn add webcrack
+yarn add webcrack@latest
 ```
 
 ```bash [pnpm]
-pnpm add webcrack --allow-build=isolated-vm
+pnpm add webcrack@latest --allow-build=isolated-vm
 ```
 
 ## Basic Usage

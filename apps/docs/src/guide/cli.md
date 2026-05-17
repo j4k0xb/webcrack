@@ -5,15 +5,15 @@ Install the package globally:
 ::: code-group
 
 ```bash [npm]
-npm install -g webcrack
+npm install -g webcrack@latest
 ```
 
 ```bash [yarn]
-yarn global add webcrack
+yarn global add webcrack@latest
 ```
 
 ```bash [pnpm]
-pnpm add -g webcrack --allow-build=isolated-vm
+pnpm add -g webcrack@latest --allow-build=isolated-vm
 ```
 
 :::
