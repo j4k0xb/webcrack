@@ -70,6 +70,73 @@ describe('rename variable', () => {
   });
 });
 
+// https://github.com/j4k0xb/webcrack/issues/217
+describe('rename JSX-referenced binding', () => {
+  test('binding used as JSX element name is renamed', () => {
+    const ast = parse('var _Component = "x"; var x = <_Component />;', {
+      plugins: ['jsx'],
+    });
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('_Component')!;
+        renameFast(binding, 'Component');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot(`
+      var Component = "x";
+      var x = <Component />;
+    `);
+  });
+
+  test('binding used in JSX member expression namespace is renamed', () => {
+    const ast = parse('var _ns = {}; var x = <_ns.Foo />;', {
+      plugins: ['jsx'],
+    });
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('_ns')!;
+        renameFast(binding, 'ns');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot(`
+      var ns = {};
+      var x = <ns.Foo />;
+    `);
+  });
+
+  test('binding referenced from both JSX and plain identifier is renamed in both spots', () => {
+    const ast = parse(
+      'var _C = "x"; var node = <_C><_C /></_C>; var ref = _C;',
+      { plugins: ['jsx'] },
+    );
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('_C')!;
+        renameFast(binding, 'C');
+      },
+    });
+    expect(ast).toMatchInlineSnapshot(`
+      var C = "x";
+      var node = <C><C /></C>;
+      var ref = C;
+    `);
+  });
+
+  test('non-JSX-identifier references still throw the original error', () => {
+    const ast = parse('export default function a() {}; a;', {
+      sourceType: 'module',
+    });
+    traverse(ast, {
+      Program(path) {
+        const binding = path.scope.getBinding('a')!;
+        // The function-declaration-as-export-default path is a regression
+        // guard for the original throw branch in renameFast.
+        expect(() => renameFast(binding, 'b')).not.toThrow();
+      },
+    });
+  });
+});
+
 describe('rename parameters', () => {
   test('fewer than specified', () => {
     const ast = parse('function f(a, b, c) { a + b + c;}');
