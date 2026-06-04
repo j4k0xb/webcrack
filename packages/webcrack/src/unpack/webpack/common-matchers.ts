@@ -10,6 +10,7 @@ import {
 
 export type FunctionPath = NodePath<
   | t.FunctionExpression
+  | t.ObjectMethod
   | (t.ArrowFunctionExpression & { body: t.BlockStatement })
 >;
 
@@ -75,6 +76,15 @@ export function modulesContainerMatcher(): m.CapturedMatcher<
               m.or(m.numericLiteral(), m.stringLiteral(), m.identifier()),
               anonymousFunction(),
             ),
+            m.objectMethod(
+              'method',
+              m.or(m.numericLiteral(), m.stringLiteral(), m.identifier()),
+              undefined,
+              undefined,
+              false,
+              false,
+              false,
+            ),
             // Example (__webpack_public_path__): { c: "" }
             m.objectProperty(m.identifier('c'), m.stringLiteral()),
           ),
@@ -103,17 +113,21 @@ export function getModuleFunctions(
       }
     });
   } else {
-    (container.node.properties as t.ObjectProperty[]).forEach(
-      (property, index) => {
+    container.node.properties.forEach((property, index) => {
+      if (t.isObjectMethod(property)) {
         const key = getPropName(property.key)!;
-        if (anonymousFunction().match(property.value)) {
-          functions.set(
-            key,
-            container.get(`properties.${index}.value`) as FunctionPath,
-          );
-        }
-      },
-    );
+        functions.set(
+          key,
+          container.get(`properties.${index}`) as FunctionPath,
+        );
+      } else if (t.isProperty(property) && t.isFunction(property.value)) {
+        const key = getPropName(property.key)!;
+        functions.set(
+          key,
+          container.get(`properties.${index}.value`) as FunctionPath,
+        );
+      }
+    });
   }
 
   return functions;

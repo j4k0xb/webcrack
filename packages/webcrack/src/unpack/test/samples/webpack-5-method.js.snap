@@ -1,0 +1,13 @@
+WebpackBundle {
+  "entryId": "2",
+  "modules": Map {
+    "2" => WebpackModule {
+      "ast": const lib = require(/*webcrack:missing*/"./3.js");
+console.log(lib);,
+      "id": "2",
+      "isEntry": true,
+      "path": "./index.js",
+    },
+  },
+  "type": "webpack",
+}
