@@ -224,7 +224,8 @@ exports.rethrow = function rethrow(err, filename, lineno) {
   var str = require("./6.js").readFileSync(filename, "utf8");
   var lines = str.split("\n");
   var start = Math.max(lineno - context, 0);
-  var end = Math.min(lines.length, lineno + context); // Error context
+  var end = Math.min(lines.length, lineno + context);
+  // Error context
   var context = lines.slice(start, end).map(function (line, i) {
     var curr = i + start + 1;
     return (curr == lineno ? "  > " : "    ") + curr + "| " + line;
