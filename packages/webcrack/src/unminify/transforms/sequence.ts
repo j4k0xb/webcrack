@@ -35,6 +35,44 @@ export default {
     );
 
     return {
+      Block(path) {
+        // Fast path (reached ~70% of the time): expand ExpressionStatement(Sequence) and ReturnStatement(Sequence)
+        // into multiple statements by allocating new array once instead of splicing for each match.
+        const startIndex = path.node.body.findIndex(
+          (stmt) =>
+            (t.isExpressionStatement(stmt) &&
+              t.isSequenceExpression(stmt.expression)) ||
+            (t.isReturnStatement(stmt) &&
+              t.isSequenceExpression(stmt.argument)),
+        );
+        if (startIndex === -1) return;
+
+        const newBody: t.Statement[] = path.node.body.slice(0, startIndex);
+        for (let i = startIndex; i < path.node.body.length; i++) {
+          const stmt = path.node.body[i];
+          if (
+            t.isExpressionStatement(stmt) &&
+            t.isSequenceExpression(stmt.expression)
+          ) {
+            stmt.expression.expressions.forEach((expr) => {
+              newBody.push(t.expressionStatement(expr));
+            });
+          } else if (
+            t.isReturnStatement(stmt) &&
+            t.isSequenceExpression(stmt.argument)
+          ) {
+            for (let i = 0; i < stmt.argument.expressions.length - 1; i++) {
+              newBody.push(t.expressionStatement(stmt.argument.expressions[i]));
+            }
+            stmt.argument = stmt.argument.expressions.at(-1);
+            newBody.push(stmt);
+          } else {
+            newBody.push(stmt);
+          }
+        }
+        this.changes += newBody.length - path.node.body.length;
+        path.node.body = newBody;
+      },
       AssignmentExpression: {
         exit(path) {
           if (!assignmentMatcher.match(path.node)) return;
