@@ -16,23 +16,21 @@ yarn add webcrack@latest
 pnpm add webcrack@latest --allow-build=isolated-vm
 ```
 
+:::
+
 ## Basic Usage
 
-:::
-
-:::info
-All examples are shown with ESM syntax.
-For CommonJS, use the following instead:
-
-```js
-const { webcrack } = require('webcrack');
-
-webcrack('const a = 1+1;').then((result) => {
-  console.log(result.code); // 'const a = 2;'
-});
-```
-
-:::
+> [!NOTE]
+> All examples are shown with ESM syntax.
+> For CommonJS, use the following instead:
+>
+> ```js
+> const { webcrack } = require('webcrack');
+>
+> webcrack('const a = 1+1;').then((result) => {
+>   console.log(result.code); // 'const a = 2;'
+> });
+> ```
 
 ```js
 import { webcrack } from 'webcrack';
@@ -101,15 +99,14 @@ In future versions, this should hopefully not be necessary anymore.
 
 It is an (optionally async) function that takes a `code` parameter and returns the evaluated value.
 
-::: danger Security warning
-Simplest possible implementation, avoid using due to potentially executing malicious code
-:::
+> [!CAUTION]
+> Simplest possible implementation. Don't run this with untrusted or malicious code.
 
 ```js
 const result = await webcrack('function _0x317a(){....', { sandbox: eval });
 ```
 
-More secure version with [sandybox](https://github.com/trentmwillis/sandybox) and CSP:
+This is how the webcrack playground currently implements it in a more secure way, with [sandybox](https://github.com/trentmwillis/sandybox), a Content-Security-Policy to prevent network access and a timeout:
 
 ```js
 const sandbox = await Sandybox.create();

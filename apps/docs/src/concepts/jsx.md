@@ -20,6 +20,5 @@ React.createElement(
 </div>
 ```
 
-:::info
-This currently only works for the React **UMD** build, not when bundled.
-:::
+> [!NOTE]
+> This currently only works for the React **UMD** build, not when bundled.

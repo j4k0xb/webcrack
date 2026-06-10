@@ -12,10 +12,6 @@ This feature can unpack [webpack](https://webpack.js.org/) and [browserify](http
 
 ![Webpack structure](../assets/webpack-structure.png)
 
-<!-- ::: details  -->
-
-<!-- ### `__webpack_require__` properties and functions -->
-
 ### `__webpack_require__`
 
 ```ts
@@ -90,8 +86,6 @@ interface WebpackRequire {
 }
 ```
 
-<!-- ::: -->
-
 ## Browserify
 
 Each module has a numerical id and contains a list of dependencies: `{ './foo': 1, './bar': 3 }`.
@@ -100,7 +94,10 @@ These paths are relative to the current module and are used like `require('./foo
 The absolute path a module is not stored anywhere, so webcrack builds a dependency tree
 and resolves the paths to preserve the original file structure as much as possible.
 
-::: details Example
+Sometimes the entry module was deeply nested (e.g. `src/app/index.js`), but `"src"` or `"app"` is not included in the bundle.
+In this case, directory names like `tmp0/tmp1`, etc. are used instead.
+
+### Example
 
 Module id -> dependencies:
 
@@ -125,8 +122,3 @@ Resulting file structure:
 │       └── b.js
 ├── c.js
 ```
-
-:::
-
-Sometimes the entry module was deeply nested (e.g. `src/app/index.js`), but `"src"` or `"app"` is not included in the bundle.
-In this case, directory names like `tmp0/tmp1`, etc. are used instead.
