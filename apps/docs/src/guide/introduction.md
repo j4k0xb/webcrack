@@ -14,7 +14,7 @@ to resemble the original source code as much as possible.
 
 ## Requirements
 
-Node.js 22 or 24.
+Node.js 22, 24, or 26.
 
 ## Planned Features
 

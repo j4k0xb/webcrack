@@ -172,9 +172,6 @@ importers:
       debug:
         specifier: ^4.4.3
         version: 4.4.3
-      isolated-vm:
-        specifier: ^6.1.2
-        version: 6.1.2
     devDependencies:
       '@types/babel__generator':
         specifier: ^7.27.0
@@ -206,6 +203,13 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+    optionalDependencies:
+      isolated-vm-6:
+        specifier: npm:isolated-vm@^6.1.2
+        version: isolated-vm@6.1.2
+      isolated-vm-7:
+        specifier: npm:isolated-vm@^7.0.0
+        version: isolated-vm@7.0.0
 
 packages:
 
@@ -2092,6 +2096,10 @@ packages:
   isolated-vm@6.1.2:
     resolution: {integrity: sha512-GGfsHqtlZiiurZaxB/3kY7LLAXR3sgzDul0fom4cSyBjx6ZbjpTrFWiH3z/nUfLJGJ8PIq9LQmQFiAxu24+I7A==}
     engines: {node: '>=22.0.0'}
+
+  isolated-vm@7.0.0:
+    resolution: {integrity: sha512-TXlJp9kiSf4AEpkCgB4VIf2M+6MRW3SEzlZUXFmQ6QcRypOnENRvK6RoZuQt/dlLOnqyFGUoZELUfH4ucsG4iw==}
+    engines: {node: '>=26.0.0'}
 
   isomorphic-timers-promises@1.0.1:
     resolution: {integrity: sha512-u4sej9B1LPSxTGKB/HiuzvEQnXH0ECYkSVQU39koSwmFAxhlEAFl9RdTvLv4TOTQUgBS5O3O5fwUxk6byBZ+IQ==}
@@ -4719,6 +4727,12 @@ snapshots:
   isolated-vm@6.1.2:
     dependencies:
       node-gyp-build: 4.8.4
+    optional: true
+
+  isolated-vm@7.0.0:
+    dependencies:
+      node-gyp-build: 4.8.4
+    optional: true
 
   isomorphic-timers-promises@1.0.1: {}
 
@@ -4897,7 +4911,8 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  node-gyp-build@4.8.4: {}
+  node-gyp-build@4.8.4:
+    optional: true
 
   node-releases@2.0.18: {}
 

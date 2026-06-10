@@ -14,13 +14,13 @@ const { default: monacoEditorPlugin } = monacoEditor as unknown as {
 
 export default defineConfig({
   optimizeDeps: {
-    exclude: ['isolated-vm'],
+    exclude: ['isolated-vm-6', 'isolated-vm-7'],
   },
   build: {
     target: 'chrome89',
     sourcemap: true,
     rollupOptions: {
-      external: ['isolated-vm'],
+      external: ['isolated-vm-6', 'isolated-vm-7'],
       output: {
         format: 'es',
         manualChunks: (id) => {
@@ -37,7 +37,8 @@ export default defineConfig({
       // @codemod/matchers imports @codemod/utils which imports @babel/core, but it's not needed
       // by replacing it with a dummy module we can reduce the bundle size by 360kb
       '@babel/core': path.resolve(import.meta.dirname, 'src/_empty.ts'),
-      'isolated-vm': path.resolve(import.meta.dirname, 'src/_empty.ts'),
+      'isolated-vm-6': path.resolve(import.meta.dirname, 'src/_empty.ts'),
+      'isolated-vm-7': path.resolve(import.meta.dirname, 'src/_empty.ts'),
       webcrack: path.resolve(
         import.meta.dirname,
         '../../packages/webcrack/src',

@@ -20,7 +20,7 @@ export default {
 
     const decodedValues = await options.vm.decode(calls);
 
-    for (let i = 0; i < calls.length; i++) {
+    for (let i = 0; i < calls.length && i < decodedValues.length; i++) {
       const call = calls[i];
       const value = decodedValues[i];
 

@@ -25,7 +25,7 @@
     "src/cli-wrapper.js"
   ],
   "engines": {
-    "node": ">=22.0.0 <23 || >=24.0.0 <25"
+    "node": ">=22.0.0 <23 || >=24.0.0 <25 || >=26.0.0 <27"
   },
   "scripts": {
     "build": "node esbuild.config.js && tsc -p tsconfig.build.json",
@@ -66,8 +66,11 @@
     "@babel/types": "^7.29.0",
     "@codemod/matchers": "^1.7.1",
     "commander": "^14.0.3",
-    "debug": "^4.4.3",
-    "isolated-vm": "^6.1.2"
+    "debug": "^4.4.3"
+  },
+  "optionalDependencies": {
+    "isolated-vm-6": "npm:isolated-vm@^6.1.2",
+    "isolated-vm-7": "npm:isolated-vm@^7.0.0"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.27.0",
