@@ -25,7 +25,9 @@ Try it in the [online playground](https://webcrack.netlify.app/) or view the [do
 
 ## Requirements
 
-Node.js 22, 24, or 26.
+Node.js 22 or 24.
+
+<!-- TODO: add 26 on release -->
 
 > [!NOTE]
 > webcrack depends on [`isolated-vm`](https://github.com/laverdet/isolated-vm), which [does not recommend using odd-numbered Node.js releases](https://github.com/laverdet/isolated-vm#security) because they frequently break ABI/API compatibility with V8.
