@@ -15,13 +15,7 @@ export default {
 
     const cases = m.capture(
       m.arrayOf(
-        m.switchCase(
-          m.stringLiteral(m.matcher((s) => /^\d+$/.test(s))),
-          m.anyList(
-            m.zeroOrMore(),
-            m.or(m.continueStatement(), m.returnStatement()),
-          ),
-        ),
+        m.switchCase(m.stringLiteral(m.matcher((s) => /^\d+$/.test(s)))),
       ),
     );
 
