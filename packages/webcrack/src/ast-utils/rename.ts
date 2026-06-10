@@ -7,7 +7,7 @@ import { codePreview } from './generator';
 export function renameFast(binding: Binding, newName: string): void {
   binding.referencePaths.forEach((ref) => {
     if (ref.isExportDefaultDeclaration()) return;
-    if (!ref.isIdentifier()) {
+    if (!ref.isIdentifier() && !ref.isJSXIdentifier()) {
       throw new Error(
         `Unexpected reference (${ref.type}): ${codePreview(ref.node)}`,
       );
