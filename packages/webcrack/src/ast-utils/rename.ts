@@ -7,18 +7,15 @@ import { codePreview } from './generator';
 export function renameFast(binding: Binding, newName: string): void {
   binding.referencePaths.forEach((ref) => {
     if (ref.isExportDefaultDeclaration()) return;
-    if (ref.isIdentifier()) {
-      // To avoid conflicts with other bindings of the same name
-      if (ref.scope.hasBinding(newName)) ref.scope.rename(newName);
-      ref.node.name = newName;
-    } else if (ref.isJSXIdentifier()) {
-      if (ref.scope.hasBinding(newName)) ref.scope.rename(newName);
-      ref.node.name = newName;
-    } else {
+    if (!ref.isIdentifier() && !ref.isJSXIdentifier()) {
       throw new Error(
         `Unexpected reference (${ref.type}): ${codePreview(ref.node)}`,
       );
     }
+
+    // To avoid conflicts with other bindings of the same name
+    if (ref.scope.hasBinding(newName)) ref.scope.rename(newName);
+    ref.node.name = newName;
   });
 
   // Also update assignments
