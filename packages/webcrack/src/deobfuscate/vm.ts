@@ -1,8 +1,7 @@
 import type { NodePath } from '@babel/traverse';
 import type { CallExpression } from '@babel/types';
 import debug from 'debug';
-import type ivm6 from 'isolated-vm-6';
-import type ivm7 from 'isolated-vm-7';
+import type IsolatedVM from 'isolated-vm-shared';
 import { generate } from '../ast-utils';
 import type { ArrayRotator } from './array-rotator';
 import type { Decoder } from './decoder';
@@ -10,12 +9,14 @@ import type { StringArray } from './string-array';
 
 export type Sandbox = (code: string) => Promise<unknown>;
 
-async function importIsolatedVM(): Promise<typeof ivm6 | typeof ivm7> {
+async function importIsolatedVM(): Promise<typeof IsolatedVM> {
   const major = Number(globalThis.process.versions.node.split('.')[0]);
-  const ivm = await (major >= 26
-    ? import('isolated-vm-7')
-    : import('isolated-vm-6'));
-  return ivm.default;
+  const { default: ivm } = (await (major >= 26
+    ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      import('isolated-vm-7')
+    : import('isolated-vm-6'))) as { default: typeof IsolatedVM };
+  return ivm;
 }
 
 export function createNodeSandbox(): Sandbox {
