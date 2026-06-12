@@ -184,7 +184,7 @@ function convertAttributeValue(
 function convertChildren(
   object: t.ObjectExpression,
   pragma: string,
-): (t.JSXText | t.JSXElement | t.JSXExpressionContainer)[] {
+): (t.JSXText | t.JSXElement | t.JSXExpressionContainer | t.JSXSpreadChild)[] {
   const children = m.capture(m.anyExpression());
   const matcher = m.objectProperty(
     m.or(m.identifier('children'), m.stringLiteral('children')),
@@ -195,16 +195,16 @@ function convertChildren(
   if (!prop) return [];
 
   if (pragma.includes('jsxs') && t.isArrayExpression(children.current)) {
-    return children.current.elements.map((child) =>
-      convertChild(child as t.Expression),
-    );
+    return children.current.elements
+      .filter((child) => child !== null)
+      .map(convertChild);
   }
   return [convertChild(children.current!)];
 }
 
 function convertChild(
-  child: t.Expression,
-): t.JSXElement | t.JSXExpressionContainer | t.JSXText {
+  child: t.Expression | t.SpreadElement,
+): t.JSXText | t.JSXElement | t.JSXExpressionContainer | t.JSXSpreadChild {
   if (t.isJSXElement(child)) {
     return child;
   } else if (t.isStringLiteral(child)) {
@@ -212,6 +212,8 @@ function convertChild(
     return hasSpecialChars
       ? t.jsxExpressionContainer(child)
       : t.jsxText(child.value);
+  } else if (t.isSpreadElement(child)) {
+    return t.jsxSpreadChild(child.argument);
   } else {
     return t.jsxExpressionContainer(child);
   }

@@ -71,6 +71,11 @@ test('fragment with key', () =>
     '<React.Fragment key={o} />;',
   ));
 
+test('fragment with spread element', () =>
+  expectJS(
+    'jsxs(React.Fragment, { children: [x, ...y] })',
+  ).toMatchInlineSnapshot(`<>{x}{...y}</>;`));
+
 test('remove leading comments', () =>
   expectJS(
     'return /*#__PURE__*/_jsx("h1", {children: /*#__PURE__*/_jsx("div", {})});',

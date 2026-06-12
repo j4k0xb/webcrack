@@ -52,7 +52,10 @@ export default {
         exit(path) {
           if (fragmentMatcher.match(path.node)) {
             const children = convertChildren(
-              path.node.arguments.slice(2) as t.Expression[],
+              path.node.arguments.slice(2) as (
+                | t.Expression
+                | t.SpreadElement
+              )[],
             );
             const opening = t.jsxOpeningFragment();
             const closing = t.jsxClosingFragment();
