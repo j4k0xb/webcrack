@@ -13,8 +13,7 @@ document.write(template({
     },
     "1" => WebpackModule {
       "ast": // style-loader: Adds some css to the DOM by adding a <style> tag
-var dispose = require("./2.js")
-// The css code:
+var dispose = require("./2.js") // The css code:
 (require("./3.js"));
 if (false) {
   module.hot.accept();
@@ -77,21 +76,17 @@ module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
  * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
  * MIT Licensed
  */
-
 /**
  * Lame Array.isArray() polyfill for now.
  */
-
 if (!Array.isArray) {
   Array.isArray = function (arr) {
     return Object.prototype.toString.call(arr) == "[object Array]";
   };
 }
-
 /**
  * Lame Object.keys() polyfill for now.
  */
-
 if (!Object.keys) {
   Object.keys = function (obj) {
     var arr = [];
@@ -103,7 +98,6 @@ if (!Object.keys) {
     return arr;
   };
 }
-
 /**
  * Merge two attribute objects giving precedence
  * to values in object `b`. Classes are special-cased
@@ -115,7 +109,6 @@ if (!Object.keys) {
  * @return {Object} a
  * @api private
  */
-
 exports.merge = function merge(a, b) {
   var ac = a.class;
   var bc = b.class;
@@ -139,7 +132,6 @@ exports.merge = function merge(a, b) {
   }
   return a;
 };
-
 /**
  * Filter null `val`s.
  *
@@ -147,11 +139,9 @@ exports.merge = function merge(a, b) {
  * @return {Mixed}
  * @api private
  */
-
 function nulls(val) {
   return val != null;
 }
-
 /**
  * Render the given attributes object.
  *
@@ -160,7 +150,6 @@ function nulls(val) {
  * @return {String}
  * @api private
  */
-
 exports.attrs = function attrs(obj, escaped) {
   var buf = [];
   var terse = obj.terse;
@@ -193,7 +182,6 @@ exports.attrs = function attrs(obj, escaped) {
   }
   return buf.join(" ");
 };
-
 /**
  * Escape the given string of `html`.
  *
@@ -201,11 +189,9 @@ exports.attrs = function attrs(obj, escaped) {
  * @return {String}
  * @api private
  */
-
 exports.escape = function escape(html) {
   return String(html).replace(/&(?!(\w+|\#\d+);)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 };
-
 /**
  * Re-throw the given `err` in context to the
  * the jade in `filename` at the given `lineno`.
@@ -215,7 +201,6 @@ exports.escape = function escape(html) {
  * @param {String} lineno
  * @api private
  */
-
 exports.rethrow = function rethrow(err, filename, lineno) {
   if (!filename) {
     throw err;
@@ -229,9 +214,7 @@ exports.rethrow = function rethrow(err, filename, lineno) {
   var context = lines.slice(start, end).map(function (line, i) {
     var curr = i + start + 1;
     return (curr == lineno ? "  > " : "    ") + curr + "| " + line;
-  }).join("\n");
-
-  // Alter exception message
+  }).join("\n"); // Alter exception message
   err.path = filename;
   err.message = (filename || "Jade") + ":" + lineno + "\n" + context + "\n\n" + err.message;
   throw err;

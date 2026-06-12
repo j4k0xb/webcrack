@@ -11,6 +11,7 @@ import {
   applyTransforms,
   generate,
 } from './ast-utils';
+import { removeNodeFields } from './ast-utils/remove-node-fields.js';
 import type { Sandbox } from './deobfuscate';
 import deobfuscate, {
   createBrowserSandbox,
@@ -165,6 +166,9 @@ export async function webcrack(
     plugins.afterParse && (() => runPlugins(ast, plugins.afterParse!, state)),
 
     () => {
+      // Separate traverseFast is ~4x faster than running it within the merged prepare visitor.
+      // This introduces some initial performance overhead, but reduces the memory usage of each AST node by half,
+      removeNodeFields(ast);
       applyTransforms(
         ast,
         [blockStatements, sequence, splitVariableDeclarations],
