@@ -96,7 +96,7 @@ export default {
 
     state.changes += applyTransforms(
       ast,
-      [mergeStrings, controlFlowObject, controlFlowSwitch, deadCode],
+      [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
       { noScope: true },
     ).changes;
   },
