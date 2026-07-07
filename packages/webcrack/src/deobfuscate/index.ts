@@ -18,7 +18,6 @@ import { findStringArray } from './string-array';
 import type { Sandbox } from './vm';
 import { VMDecoder, createBrowserSandbox, createNodeSandbox } from './vm';
 import type { Node } from '@babel/types';
-import deadAssignmentElimination from './dead-assignment-elimination';
 
 export { createBrowserSandbox, createNodeSandbox, type Sandbox };
 
@@ -81,11 +80,7 @@ async function deobfuscateAllStringArrays(
     possibleStringArray = findStringArray(ast);
   }
 
-  logger(
-    stringArraysFound > 0
-      ? `${stringArraysFound} string arrays were deobfuscated`
-      : 'no string arrays found',
-  );
+  logger(stringArraysFound > 0 ? `${stringArraysFound} string arrays were deobfuscated` : 'no string arrays found');
 }
 
 export default {
@@ -101,13 +96,7 @@ export default {
 
     state.changes += applyTransforms(
       ast,
-      [
-        mergeStrings,
-        deadCode,
-        controlFlowObject,
-        controlFlowSwitch,
-        deadAssignmentElimination,
-      ],
+      [mergeStrings, deadCode, controlFlowObject, controlFlowSwitch],
       { noScope: true },
     ).changes;
   },
