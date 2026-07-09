@@ -1,6 +1,19 @@
 import * as t from '@babel/types';
 import type { Transform } from '../../ast-utils';
 
+function escape(str: string) {
+  return str
+    .replaceAll('\\', '\\\\')
+    .replaceAll('`', '\\`')
+    .replaceAll('$', '\\$')
+    .replaceAll('\0', '\\0')
+    .replaceAll('\b', '\\b')
+    .replaceAll('\f', '\\f')
+    .replaceAll('\r', '\\r')
+    .replaceAll('\t', '\\t')
+    .replaceAll('\v', '\\v');
+}
+
 export default {
   name: 'string-literal-in-template-literal',
   tags: ['safe'],
@@ -13,7 +26,7 @@ export default {
         if (t.isStringLiteral(expr)) {
           path.node.expressions.splice(i, 1);
           const main = path.node.quasis[i];
-          main.value.raw += expr.value;
+          main.value.raw += escape(expr.value);
 
           const next = path.node.quasis[i + 1];
           if (next) {
