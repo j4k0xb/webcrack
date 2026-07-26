@@ -88,7 +88,19 @@ if (x) {
 }  // [!code --]
 
 if (x) {
-} else if (y) {} // [!code ++]
+} else if (y) { // [!code ++]
+} else {} // [!code ++]
+```
+
+```js
+if (x) {  // [!code --]
+  if (y) {}  // [!code --]
+} else {  // [!code --]
+}  // [!code --]
+
+if (!x) {  // [!code ++]
+} else if (y) { // [!code ++]
+} else {} // [!code ++]
 ```
 
 ## merge-strings
