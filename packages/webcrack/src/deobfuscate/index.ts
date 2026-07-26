@@ -17,6 +17,7 @@ import inlineObjectProps from './inline-object-props';
 import { findStringArray } from './string-array';
 import type { Sandbox } from './vm';
 import { VMDecoder, createBrowserSandbox, createNodeSandbox } from './vm';
+import deadAssignmentElimination from './dead-assignment-elimination';
 
 export { createBrowserSandbox, createNodeSandbox, type Sandbox };
 
@@ -30,12 +31,20 @@ export default {
     if (!sandbox) return;
 
     const logger = debug('webcrack:deobfuscate');
+
+    logger('Dead Assignment Elimination: started');
+
+    state.changes += applyTransform(ast, deadAssignmentElimination).changes;
+
+    logger('Dead Assignment Elimination: finished');
+
     const stringArray = findStringArray(ast);
     logger(
       stringArray
         ? `String Array: ${stringArray.originalName}, length ${stringArray.length}`
         : 'String Array: no',
     );
+
     if (!stringArray) return;
 
     const rotator = findArrayRotator(stringArray);
