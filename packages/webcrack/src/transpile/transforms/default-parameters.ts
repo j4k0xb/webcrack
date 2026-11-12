@@ -1,6 +1,26 @@
+import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { constMemberExpression, type Transform } from '../../ast-utils';
+
+/**
+ * A function with a "use strict" directive can't have default, rest or
+ * destructuring parameters (SyntaxError). Drop the directive when the code
+ * around the function is already strict, otherwise the parameters must stay
+ * simple.
+ * @returns whether the parameters of the function may become non-simple
+ */
+function allowNonSimpleParams(fnPath: NodePath<t.Function>): boolean {
+  const body = fnPath.node.body;
+  if (!t.isBlockStatement(body)) return true;
+  const isUseStrict = (directive: t.Directive) =>
+    directive.value.value === 'use strict';
+  if (!body.directives.some(isUseStrict)) return true;
+  if (!fnPath.isInStrictMode()) return false;
+
+  body.directives = body.directives.filter((d) => !isUseStrict(d));
+  return true;
+}
 
 export default {
   name: 'default-parameters',
@@ -145,6 +165,13 @@ export default {
                   ? varId.current!
                   : null;
           if (!newParam) return;
+          if (
+            !t.isIdentifier(newParam) &&
+            !allowNonSimpleParams(
+              path.parentPath.parentPath as NodePath<t.Function>,
+            )
+          )
+            return;
 
           for (let i = fn.params.length; i < index.current!.value; i++) {
             fn.params[i] = t.identifier(path.scope.generateUid('param'));
@@ -165,6 +192,12 @@ export default {
           const isFunctionParam =
             binding.path.listKey === 'params' && binding.path.parent === fn;
           if (!isFunctionParam) return;
+          if (
+            !allowNonSimpleParams(
+              path.parentPath.parentPath as NodePath<t.Function>,
+            )
+          )
+            return;
 
           binding.path.replaceWith(
             t.assignmentPattern(varName.current!, defaultExpression.current!),
