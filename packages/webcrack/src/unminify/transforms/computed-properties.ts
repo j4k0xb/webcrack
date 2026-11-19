@@ -34,9 +34,11 @@ export default {
         exit(path) {
           if (!keyMatcher.match(path.node)) return;
           if (
-            (path.type === 'ClassMethod' &&
-              stringMatcher.current!.value === 'constructor') ||
-            (path.type === 'ObjectProperty' &&
+            (path.type === 'ClassMethod' ||
+              path.type === 'ClassProperty' ||
+              path.type === 'ObjectMethod' ||
+              path.type === 'ObjectProperty') &&
+            (stringMatcher.current!.value === 'constructor' ||
               stringMatcher.current!.value === '__proto__')
           )
             return;

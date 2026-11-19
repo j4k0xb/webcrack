@@ -49,6 +49,17 @@ test('ignore __proto__ property', () =>
     };
   `));
 
+test('ignore __proto__ class property', () =>
+  expectJS(`
+    class Foo {
+      ["__proto__"] = 1;
+    }
+  `).toMatchInlineSnapshot(`
+    class Foo {
+      ["__proto__"] = 1;
+    }
+  `));
+
 test('ignore constructor method', () =>
   expectJS(`
     class Foo {
@@ -57,5 +68,16 @@ test('ignore constructor method', () =>
   `).toMatchInlineSnapshot(`
     class Foo {
       ["constructor"]() {}
+    }
+  `));
+
+test('ignore constructor class property', () =>
+  expectJS(`
+    class Foo {
+      ["constructor"] = 1;
+    }
+  `).toMatchInlineSnapshot(`
+    class Foo {
+      ["constructor"] = 1;
     }
   `));
