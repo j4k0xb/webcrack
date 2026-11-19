@@ -22,3 +22,27 @@ test('ignore when JSON is declared in scope', () =>
     JSON.parse("null");
   `,
   ));
+
+test('keep __proto__ as an own property', () =>
+  expectJS(`JSON.parse('{"__proto__": {"admin": true}}')`)
+    .toMatchInlineSnapshot(`
+    ({
+      ["__proto__"]: {
+        "admin": true
+      }
+    });
+  `));
+
+test('keep nested and repeated __proto__ keys as own properties', () =>
+  expectJS(
+    `JSON.parse('[{"a": {"__proto__": 1}}, {"__proto__": 2, "__proto__": 3}]')`,
+  ).toMatchInlineSnapshot(`
+    [{
+      "a": {
+        ["__proto__"]: 1
+      }
+    }, {
+      ["__proto__"]: 2,
+      ["__proto__"]: 3
+    }];
+  `));
