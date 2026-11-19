@@ -19,6 +19,12 @@ export default {
   tags: ['safe'],
   visitor: () => ({
     TemplateLiteral(path) {
+      // a tag gets the segments and the substitutions as separate arguments,
+      // so inlining would change what it is called with
+      if (path.parentPath.isTaggedTemplateExpression({ quasi: path.node })) {
+        return;
+      }
+
       // inline string literals in template literals
       // e.g. `Hello ${'World'}!` -> `Hello World!`
       for (let i = 0; i < path.node.expressions.length; i++) {

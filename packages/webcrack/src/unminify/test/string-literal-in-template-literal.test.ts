@@ -32,3 +32,13 @@ test('string-literal-in-template-literal', () => {
     `const a = \`\\\\\`;`,
   );
 });
+
+test('keep substitutions of tagged templates', () => {
+  // the tag receives the segments and the values separately
+  expectJS('tag`a${"x"}b`;').toMatchInlineSnapshot(`tag\`a\${"x"}b\`;`);
+  expectJS('String.raw`${"\\\\n"}`;').toMatchInlineSnapshot(
+    `String.raw\`\${"\\\\n"}\`;`,
+  );
+  // a nested untagged template is still inlined
+  expectJS('tag`${`a${"x"}b`}`;').toMatchInlineSnapshot(`tag\`\${\`axb\`}\`;`);
+});
