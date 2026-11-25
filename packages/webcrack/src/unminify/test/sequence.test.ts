@@ -185,6 +185,52 @@ test('rearrange assignment', () => {
   `);
 });
 
+test('rearrange compound assignment', () =>
+  expectJS(`
+    a += (b = 1, c());
+    a.x *= (b++, c());
+  `).toMatchInlineSnapshot(`
+    b = 1;
+    a += c();
+    b++;
+    a.x *= c();
+  `));
+
+test('dont rearrange assignment when the target changes', () => {
+  // the value of the target is read first
+  expectJS(`
+    a += (a = 1, b());
+    a -= ([a] = b, 1);
+    a *= (a++, 1);
+    a += (b(), 1);
+    a.x += (b(), 1);
+    a.x += (b.x = 1, 1);
+    a.x += (delete b.x, 1);
+  `).toMatchInlineSnapshot(`
+    a += (a = 1, b());
+    a -= ([a] = b, 1);
+    a *= (a++, 1);
+    a += (b(), 1);
+    a.x += (b(), 1);
+    a.x += (b.x = 1, 1);
+    a.x += (delete b.x, 1);
+  `);
+
+  // the base object and the key are evaluated first
+  expectJS(`
+    a.x = (a = {}, b());
+    a.x = (b(), [a] = b, c());
+    a[x] = (x = 1, b());
+    a.x = (x = 1, b());
+  `).toMatchInlineSnapshot(`
+    a.x = (a = {}, b());
+    a.x = (b(), [a] = b, c());
+    a[x] = (x = 1, b());
+    x = 1;
+    a.x = b();
+  `);
+});
+
 // appears in some obfuscator.io forks
 test('simplify computed property with only literals', () =>
   expectJS(`
