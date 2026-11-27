@@ -42,3 +42,22 @@ test('keep substitutions of tagged templates', () => {
   // a nested untagged template is still inlined
   expectJS('tag`${`a${"x"}b`}`;').toMatchInlineSnapshot(`tag\`\${\`axb\`}\`;`);
 });
+
+test('escape NUL before decimal digit', () => {
+  expectJS('const a = `${"\\0"}1`;').toMatchInlineSnapshot(
+    `const a = \`\\x001\`;`,
+  );
+  expectJS('const a = `${"\\x001"}`;').toMatchInlineSnapshot(
+    `const a = \`\\x001\`;`,
+  );
+  expectJS('const a = `${"\\0"}`;').toMatchInlineSnapshot(`const a = \`\\0\`;`);
+  expectJS('const a = `\\0${"1"}`;').toMatchInlineSnapshot(
+    `const a = \`\\x001\`;`,
+  );
+  expectJS('const a = `\\0${""}1`;').toMatchInlineSnapshot(
+    `const a = \`\\x001\`;`,
+  );
+  expectJS('const a = `\\\\0${"1"}`;').toMatchInlineSnapshot(
+    `const a = \`\\\\01\`;`,
+  );
+});
