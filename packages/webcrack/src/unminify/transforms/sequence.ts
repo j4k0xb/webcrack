@@ -2,6 +2,56 @@ import * as t from '@babel/types';
 import * as m from '@codemod/matchers';
 import { safeLiteral, type Transform } from '../../ast-utils';
 
+/**
+ * Whether the expressions could change the target of the assignment when they are evaluated before it.
+ * Its base object and key are evaluated before the right side, and for `+=` etc. its current value too.
+ */
+function affectsTarget(
+  { left, operator }: t.AssignmentExpression,
+  expressions: t.Expression[],
+): boolean {
+  const isMember = t.isMemberExpression(left);
+  const readsValue = operator !== '=';
+  const targets: t.Node[] = !isMember
+    ? [left]
+    : left.computed
+      ? [left.object, left.property]
+      : [left.object];
+  const isTarget = (name: string) =>
+    targets.some((node) => t.isIdentifier(node, { name }));
+
+  if (!isMember && !readsValue) return false;
+
+  return expressions.some((expression) => {
+    let result = false;
+    t.traverseFast(expression, (node) => {
+      if (t.isAssignmentExpression(node) || t.isUpdateExpression(node)) {
+        result ||= Object.keys(t.getBindingIdentifiers(node)).some(isTarget);
+      }
+      if (readsValue) {
+        result ||=
+          t.isCallExpression(node) ||
+          t.isOptionalCallExpression(node) ||
+          t.isNewExpression(node) ||
+          t.isTaggedTemplateExpression(node) ||
+          t.isAwaitExpression(node) ||
+          t.isYieldExpression(node) ||
+          // another reference to the same object
+          (isMember && writesProperty(node));
+      }
+    });
+    return result;
+  });
+}
+
+function writesProperty(node: t.Node): boolean {
+  return (
+    (t.isAssignmentExpression(node) && !t.isIdentifier(node.left)) ||
+    (t.isUpdateExpression(node) && !t.isIdentifier(node.argument)) ||
+    t.isUnaryExpression(node, { operator: 'delete' })
+  );
+}
+
 export default {
   name: 'sequence',
   tags: ['safe'],
@@ -78,6 +128,8 @@ export default {
           if (!assignmentMatcher.match(path.node)) return;
 
           const { expressions } = assignedSequence.current!;
+          if (affectsTarget(path.node, expressions.slice(0, -1))) return;
+
           path.node.right = expressions.pop()!;
           const newNodes = path.parentPath.isExpressionStatement()
             ? expressions.map(t.expressionStatement)
